@@ -263,6 +263,11 @@ toc: h2,h3
                 <span class="luz-icon-name" id="c-icons-volume-off">Volume off</span>
                 <button type="button" class="luz-copy-btn" id="c-icons-volume-off-copy" aria-labelledby="c-icons-volume-off-copy c-icons-volume-off" data-copy="&lt;svg viewBox=&quot;0 0 24 24&quot; width=&quot;24&quot; height=&quot;24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.5&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot; aria-hidden=&quot;true&quot; focusable=&quot;false&quot;&gt;&lt;path d=&quot;M4 9.5h3.5L12 5.5v13l-4.5-4H4v-5ZM16 9.5l5 5M21 9.5l-5 5&quot;/&gt;&lt;/svg&gt;">Copy SVG</button>
               </li>
+              <li class="luz-icon-item">
+                <span class="luz-icon-display"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="7" cy="5.5" r="2.25"/><circle cx="7" cy="18.5" r="2.25"/><circle cx="17" cy="7" r="2.25"/><path d="M7 7.75v8.5M17 9.25c0 4.5-10 3-10 7"/></svg></span>
+                <span class="luz-icon-name" id="c-icons-git-branch">Git branch</span>
+                <button type="button" class="luz-copy-btn" id="c-icons-git-branch-copy" aria-labelledby="c-icons-git-branch-copy c-icons-git-branch" data-copy="&lt;svg viewBox=&quot;0 0 24 24&quot; width=&quot;24&quot; height=&quot;24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.5&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot; aria-hidden=&quot;true&quot; focusable=&quot;false&quot;&gt;&lt;circle cx=&quot;7&quot; cy=&quot;5.5&quot; r=&quot;2.25&quot;/&gt;&lt;circle cx=&quot;7&quot; cy=&quot;18.5&quot; r=&quot;2.25&quot;/&gt;&lt;circle cx=&quot;17&quot; cy=&quot;7&quot; r=&quot;2.25&quot;/&gt;&lt;path d=&quot;M7 7.75v8.5M17 9.25c0 4.5-10 3-10 7&quot;/&gt;&lt;/svg&gt;">Copy SVG</button>
+              </li>
             </ul>
             <p class="docs-demo__note">The logo is not an icon of the set: it is filled, in four shades of the text colour, on its own 32 × 32 grid. Copy it as it is; do not draw it with a stroke.</p>
             <ul class="luz-icon-grid">
@@ -356,6 +361,7 @@ toc: h2,h3
   &lt;symbol id=&quot;luz-icon-pause&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;rect x=&quot;6&quot; y=&quot;5&quot; width=&quot;4&quot; height=&quot;14&quot; rx=&quot;1&quot;/&gt;&lt;rect x=&quot;14&quot; y=&quot;5&quot; width=&quot;4&quot; height=&quot;14&quot; rx=&quot;1&quot;/&gt;&lt;/symbol&gt;
   &lt;symbol id=&quot;luz-icon-volume&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;path d=&quot;M4 9.5h3.5L12 5.5v13l-4.5-4H4v-5ZM16 9a4.5 4.5 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11&quot;/&gt;&lt;/symbol&gt;
   &lt;symbol id=&quot;luz-icon-volume-off&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;path d=&quot;M4 9.5h3.5L12 5.5v13l-4.5-4H4v-5ZM16 9.5l5 5M21 9.5l-5 5&quot;/&gt;&lt;/symbol&gt;
+  &lt;symbol id=&quot;luz-icon-git-branch&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;circle cx=&quot;7&quot; cy=&quot;5.5&quot; r=&quot;2.25&quot;/&gt;&lt;circle cx=&quot;7&quot; cy=&quot;18.5&quot; r=&quot;2.25&quot;/&gt;&lt;circle cx=&quot;17&quot; cy=&quot;7&quot; r=&quot;2.25&quot;/&gt;&lt;path d=&quot;M7 7.75v8.5M17 9.25c0 4.5-10 3-10 7&quot;/&gt;&lt;/symbol&gt;
 &lt;/svg&gt;
 
 &lt;svg width=&quot;24&quot; height=&quot;24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;2&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot; aria-hidden=&quot;true&quot; focusable=&quot;false&quot;&gt;&lt;use href=&quot;#luz-icon-cart&quot;/&gt;&lt;/svg&gt;</code></pre>
@@ -408,7 +414,7 @@ toc: h2,h3
             <p>A <code>&lt;ul&gt;</code> of icons, styled by <code>components/icon-grid.css</code>. The copy buttons are <a href="/docs/components/copy-button/">copy buttons</a>, wired by <code>clipboard.js</code>.</p>
             <ul>
               <li>Each button carries the icon's SVG, escaped, in <code>data-copy</code>.</li>
-              <li>The 50 icons are LUZ's own, drawn for it on a 24 × 24 grid with a 1.5 px round stroke in <code>currentColor</code>. They are not a package and no file is loaded: copy the SVG, or the sprite, into your page.</li>
+              <li>The 51 icons are LUZ's own, drawn for it on a 24 × 24 grid with a 1.5 px round stroke in <code>currentColor</code>. They are not a package and no file is loaded: copy the SVG, or the sprite, into your page.</li>
               <li>An icon is 24 × 24 px as written, and 16 px inside a <code>.luz-btn</code>. For an icon that must follow the text size, set <code>width="1.5em" height="1.5em"</code>.</li>
             </ul>
             <h3 id="no-js">Without JavaScript</h3>
@@ -433,7 +439,7 @@ toc: h2,h3
               <li>For a row of actions, use buttons with text in an <a href="/docs/components/layout/#objects-actions">action group</a>.</li>
               <li>Never use an icon as the only label of an action: give it its name as text, visible or in a <code>.u-sr-only</code> span.</li>
               <li>For a logo or an illustration, use an <code>&lt;img&gt;</code> or an SVG at its own size.</li>
-              <li>For hundreds of icons, bring your own set: LUZ's has 50.</li>
+              <li>For hundreds of icons, bring your own set: LUZ's has 51.</li>
             </ul>
             <h3 id="do-dont">Do and don't</h3>
             <div class="luz-do-dont">
