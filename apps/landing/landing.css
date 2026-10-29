@@ -3096,12 +3096,39 @@ html[data-native="b"] .landing-typed__modes {
   position: absolute;
 }
 
-/* The outline icons of the page (1.6 wide, round ends): drawn by this class
+/* The outline icons of the page (1.5 wide on 24, round ends, as the Icons page): drawn by this class
    instead of by the same five attributes on each of their paths */
 .ic {
   fill: none;
   stroke: currentcolor;
-  stroke-width: 1.6;
+  stroke-width: 1.5;
   stroke-linecap: round;
   stroke-linejoin: round;
+}
+
+/* PROTO hero order: on a phone the buttons stack and "Get started with AI"
+   leads; from 641px up the row keeps the source order, AI in the middle */
+@media (max-width: 640px) {
+  .landing-hero__ai {
+    order: -1;
+  }
+}
+
+/* PROTO light bar: only the slider under the hero; the place, the light and
+   the hour stay in the slider's aria-valuetext */
+.landing-light home-light .home-light__where,
+.landing-light home-light .home-light__time {
+  display: none;
+}
+
+/* PROTO light bar: closed on every width, opened from the phrase as on a
+   phone; the desktop's resting 70% and no-entrance were for a bar always there */
+@media (min-width: 1024px) and (hover: hover) {
+  .landing-light home-light .home-light__bar {
+    opacity: 1;
+  }
+
+  .landing-light home-light .home-light__bar:not([hidden]) {
+    animation: home-light-bar var(--luz-duration-slower) var(--_ease);
+  }
 }

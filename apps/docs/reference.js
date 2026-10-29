@@ -357,6 +357,8 @@ function initCopy() {
 
 const VARIANTS = new Set(["primary", "secondary", "outline", "ghost", "danger"]);
 const SIZES = new Set(["sm", "lg"]);
+const ICONS = new Set(["start", "end", "only"]);
+const LABEL = "Save changes";
 
 /**
  * Try it (the Button page): the form is hidden in the markup, so without a
@@ -370,6 +372,7 @@ function initTryIt() {
   const code = form?.querySelector("pre.luz-code-block code");
   if (!form || !button || !code) return;
   const copy = form.querySelector(".luz-copy-btn[data-copy-from]");
+  const icon = form.querySelector("template.docs-try__icon")?.content.firstElementChild;
   const render = () => {
     const value = (name) => form.querySelector(`input[name="${name}"]:checked`)?.value;
     const variant = value("variant");
@@ -378,6 +381,20 @@ function initTryIt() {
     if (SIZES.has(size)) classes.push(`luz-btn--${size}`);
     if (value("block")) classes.push("luz-btn--block");
     button.className = classes.join(" ");
+    // The icon: before or after the label, or alone with the label for screen readers only
+    const where = value("icon");
+    const parts = [LABEL];
+    if (icon && ICONS.has(where)) {
+      if (where === "only") {
+        const name = document.createElement("span");
+        name.className = "u-sr-only";
+        name.textContent = LABEL;
+        parts[0] = name;
+      }
+      parts.splice(where === "end" ? 1 : 0, 0, icon.cloneNode(true));
+    }
+    // One part a line in the code, as a person would write it
+    button.replaceChildren(...(parts.length > 1 ? parts.flatMap((part) => ["\n  ", part]).concat("\n") : parts));
     code.textContent = button.outerHTML;
     highlightBlock(code.closest("pre"));
     // initCopy() took the text once, at load: give the button the new one

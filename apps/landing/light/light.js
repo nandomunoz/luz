@@ -31,7 +31,8 @@
 
 const DEG = Math.PI / 180;
 // A desktop with a pointer that hovers: the bar is always there, resting faint until the pointer or the focus comes (light.css)
-const RESTING = "(min-width: 1024px) and (hover: hover)";
+// PROTO light bar: no width keeps the bar open; it opens from its line everywhere (was "(min-width: 1024px) and (hover: hover)")
+const RESTING = "not all";
 // A place for each common time zone, latitude and longitude; another zone gets its offset's meridian at 30°
 const PLACES = {
   "Europe/Madrid": [40.42, -3.7], "Atlantic/Canary": [28.1, -15.4], "Europe/Lisbon": [38.72, -9.14],
