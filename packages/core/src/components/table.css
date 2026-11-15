@@ -135,8 +135,8 @@
   /* Visually hidden thead — kept in DOM for screen readers */
   .luz-table thead {
     position: absolute;
-    width: 1px;
-    height: 1px;
+    inline-size: 1px;
+    block-size: 1px;
     padding: 0;
     margin: -1px;
     overflow: hidden;

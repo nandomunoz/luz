@@ -130,8 +130,8 @@
   border-block-end-style: dashed;
 }
 
-/* The colour scheme of the date and time pickers and of the open list of a
-   select follows the colour mode, through one hook, --luz-scheme, read by the
+/* The colour scheme of the date and time pickers, of the open list of a
+   select and of the box of a checkbox and a radio follows the colour mode, through one hook, --luz-scheme, read by the
    controls below: dark in a dark mode, and in the system's dark when the page
    names no mode (the case of the tokens' own @media blocks: no data-mode, no
    data-theme, no radio checked but Auto). High contrast is light. */
@@ -266,6 +266,7 @@
   block-size: 1.125rem;
   flex: none;
   accent-color: var(--luz-brand-fill);
+  color-scheme: var(--luz-scheme, light);
   cursor: pointer;
 }
 

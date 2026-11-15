@@ -9,7 +9,7 @@
 .luz-tag {
   display: inline-flex;
   align-items: center;
-  min-height: 24px;
+  min-block-size: 24px;
   padding: 0 var(--luz-space-xs);
   font-size: var(--luz-text-xs);
   font-weight: 400;
@@ -52,8 +52,8 @@
 .luz-tag--dot::before {
   content: "";
   display: inline-block;
-  width: 6px;
-  height: 6px;
+  inline-size: 6px;
+  block-size: 6px;
   border-radius: 50%;
   background: currentcolor;
 }
@@ -62,8 +62,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 20px;
-  min-height: 20px;
+  min-inline-size: 20px;
+  min-block-size: 20px;
   padding: 1px var(--luz-space-2xs) 0; /* the mono face leaves descender room: the digits sit about 1 px high without it */
   font-size: var(--luz-text-xs);
   line-height: 1;

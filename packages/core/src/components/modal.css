@@ -44,8 +44,8 @@
   align-items: center;
   justify-content: center;
   /* 24×24 minimum target (WCAG 2.5.8) */
-  min-width: var(--luz-control-sm);
-  min-height: var(--luz-control-sm);
+  min-inline-size: var(--luz-control-sm);
+  min-block-size: var(--luz-control-sm);
   background: none;
   border: none;
   cursor: pointer;

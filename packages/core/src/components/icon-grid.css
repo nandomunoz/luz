@@ -29,8 +29,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 48px;
-  height: 48px;
+  inline-size: 48px;
+  block-size: 48px;
   border-radius: var(--luz-radius-md);
   color: var(--luz-text-secondary);
   background: transparent;
