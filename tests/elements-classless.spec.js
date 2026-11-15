@@ -18,6 +18,7 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { MODES, contrast } from './helpers/design-tokens.js';
+import { near, readPoints } from './helpers/pixels.js';
 
 const FIXTURE = '/tests/fixtures/elements-bare.html';
 
@@ -686,6 +687,118 @@ test.describe('accessibility of the bare elements', () => {
       await open(page, { mode });
       const { violations } = await new AxeBuilder({ page }).include('#page').withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa']).analyze();
       expect(violations.filter((v) => ['serious', 'critical'].includes(v.impact ?? '')).map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`)).toEqual([]);
+    });
+  }
+});
+
+/**
+ * The box of a checkbox and a radio, drawn by the browser, takes the colour scheme of the page through the
+ * same hook as the date and time pickers (--luz-scheme). Before, the unchecked box was white in dark.
+ * (DESIGN.md: the item "Checkbox and radio in dark (bare)" of Open.)
+ */
+test.describe('the box of a bare checkbox and radio follows the colour mode', () => {
+  const CONTROLS = ['#bc-chk', '#bc-rad'];
+
+  /** Controls with no class, unchecked and enabled, and one inside a .luz-check-item, appended to the page. */
+  async function addControls(page) {
+    await page.evaluate(() => {
+      const wrap = document.createElement('div');
+      wrap.id = 'bc';
+      const make = (id, type, label, cls) => {
+        const l = document.createElement('label');
+        if (cls) l.className = cls;
+        const i = document.createElement('input');
+        Object.assign(i, { id, type, name: `n-${id}` });
+        l.append(i, ` ${label}`);
+        wrap.append(l);
+      };
+      make('bc-chk', 'checkbox', 'Bare checkbox');
+      make('bc-rad', 'radio', 'Bare radio');
+      make('bc-item', 'checkbox', 'Component checkbox', 'luz-check-item');
+      document.body.prepend(wrap);
+    });
+  }
+
+  /** The page in a mode named by an attribute of <html>, or in none (`attr` null), under the emulated scheme of the system. */
+  async function openIn(page, { attr = null, mode = null, system = 'light' }) {
+    await page.emulateMedia({ reducedMotion: 'reduce', colorScheme: system });
+    await page.goto(FIXTURE);
+    await page.evaluate(([a, m]) => {
+      document.documentElement.removeAttribute('data-theme');
+      if (a) document.documentElement.setAttribute(a, m);
+    }, [attr, mode]);
+    await addControls(page);
+  }
+
+  /** The pixel in the middle of the control (the fill of an unchecked box), or, when `gap`, one in the space just after it. */
+  async function fill(page, id, gap = false) {
+    await page.locator(id).scrollIntoViewIfNeeded();
+    const box = await page.locator(id).boundingBox();
+    const [width, height] = [Math.ceil(box?.width ?? 1), Math.ceil(box?.height ?? 1)];
+    const clip = { x: Math.floor(box?.x ?? 0), y: Math.floor(box?.y ?? 0), width: width + (gap ? 3 : 0), height };
+    const png = await page.screenshot({ clip });
+    return (await readPoints(page, png, [[gap ? width + 1 : Math.floor(width / 2), Math.floor(height / 2)]]))[0];
+  }
+
+  const CASES = [
+    ['data-theme="dark"', { attr: 'data-theme', mode: 'dark' }, 'dark'],
+    ['data-mode="dark"', { attr: 'data-mode', mode: 'dark' }, 'dark'],
+    ['the system in dark and no mode named', { system: 'dark' }, 'dark'],
+    ['data-theme="light"', { attr: 'data-theme', mode: 'light' }, 'light'],
+    ['data-theme="high-contrast"', { attr: 'data-theme', mode: 'high-contrast' }, 'light'],
+    ['data-mode="high-contrast" under the system in dark', { attr: 'data-mode', mode: 'high-contrast', system: 'dark' }, 'light'],
+    ['data-theme="light" under the system in dark', { attr: 'data-theme', mode: 'light', system: 'dark' }, 'light'],
+    ['the system in light and no mode named', { system: 'light' }, 'light'],
+  ];
+
+  for (const [name, opts, scheme] of CASES) {
+    test(`the computed colour scheme of the checkbox and the radio is ${scheme} with ${name}`, async ({ page }) => {
+      await openIn(page, opts);
+      for (const id of CONTROLS) expect(await value(page, id, 'color-scheme'), id).toBe(scheme);
+    });
+  }
+
+  test('a radio of luz-theme-mode checked on dark makes the box dark', async ({ page }) => {
+    await openIn(page, { attr: null });
+    await page.evaluate(() => {
+      const radio = Object.assign(document.createElement('input'), { type: 'radio', name: 'luz-theme-mode', value: 'dark', checked: true });
+      radio.hidden = true;
+      document.body.append(radio);
+    });
+    for (const id of CONTROLS) expect(await value(page, id, 'color-scheme'), id).toBe('dark');
+  });
+
+  for (const id of CONTROLS) {
+    test(`the unchecked box of ${id} is not white in dark and is white in light`, async ({ page }) => {
+      await openIn(page, { attr: 'data-theme', mode: 'dark' });
+      const dark = await fill(page, id);
+      expect(Math.max(...dark.slice(0, 3)), `dark: the fill is ${dark.join(',')}`).toBeLessThan(128);
+      expect(near(dark, [255, 255, 255], 40), `dark: the fill ${dark.join(',')} is not white`).toBe(false);
+
+      await openIn(page, { attr: 'data-theme', mode: 'light' });
+      const light = await fill(page, id);
+      expect(Math.min(...light.slice(0, 3)), `light: the fill is ${light.join(',')}`).toBeGreaterThan(200);
+    });
+
+    test(`the unchecked box of ${id} is not white under the system's dark with no mode named`, async ({ page }) => {
+      await openIn(page, { system: 'dark' });
+      const dark = await fill(page, id);
+      expect(Math.max(...dark.slice(0, 3)), `the fill is ${dark.join(',')}`).toBeLessThan(128);
+    });
+  }
+
+  for (const mode of ['light', 'dark']) {
+    test(`a .luz-check-item keeps the box of its component in ${mode}`, async ({ page }) => {
+      await openIn(page, { attr: 'data-theme', mode });
+      const css = await read(page, '#bc-item', ['appearance', 'border-top-width', 'border-top-color', 'background-color']);
+      expect(css.appearance).toBe('none');
+      expect(css['border-top-width']).toBe('2px');
+      expect(css['border-top-color']).toBe(await color(page, '#bc-item', '--luz-outline'));
+      expect(css['background-color']).toBe('rgba(0, 0, 0, 0)');
+      // The inside of the box is the page behind it, not the white or the grey of a browser control
+      const inside = await fill(page, '#bc-item');
+      const behind = await fill(page, '#bc-item', true);
+      expect(near(inside, behind, 8), `the inside ${inside.join(',')} is the page ${behind.join(',')}`).toBe(true);
     });
   }
 });

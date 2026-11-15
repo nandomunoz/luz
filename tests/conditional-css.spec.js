@@ -174,6 +174,13 @@ test.describe('luz.conditional.css: inside the zone, the bare elements are LUZ\'
     expect(await value(page, '#legacy-button', 'padding-left')).toBe(await tokenOf(page, '#legacy-button', 'padding-left', '--luz-space-lg'));
     expect(await value(page, '#zone-button', 'padding-left')).not.toBe(await tokenOf(page, '#zone-button', 'padding-left', '--luz-space-lg'));
   });
+
+  for (const [mode, scheme] of [['dark', 'dark'], ['light', 'light'], ['high-contrast', 'light']]) {
+    test(`the checkbox of the zone takes the colour scheme of the mode: ${scheme} in ${mode}`, async ({ page }) => {
+      await open(page, mode);
+      expect(await value(page, '#zone-checkbox', 'color-scheme')).toBe(scheme);
+    });
+  }
 });
 
 test.describe('luz.conditional.css: a component works outside the zone', () => {
