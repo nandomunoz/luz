@@ -1,7 +1,7 @@
 <!-- luz:page
 title: Formularios
 description: Controles y la estructura que los rodea. Los botones, los campos, las listas de selección, los label y los fieldset tienen estilos sin clase, y también output, meter y progress. Una clase .luz-* añade un papel, un tamaño o las partes que un elemento sin clase no puede expresar.
-source: 1d04b491b772
+source: df08b8bb2ea4
 reviewed: false
 -->
     <div class="docs-block elements-section" id="cat-forms" data-category="forms">
@@ -202,7 +202,7 @@ reviewed: false
             <pre class="luz-code-block" data-lang="html" tabindex="0" role="region" aria-label="meter markup"><code id="code-meter">&lt;label for=&quot;d-meter&quot;&gt;Storage used, 6 of 10 GB&lt;/label&gt;
 &lt;meter id=&quot;d-meter&quot; min=&quot;0&quot; max=&quot;10&quot; low=&quot;3&quot; high=&quot;8&quot; optimum=&quot;2&quot; value=&quot;6&quot;&gt;6 of 10 GB&lt;/meter&gt;</code></pre>
           </div>
-          <p class="elements-card__style">Con estilos de <code>elements/forms.css</code>, sin clase: el tamaño de la barra. El navegador dibuja sus colores; <code>.luz-meter</code> los dibuja en el color de marca.</p>
+          <p class="elements-card__style">Con estilos de <code>elements/forms.css</code>, sin clase: el tamaño de la barra. El navegador dibuja sus colores y su pista, que está por debajo de 3:1 frente a la superficie. Para una pista con contraste, usa <code>.luz-meter</code>, que los dibuja en el color de marca.</p>
         </article>
 
         <article class="elements-card" id="el-optgroup" data-element="optgroup" aria-labelledby="el-optgroup-title">
@@ -320,7 +320,7 @@ reviewed: false
 &lt;label for=&quot;d-progress-wait&quot;&gt;Working&lt;/label&gt;
 &lt;progress id=&quot;d-progress-wait&quot;&gt;Working&lt;/progress&gt;</code></pre>
           </div>
-          <p class="elements-card__style">Con estilos de <code>elements/forms.css</code>, sin clase: el tamaño de la barra y el color de marca de su relleno. <code>.luz-progress</code> dibuja ella misma la pista y el relleno.</p>
+          <p class="elements-card__style">Con estilos de <code>elements/forms.css</code>, sin clase: el tamaño de la barra y el color de marca de su relleno. Su pista es la del navegador, por debajo de 3:1 frente a la superficie. Para una pista con contraste, usa <code>.luz-progress</code>, que dibuja ella misma la pista y el relleno.</p>
         </article>
 
         <article class="elements-card" id="el-select" data-element="select" aria-labelledby="el-select-title">
@@ -469,7 +469,7 @@ reviewed: false
             </li>
             <li class="elements-type" id="it-range">
               <p class="elements-type__name"><code>type=&quot;range&quot;</code></p>
-              <p class="elements-type__desc">Un control deslizante entre <code>min</code> y <code>max</code>. No muestra el valor: acompáñalo de un elemento <code>output</code>.</p>
+              <p class="elements-type__desc">Un control deslizante entre <code>min</code> y <code>max</code>. No muestra el valor: acompáñalo de un elemento <code>output</code>. Su pista es la del navegador, por debajo de 3:1 frente a la superficie.</p>
               <div class="elements-type__stage"><input type="range" min="0" max="100" value="40" aria-label="Rango"></div>
             </li>
             <li class="elements-type" id="it-reset">
