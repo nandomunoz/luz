@@ -46,7 +46,7 @@ npx @luz-ds/tokens@0.3.0 check-contrast my-theme.css
 npx @luz-ds/tokens@0.3.0 check-contrast base.css my-theme.css --json
 ```
 
-Exit code `0` when every pair passes, `1` when one fails or a color could not be read, `2` for a usage or file error. What it reads, and what it reports as not read, is on [the contrast page of the docs](https://nandovejer.github.io/luz/docs/tokens/contrast/).
+Exit code `0` when every pair passes, `1` when one fails or a color could not be read, `2` for a usage or file error. What it reads, and what it reports as not read, is on [the contrast page of the docs](https://nandomunoz.github.io/luz/docs/tokens/contrast/).
 
 ## What's included
 
@@ -97,7 +97,7 @@ Three tokens set the size of the whole type and space scales. Set them on `:root
 }
 ```
 
-Every `--luz-text-*` and `--luz-space-*` step is computed from them. At the defaults the sizes are the same as before the knobs existed. A knob set on `body` or on a section changes nothing: the steps are resolved on `:root`. Components read the steps, never the knobs. The page [Make it yours](https://nandovejer.github.io/luz/docs/get-started/make-it-yours/) has the tested ranges and a table of presets.
+Every `--luz-text-*` and `--luz-space-*` step is computed from them. At the defaults the sizes are the same as before the knobs existed. A knob set on `body` or on a section changes nothing: the steps are resolved on `:root`. Components read the steps, never the knobs. The page [Make it yours](https://nandomunoz.github.io/luz/docs/get-started/make-it-yours/) has the tested ranges and a table of presets.
 
 ## Fonts
 
@@ -128,9 +128,9 @@ Older versions: https://github.com/nandomunoz/luz/blob/main/packages/tokens/CHAN
 ### Read first
 
 1. `dist/classes.json` in this package: the classes and custom properties its CSS defines. Write only those.
-2. https://nandovejer.github.io/luz/llms.txt: the index of the documentation, short enough for a small context.
-3. https://nandovejer.github.io/luz/llms-full.txt: the same pages in full.
-4. https://nandovejer.github.io/luz/examples/: one standalone page of markup for each component and pattern.
+2. https://nandomunoz.github.io/luz/llms.txt: the index of the documentation, short enough for a small context.
+3. https://nandomunoz.github.io/luz/llms-full.txt: the same pages in full.
+4. https://nandomunoz.github.io/luz/examples/: one standalone page of markup for each component and pattern.
 
 ### Load order
 
