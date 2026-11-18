@@ -57,5 +57,5 @@ Use the head at the top of every page of a documentation site, so a reader finds
 Do not use the head for the banner of the site: it holds the page's `h1`.
 
 - One head per page. A section of a long page has an `h2`, not another head.
-- For the header of an article in a blog, use [the CMS article header](https://nandovejer.github.io/luz/docs/cms/article-header/).
-- A landing page opens with [the hero](https://nandovejer.github.io/luz/docs/landing/hero/).
+- For the header of an article in a blog, use [the CMS article header](https://nandomunoz.github.io/luz/docs/cms/article-header/).
+- A landing page opens with [the hero](https://nandomunoz.github.io/luz/docs/landing/hero/).

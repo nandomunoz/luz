@@ -8,7 +8,7 @@ It cannot be closed: a close button needs a script, and a choice that lasts from
 In a browser without CSS anchor positioning (before Chrome and Edge 125, Safari 26, Firefox 147), the header’s menu at 768 px and below opens at the top of the window, so before the page scrolls it covers part of the header under a banner; Escape or a click outside closes it.
 
 ### Copy the markup
-A `<luz-banner>` around one `<section>` named by its first words, after the [skip link](https://nandovejer.github.io/luz/docs/components/skip-link/) and the [cookie consent](https://nandovejer.github.io/luz/docs/site/consent/), before the header of the page (a [landing](https://nandovejer.github.io/luz/docs/landing/header/) or [CMS](https://nandovejer.github.io/luz/docs/cms/header/) header).
+A `<luz-banner>` around one `<section>` named by its first words, after the [skip link](https://nandomunoz.github.io/luz/docs/components/skip-link/) and the [cookie consent](https://nandomunoz.github.io/luz/docs/site/consent/), before the header of the page (a [landing](https://nandomunoz.github.io/luz/docs/landing/header/) or [CMS](https://nandomunoz.github.io/luz/docs/cms/header/) header).
 
 Banner markup
 ```html
@@ -32,7 +32,7 @@ CSS from `@luz-ds/site`. No JavaScript: `<luz-banner>` is a tag that no script e
 - It is a band of the page, in the flow: it scrolls away with the page, and an `.o-sticky` header stays at the top under it. Nothing covers the page.
 - Its inline padding lines its text up with the header’s row, up to `--luz-content-max` wide, in either direction of text.
 - There is no close button. Closing it for good needs a script and a value stored in the browser, and a button that does nothing without a script is never shown. A banner is short-lived: remove it from the markup when the event is over.
-- There is no success or error tone: a banner is not the answer to something the visitor did. For that use an [alert](https://nandovejer.github.io/luz/docs/components/alert/) in the page.
+- There is no success or error tone: a banner is not the answer to something the visitor did. For that use an [alert](https://nandomunoz.github.io/luz/docs/components/alert/) in the page.
 
 ### Without JavaScript
 Nothing changes: there is no script.
@@ -46,10 +46,10 @@ Nothing changes: there is no script.
 Use it for one short, timely thing every visitor of the site should know, on every page, for a few days: a sale, an event, planned maintenance, a change of opening hours.
 
 ### When not to use
-Do not use it for something that belongs to one page or to one visitor: put that in the page, or answer with an [alert](https://nandovejer.github.io/luz/docs/components/alert/) or a [toast](https://nandovejer.github.io/luz/docs/components/toast/).
+Do not use it for something that belongs to one page or to one visitor: put that in the page, or answer with an [alert](https://nandomunoz.github.io/luz/docs/components/alert/) or a [toast](https://nandomunoz.github.io/luz/docs/components/toast/).
 
 - Do not show two banners at once, and do not leave one up for months: a band that never changes is no longer read.
-- Do not use it to ask for cookies: use the [cookie consent](https://nandovejer.github.io/luz/docs/site/consent/) banner.
+- Do not use it to ask for cookies: use the [cookie consent](https://nandomunoz.github.io/luz/docs/site/consent/) banner.
 - Do not put a form or more than one link in it.
 
 It replaces the announcement bars a site builds with its own CSS. Nothing in LUZ is removed.

@@ -111,7 +111,7 @@ The element looks for the first `.luz-timeline` inside it; with none, it does no
 - **The rail.** The current date is scrolled to the middle, with a smooth scroll only if the visitor has not asked for reduced motion. A keyboard move keeps the focus on the new current date, and so does a change that hides the card the focus was in.
 - **Vertical.** The script marks the item crossing the middle of the screen `data-luz-state="active"` and the ones before it `past`. The line behind a past item takes the brand colour, and the active dot is filled and larger. It runs with reduced motion too, without the transition.
 - **Autoplay.** With `autoplay`, the item changes every `interval` milliseconds, in a loop. The Pause button under the rail stops it; it then reads Play and starts it again. The timeline also waits, without a change to the button, while the pointer moves over it (it goes on after 4 seconds still, or when the pointer leaves), while the keyboard focus is inside it, while less than half of it is on screen and while the tab is hidden. With reduced motion it never starts and the button is not shown.
-- **Text.** "Previous", "Next", "Pause" and "Play" are in the language of the page when LUZ ships it (English, Spanish), chosen by the nearest `lang`, or yours through `registerLocale()` and `data-luz-label-*`. They travel with the script, so `@luz-ds/core/timeline` works on its own. With `luz.js` on the page, a language you add with `registerLocale()` reaches them too. See [the JavaScript modules](https://nandovejer.github.io/luz/docs/get-started/javascript/).
+- **Text.** "Previous", "Next", "Pause" and "Play" are in the language of the page when LUZ ships it (English, Spanish), chosen by the nearest `lang`, or yours through `registerLocale()` and `data-luz-label-*`. They travel with the script, so `@luz-ds/core/timeline` works on its own. With `luz.js` on the page, a language you add with `registerLocale()` reaches them too. See [the JavaScript modules](https://nandomunoz.github.io/luz/docs/get-started/javascript/).
 
 ### Without JavaScript
 An ordered list, with every item visible: a line down the inline-start side with a dot at each item, then the date, the title and the text. The list looks the same before the script has defined the element, so nothing jumps when it does.
@@ -141,6 +141,6 @@ Use a timeline for a short run of events with dates, where the order is the poin
 Do not use a timeline for steps the reader has to follow in order, or for events without dates.
 
 - For a process, use a numbered list.
-- To compare events across attributes, use a [table](https://nandovejer.github.io/luz/docs/components/table/).
+- To compare events across attributes, use a [table](https://nandomunoz.github.io/luz/docs/components/table/).
 - When the reader needs to see every item at once, use the vertical layout: the horizontal one shows a single card.
 - Do not turn on autoplay for content the reader must not miss. Nobody has to wait for the next card.

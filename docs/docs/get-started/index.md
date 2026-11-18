@@ -2,7 +2,7 @@
 
 Pick a level, then copy one install command or the CDN tags. Each level needs the ones below it and nothing above.
 
-Know what you are building? [Choose your snippet](https://nandovejer.github.io/luz/docs/get-started/snippet/) and copy the lines for it, CDN hashes included.
+Know what you are building? [Choose your snippet](https://nandomunoz.github.io/luz/docs/get-started/snippet/) and copy the lines for it, CDN hashes included.
 
 Beta
 
@@ -13,7 +13,7 @@ Names, classes and behaviour can still change before the stable release. Pin an 
 - **Your own components, LUZ's colours and spacing:** level 1, tokens only.
 - **Ready-made buttons, forms, tables and dialogs:** level 2, tokens and core.
 - **Whole pages: shell, page header, footer, search:** level 3, all three packages.
-- **A landing page, with its header, hero and blocks:** level 3 and [a package for that kind of site](https://nandovejer.github.io/luz/docs/get-started/#site-kinds).
+- **A landing page, with its header, hero and blocks:** level 3 and [a package for that kind of site](https://nandomunoz.github.io/luz/docs/get-started/#site-kinds).
 
 ### Level 1: tokens only
 
@@ -35,7 +35,7 @@ import "@luz-ds/tokens/css";
 
 - Running text and headings use ET Book, an MIT-licensed font that ships with the tokens. Controls, labels and tables use the system sans, and code the system mono.
 - Bringing your own fonts? Load `dist/tokens.min.css` instead: the same tokens without any `@font-face`.
-- Check your own colours against the WCAG ratios with `npx @luz-ds/tokens check-contrast`, or [in the browser](https://nandovejer.github.io/luz/docs/tokens/contrast/).
+- Check your own colours against the WCAG ratios with `npx @luz-ds/tokens check-contrast`, or [in the browser](https://nandomunoz.github.io/luz/docs/tokens/contrast/).
 
 ### Level 2: tokens and core
 
@@ -61,9 +61,9 @@ import "@luz-ds/core/css";
 import "@luz-ds/core";
 ```
 
-- Every page works without the script. See [what each JavaScript module adds](https://nandovejer.github.io/luz/docs/get-started/javascript/).
+- Every page works without the script. See [what each JavaScript module adds](https://nandomunoz.github.io/luz/docs/get-started/javascript/).
 - Need a single component? Load `dist/base.min.css` plus the file you want, for example `dist/components/button.min.css`.
-- Markup you cannot add classes to, such as Markdown or a CMS? Load [`classless.css`](https://nandovejer.github.io/luz/docs/get-started/classless/) and mark the zone with `data-luz-classless`.
+- Markup you cannot add classes to, such as Markdown or a CMS? Load [`classless.css`](https://nandomunoz.github.io/luz/docs/get-started/classless/) and mark the zone with `data-luz-classless`.
 
 ### Level 3: tokens, core and site
 
@@ -99,10 +99,10 @@ import "@luz-ds/site";
 
 On top of level 3, a package can add what one kind of site needs:
 
-- [Landing](https://nandovejer.github.io/luz/docs/landing/): the header, hero, sections and footer of a landing page, and blocks to copy for it.
-- [CMS](https://nandovejer.github.io/luz/docs/cms/): the header, page header, article header, table of contents and footer of a blog or a newspaper, with any CMS.
-- [App](https://nandovejer.github.io/luz/docs/app/): the header and the dashboard of a web application.
-- [Documentation](https://nandovejer.github.io/luz/docs/documentation/): the shell, page head, rail, example, do and don't, pager and page foot of a documentation site.
+- [Landing](https://nandomunoz.github.io/luz/docs/landing/): the header, hero, sections and footer of a landing page, and blocks to copy for it.
+- [CMS](https://nandomunoz.github.io/luz/docs/cms/): the header, page header, article header, table of contents and footer of a blog or a newspaper, with any CMS.
+- [App](https://nandomunoz.github.io/luz/docs/app/): the header and the dashboard of a web application.
+- [Documentation](https://nandomunoz.github.io/luz/docs/documentation/): the shell, page head, rail, example, do and don't, pager and page foot of a documentation site.
 
 Each needs the packages of level 2, loaded first. Site is optional for them, and the commands below add it for its search and its language switch.
 
@@ -192,8 +192,8 @@ Integrity for the site scripts
 
 ### Next steps
 
-- [Choose your snippet](https://nandovejer.github.io/luz/docs/get-started/snippet/) for your kind of site and the way you load it.
-- [Browse the components](https://nandovejer.github.io/luz/docs/components/) and copy their markup.
-- [Set up the color modes](https://nandovejer.github.io/luz/docs/tokens/modes/): light, dark and high contrast.
-- [Learn how the tokens work](https://nandovejer.github.io/luz/docs/tokens/) before you write your own components.
-- [See how LUZ is organised](https://nandovejer.github.io/luz/docs/get-started/structure/): packages, CSS layers and the page skeleton.
+- [Choose your snippet](https://nandomunoz.github.io/luz/docs/get-started/snippet/) for your kind of site and the way you load it.
+- [Browse the components](https://nandomunoz.github.io/luz/docs/components/) and copy their markup.
+- [Set up the color modes](https://nandomunoz.github.io/luz/docs/tokens/modes/): light, dark and high contrast.
+- [Learn how the tokens work](https://nandomunoz.github.io/luz/docs/tokens/) before you write your own components.
+- [See how LUZ is organised](https://nandomunoz.github.io/luz/docs/get-started/structure/): packages, CSS layers and the page skeleton.

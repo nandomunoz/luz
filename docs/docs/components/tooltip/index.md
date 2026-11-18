@@ -5,7 +5,7 @@ Adds a short hint to a control on hover or focus; never essential content.
 ### Known issues
 Partly fails WCAG 1.4.13 (content on hover or focus): Escape does not close the tooltip, so the reader has to move the pointer or the focus away. Keep tooltips short and non-essential.
 
-Listed in the [accessibility statement](https://nandovejer.github.io/luz/docs/accessibility/).
+Listed in the [accessibility statement](https://nandomunoz.github.io/luz/docs/accessibility/).
 
 ### Copy the markup
 Tooltip markup
@@ -48,6 +48,6 @@ Use a tooltip to add a short explanation to a control whose label is clear but b
 ### When not to use
 Do not put anything essential, long or interactive in a tooltip.
 
-- Touch screens have no hover: put information people need on the page, as a hint ([form fields](https://nandovejer.github.io/luz/docs/components/form/)).
+- Touch screens have no hover: put information people need on the page, as a hint ([form fields](https://nandomunoz.github.io/luz/docs/components/form/)).
 - Never use a tooltip as the only name of an icon button.
 - No links or buttons inside it.

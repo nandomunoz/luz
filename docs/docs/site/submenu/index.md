@@ -8,7 +8,7 @@ A submenu is a native `<details>`, which has no Escape key and does not close wh
 In the menu at 768 px and below this does not happen: the links are in the flow and Escape closes the whole menu. It has not been tested with a screen reader.
 
 ### Copy the markup
-An item of the list of core’s [navbar](https://nandovejer.github.io/luz/docs/components/navbar/), in a [landing](https://nandovejer.github.io/luz/docs/landing/header/) or [CMS](https://nandovejer.github.io/luz/docs/cms/header/) header, whose content is a `<luz-submenu>` around a `<details>`: its `<summary>` is the button, and a list of links follows it. No class: the tag is the block, and its parts are found by their place.
+An item of the list of core’s [navbar](https://nandomunoz.github.io/luz/docs/components/navbar/), in a [landing](https://nandomunoz.github.io/luz/docs/landing/header/) or [CMS](https://nandomunoz.github.io/luz/docs/cms/header/) header, whose content is a `<luz-submenu>` around a `<details>`: its `<summary>` is the button, and a list of links follows it. No class: the tag is the block, and its parts are found by their place.
 
 Give every submenu of the header the same `name`, so opening one closes the others.
 
@@ -65,7 +65,7 @@ Use it when the header needs more links than fit in a short row, and some of the
 Do not use it for a single link, or to hide pages most visitors need: put those in the row itself.
 
 - Do not nest a submenu in a submenu: two levels hide pages from the visitor and are hard to use with a pointer and a keyboard.
-- Do not put actions, forms or settings in it: it holds links to pages. For actions use buttons, or a [dropdown](https://nandovejer.github.io/luz/docs/components/dropdown/).
+- Do not put actions, forms or settings in it: it holds links to pages. For actions use buttons, or a [dropdown](https://nandomunoz.github.io/luz/docs/components/dropdown/).
 - If every group has many links, give each group a page of its own and link to it: a long submenu is a page in a box.
 
 It replaces a dropdown navigation built with a script, and the hover menu. Nothing in LUZ is removed.

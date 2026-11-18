@@ -36,7 +36,7 @@ Nothing changes: a figure is HTML and CSS.
 A figure is not interactive and takes no focus.
 
 - The media needs its own text alternative: `alt` on an `<img>`, or `role="img"` and `aria-label` on an inline `<svg>`.
-- A chart also needs its numbers as text: in the alt text, the caption or a [table](https://nandovejer.github.io/luz/docs/components/table/) next to it.
+- A chart also needs its numbers as text: in the alt text, the caption or a [table](https://nandomunoz.github.io/luz/docs/components/table/) next to it.
 
 ### When to use
 Use a figure for a chart, an image, a diagram or a code sample that the text refers to and that needs a caption.
@@ -45,4 +45,4 @@ Use a figure for a chart, an image, a diagram or a code sample that the text ref
 Do not use a figure for decoration.
 
 - A decorative image gets `alt=""` and no figure.
-- For a picture in a box of fixed shape, use the [image](https://nandovejer.github.io/luz/docs/components/image/) frame.
+- For a picture in a box of fixed shape, use the [image](https://nandomunoz.github.io/luz/docs/components/image/) frame.

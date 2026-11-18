@@ -6,7 +6,7 @@ A fifth keyframe, `luz-fade-in`, opens the modal.
 
 ### Use a keyframe
 
-Name the keyframe in your own `animation`, and take its duration from a [motion token](https://nandovejer.github.io/luz/docs/tokens/motion/).
+Name the keyframe in your own `animation`, and take its duration from a [motion token](https://nandomunoz.github.io/luz/docs/tokens/motion/).
 
 Panel that slides in code
 ```css

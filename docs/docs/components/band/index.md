@@ -53,6 +53,6 @@ Use a band for a call to act near the end of a long page, or for one pause in th
 Do not band every section: when everything stands out, nothing does.
 
 - One band for each screen height at most; two in a row read as a new background, not as a call to act.
-- Do not use the tint to say something (a warning, a status): it carries no meaning, and forced colors remove it. Use an [alert](https://nandovejer.github.io/luz/docs/components/alert/).
+- Do not use the tint to say something (a warning, a status): it carries no meaning, and forced colors remove it. Use an [alert](https://nandomunoz.github.io/luz/docs/components/alert/).
 - Do not put a band inside a card or on a `--luz-surface` area, or around the whole page. In dark mode the primary button falls to 2.7:1 against a tint laid over `--luz-surface`, under the 3:1 a control's edge needs.
 - Do not put a `.luz-btn--secondary` on the band: its fill is the tint's own colour, and it reads as plain text.

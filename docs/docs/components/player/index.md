@@ -99,4 +99,4 @@ Use a player to play a video, a sound or a MIDI file inside the page, when the r
 Do not use a player for media that starts on its own or plays in the background.
 
 - Never autoplay.
-- For a short animated illustration with no sound, use an image or a [figure](https://nandovejer.github.io/luz/docs/components/figure/).
+- For a short animated illustration with no sound, use an image or a [figure](https://nandomunoz.github.io/luz/docs/components/figure/).

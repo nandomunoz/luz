@@ -37,7 +37,7 @@ A styled block from `components/toast.css`. LUZ has no toast script.
 - The close button needs your script to remove the toast.
 
 ### Without JavaScript
-A toast only appears in answer to something your script did, so it does not exist without JavaScript. Show the same result on the page, for example in an [alert](https://nandovejer.github.io/luz/docs/components/alert/) after a form is sent.
+A toast only appears in answer to something your script did, so it does not exist without JavaScript. Show the same result on the page, for example in an [alert](https://nandomunoz.github.io/luz/docs/components/alert/) after a form is sent.
 
 ### Keyboard and ARIA
 Showing a toast does not move focus.
@@ -51,6 +51,6 @@ Use a toast to confirm a small result that needs no answer: "Draft saved", "Link
 ### When not to use
 Do not use a toast for anything the reader must act on or must not miss: it goes away.
 
-- For an error, use an [alert](https://nandovejer.github.io/luz/docs/components/alert/) next to what failed.
-- For a decision, use a [modal](https://nandovejer.github.io/luz/docs/components/modal/).
+- For an error, use an [alert](https://nandomunoz.github.io/luz/docs/components/alert/) next to what failed.
+- For a decision, use a [modal](https://nandomunoz.github.io/luz/docs/components/modal/).
 - Do not put links or buttons in it, other than the close button.

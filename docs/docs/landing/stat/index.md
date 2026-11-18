@@ -29,7 +29,7 @@ No modifiers: two parts, alone or inside a card.
 ### How it works
 CSS from `@luz-ds/landing`. No JavaScript, and `@luz-ds/site` is optional.
 
-- The stat lays out nothing: put several in a core grid list, `ul.o-grid.o-grid--3`. In a [card](https://nandovejer.github.io/luz/docs/components/card/) it uses the card's padding and surface.
+- The stat lays out nothing: put several in a core grid list, `ul.o-grid.o-grid--3`. In a [card](https://nandomunoz.github.io/luz/docs/components/card/) it uses the card's padding and surface.
 
 ### Without JavaScript
 Nothing changes: the stat is HTML and CSS, and does not count up.
@@ -45,4 +45,4 @@ Use a stat for a figure that backs up a claim: how many use the product, how fas
 ### When not to use
 Do not use a stat for a figure that needs a sentence to be understood.
 
-- For rows and columns to compare, use a [table](https://nandovejer.github.io/luz/docs/components/table/).
+- For rows and columns to compare, use a [table](https://nandomunoz.github.io/luz/docs/components/table/).

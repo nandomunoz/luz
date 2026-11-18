@@ -9,7 +9,7 @@ The page structure of one kind of site, a landing page: the page of a product, a
 - You build the page of a product, a service or an event, with a hero and features to show side by side.
 - Not for articles or an app: `@luz-ds/cms` and core's shell have what they need.
 
-The blocks of an event landing page (hero, programme, speakers, tickets, call to action, registration) are markup to copy, on the [Landing page templates](https://nandovejer.github.io/luz/docs/landing/templates/) page of the docs. They use the classes of core and this package; a block of features of equal weight is a list on core's split grid, `ul.o-grid.o-grid--split`.
+The blocks of an event landing page (hero, programme, speakers, tickets, call to action, registration) are markup to copy, on the [Landing page templates](https://nandomunoz.github.io/luz/docs/landing/templates/) page of the docs. They use the classes of core and this package; a block of features of equal weight is a list on core's split grid, `ul.o-grid.o-grid--split`.
 
 ## Prerequisites
 
@@ -50,11 +50,11 @@ There is no script. Add core's and site's if you use their behaviours.
 
 ## Classes included
 
-- `.luz-landing-header`, `__brand`, `__actions` — The header: on `header.o-sticky > .o-container.o-container--inline.o-row`, with core's `.luz-nav-toggle` and `.luz-navbar`. The page surface, a rule underneath, the brand and the row's gaps; its panels open under it. [Docs](https://nandovejer.github.io/luz/docs/landing/header/)
-- `.luz-landing-hero`, `__copy`, `__eyebrow`, `__title`, `__lead`, `__media` — The first block: on `section.o-grid.o-grid--split`, two equal columns when each gets 24rem, one below. `--centered`: one column, the copy centred above the media. `__media--bleed`, in a centred hero: the media runs from edge to edge of the window, with no sideways scroll. [Docs](https://nandovejer.github.io/luz/docs/landing/hero/)
-- `.luz-landing-main`, `.luz-landing-section`, `__eyebrow`, `__title`, `__lead`, `.luz-landing-glow` — The rhythm of the page, on `main.o-container.o-stack` and `section.o-stack`; the head of a section, which shares the hero's rules (load `hero.css` with `section.css`) one step smaller; and a tint behind the `.o-page`. Two knobs: `--luz-landing-title-accent`, the colour of the `em` in a hero or section title (unset, the title's), and `--luz-landing-glow-x`, where along the top edge the tint sits (unset, the edge where reading starts). [Docs](https://nandovejer.github.io/luz/docs/landing/section/)
-- `.luz-landing-stat`, `__value`, `__label` — A figure and what it counts, alone or in core's `.luz-card`: a big number in the heading face with tabular figures, the label under it. [Docs](https://nandovejer.github.io/luz/docs/landing/stat/)
-- `.luz-landing-footer`, `__brand`, `__col`, `__col-title` — The footer: on `footer > .o-container.o-container--inline.o-row`, a rule on top and its items at the two ends of the row; or on `footer > .o-container.o-container--inline.o-grid`, a brand block and columns of links, side by side from 768px, one under the other below. [Docs](https://nandovejer.github.io/luz/docs/landing/footer/)
+- `.luz-landing-header`, `__brand`, `__actions` — The header: on `header.o-sticky > .o-container.o-container--inline.o-row`, with core's `.luz-nav-toggle` and `.luz-navbar`. The page surface, a rule underneath, the brand and the row's gaps; its panels open under it. [Docs](https://nandomunoz.github.io/luz/docs/landing/header/)
+- `.luz-landing-hero`, `__copy`, `__eyebrow`, `__title`, `__lead`, `__media` — The first block: on `section.o-grid.o-grid--split`, two equal columns when each gets 24rem, one below. `--centered`: one column, the copy centred above the media. `__media--bleed`, in a centred hero: the media runs from edge to edge of the window, with no sideways scroll. [Docs](https://nandomunoz.github.io/luz/docs/landing/hero/)
+- `.luz-landing-main`, `.luz-landing-section`, `__eyebrow`, `__title`, `__lead`, `.luz-landing-glow` — The rhythm of the page, on `main.o-container.o-stack` and `section.o-stack`; the head of a section, which shares the hero's rules (load `hero.css` with `section.css`) one step smaller; and a tint behind the `.o-page`. Two knobs: `--luz-landing-title-accent`, the colour of the `em` in a hero or section title (unset, the title's), and `--luz-landing-glow-x`, where along the top edge the tint sits (unset, the edge where reading starts). [Docs](https://nandomunoz.github.io/luz/docs/landing/section/)
+- `.luz-landing-stat`, `__value`, `__label` — A figure and what it counts, alone or in core's `.luz-card`: a big number in the heading face with tabular figures, the label under it. [Docs](https://nandomunoz.github.io/luz/docs/landing/stat/)
+- `.luz-landing-footer`, `__brand`, `__col`, `__col-title` — The footer: on `footer > .o-container.o-container--inline.o-row`, a rule on top and its items at the two ends of the row; or on `footer > .o-container.o-container--inline.o-grid`, a brand block and columns of links, side by side from 768px, one under the other below. [Docs](https://nandomunoz.github.io/luz/docs/landing/footer/)
 
 <!-- luz:ai-agents:start -->
 ## For AI agents
@@ -68,9 +68,9 @@ Not released yet: 0.0.0 is the workspace's placeholder; the first release is 0.1
 ### Read first
 
 1. `dist/classes.json` in this package: the classes and custom properties its CSS defines. Write only those.
-2. https://nandovejer.github.io/luz/llms.txt: the index of the documentation, short enough for a small context.
-3. https://nandovejer.github.io/luz/llms-full.txt: the same pages in full.
-4. https://nandovejer.github.io/luz/examples/: one standalone page of markup for each component and pattern.
+2. https://nandomunoz.github.io/luz/llms.txt: the index of the documentation, short enough for a small context.
+3. https://nandomunoz.github.io/luz/llms-full.txt: the same pages in full.
+4. https://nandomunoz.github.io/luz/examples/: one standalone page of markup for each component and pattern.
 
 ### Load order
 

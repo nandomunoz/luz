@@ -52,9 +52,9 @@ One token of each kind
 - `--luz-z-modal`: Setting: A value core uses to lay out the page: stacking order, motion and breakpoints
 
 - LUZ's own components read semantic tokens and scale steps. They never read a primitive or a knob.
-- You can set any token in your own CSS. [Make it yours](https://nandovejer.github.io/luz/docs/get-started/make-it-yours/) shows how.
+- You can set any token in your own CSS. [Make it yours](https://nandomunoz.github.io/luz/docs/get-started/make-it-yours/) shows how.
 
-Each family has a page: [color](https://nandovejer.github.io/luz/docs/tokens/color/), [typography](https://nandovejer.github.io/luz/docs/tokens/typography/), [spacing and sizing](https://nandovejer.github.io/luz/docs/tokens/spacing/), [radius](https://nandovejer.github.io/luz/docs/tokens/radius/), [shadows](https://nandovejer.github.io/luz/docs/tokens/shadows/), [motion](https://nandovejer.github.io/luz/docs/tokens/motion/) and [layout and breakpoints](https://nandovejer.github.io/luz/docs/tokens/layout/).
+Each family has a page: [color](https://nandomunoz.github.io/luz/docs/tokens/color/), [typography](https://nandomunoz.github.io/luz/docs/tokens/typography/), [spacing and sizing](https://nandomunoz.github.io/luz/docs/tokens/spacing/), [radius](https://nandomunoz.github.io/luz/docs/tokens/radius/), [shadows](https://nandomunoz.github.io/luz/docs/tokens/shadows/), [motion](https://nandomunoz.github.io/luz/docs/tokens/motion/) and [layout and breakpoints](https://nandomunoz.github.io/luz/docs/tokens/layout/).
 
 ### Attributes
 
@@ -63,7 +63,7 @@ Classes are for style. Attributes that start with `data-` are how a script and y
 - `data-theme` on `<html>` picks the color mode (`light`, `dark` or `high-contrast`) or the name of a look of your own.
 - `data-mode` on `<html>` picks the color mode inside a look of your own: `data-theme="my-brand"` with `data-mode="dark"`.
 - `data-luz-*` are the hooks of LUZ's scripts, such as `data-luz-js`, which the script sets on `<html>` once it runs. A script binds to these, never to a class.
-- `data-luz-classless` turns on [classless styles](https://nandovejer.github.io/luz/docs/get-started/classless/) for the markup inside it.
+- `data-luz-classless` turns on [classless styles](https://nandomunoz.github.io/luz/docs/get-started/classless/) for the markup inside it.
 - `data-luz-label-*` overrides one string a script writes.
 
 These are examples, not the full list: each component's page names the attributes it uses.
@@ -75,11 +75,11 @@ A tag that starts with `luz-` is a custom element. LUZ's are in the light DOM, s
 - **With a script:** `<luz-search>`, `<luz-consent>`, `<luz-mode>` and `<luz-timeline>` need their script to do their job.
 - **CSS only:** `<luz-lang-switch>`, `<luz-submenu>` and `<luz-banner>` have no script at all. They are a tag you can style before and without its script.
 
-Which package holds each one is in [How LUZ is organised](https://nandovejer.github.io/luz/docs/get-started/structure/).
+Which package holds each one is in [How LUZ is organised](https://nandomunoz.github.io/luz/docs/get-started/structure/).
 
 ### Layers, in one paragraph
 
-All of LUZ's CSS is in one cascade layer called `luz`, with named layers inside it, and any CSS of yours that is not in a layer wins over all of it, with no `!important`. [Cascade layers](https://nandovejer.github.io/luz/docs/get-started/layers/) lists them in order and shows how to override one.
+All of LUZ's CSS is in one cascade layer called `luz`, with named layers inside it, and any CSS of yours that is not in a layer wins over all of it, with no `!important`. [Cascade layers](https://nandomunoz.github.io/luz/docs/get-started/layers/) lists them in order and shows how to override one.
 
 ### What you can rely on
 
@@ -107,4 +107,4 @@ Files in the dist folder of each package
 - `themes/_template.css`: `@luz-ds/core`: Never as it is: copy it as the start of a look of your own
 - `site.css`: `@luz-ds/site`: When the page uses a site element such as `<luz-search>`
 
-To pick the lines for your build, [choose your snippet](https://nandovejer.github.io/luz/docs/get-started/snippet/).
+To pick the lines for your build, [choose your snippet](https://nandomunoz.github.io/luz/docs/get-started/snippet/).

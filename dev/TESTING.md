@@ -1,6 +1,6 @@
 # Testing
 
-How to write and run the tests of LUZ. The rules they enforce are in [PRINCIPLES.md](../PRINCIPLES.md). [How LUZ is built](https://nandovejer.github.io/luz/docs/get-started/how-luz-is-built/#tests-first) says why the test comes first.
+How to write and run the tests of LUZ. The rules they enforce are in [PRINCIPLES.md](../PRINCIPLES.md). [How LUZ is built](https://nandomunoz.github.io/luz/docs/get-started/how-luz-is-built/#tests-first) says why the test comes first.
 
 ## Quick start
 

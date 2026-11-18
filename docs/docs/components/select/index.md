@@ -61,7 +61,7 @@ A select hides the options until the reader opens it, and some people find that 
 
 The rule of six is LUZ's own: that guide gives no number.
 
-- With six options or fewer, use [radio buttons](https://nandovejer.github.io/luz/docs/components/form/): every option stays in view.
-- To choose several, use [checkboxes](https://nandovejer.github.io/luz/docs/components/form/).
+- With six options or fewer, use [radio buttons](https://nandomunoz.github.io/luz/docs/components/form/): every option stays in view.
+- To choose several, use [checkboxes](https://nandomunoz.github.io/luz/docs/components/form/).
 - Before you use a long list, ask a question that cuts it down.
 - Never build your own listbox from `<div>` elements, or hide the select behind a copy of it.

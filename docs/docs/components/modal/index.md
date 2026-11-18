@@ -75,7 +75,7 @@ Use a modal to ask for a decision or a short input that must be settled before t
 ### When not to use
 Do not use a modal for something the reader can ignore or come back to.
 
-- For information about the page, use an [alert](https://nandovejer.github.io/luz/docs/components/alert/).
-- For a confirmation that needs no answer, use a [toast](https://nandovejer.github.io/luz/docs/components/toast/).
+- For information about the page, use an [alert](https://nandomunoz.github.io/luz/docs/components/alert/).
+- For a confirmation that needs no answer, use a [toast](https://nandomunoz.github.io/luz/docs/components/toast/).
 - For a long form, use its own page.
 - Never open a modal when the page loads.

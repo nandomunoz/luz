@@ -24,7 +24,7 @@ There are no modifiers. The footer is a class of cms on a native `<footer>`, wit
 
 - `.luz-cms-footer`: On `<footer>`: a rule on top, 24 px above its row and 32 px below; its row spreads its children to the two ends, and is a column aligned to the start at 768 px and below
 - `.o-container.o-container--inline.o-row` (core): The row: the width and gutters of the page, so its content starts where the main's does
-- `.o-actions` (core): The links, as an [action group](https://nandovejer.github.io/luz/docs/components/layout/#objects-actions)
+- `.o-actions` (core): The links, as an [action group](https://nandomunoz.github.io/luz/docs/components/layout/#objects-actions)
 
 ### How it works
 CSS from `@luz-ds/cms` on core's objects. No JavaScript, and `@luz-ds/site` is optional.
@@ -34,7 +34,7 @@ CSS from `@luz-ds/cms` on core's objects. No JavaScript, and `@luz-ds/site` is o
 - The column at 768 px and below does not wrap, so its children stay one under the other.
 
 ### Without JavaScript
-Nothing changes: the footer is HTML and CSS. A [color mode switcher](https://nandovejer.github.io/luz/docs/components/mode-switcher/) inside it keeps working as radios.
+Nothing changes: the footer is HTML and CSS. A [color mode switcher](https://nandomunoz.github.io/luz/docs/components/mode-switcher/) inside it keeps working as radios.
 
 ### Keyboard and ARIA
 The footer has no interaction of its own; its links keep theirs.
@@ -48,5 +48,5 @@ Use the footer at the end of every page of a blog or a newspaper, for who publis
 ### When not to use
 Do not put the main navigation, or anything needed to finish a task, in the footer.
 
-- The sections go in the [header](https://nandovejer.github.io/luz/docs/cms/header/).
-- A landing page has a [footer](https://nandovejer.github.io/luz/docs/landing/footer/) of its own.
+- The sections go in the [header](https://nandomunoz.github.io/luz/docs/cms/header/).
+- A landing page has a [footer](https://nandomunoz.github.io/luz/docs/landing/footer/) of its own.

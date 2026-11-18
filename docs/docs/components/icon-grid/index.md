@@ -86,7 +86,7 @@ There are no modifiers. The grid fits as many columns of at least 100 px as the 
 - `.luz-icon-name`: The name under the icon
 
 ### How it works
-A `<ul>` of icons, styled by `components/icon-grid.css`. The copy buttons are [copy buttons](https://nandovejer.github.io/luz/docs/components/copy-button/), wired by `clipboard.js`.
+A `<ul>` of icons, styled by `components/icon-grid.css`. The copy buttons are [copy buttons](https://nandomunoz.github.io/luz/docs/components/copy-button/), wired by `clipboard.js`.
 
 - Each button carries the icon's SVG, escaped, in `data-copy`.
 - The 22 icons are LUZ's own, drawn for it on a 24 × 24 grid with a 2 px round stroke in `currentColor`. They are not a package and no file is loaded: copy the SVG, or the sprite, into your page.
@@ -109,7 +109,7 @@ Use an icon grid to let readers browse a set of icons and copy the one they need
 ### When not to use
 Do not use it to lay out icons that do something: it is a catalogue, not a toolbar.
 
-- For a row of actions, use buttons with text in an [action group](https://nandovejer.github.io/luz/docs/components/layout/#objects-actions).
+- For a row of actions, use buttons with text in an [action group](https://nandomunoz.github.io/luz/docs/components/layout/#objects-actions).
 - Never use an icon as the only label of an action: give it its name as text, visible or in a `.u-sr-only` span.
 - For a logo or an illustration, use an `<img>` or an SVG at its own size.
 - For hundreds of icons, bring your own set: LUZ's has 22.

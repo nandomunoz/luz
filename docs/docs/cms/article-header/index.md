@@ -32,18 +32,18 @@ Article header markup
 There are no modifiers. Only the title is required: leave out the parts you do not have.
 
 - `.luz-cms-article-header`: The block: its parts one under another, 12 px apart, and 32 px of space below it
-- `.luz-cms-article-header__kicker`: The section above the title, small capitals in the mono, like the eyebrow of the [hero](https://nandovejer.github.io/luz/docs/landing/hero/). Optional
+- `.luz-cms-article-header__kicker`: The section above the title, small capitals in the mono, like the eyebrow of the [hero](https://nandomunoz.github.io/luz/docs/landing/hero/). Optional
 - `.luz-cms-article-header__title`: The title: heading font, 3xl size, light weight, balanced lines; 2xl at 640 px and below
 - `.luz-cms-article-header__standfirst`: One or two sentences in the secondary text colour, a size up from the body, 70 characters wide at most. Optional
-- `.luz-cms-article-header__byline`: A row in the sans that wraps: an [avatar](https://nandovejer.github.io/luz/docs/components/avatar/), then the author and a [meta line](https://nandovejer.github.io/luz/docs/components/meta/) with the date. Optional
-- `.luz-cms-article-header__media`: A `<figure>` with no panel around it, for an [image frame](https://nandovejer.github.io/luz/docs/components/image/) and its caption. Optional
+- `.luz-cms-article-header__byline`: A row in the sans that wraps: an [avatar](https://nandomunoz.github.io/luz/docs/components/avatar/), then the author and a [meta line](https://nandomunoz.github.io/luz/docs/components/meta/) with the date. Optional
+- `.luz-cms-article-header__media`: A `<figure>` with no panel around it, for an [image frame](https://nandomunoz.github.io/luz/docs/components/image/) and its caption. Optional
 
 ### How it works
 A grid with one column, styled by `@luz-ds/cms`, in its `cms.css`, loaded after `site.css`. No JavaScript.
 
 - Each part styles its text through inheritance, so the class can go on the element that holds the text or on a wrapper around it. A CMS template that wraps the standfirst in a `<div>` works as well as a bare `<p>`. In a WordPress block template, give each block its class in `className`.
 - The kicker is a link when your sections have pages, or plain text. The title must be the page's `<h1>`; the classes change the look only.
-- The lead picture is the [image frame](https://nandovejer.github.io/luz/docs/components/image/) of core: it keeps its ratio and shows a flat surface until the picture loads. Do not set `loading="lazy"` on it: it is near the top of the page.
+- The lead picture is the [image frame](https://nandomunoz.github.io/luz/docs/components/image/) of core: it keeps its ratio and shows a flat surface until the picture loads. Do not set `loading="lazy"` on it: it is near the top of the page.
 - A date the reader sees is a `<time>` with a machine-readable `datetime`. For a story updated after it was published, add a second line: `Updated <time datetime="…">…</time>`.
 
 ### Without JavaScript
@@ -60,7 +60,7 @@ The header has no interaction of its own: Tab reaches the kicker's and the autho
 Use an article header at the top of a story, a post or a report: a page with an author and a date, that people read from start to end.
 
 ### When not to use
-Do not use it for a page with no author or date, such as a contact or a section page: use the [page header](https://nandovejer.github.io/luz/docs/cms/page-header/).
+Do not use it for a page with no author or date, such as a contact or a section page: use the [page header](https://nandomunoz.github.io/luz/docs/cms/page-header/).
 
-- For the first block of a home or a landing page, use the [hero](https://nandovejer.github.io/luz/docs/landing/hero/).
-- For a story in a list, use a [post card](https://nandovejer.github.io/luz/docs/cms/templates/#post-card): the header is for the story's own page.
+- For the first block of a home or a landing page, use the [hero](https://nandomunoz.github.io/luz/docs/landing/hero/).
+- For a story in a list, use a [post card](https://nandomunoz.github.io/luz/docs/cms/templates/#post-card): the header is for the story's own page.

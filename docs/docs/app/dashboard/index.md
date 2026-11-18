@@ -49,7 +49,7 @@ CSS from `@luz-ds/app` on core's grid and card. No JavaScript.
 - The dashboard is a size container. The wide panel asks how wide the dashboard is, not the window, so it fits with a sidebar and without one. From 40 rem two columns always exist (two of 18 rem and a gap), and at 200% text both are in rem, so it never overflows.
 - The panels keep the order of the markup. There is no dense packing and no `order`: a wide panel that does not fit in what is left of a row starts the next one, and the gap stays. Reading order, focus order and what is drawn are the same.
 - A panel can shrink, so a long line of code or a table inside it scrolls in its own wrapper and does not widen the column.
-- Empty, loading and failed panels are the panel's own content: a sentence and a link, core's [progress](https://nandovejer.github.io/luz/docs/components/progress/) or [alert](https://nandovejer.github.io/luz/docs/components/alert/). There is no skeleton class in 0.1.
+- Empty, loading and failed panels are the panel's own content: a sentence and a link, core's [progress](https://nandomunoz.github.io/luz/docs/components/progress/) or [alert](https://nandomunoz.github.io/luz/docs/components/alert/). There is no skeleton class in 0.1.
 
 ### Without JavaScript
 Nothing changes: the grid, the container query and the cards are CSS.
@@ -59,7 +59,7 @@ Nothing changes: the grid, the container query and the cards are CSS.
 - **Headings:** the view has one `<h1>`, in the title row, and each panel starts with an `<h2>`. The title row is a `<div>`, not a `<header>`.
 - **List:** the panels are a `<ul>` of `<li>`: a screen reader says how many there are. Safari can drop the list role from a list without markers; the headings still lead through the panels.
 - **Actions:** an action that goes somewhere is a link (`<a href>`); one that does something on this page is a `<button type="button">`. Never an `<a>` without `href`.
-- **Landmarks:** the dashboard is the page's `<main>`, the sibling of the [header](https://nandovejer.github.io/luz/docs/app/header/). It takes the skip link's target, with `tabindex="-1"`.
+- **Landmarks:** the dashboard is the page's `<main>`, the sibling of the [header](https://nandomunoz.github.io/luz/docs/app/header/). It takes the skip link's target, with `tabindex="-1"`.
 
 ### When to use
 Use the dashboard for a view that shows several things about the same subject, each short enough to read at a glance and each leading to its own page.
@@ -72,4 +72,4 @@ Do not use it for a view that is one long thing: a table, a form or a document a
 
 - One primary action per view, in the title row, never in a panel.
 - Do not make a panel taller than its neighbours with row spans or dense packing: it moves a panel before the ones that come first in the markup.
-- For a plain grid of cards in a page of content, use core's [grid](https://nandovejer.github.io/luz/docs/components/layout/#objects-grid) and [card](https://nandovejer.github.io/luz/docs/components/card/).
+- For a plain grid of cards in a page of content, use core's [grid](https://nandomunoz.github.io/luz/docs/components/layout/#objects-grid) and [card](https://nandomunoz.github.io/luz/docs/components/card/).

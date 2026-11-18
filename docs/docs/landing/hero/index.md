@@ -27,7 +27,7 @@ Hero markup
 ```
 
 ### Variants and options
-Two modifiers, `--centered` and `__media--bleed`, as in the [product page template](https://nandovejer.github.io/luz/docs/landing/templates/#product-page). The eyebrow, the lead and the picture are optional; with no picture the copy takes the whole width.
+Two modifiers, `--centered` and `__media--bleed`, as in the [product page template](https://nandomunoz.github.io/luz/docs/landing/templates/#product-page). The eyebrow, the lead and the picture are optional; with no picture the copy takes the whole width.
 
 The block is a class of the landing on core's split grid.
 
@@ -37,15 +37,15 @@ The block is a class of the landing on core's split grid.
 - `.luz-landing-hero__eyebrow`: A short line above the title, in small capitals of the mono face; the sans in Arabic
 - `.luz-landing-hero__title`: The title: heading font, 4xl size, balanced lines; 3xl below 1024 px and 2xl at 640 px and below
 - `.luz-landing-hero__lead`: One or two sentences in the secondary text colour, 70 characters wide at most; xl, lg below 1024 px and base at 640 px and below
-- `.luz-landing-hero__media`: The second column, holding core's [image frame](https://nandovejer.github.io/luz/docs/components/image/)
+- `.luz-landing-hero__media`: The second column, holding core's [image frame](https://nandomunoz.github.io/luz/docs/components/image/)
 - `.luz-landing-hero__media--bleed`: On the picture of a centred hero: it runs from edge to edge of the window, past the page's gutters, with no sideways scroll. The frame is 16:9 unless you give it a ratio
 
 ### How it works
 A `<section>` named by its title, laid out by core's split grid and styled by `@luz-ds/landing`. No JavaScript, and `@luz-ds/site` is optional.
 
-- The columns are core's [split grid](https://nandovejer.github.io/luz/docs/components/layout/#objects-actions), intrinsic: they follow the room the hero has, not the window. A hero as wide as the page splits from about 900 px of window; in a narrow column, or with larger text, it stays one column.
+- The columns are core's [split grid](https://nandomunoz.github.io/luz/docs/components/layout/#objects-actions), intrinsic: they follow the room the hero has, not the window. A hero as wide as the page splits from about 900 px of window; in a narrow column, or with larger text, it stays one column.
 - The order is the source order: the copy comes first, on the left in a left-to-right page and on the right in a right-to-left one.
-- The actions are core's [action group](https://nandovejer.github.io/luz/docs/components/layout/#objects-actions), `.o-actions`: at 640 px and below its buttons stack and take the whole width.
+- The actions are core's [action group](https://nandomunoz.github.io/luz/docs/components/layout/#objects-actions), `.o-actions`: at 640 px and below its buttons stack and take the whole width.
 - The bleed measures the window without a viewport unit, which counts a scrollbar and scrolls the page sideways: the page's root becomes a size container (`container-type: inline-size`). The column must be centred in the window, as core's `.o-container` is.
 - The `em` in a title takes the colour of `--luz-landing-title-accent`, the title's own when it is unset.
 - The classes change the look only. The title must be the page's `<h1>`.
@@ -66,4 +66,4 @@ Use a hero at the top of a home page, a landing page or a front page, to say in 
 Do not use it on a page whose reader came to read or to do a task: use a plain `<h1>` and a lead paragraph, which are smaller.
 
 - One hero per page, and only at the top.
-- Not for a message in the middle of a page: use a [section](https://nandovejer.github.io/luz/docs/landing/section/), with core's [band](https://nandovejer.github.io/luz/docs/components/band/) if it must stand out.
+- Not for a message in the middle of a page: use a [section](https://nandomunoz.github.io/luz/docs/landing/section/), with core's [band](https://nandomunoz.github.io/luz/docs/components/band/) if it must stand out.

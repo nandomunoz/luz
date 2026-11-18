@@ -40,5 +40,5 @@ Use a progress bar for a task that takes more than a few seconds, such as an upl
 ### When not to use
 Do not use a progress bar for a value that is not a task.
 
-- For a measure in a known range, such as storage used, use a [meter](https://nandovejer.github.io/luz/docs/components/meter/).
+- For a measure in a known range, such as storage used, use a [meter](https://nandomunoz.github.io/luz/docs/components/meter/).
 - Do not use it as decoration.

@@ -51,6 +51,6 @@ Use a tag to label an item with a short status or category, and a badge to show 
 ### When not to use
 Do not use a tag for an action: it is not clickable.
 
-- For an action, use a [button](https://nandovejer.github.io/luz/docs/components/button/).
-- For a sentence, use an [alert](https://nandovejer.github.io/luz/docs/components/alert/).
+- For an action, use a [button](https://nandomunoz.github.io/luz/docs/components/button/).
+- For a sentence, use an [alert](https://nandomunoz.github.io/luz/docs/components/alert/).
 - Do not give teal or purple a status meaning: they are for categories.

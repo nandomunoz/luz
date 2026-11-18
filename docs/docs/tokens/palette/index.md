@@ -2,7 +2,7 @@
 
 The primitive colour scales. For theme authors only: components never use them.
 
-Building a component? Use the [semantic colours](https://nandovejer.github.io/luz/docs/tokens/color/) instead. These scales are what a theme points the semantic tokens at.
+Building a component? Use the [semantic colours](https://nandomunoz.github.io/luz/docs/tokens/color/) instead. These scales are what a theme points the semantic tokens at.
 
 Raw values, never used directly in components. LUZ's own palette: `scripts/build-palette.js` computes every step in OKLCH from one lightness curve shared by all families, a chroma curve and a hue per family.
 

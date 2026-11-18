@@ -54,4 +54,4 @@ Use the pager at the end of the content, so a reader who finishes a page goes to
 Do not use the pager for pages that have no order, or for the pages of a list of results.
 
 - The sidebar already lists every page. The pager gives the next step, not the whole map.
-- For the pages of a list or a table, use [pagination](https://nandovejer.github.io/luz/docs/components/pagination/), which has page numbers.
+- For the pages of a list or a table, use [pagination](https://nandomunoz.github.io/luz/docs/components/pagination/), which has page numbers.

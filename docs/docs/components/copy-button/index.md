@@ -50,4 +50,4 @@ Use a copy button for a short string the reader will paste somewhere else: a com
 ### When not to use
 Do not use a copy button where selecting the text is just as easy, or as the only way to get the content.
 
-- For long text, show it in a [code block](https://nandovejer.github.io/luz/docs/components/code/) the reader can select.
+- For long text, show it in a [code block](https://nandomunoz.github.io/luz/docs/components/code/) the reader can select.

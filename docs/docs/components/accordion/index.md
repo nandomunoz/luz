@@ -59,6 +59,6 @@ Use an accordion for content that most readers can skip, grouped under short tit
 ### When not to use
 Do not hide what every reader needs, and do not use it to move around the site.
 
-- For the main sections of a site, use a [sidebar](https://nandovejer.github.io/luz/docs/components/sidebar/). For content a reader switches between, use [tabs](https://nandovejer.github.io/luz/docs/components/tabs/).
+- For the main sections of a site, use a [sidebar](https://nandomunoz.github.io/luz/docs/components/sidebar/). For content a reader switches between, use [tabs](https://nandomunoz.github.io/luz/docs/components/tabs/).
 - Do not put an error, a warning or a required step inside a closed panel.
 - With only one or two short answers, show them as plain text.

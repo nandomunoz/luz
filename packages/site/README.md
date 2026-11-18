@@ -82,7 +82,7 @@ Each tag is the block; its parts are `.luz-<tag>__<part>`.
 
 ## Search
 
-A button shaped like a field ("Search docs…", <kbd>Ctrl K</kbd>) opens a native `<dialog>` with a field and the results as links, grouped under Pages, Sections and HTML elements (8 per group at most). Ctrl+K and ⌘K open it too, also before its script has loaded. Without JavaScript the button stays hidden and a plain link to your index page shows in its place. Every fixed text is in your markup, and the few the script writes (the count, "no results", loading, error) are `data-luz-label-*` attributes on the dialog, in the page's language. The full markup, the keyboard model and the index format are on the [Search page of the docs](https://nandovejer.github.io/luz/docs/site/search/).
+A button shaped like a field ("Search docs…", <kbd>Ctrl K</kbd>) opens a native `<dialog>` with a field and the results as links, grouped under Pages, Sections and HTML elements (8 per group at most). Ctrl+K and ⌘K open it too, also before its script has loaded. Without JavaScript the button stays hidden and a plain link to your index page shows in its place. Every fixed text is in your markup, and the few the script writes (the count, "no results", loading, error) are `data-luz-label-*` attributes on the dialog, in the page's language. The full markup, the keyboard model and the index format are on the [Search page of the docs](https://nandomunoz.github.io/luz/docs/site/search/).
 
 The index is a JSON file on the same origin (`data-luz-search-src`), format version 1, with URLs relative to the file:
 
@@ -99,7 +99,7 @@ Each item is `[text, url, meta?, lang?]`. The component fetches it only from the
 
 A band fixed at the bottom of the window asks once whether the site may use optional cookies: Accept and Reject side by side, with the same style, and a `<details>` with one checkbox per category. It is `hidden` in the markup and `consent.js` shows it when no answer is stored, when the stored one has expired (180 days by default, `data-luz-consent-days`, 395 at most), or when it offers a category the stored answer was not asked about. It does not take focus, and while it shows it reserves the page's height, so it covers nothing; Escape is not an answer. Without JavaScript it stays hidden: none of your scripts run either, and the cookie policy is a link on every page.
 
-The answer is stored in `localStorage` under `luz-consent` (or `data-luz-consent-key`, starting with `luz-`), as `{"version":1,"expires":<ms>,"asked":[…],"granted":[…]}`. Read it with `getConsent()`, which returns `{ asked, granted, expires }` or `null`, and listen for `luz:consent` on `document`, dispatched with the same object as `detail` on every new answer. A button with `data-luz-consent-open` (and `hidden`) shows the banner again. The script writes no text. Full markup on the [Cookie consent page of the docs](https://nandovejer.github.io/luz/docs/site/consent/).
+The answer is stored in `localStorage` under `luz-consent` (or `data-luz-consent-key`, starting with `luz-`), as `{"version":1,"expires":<ms>,"asked":[…],"granted":[…]}`. Read it with `getConsent()`, which returns `{ asked, granted, expires }` or `null`, and listen for `luz:consent` on `document`, dispatched with the same object as `detail` on every new answer. A button with `data-luz-consent-open` (and `hidden`) shows the banner again. The script writes no text. Full markup on the [Cookie consent page of the docs](https://nandomunoz.github.io/luz/docs/site/consent/).
 
 ```js
 import { getConsent } from "@luz-ds/site/consent";
@@ -124,7 +124,7 @@ document.addEventListener("luz:consent", (e) => (granted(e.detail) ? startMeasur
 </luz-mode>
 ```
 
-The element has `mode` (`"auto"`, `"light"`, `"dark"` or `"high-contrast"`), `light` (the phase, or `null` without the clock) and `preview(phase | hour | null)`, which shows another hour of the day with the clock (and returns `false` without it). It dispatches `luz-mode:change`, bubbling, after it starts and on every change, with `{ mode, theme, light, remembered, simulated }`. Full markup, the boot snippet for `<head>` and a theme with a day and a night light on the [Color mode page of the docs](https://nandovejer.github.io/luz/docs/site/mode/).
+The element has `mode` (`"auto"`, `"light"`, `"dark"` or `"high-contrast"`), `light` (the phase, or `null` without the clock) and `preview(phase | hour | null)`, which shows another hour of the day with the clock (and returns `false` without it). It dispatches `luz-mode:change`, bubbling, after it starts and on every change, with `{ mode, theme, light, remembered, simulated }`. Full markup, the boot snippet for `<head>` and a theme with a day and a night light on the [Color mode page of the docs](https://nandomunoz.github.io/luz/docs/site/mode/).
 
 ## What moved out
 
@@ -143,9 +143,9 @@ Not released yet: 0.0.0 is the workspace's placeholder; the first release is 0.1
 
 1. `dist/classes.json` in this package: the classes and custom properties its CSS defines. Write only those.
 2. `dist/custom-elements.json` in this package: the `<luz-*>` elements it defines, with their attributes.
-3. https://nandovejer.github.io/luz/llms.txt: the index of the documentation, short enough for a small context.
-4. https://nandovejer.github.io/luz/llms-full.txt: the same pages in full.
-5. https://nandovejer.github.io/luz/examples/: one standalone page of markup for each component and pattern.
+3. https://nandomunoz.github.io/luz/llms.txt: the index of the documentation, short enough for a small context.
+4. https://nandomunoz.github.io/luz/llms-full.txt: the same pages in full.
+5. https://nandomunoz.github.io/luz/examples/: one standalone page of markup for each component and pattern.
 
 ### Load order
 

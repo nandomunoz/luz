@@ -4,13 +4,13 @@ Six self-contained components that need data of the site: search, cookie consent
 
 A piece is here when it needs data of the site: its search index, its cookie policy, its languages, its menu, an announcement. Each is a `<luz-*>` tag that works on its own, in any header or page.
 
-Everything else is a **component** of core, one reusable piece that fits inside anything; components are in [Components](https://nandovejer.github.io/luz/docs/components/).
+Everything else is a **component** of core, one reusable piece that fits inside anything; components are in [Components](https://nandomunoz.github.io/luz/docs/components/).
 
-The page structure (the header, the hero, the footer, the page header) is in the packages for one kind of site: [landing](https://nandovejer.github.io/luz/docs/landing/) for a landing page and [CMS](https://nandovejer.github.io/luz/docs/cms/) for a blog, a newspaper or any CMS. They work without this package, and take its components where a search or a language switch goes.
+The page structure (the header, the hero, the footer, the page header) is in the packages for one kind of site: [landing](https://nandomunoz.github.io/luz/docs/landing/) for a landing page and [CMS](https://nandomunoz.github.io/luz/docs/cms/) for a blog, a newspaper or any CMS. They work without this package, and take its components where a search or a language switch goes.
 
 - Each tag is the block, and its parts are `.luz-<tag>__<part>`; every rule uses semantic tokens only.
-- [The LUZ home page](https://nandovejer.github.io/luz/) and these docs are built with them.
-- Not sure which package a piece belongs to? [What each package needs](https://nandovejer.github.io/luz/docs/get-started/structure/#needs) lists every piece, with the package it is in.
+- [The LUZ home page](https://nandomunoz.github.io/luz/) and these docs are built with them.
+- Not sure which package a piece belongs to? [What each package needs](https://nandomunoz.github.io/luz/docs/get-started/structure/#needs) lists every piece, with the package it is in.
 
 ### Use site when
 
@@ -26,7 +26,7 @@ The page structure (the header, the hero, the footer, the page header) is in the
 
 ### Your own components on top
 
-Style what you add with semantic tokens too, so it follows the color mode and any [theme of your own](https://nandovejer.github.io/luz/docs/tokens/themes/).
+Style what you add with semantic tokens too, so it follows the color mode and any [theme of your own](https://nandomunoz.github.io/luz/docs/tokens/themes/).
 
 Semantic tokens in an app-level component
 ```css

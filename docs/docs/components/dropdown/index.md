@@ -49,7 +49,7 @@ Escape closes the panel and returns the focus to the button.
 
 - Give the button a name that says what is inside: “Actions”, “More options for Ana”, not a bare “…”.
 - An unavailable action uses `aria-disabled="true"` and no `disabled`, so it stays reachable and a screen reader says it exists. Do not run its action when it is activated.
-- The panel is not a dialog and holds no form: for a decision or a form, use the [modal](https://nandovejer.github.io/luz/docs/components/modal/).
+- The panel is not a dialog and holds no form: for a decision or a form, use the [modal](https://nandomunoz.github.io/luz/docs/components/modal/).
 
 ### When to use
 Use a dropdown for three to seven related actions on one thing, when showing them all would crowd the page: the actions of a row in a table, of a card, of a project.
@@ -57,7 +57,7 @@ Use a dropdown for three to seven related actions on one thing, when showing the
 ### When not to use
 Do not use a dropdown to pick a value, or to hide the main action.
 
-- To pick one value of a form, use a [select](https://nandovejer.github.io/luz/docs/components/select/).
-- For the main action of a page, use a visible [button](https://nandovejer.github.io/luz/docs/components/button/).
-- For the sections of a site, use a [sidebar](https://nandovejer.github.io/luz/docs/components/sidebar/) or a navigation list.
+- To pick one value of a form, use a [select](https://nandomunoz.github.io/luz/docs/components/select/).
+- For the main action of a page, use a visible [button](https://nandomunoz.github.io/luz/docs/components/button/).
+- For the sections of a site, use a [sidebar](https://nandomunoz.github.io/luz/docs/components/sidebar/) or a navigation list.
 - LUZ has no context menu on right click. The browser's own menu is the reader's, and replacing it breaks copy, paste and spelling help; give the same actions in a dropdown.

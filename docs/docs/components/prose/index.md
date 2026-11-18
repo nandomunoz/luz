@@ -3,7 +3,7 @@
 Sets long text in lines of about 70 characters, with space between its blocks, whatever markup an editor writes inside.
 
 ### Known issues
-A table without a wrapper that is wider than the column pushes the page sideways on a narrow screen. Put a wide table in core's [table](https://nandovejer.github.io/luz/docs/components/table/) wrapper, `.luz-table-wrap`, which scrolls inside itself.
+A table without a wrapper that is wider than the column pushes the page sideways on a narrow screen. Put a wide table in core's [table](https://nandomunoz.github.io/luz/docs/components/table/) wrapper, `.luz-table-wrap`, which scrolls inside itself.
 
 Not yet tested with a screen reader.
 
@@ -30,7 +30,7 @@ There are no modifiers.
 
 - `.luz-prose`: On the element that holds the text: lines of about 70 characters, the space between its blocks, the indent and markers of its lists, inline code as a chip
 - `--luz-prose-measure`: The longest line, `70ch` by default. Set it on the wrapper, between `60ch` and `80ch`
-- `data-luz-classless` on the same element: With [classless mode](https://nandovejer.github.io/luz/docs/get-started/classless/) loaded, its tables, buttons and fields take the look of core's components
+- `data-luz-classless` on the same element: With [classless mode](https://nandomunoz.github.io/luz/docs/get-started/classless/) loaded, its tables, buttons and fields take the look of core's components
 
 ### How it works
 CSS only, in `components/prose.css`. Every selector is inside `:where()`, so a LUZ component inside the text, or a rule of yours, wins.
@@ -47,7 +47,7 @@ Nothing changes: prose is CSS.
 ### Keyboard and ARIA
 Prose takes no focus and adds no role. Tab reaches the links and controls inside it, in source order.
 
-- A long `<pre>` scrolls sideways inside itself. To scroll it with the keyboard, give it `tabindex="0"`, `role="region"` and a name, as core's [code block](https://nandovejer.github.io/luz/docs/components/code/) does.
+- A long `<pre>` scrolls sideways inside itself. To scroll it with the keyboard, give it `tabindex="0"`, `role="region"` and a name, as core's [code block](https://nandomunoz.github.io/luz/docs/components/code/) does.
 - The headings inside make the outline of the text: start at the level under the page's title, and do not skip one.
 
 ### When to use
@@ -56,5 +56,5 @@ Use prose around running text whose markup you do not write block by block: the 
 ### When not to use
 Do not put prose around a whole page or an interface: the header, the navigation, forms and cards lay themselves out.
 
-- For a column of blocks you build yourself, use [`.o-stack`](https://nandovejer.github.io/luz/docs/components/layout/).
+- For a column of blocks you build yourself, use [`.o-stack`](https://nandomunoz.github.io/luz/docs/components/layout/).
 - For one or two lines inside a component, such as a card's text, use the component's own classes.

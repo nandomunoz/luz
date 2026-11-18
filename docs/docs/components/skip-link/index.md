@@ -25,7 +25,7 @@ A normal link to the `id` of `<main>`, first in `<body>`, before a cookie banner
 
 - It slides in when it receives focus, over `--luz-duration-fast`; under reduced motion it appears at once.
 - The browser does the jump. `tabindex="-1"` on `<main>` lets it take the focus, so the next Tab starts inside it in every browser.
-- Under a sticky bar ([.o-sticky](https://nandovejer.github.io/luz/docs/components/layout/#objects-page)) the page's scroll padding keeps the start of `<main>` below the bar after the jump.
+- Under a sticky bar ([.o-sticky](https://nandomunoz.github.io/luz/docs/components/layout/#objects-page)) the page's scroll padding keeps the start of `<main>` below the bar after the jump.
 
 ### Without JavaScript
 Nothing changes: the skip link is a link and CSS.

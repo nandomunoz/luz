@@ -46,5 +46,5 @@ Use a breadcrumb when pages sit three or more levels deep, so the reader sees wh
 ### When not to use
 Do not use a breadcrumb on a flat site, or as the only navigation.
 
-- For the main sections of a site, use a [sidebar](https://nandovejer.github.io/luz/docs/components/sidebar/) or a header navigation.
+- For the main sections of a site, use a [sidebar](https://nandomunoz.github.io/luz/docs/components/sidebar/) or a header navigation.
 - For steps in a process, show the step number in the page heading instead.

@@ -45,7 +45,7 @@ Nothing changes in the frame. The code block is plain text in a region that scro
 ### Keyboard and ARIA
 - **Order:** the controls of the preview, then the code block.
 - **Code block:** keep `tabindex="0"` and an `aria-label` on the `<pre>`: it scrolls, and without them a keyboard user cannot reach it or tell what it is.
-- **Preview:** it is live, so what is in it works as it does anywhere. A picture that must not be used goes in [Do and don't](https://nandovejer.github.io/luz/docs/documentation/dodont/), whose stage is inert.
+- **Preview:** it is live, so what is in it works as it does anywhere. A picture that must not be used goes in [Do and don't](https://nandomunoz.github.io/luz/docs/documentation/dodont/), whose stage is inert.
 
 ### When to use
 Use the example to show a piece and the markup that makes it, in one frame, the code under the preview.
@@ -56,5 +56,5 @@ Use the example to show a piece and the markup that makes it, in one frame, the 
 ### When not to use
 Do not use the example to show a mistake or code with nothing to preview.
 
-- A picture of a mistake goes in [Do and don't](https://nandovejer.github.io/luz/docs/documentation/dodont/), which is inert.
-- Code with nothing to show, such as a command, is a plain [code block](https://nandovejer.github.io/luz/docs/components/code/).
+- A picture of a mistake goes in [Do and don't](https://nandomunoz.github.io/luz/docs/documentation/dodont/), which is inert.
+- Code with nothing to show, such as a command, is a plain [code block](https://nandomunoz.github.io/luz/docs/components/code/).

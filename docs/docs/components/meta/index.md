@@ -46,5 +46,5 @@ Use a meta line for two to four short facts about a post, a story or an item: th
 ### When not to use
 Do not use it for a sentence, or for facts the reader needs to compare across items.
 
-- Facts with labels, such as a price and a size, are a description list (`<dl>`) or a [table](https://nandovejer.github.io/luz/docs/components/table/).
-- A path of pages is a [breadcrumb](https://nandovejer.github.io/luz/docs/components/breadcrumb/); a set of labels is a row of [tags](https://nandovejer.github.io/luz/docs/components/tag/).
+- Facts with labels, such as a price and a size, are a description list (`<dl>`) or a [table](https://nandomunoz.github.io/luz/docs/components/table/).
+- A path of pages is a [breadcrumb](https://nandomunoz.github.io/luz/docs/components/breadcrumb/); a set of labels is a row of [tags](https://nandomunoz.github.io/luz/docs/components/tag/).

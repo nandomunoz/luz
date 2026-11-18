@@ -4,7 +4,7 @@ Every tag and class of the site components, what element it goes on and what it 
 
 Look up a tag or a class by name. Each component's own page has its markup and guidance.
 
-The page structure that site held before, from the shell to the footer, is in core ([layout](https://nandovejer.github.io/luz/docs/components/layout/), [skip link](https://nandovejer.github.io/luz/docs/components/skip-link/), [image](https://nandovejer.github.io/luz/docs/components/image/), [band](https://nandovejer.github.io/luz/docs/components/band/)) and in the packages for one kind of site ([landing](https://nandovejer.github.io/luz/docs/landing/), [CMS](https://nandovejer.github.io/luz/docs/cms/)).
+The page structure that site held before, from the shell to the footer, is in core ([layout](https://nandomunoz.github.io/luz/docs/components/layout/), [skip link](https://nandomunoz.github.io/luz/docs/components/skip-link/), [image](https://nandomunoz.github.io/luz/docs/components/image/), [band](https://nandomunoz.github.io/luz/docs/components/band/)) and in the packages for one kind of site ([landing](https://nandomunoz.github.io/luz/docs/landing/), [CMS](https://nandomunoz.github.io/luz/docs/cms/)).
 
 ### Search
 

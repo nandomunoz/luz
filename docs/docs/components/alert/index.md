@@ -49,7 +49,7 @@ Use an alert to tell the reader about a state that matters on this page.
 ### When not to use
 Do not use an alert for a message that must stop the reader, or one they can safely miss.
 
-- A decision the reader must make before going on: use a [modal](https://nandovejer.github.io/luz/docs/components/modal/).
-- A short confirmation that needs no action: use a [toast](https://nandovejer.github.io/luz/docs/components/toast/).
-- An error on one field: put it next to the field ([form fields](https://nandovejer.github.io/luz/docs/components/form/)).
+- A decision the reader must make before going on: use a [modal](https://nandomunoz.github.io/luz/docs/components/modal/).
+- A short confirmation that needs no action: use a [toast](https://nandomunoz.github.io/luz/docs/components/toast/).
+- An error on one field: put it next to the field ([form fields](https://nandomunoz.github.io/luz/docs/components/form/)).
 - More than two alerts at once: merge them, or the reader stops reading them.

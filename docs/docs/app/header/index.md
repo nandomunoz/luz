@@ -46,11 +46,11 @@ No modifier. The header is a class of app on a native `<header>`, laid out by co
 
 - `.luz-app-header`: On `<header>`, a child of `.o-main`: the page surface and a rule underneath. It is one row of `--luz-bar-h`; its `.o-row` has the gutters of the content
 - `.luz-app-header__product`: The product's name in medium text, semibold. It shows only at 768 px and below, where the sidebar is a drawer and its brand is out of sight
-- `.luz-app-header__actions`: On a `.o-row`: the global tools at the inline end of the bar. Site's [search](https://nandovejer.github.io/luz/docs/site/search/), then the account
+- `.luz-app-header__actions`: On a `.o-row`: the global tools at the inline end of the bar. Site's [search](https://nandomunoz.github.io/luz/docs/site/search/), then the account
 - `.luz-app-header__account`: On the `.luz-btn.luz-btn--ghost` that opens the account list: at least 44 by 44 px, with its initials in a `.luz-avatar` and then the name
 - `.luz-app-header__account-name`: The account's name. At 640 px and below it is clipped to nothing, and stays in the button's name
-- `.o-sticky` (core): Keeps the bar at the top while the page scrolls, in a window at least 30 rem tall; see [the page and its bars](https://nandovejer.github.io/luz/docs/components/layout/#objects-page)
-- `.luz-dropdown` (core): The account list, a disclosure of links: see the [dropdown](https://nandovejer.github.io/luz/docs/components/dropdown/)
+- `.o-sticky` (core): Keeps the bar at the top while the page scrolls, in a window at least 30 rem tall; see [the page and its bars](https://nandomunoz.github.io/luz/docs/components/layout/#objects-page)
+- `.luz-dropdown` (core): The account list, a disclosure of links: see the [dropdown](https://nandomunoz.github.io/luz/docs/components/dropdown/)
 
 ### How it works
 CSS from `@luz-ds/app` on core's shell, sticky bar, drawer and dropdown. No JavaScript, and `@luz-ds/site` is optional.
@@ -60,7 +60,7 @@ CSS from `@luz-ds/app` on core's shell, sticky bar, drawer and dropdown. No Java
 - The page is what scrolls, not `.o-main`, so the sticky bar stays at the window's top. If you give `.o-main` a height of its own and make it scroll, what it focuses stays clear of the bar through its scroll padding.
 - The account list opens under its button and ends where the button ends, so it never leaves the window at the inline end of the bar.
 - Without site there is no search: leave `<luz-search>` out. Nothing else changes.
-- The view's `h1` and its main action are not here: they are the first row of the [dashboard](https://nandovejer.github.io/luz/docs/app/dashboard/). The bar holds only what is the same in every view.
+- The view's `h1` and its main action are not here: they are the first row of the [dashboard](https://nandomunoz.github.io/luz/docs/app/dashboard/). The bar holds only what is the same in every view.
 
 ### Without JavaScript
 Nothing changes.
@@ -72,7 +72,7 @@ The drawer and the account list are popovers opened by the button's `popovertarg
 - **Keys:** Enter or Space on the menu button opens the drawer, and on the account button opens the list; Tab reaches each link in order; Escape closes it and returns focus to the button.
 - **Names:** the menu button is named "Menu" (`aria-label`, translated like the rest of the page). The account button's name is its initials, then the name: "AM Ana Martín", so a person who says "click AM" finds it at any width. The browser exposes the buttons' expanded state.
 - **Not a menu:** the account list is a list of links in a popover. It has no `role="menu"`, no `aria-haspopup` and no arrow keys.
-- **Landmarks:** a `<header>` in `.o-main`, which is a `<div>`, is the page's banner, beside the `<main>`, never inside it. The sidebar is the one navigation, named "Main". Put the [skip link](https://nandovejer.github.io/luz/docs/components/skip-link/) first: it skips the sidebar and the bar.
+- **Landmarks:** a `<header>` in `.o-main`, which is a `<div>`, is the page's banner, beside the `<main>`, never inside it. The sidebar is the one navigation, named "Main". Put the [skip link](https://nandomunoz.github.io/luz/docs/components/skip-link/) first: it skips the sidebar and the bar.
 
 ### When to use
 Use the header at the top of the main area of every view of an application: the person always finds the search and their account in the same place.
@@ -85,4 +85,4 @@ Do not use it for the title of the view or for its actions: they go in the first
 
 - One header per page, in `.o-main`: it is the page's banner.
 - Do not put a primary button in the bar: the view's main action would be lost among the chrome.
-- For a bar with the site's own sections, use the [navbar](https://nandovejer.github.io/luz/docs/components/navbar/) in the header of [landing](https://nandovejer.github.io/luz/docs/landing/header/) or [CMS](https://nandovejer.github.io/luz/docs/cms/header/).
+- For a bar with the site's own sections, use the [navbar](https://nandomunoz.github.io/luz/docs/components/navbar/) in the header of [landing](https://nandomunoz.github.io/luz/docs/landing/header/) or [CMS](https://nandomunoz.github.io/luz/docs/cms/header/).

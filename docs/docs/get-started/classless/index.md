@@ -62,10 +62,10 @@ LUZ's reset removes every margin, so a Markdown article would run together. Insi
 A heading starts further down (`--luz-space-xl`), and the block that follows it sits closer (`--luz-space-sm`), so each heading belongs to what it introduces.
 
 - The first child of its parent has no margin above it, so the zone does not push itself away from its container.
-- `div`, `span` and inline elements are left alone: their layout is yours. For a column of blocks you build yourself, use [`.o-stack`](https://nandovejer.github.io/luz/docs/components/layout/).
+- `div`, `span` and inline elements are left alone: their layout is yours. For a column of blocks you build yourself, use [`.o-stack`](https://nandomunoz.github.io/luz/docs/components/layout/).
 - A button that follows a field gets the same step, so it does not touch it. Buttons side by side stay together.
 - It is a margin at specificity zero: any class of yours wins, and a LUZ component that sets its own margin keeps it.
-- For an article, core's [`.luz-prose`](https://nandovejer.github.io/luz/docs/components/prose/) takes the same three steps between the blocks of one wrapper and adds the line length and the indent of lists. The two work together: put both on the element that holds the text, and classless mode adds the look of its tables and controls.
+- For an article, core's [`.luz-prose`](https://nandomunoz.github.io/luz/docs/components/prose/) takes the same three steps between the blocks of one wrapper and adds the line length and the indent of lists. The two work together: put both on the element that holds the text, and classless mode adds the look of its tables and controls.
 
 ### How it stays out of the way
 

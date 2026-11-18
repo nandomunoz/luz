@@ -19,14 +19,14 @@ The token override
 
 - Write the token on `:root`, in CSS that is not inside an `@layer`.
 - CSS outside any layer wins over every LUZ layer, wherever it sits in the file. You do not need `!important`, or a longer selector.
-- If you use layers of your own, declare their order first. [Cascade layers](https://nandovejer.github.io/luz/docs/get-started/layers/) has the order and the three ways to override LUZ.
-- Token names are on [the Tokens pages](https://nandovejer.github.io/luz/docs/tokens/). A token you write that LUZ does not read does nothing.
+- If you use layers of your own, declare their order first. [Cascade layers](https://nandomunoz.github.io/luz/docs/get-started/layers/) has the order and the three ways to override LUZ.
+- Token names are on [the Tokens pages](https://nandomunoz.github.io/luz/docs/tokens/). A token you write that LUZ does not read does nothing.
 
 ### Colours and modes
 
 LUZ ships one look in three modes: light, dark and high contrast. Colours are semantic tokens, such as `--luz-brand-fill` and `--luz-surface-page`, and each one has a value for each mode.
 
-To change them, [make your own theme](https://nandovejer.github.io/luz/docs/tokens/themes/): it gives you a template, the steps and where to load it. Then run [the contrast check](https://nandovejer.github.io/luz/docs/tokens/contrast/) on your colours, which measures the pairs LUZ promises to keep readable.
+To change them, [make your own theme](https://nandomunoz.github.io/luz/docs/tokens/themes/): it gives you a template, the steps and where to load it. Then run [the contrast check](https://nandomunoz.github.io/luz/docs/tokens/contrast/) on your colours, which measures the pairs LUZ promises to keep readable.
 
 ### Fonts
 
@@ -54,7 +54,7 @@ The font override
 - On an element marked `lang="ar"`, body and headings already take the sans: ET Book has no Arabic letters. A rule of your own, outside LUZ's layers, still wins.
 - A font you bring has its own licence. Read it before you publish the file.
 
-[Typography](https://nandovejer.github.io/luz/docs/tokens/typography/) lists the font roles and the type scale.
+[Typography](https://nandomunoz.github.io/luz/docs/tokens/typography/) lists the font roles and the type scale.
 
 ### Text and space sizes
 
@@ -138,7 +138,7 @@ Type sizes at 16px root
 - With a base of 0.875rem the floors hold: `--luz-text-sm`, `--luz-text-md` and `--luz-text-base` are all 14px.
 - Each step is rounded to 1/16 rem, which is a whole pixel at a 16px root. A browser without `round()` uses the plain chain: at the defaults the three largest steps are at most 0.25px away.
 
-[Typography](https://nandovejer.github.io/luz/docs/tokens/typography/) and [Spacing and sizing](https://nandovejer.github.io/luz/docs/tokens/spacing/) list each step with its formula.
+[Typography](https://nandomunoz.github.io/luz/docs/tokens/typography/) and [Spacing and sizing](https://nandomunoz.github.io/luz/docs/tokens/spacing/) list each step with its formula.
 
 ### Corners
 
@@ -158,7 +158,7 @@ Square corners
 }
 ```
 
-[Radius](https://nandovejer.github.io/luz/docs/tokens/radius/) says which component uses which step.
+[Radius](https://nandomunoz.github.io/luz/docs/tokens/radius/) says which component uses which step.
 
 ### Shadows
 
@@ -179,7 +179,7 @@ Shadows for light and dark
 }
 ```
 
-Never let a shadow be the only edge of a surface: it disappears in forced colors. [Shadows](https://nandovejer.github.io/luz/docs/tokens/shadows/) has the values, and [Color modes](https://nandovejer.github.io/luz/docs/tokens/modes/) how the three modes are chosen.
+Never let a shadow be the only edge of a surface: it disappears in forced colors. [Shadows](https://nandomunoz.github.io/luz/docs/tokens/shadows/) has the values, and [Color modes](https://nandomunoz.github.io/luz/docs/tokens/modes/) how the three modes are chosen.
 
 ### Adjust one component
 
@@ -211,13 +211,13 @@ Three things to avoid.
 
 - **`!important`.** It is never needed: unlayered CSS and the order of layers decide first.
 - **A status colour for something else.** Success, warning, danger and info keep their meaning, so do not use them to decorate.
-- **Removing the focus ring.** `outline: none` leaves a keyboard user with no way to see where they are. Change its colour with `--luz-focus-ring` and check the result with [the contrast check](https://nandovejer.github.io/luz/docs/tokens/contrast/).
+- **Removing the focus ring.** `outline: none` leaves a keyboard user with no way to see where they are. Change its colour with `--luz-focus-ring` and check the result with [the contrast check](https://nandomunoz.github.io/luz/docs/tokens/contrast/).
 
-[Cascade layers](https://nandovejer.github.io/luz/docs/get-started/layers/) has the full order of LUZ's layers.
+[Cascade layers](https://nandomunoz.github.io/luz/docs/get-started/layers/) has the full order of LUZ's layers.
 
 ### Icons
 
-LUZ draws 22 icons of its own, on [the Icon grid page](https://nandovejer.github.io/luz/docs/components/icon-grid/), which also has the markup. For hundreds, bring a set.
+LUZ draws 22 icons of its own, on [the Icon grid page](https://nandomunoz.github.io/luz/docs/components/icon-grid/), which also has the markup. For hundreds, bring a set.
 
 Whatever set you use, the pattern is the same:
 
@@ -270,7 +270,7 @@ Icon sets that are not MIT only
 
 Everything above is safe to change. These are not, and each has a reason.
 
-- **The colour scales.** Components read semantic tokens. Change those, in [a theme of your own](https://nandovejer.github.io/luz/docs/tokens/themes/), not the palette they are built on.
+- **The colour scales.** Components read semantic tokens. Change those, in [a theme of your own](https://nandomunoz.github.io/luz/docs/tokens/themes/), not the palette they are built on.
 - **The status colours.** `--luz-color-success`, `--luz-color-warning`, `--luz-color-danger` and `--luz-color-info` mean what their names say. Do not use them for anything else.
 - **The focus ring.** You can set its colour. You cannot remove it.
 - **The 44px targets.** The control heights, `--luz-control-sm` to `--luz-control-xl`, are not knobs.

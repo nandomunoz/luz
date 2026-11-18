@@ -23,7 +23,7 @@ Layers, and names with a dot such as `luz.components`, work in every current bro
 Core and the other packages put their rules in their own layers inside `luz`. They are listed here from first to last: a layer lower in the table wins over the ones above it.
 
 - `luz.tokens`: tokens: The `--luz-*` custom properties
-- `luz.themes`: core: Your own looks (only custom properties; [make one](https://nandovejer.github.io/luz/docs/tokens/themes/)). LUZ ships none: its default look is in `luz.tokens`
+- `luz.themes`: core: Your own looks (only custom properties; [make one](https://nandomunoz.github.io/luz/docs/tokens/themes/)). LUZ ships none: its default look is in `luz.tokens`
 - `luz.settings`: core: Motion, z-index and breakpoint settings
 - `luz.generic`: core: The reset
 - `luz.elements`: core: Bare HTML elements, at specificity 0
@@ -35,7 +35,7 @@ Core and the other packages put their rules in their own layers inside `luz`. Th
 - `luz.cms`: cms: The patterns of a blog, a newspaper or any CMS: `.luz-cms-*`. After site; landing and cms share no class, so their order decides nothing
 - `luz.app`: app: The header and the dashboard of a web application: `.luz-app-*`. After cms; landing, cms and app share no class, so their order decides nothing
 - `luz.docs`: docs: The pieces of a documentation page: `.luz-docs-*`. After app; it shares no class with any other package, so its place moves no other layer
-- `luz.print`: core: What changes on paper, inside `@media print`: [Print styles](https://nandovejer.github.io/luz/docs/get-started/print/). Last, so it wins over the screen styles of every package
+- `luz.print`: core: What changes on paper, inside `@media print`: [Print styles](https://nandomunoz.github.io/luz/docs/get-started/print/). Last, so it wins over the screen styles of every package
 
 Every file LUZ publishes repeats the order of this list first, so it is the same whichever file a page loads first. These names are public: renaming one is a breaking change.
 
@@ -73,7 +73,7 @@ Overriding LUZ from your own layer
 }
 ```
 
-- **Prefer tokens.** A token changes every component that reads it, in the mode it is set for. Check the colors you set with [the contrast check](https://nandovejer.github.io/luz/docs/tokens/contrast/).
+- **Prefer tokens.** A token changes every component that reads it, in the mode it is set for. Check the colors you set with [the contrast check](https://nandomunoz.github.io/luz/docs/tokens/contrast/).
 - **No `!important` and no longer selectors** are needed: layer order decides first, and specificity only counts inside one layer.
 - Keep a color override in the right mode: `:root` in `app` wins over LUZ's dark mode too. Set the token per mode, for example in `[data-theme="dark"]`.
 

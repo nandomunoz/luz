@@ -176,13 +176,13 @@ describe("languages of the home page: generated markup", () => {
   });
 
   it("writes them absolute from the site's URL in the pages build, and refuses a URL that is not https or has no final slash", () => {
-    const url = "https://nandovejer.github.io/luz/";
+    const url = "https://nandomunoz.github.io/luz/";
     expect(renderAlternates(i18n, i18n.byCode.get("ar"), url).split(/\n\s*/)).toEqual([
-      '<link rel="canonical" href="https://nandovejer.github.io/luz/ar/">',
-      '<link rel="alternate" hreflang="en" href="https://nandovejer.github.io/luz/">',
-      '<link rel="alternate" hreflang="es" href="https://nandovejer.github.io/luz/es/">',
-      '<link rel="alternate" hreflang="ar" href="https://nandovejer.github.io/luz/ar/">',
-      '<link rel="alternate" hreflang="x-default" href="https://nandovejer.github.io/luz/">',
+      '<link rel="canonical" href="https://nandomunoz.github.io/luz/ar/">',
+      '<link rel="alternate" hreflang="en" href="https://nandomunoz.github.io/luz/">',
+      '<link rel="alternate" hreflang="es" href="https://nandomunoz.github.io/luz/es/">',
+      '<link rel="alternate" hreflang="ar" href="https://nandomunoz.github.io/luz/ar/">',
+      '<link rel="alternate" hreflang="x-default" href="https://nandomunoz.github.io/luz/">',
     ]);
     const html = renderDocument(LANDING, "apps/landing/index.html", "/es/", site, { locale: i18n.byCode.get("es"), siteUrl: "https://example.org/" });
     expect(html).toContain('<link rel="canonical" href="https://example.org/es/">');
@@ -243,12 +243,12 @@ describe("the LUZ home page in every language", () => {
   const render = (doc) => renderDocument(doc.html, doc.file, doc.route, site, { locale: doc.locale });
 
   it("publishes at the GitHub Pages URL of the repository, whose path is PAGES_BASE", () => {
-    expect(SITE_URL).toBe("https://nandovejer.github.io/luz/");
+    expect(SITE_URL).toBe("https://nandomunoz.github.io/luz/");
     expect(new URL(SITE_URL).pathname).toBe(PAGES_BASE);
     const options = { repoRoot: repo, relative: true, outRoot: join(repo, "docs"), pagesBase: PAGES_BASE };
     expect(() => docsSite({ ...options, siteUrl: SITE_URL })).not.toThrow();
-    expect(() => docsSite({ ...options, siteUrl: "https://nandovejer.github.io/other/" })).toThrow(/whose path is pagesBase/);
-    expect(() => docsSite({ ...options, siteUrl: "http://nandovejer.github.io/luz/" })).toThrow(/https URL/);
+    expect(() => docsSite({ ...options, siteUrl: "https://nandomunoz.github.io/other/" })).toThrow(/whose path is pagesBase/);
+    expect(() => docsSite({ ...options, siteUrl: "http://nandomunoz.github.io/luz/" })).toThrow(/https URL/);
   });
 
   it("ships English (default), Spanish and Arabic, each named in itself", () => {

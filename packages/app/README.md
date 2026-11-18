@@ -10,7 +10,7 @@ The header and the dashboard of a web application: the bar at the top of the mai
 - You want a quiet bar for the global tools, and a dashboard of panels for the view's state.
 - Not for a landing page (`@luz-ds/landing`), a blog (`@luz-ds/cms`) or documentation.
 
-There is no sidebar of its own: core's `.luz-sidebar` is a column from 769 px and a drawer at 768 px and below, opened by the menu button with no script. An icon rail and a collapsible sidebar are not in 0.1. The app page, an app with no sidebar and an empty dashboard need no CSS of their own: they are markup to copy, on the [App templates](https://nandovejer.github.io/luz/docs/app/templates/) page of the docs.
+There is no sidebar of its own: core's `.luz-sidebar` is a column from 769 px and a drawer at 768 px and below, opened by the menu button with no script. An icon rail and a collapsible sidebar are not in 0.1. The app page, an app with no sidebar and an empty dashboard need no CSS of their own: they are markup to copy, on the [App templates](https://nandomunoz.github.io/luz/docs/app/templates/) page of the docs.
 
 ## Prerequisites
 
@@ -53,8 +53,8 @@ The view's `h1` and its main action are not in the bar: they are the first row o
 
 ## Classes included
 
-- `.luz-app-header` (`__toggle`, `__product`, `__actions`, `__account`, `__account-name`) — The bar at the top of `.o-main`, one row of core's `--luz-bar-h`, kept at the top with `.o-sticky`: the menu button, the product's name while the sidebar is a drawer, the search and the account. [Docs](https://nandovejer.github.io/luz/docs/app/header/)
-- `.luz-app-dashboard` (`__head`, `__title`, `__panel`, `__panel--wide`) — The view: its title row, then a grid of panels (core's `.o-grid--auto` and `.luz-card`) as many columns as fit, none narrower than 18 rem; a wide panel takes two columns when the view is 40 rem wide. [Docs](https://nandovejer.github.io/luz/docs/app/dashboard/)
+- `.luz-app-header` (`__toggle`, `__product`, `__actions`, `__account`, `__account-name`) — The bar at the top of `.o-main`, one row of core's `--luz-bar-h`, kept at the top with `.o-sticky`: the menu button, the product's name while the sidebar is a drawer, the search and the account. [Docs](https://nandomunoz.github.io/luz/docs/app/header/)
+- `.luz-app-dashboard` (`__head`, `__title`, `__panel`, `__panel--wide`) — The view: its title row, then a grid of panels (core's `.o-grid--auto` and `.luz-card`) as many columns as fit, none narrower than 18 rem; a wide panel takes two columns when the view is 40 rem wide. [Docs](https://nandomunoz.github.io/luz/docs/app/dashboard/)
 
 <!-- luz:ai-agents:start -->
 ## For AI agents
@@ -68,9 +68,9 @@ Not released yet: 0.0.0 is the workspace's placeholder; the first release is 0.1
 ### Read first
 
 1. `dist/classes.json` in this package: the classes and custom properties its CSS defines. Write only those.
-2. https://nandovejer.github.io/luz/llms.txt: the index of the documentation, short enough for a small context.
-3. https://nandovejer.github.io/luz/llms-full.txt: the same pages in full.
-4. https://nandovejer.github.io/luz/examples/: one standalone page of markup for each component and pattern.
+2. https://nandomunoz.github.io/luz/llms.txt: the index of the documentation, short enough for a small context.
+3. https://nandomunoz.github.io/luz/llms-full.txt: the same pages in full.
+4. https://nandomunoz.github.io/luz/examples/: one standalone page of markup for each component and pattern.
 
 ### Load order
 

@@ -56,6 +56,6 @@ Use tabs to switch between panels of the same level that readers do not need sid
 ### When not to use
 Do not use tabs to move between pages, or to hide content readers need all at once.
 
-- Between pages, use a [sidebar](https://nandovejer.github.io/luz/docs/components/sidebar/) or header links.
+- Between pages, use a [sidebar](https://nandomunoz.github.io/luz/docs/components/sidebar/) or header links.
 - For steps in order, use separate pages.
 - More than five or six tabs do not fit a phone: use sections with headings.

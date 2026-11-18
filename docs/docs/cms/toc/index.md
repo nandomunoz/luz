@@ -43,7 +43,7 @@ There are no modifiers. The contents are optional: without them, the text takes 
 - `data-luz-spy` on `.luz-cms-toc`: Core's scroll spy marks the link of the section in view. Optional
 - `.luz-cms-toc__title`: The heading of the contents, in the sans, semibold
 - `.luz-cms-toc__list`: The list, with no markers and a rule along its inline start; one link a line
-- `--luz-cms-toc-top`: The space above the contents while they stay in view: 24 px, or 24 px under a sticky bar (core's `.o-sticky`, one row of `--luz-bar-h`, such as the [header](https://nandovejer.github.io/luz/docs/cms/header/)). Set it on `.luz-cms-toc` for a header of another height
+- `--luz-cms-toc-top`: The space above the contents while they stay in view: 24 px, or 24 px under a sticky bar (core's `.o-sticky`, one row of `--luz-bar-h`, such as the [header](https://nandomunoz.github.io/luz/docs/cms/header/)). Set it on `.luz-cms-toc` for a header of another height
 
 ### How it works
 A CSS grid inside a size container, from `@luz-ds/cms`. No JavaScript of its own.
@@ -69,5 +69,5 @@ Use a table of contents in an article of four or more sections, which people rea
 ### When not to use
 Do not use it in a short post: three paragraphs need no map.
 
-- Not for links to other pages: that is navigation, in the [header](https://nandovejer.github.io/luz/docs/cms/header/) or a [sidebar](https://nandovejer.github.io/luz/docs/components/sidebar/).
+- Not for links to other pages: that is navigation, in the [header](https://nandomunoz.github.io/luz/docs/cms/header/) or a [sidebar](https://nandomunoz.github.io/luz/docs/components/sidebar/).
 - Not for the steps of a task done in order: number the steps in the text.

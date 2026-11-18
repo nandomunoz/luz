@@ -8,7 +8,7 @@ LUZ is made for the person who uses the page. It starts from native HTML, works 
 
 Plain HTML and CSS with a closed list of class names is also easy for an AI agent to get right. The site publishes the list of names, and a command checks what the agent wrote.
 
-[Working with AI](https://nandovejer.github.io/luz/docs/get-started/ai/) has the files and the prompt.
+[Working with AI](https://nandomunoz.github.io/luz/docs/get-started/ai/) has the files and the prompt.
 
 ### Tests first
 
@@ -42,4 +42,4 @@ The packages have no runtime dependency. They ship plain CSS and small ES module
 
 Size budgets are a red line: a check fails when a file grows past its ceiling, and nobody raises a ceiling to make it pass. Everything LUZ ships is under the MIT licence, and only the MIT licence.
 
-[Get started](https://nandovejer.github.io/luz/docs/get-started/) shows how to load it.
+[Get started](https://nandomunoz.github.io/luz/docs/get-started/) shows how to load it.

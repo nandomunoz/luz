@@ -62,5 +62,5 @@ Use an avatar to identify a person or an account where space is tight, such as a
 Do not use an avatar as the only way to tell people apart.
 
 - Two people can share initials: show the name as text nearby.
-- For a status or a category, use a [tag](https://nandovejer.github.io/luz/docs/components/tag/).
-- For the portrait of a speaker or a product, a size of its own, use a card with the image frame: see [Speakers](https://nandovejer.github.io/luz/docs/landing/templates/#speakers) in the landing page templates. An avatar is 24 to 48 px.
+- For a status or a category, use a [tag](https://nandomunoz.github.io/luz/docs/components/tag/).
+- For the portrait of a speaker or a product, a size of its own, use a card with the image frame: see [Speakers](https://nandomunoz.github.io/luz/docs/landing/templates/#speakers) in the landing page templates. An avatar is 24 to 48 px.

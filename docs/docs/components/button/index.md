@@ -71,6 +71,6 @@ Use a button to start an action on the current page: save, send, delete, open a 
 ### When not to use
 Do not use a button to go to another page: use a link, styled as a button only when it is the main call to action.
 
-- For several related actions in a row, use an [action group](https://nandovejer.github.io/luz/docs/components/layout/#objects-actions).
+- For several related actions in a row, use an [action group](https://nandomunoz.github.io/luz/docs/components/layout/#objects-actions).
 - Do not disable a button to hide an action the reader cannot take yet: say why instead.
 - Do not stretch a button across a wide column: a bar 1,000 px wide is not a button. Two actions side by side are two buttons of their own width.

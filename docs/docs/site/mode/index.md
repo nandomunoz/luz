@@ -8,12 +8,12 @@ What to expect:
 - With `by="clock"`, Auto is dark from 20:30 to 07:30 even when the device is set to light. The system setting is not read.
 - With `prefers-contrast: more` and a dark setting together, Auto gives the high-contrast mode, which is light.
 - In the Auto state the cycle button says Auto, not the mode Auto applied.
-- Without [the script for the head](https://nandovejer.github.io/luz/docs/site/mode/#boot), a dark system can flash the wrong mode first.
+- Without [the script for the head](https://nandomunoz.github.io/luz/docs/site/mode/#boot), a dark system can flash the wrong mode first.
 - Auto and the legend are yours to translate. A name in `data-luz-themes` is left to core.
 - It has not been tested with a screen reader.
 
 ### Copy the markup
-Core's [color mode switcher](https://nandovejer.github.io/luz/docs/components/mode-switcher/) with a fourth radio, `auto`, checked, inside `<luz-mode>`. `site.min.js` loads the element's file, `mode.min.js`; a page without it loads that file on its own.
+Core's [color mode switcher](https://nandomunoz.github.io/luz/docs/components/mode-switcher/) with a fourth radio, `auto`, checked, inside `<luz-mode>`. `site.min.js` loads the element's file, `mode.min.js`; a page without it loads that file on its own.
 
 Put the icons in the labels, not `data-mode-icon` on the cycle button: with `luz.js` the button copies the checked label's icon, and core has no Auto icon for `data-mode-icon`.
 
@@ -91,7 +91,7 @@ The phases of the day, by the visitor's clock. Night runs through midnight.
 
 #### Two lights in one mode
 
-With `by="clock"` the rest is your CSS: set only the semantic tokens that differ, as [a theme of your own](https://nandovejer.github.io/luz/docs/tokens/themes/) does. Measure each pair with the [contrast check](https://nandovejer.github.io/luz/docs/tokens/contrast/).
+With `by="clock"` the rest is your CSS: set only the semantic tokens that differ, as [a theme of your own](https://nandomunoz.github.io/luz/docs/tokens/themes/) does. Measure each pair with the [contrast check](https://nandomunoz.github.io/luz/docs/tokens/contrast/).
 
 A day look and a night look
 ```css

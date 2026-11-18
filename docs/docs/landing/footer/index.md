@@ -52,7 +52,7 @@ No modifiers. The footer is a class of the landing on a native `<footer>`, with 
 - `.luz-landing-footer__brand`: The first cell of the `.o-container.o-container--inline.o-grid` (core), 24 px (`--luz-space-lg`) apart: a name, a version, one line. From 768 px it is twice a column
 - `.luz-landing-footer__col`: A column, on a `<nav>`: a title over a list of links with no markers, 8 px (`--luz-space-xs`) apart; each link is a box 28 px (`--luz-control-sm`) tall, a target of 24 px or more
 - `.luz-landing-footer__col-title`: A column's title: sans, small, semibold, primary text
-- `.o-actions` (core): The links, as an [action group](https://nandovejer.github.io/luz/docs/components/layout/#objects-actions)
+- `.o-actions` (core): The links, as an [action group](https://nandomunoz.github.io/luz/docs/components/layout/#objects-actions)
 
 ### How it works
 CSS from `@luz-ds/landing` on core's objects. No JavaScript, and `@luz-ds/site` is optional.
@@ -63,7 +63,7 @@ CSS from `@luz-ds/landing` on core's objects. No JavaScript, and `@luz-ds/site` 
 - The column at 768 px and below does not wrap, so its children stay one under the other.
 
 ### Without JavaScript
-Nothing changes: the footer is HTML and CSS. A [color mode switcher](https://nandovejer.github.io/luz/docs/components/mode-switcher/) inside it keeps working as radios.
+Nothing changes: the footer is HTML and CSS. A [color mode switcher](https://nandomunoz.github.io/luz/docs/components/mode-switcher/) inside it keeps working as radios.
 
 ### Keyboard and ARIA
 The footer has no interaction of its own; its links keep theirs.
@@ -78,4 +78,4 @@ Use the footer at the end of every page of a landing site, for who made it, its 
 ### When not to use
 Do not put the main navigation, or anything needed to finish a task, in the footer.
 
-- Main navigation goes in the [header](https://nandovejer.github.io/luz/docs/landing/header/).
+- Main navigation goes in the [header](https://nandomunoz.github.io/luz/docs/landing/header/).

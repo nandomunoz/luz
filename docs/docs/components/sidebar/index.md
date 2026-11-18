@@ -39,7 +39,7 @@ initSidebar();
 - `.luz-sidebar__link`: A link
 - `data-luz-spy` on any element: Not part of the sidebar: the scroll spy also marks the links to sections of the page inside it, such as a table of contents styled your own way
 - `.is-active` on a link: Marks the current link with weight and colour; pair it with `aria-current="page"`
-- `.luz-sidebar__footer`: Pinned to the bottom, for example for the [color mode switcher](https://nandovejer.github.io/luz/docs/components/mode-switcher/)
+- `.luz-sidebar__footer`: Pinned to the bottom, for example for the [color mode switcher](https://nandomunoz.github.io/luz/docs/components/mode-switcher/)
 - `.luz-nav-toggle`: The menu button, shown at 768 px and below; put it first in your header row
 - `.luz-nav-toggle--fixed`: Pins the menu button to the top start corner, for a page with no header
 
@@ -66,5 +66,5 @@ Use a sidebar for the main navigation of an app or a documentation site with man
 ### When not to use
 Do not use a sidebar for a site with a few pages: a header navigation is simpler.
 
-- For the trail to the current page, use a [breadcrumb](https://nandovejer.github.io/luz/docs/components/breadcrumb/).
-- For panels of one page, use [tabs](https://nandovejer.github.io/luz/docs/components/tabs/).
+- For the trail to the current page, use a [breadcrumb](https://nandomunoz.github.io/luz/docs/components/breadcrumb/).
+- For panels of one page, use [tabs](https://nandomunoz.github.io/luz/docs/components/tabs/).

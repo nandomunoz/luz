@@ -26,7 +26,7 @@ A wrapper with a title and a lead, styled by `@luz-ds/cms`. No JavaScript, and `
 
 - The classes change the look only. The title must be the page's `<h1>`.
 - In Arabic the title has no letter-spacing, which would break the joins of the script.
-- A story has the [article header](https://nandovejer.github.io/luz/docs/cms/article-header/) instead, with its section, standfirst and byline.
+- A story has the [article header](https://nandomunoz.github.io/luz/docs/cms/article-header/) instead, with its section, standfirst and byline.
 
 ### Without JavaScript
 Nothing changes: the page header is HTML and CSS.
@@ -44,4 +44,4 @@ Use a page header at the top of a page of a blog or a newspaper that is not a st
 Do not use it for a section inside the page: use a plain heading of the right level.
 
 - One page header per page.
-- A story takes the [article header](https://nandovejer.github.io/luz/docs/cms/article-header/), which has its author and date.
+- A story takes the [article header](https://nandomunoz.github.io/luz/docs/cms/article-header/), which has its author and date.

@@ -3,7 +3,7 @@
 Gives a landing page its rhythm: wide room between the blocks of the main, a closer one inside each section, with its head, and an optional glow behind the page.
 
 ### Known issues
-None known for the main and the sections. A section on core's [band](https://nandovejer.github.io/luz/docs/components/band/#known-issues) has the band's.
+None known for the main and the sections. A section on core's [band](https://nandomunoz.github.io/luz/docs/components/band/#known-issues) has the band's.
 
 ### Copy the markup
 Main and sections markup
@@ -39,7 +39,7 @@ Section head markup
 ```
 
 ### Variants and options
-Classes of the landing on core's objects, the head of a section and two knobs. A section stands out on core's [band](https://nandovejer.github.io/luz/docs/components/band/).
+Classes of the landing on core's objects, the head of a section and two knobs. A section stands out on core's [band](https://nandomunoz.github.io/luz/docs/components/band/).
 
 - `.luz-landing-main`: On `main.o-container.o-stack`: 64 px (`--luz-space-3xl`) between the blocks and under the last one; none above the first, as the hero brings its own
 - `.luz-landing-section`: On `section.o-stack`: 16 px (`--luz-space-md`) between its children
@@ -55,7 +55,7 @@ CSS from `@luz-ds/landing` on core's objects. No JavaScript, and `@luz-ds/site` 
 
 - Core's `.o-container` gives the main its width and gutters, and `.o-stack` the column; the landing's layer comes after core's objects, so its gaps win over the stack's.
 - The glow's tint sits at the start edge: top left in a left-to-right page and top right in a right-to-left one. `--luz-landing-glow-x` moves it: `50%` centres it in both directions.
-- The head shares its rules, and the `em` knob, with the [hero](https://nandovejer.github.io/luz/docs/landing/hero/).
+- The head shares its rules, and the `em` knob, with the [hero](https://nandomunoz.github.io/luz/docs/landing/hero/).
 - Use a section on a `<section>` when the group has its own heading, or on a `<div>` when it does not.
 
 ### Without JavaScript
@@ -74,5 +74,5 @@ Use the main and its sections for every page of a landing site, so the space bet
 ### When not to use
 Do not use a section to space the paragraphs of running text: the text styles already do.
 
-- For blocks side by side, use core's [grid objects](https://nandovejer.github.io/luz/docs/components/layout/), such as `ul.o-grid.o-grid--split` for a few features of equal weight.
+- For blocks side by side, use core's [grid objects](https://nandomunoz.github.io/luz/docs/components/layout/), such as `ul.o-grid.o-grid--split` for a few features of equal weight.
 - Do not use the glow on a long page or behind a band: the tint competes with the band's.

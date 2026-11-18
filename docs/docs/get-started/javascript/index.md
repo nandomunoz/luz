@@ -20,7 +20,7 @@ initTabs();
 - `luz.js` starts every module when the page loads.
 - Importing a single module does nothing until you call its `init` function.
 - `midi.js`, `table-sort.js` and `timeline.js` are chunks of their own: `luz.js` loads each one on demand, and only on a page that needs it.
-- The site search is in `@luz-ds/site`: see [Search](https://nandovejer.github.io/luz/docs/site/search/). So is the cookie banner, a module of its own that `site.js` does not include: see [Cookie consent](https://nandovejer.github.io/luz/docs/site/consent/). The Auto color mode is a third module of the same kind, `mode.js`, loaded by `site.js` only on a page with a `<luz-mode>`: see [Auto color mode](https://nandovejer.github.io/luz/docs/site/mode/).
+- The site search is in `@luz-ds/site`: see [Search](https://nandomunoz.github.io/luz/docs/site/search/). So is the cookie banner, a module of its own that `site.js` does not include: see [Cookie consent](https://nandomunoz.github.io/luz/docs/site/consent/). The Auto color mode is a third module of the same kind, `mode.js`, loaded by `site.js` only on a page with a `<luz-mode>`: see [Auto color mode](https://nandomunoz.github.io/luz/docs/site/mode/).
 
 ### The modules
 
@@ -42,14 +42,14 @@ A language for LUZ is a pull request: the JSON file `packages/core/src/i18n/<cod
 
 What each behaviour falls back to when the script does not run:
 
-- [Tabs](https://nandovejer.github.io/luz/docs/components/tabs/): Links, and every panel stacked
-- [Color mode switcher](https://nandovejer.github.io/luz/docs/components/mode-switcher/): Three radios that still change the mode; not remembered
-- [Auto color mode](https://nandovejer.github.io/luz/docs/site/mode/): The four radios still change the mode; Auto is light, and neither the system nor the clock is followed
-- [Copy button](https://nandovejer.github.io/luz/docs/components/copy-button/): Hidden; the text stays selectable
-- [Player](https://nandovejer.github.io/luz/docs/components/player/): The browser's own media controls; MIDI shows its fallback text
-- [Modal](https://nandovejer.github.io/luz/docs/components/modal/): Opens where the browser supports `command`; elsewhere the open button does nothing
-- [Code](https://nandovejer.github.io/luz/docs/components/code/): Plain text, no colours
-- [Table](https://nandovejer.github.io/luz/docs/components/table/): A heading with a link sorts on the server; a plain heading is not sortable. Rows are never hidden
-- [Timeline](https://nandovejer.github.io/luz/docs/components/timeline/): An ordered list with a line and a dot per item; every item is visible
-- [Sidebar](https://nandovejer.github.io/luz/docs/components/sidebar/): Works, drawer included; the current link does not follow the scroll
-- [Table of contents](https://nandovejer.github.io/luz/docs/cms/toc/) and other `data-luz-spy` lists: Links to the sections; no link is marked as the one in view
+- [Tabs](https://nandomunoz.github.io/luz/docs/components/tabs/): Links, and every panel stacked
+- [Color mode switcher](https://nandomunoz.github.io/luz/docs/components/mode-switcher/): Three radios that still change the mode; not remembered
+- [Auto color mode](https://nandomunoz.github.io/luz/docs/site/mode/): The four radios still change the mode; Auto is light, and neither the system nor the clock is followed
+- [Copy button](https://nandomunoz.github.io/luz/docs/components/copy-button/): Hidden; the text stays selectable
+- [Player](https://nandomunoz.github.io/luz/docs/components/player/): The browser's own media controls; MIDI shows its fallback text
+- [Modal](https://nandomunoz.github.io/luz/docs/components/modal/): Opens where the browser supports `command`; elsewhere the open button does nothing
+- [Code](https://nandomunoz.github.io/luz/docs/components/code/): Plain text, no colours
+- [Table](https://nandomunoz.github.io/luz/docs/components/table/): A heading with a link sorts on the server; a plain heading is not sortable. Rows are never hidden
+- [Timeline](https://nandomunoz.github.io/luz/docs/components/timeline/): An ordered list with a line and a dot per item; every item is visible
+- [Sidebar](https://nandomunoz.github.io/luz/docs/components/sidebar/): Works, drawer included; the current link does not follow the scroll
+- [Table of contents](https://nandomunoz.github.io/luz/docs/cms/toc/) and other `data-luz-spy` lists: Links to the sections; no link is marked as the one in view

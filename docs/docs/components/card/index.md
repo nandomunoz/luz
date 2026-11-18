@@ -28,7 +28,7 @@ Compose a card with the layout objects and the other components, with no new cla
 
 - **Linked card:** the `<a>` goes inside the heading, round its text. A second link or a button in it is allowed, and sits above the title link: see Product card below.
 - **Avatar or icon:** `.o-media` puts it beside `.o-media__body`, which holds the title and the body. Next to a name, hide the avatar with `aria-hidden="true"`: it repeats the name.
-- **Image on top:** the [image frame](https://nandovejer.github.io/luz/docs/components/image/) (`.luz-image`), inside the padding, with `.u-mb-sm` under it. Its alt text says what the picture shows; if it only repeats the title, leave it empty (`alt=""`).
+- **Image on top:** the [image frame](https://nandomunoz.github.io/luz/docs/components/image/) (`.luz-image`), inside the padding, with `.u-mb-sm` under it. Its alt text says what the picture shows; if it only repeats the title, leave it empty (`alt=""`).
 - **Actions:** `.o-row` with small buttons (`.luz-btn--sm`) or tags (`.luz-tag`), last in the card. In a linked card, one action at most, as a button after the title.
 
 #### Product card
@@ -94,7 +94,7 @@ A container styled by `components/card.css`. No JavaScript.
 - The last title or body has no space under it: the padding is the card's last space.
 - A linked card: the link's `::after` is stretched over the card (`position: absolute; inset: 0`), so a click anywhere in it follows the link. The card is `position: relative` to hold it. Any other link or control inside the card (`a`, `button`, `input`, `select`, `textarea`, `summary`) is `position: relative` with `z-index: 1`, so it paints above that overlay and takes its own click; the title link is the one thing never raised. A button's label wraps in a card (`white-space: normal`), so a long label or enlarged text stays inside it. On hover the border turns `--luz-input-border` and a small shadow shows; on keyboard focus a ring goes round the card. The title of a linked card is in sans, as a nav or a list of links is; a card without a link keeps the heading face. Both are found with `:has()`; a card without a link does not change on hover.
 - `.luz-card--featured` sets `border-width: 2px` in `--luz-brand-primary` and takes the extra pixel from the padding, so the card keeps the height of its neighbours. In a linked card the border turns `--luz-brand-hover` on hover, and the keyboard ring stands 4 px off the border, so it does not read as a thicker border.
-- To lay cards out, use the [grid objects](https://nandovejer.github.io/luz/docs/components/layout/), such as the [split grid](https://nandovejer.github.io/luz/docs/components/layout/#objects-actions) for two cards side by side.
+- To lay cards out, use the [grid objects](https://nandomunoz.github.io/luz/docs/components/layout/), such as the [split grid](https://nandomunoz.github.io/luz/docs/components/layout/#objects-actions) for two cards side by side.
 
 ### Without JavaScript
 Nothing changes: a card, linked or not, is HTML and CSS.
@@ -116,8 +116,8 @@ Use a card to group a small set of facts that read as one unit, often in a grid 
 ### When not to use
 Do not use a card to box content that is not a separate thing.
 
-- For rows of records with the same attributes, use a [table](https://nandovejer.github.io/luz/docs/components/table/).
-- For a message about the page, use an [alert](https://nandovejer.github.io/luz/docs/components/alert/).
+- For rows of records with the same attributes, use a [table](https://nandomunoz.github.io/luz/docs/components/table/).
+- For a message about the page, use an [alert](https://nandomunoz.github.io/luz/docs/components/alert/).
 - For a list of links, each with one line of description, use a plain list (`<ul>`): a card per link adds borders and nothing else.
 - A card with more than one action besides its title link is a form or a page: use the page of the thing, not a card.
 - Do not put a card inside a card.

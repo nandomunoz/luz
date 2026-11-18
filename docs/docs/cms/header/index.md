@@ -6,7 +6,7 @@ Starts every page of a blog or a newspaper with the publication's name, its sect
 The header's own issues are those of the pieces of core it is made of, and one of the masthead.
 
 - **The masthead's menu without anchor positioning.** In browsers without CSS anchor positioning, the sections menu of the masthead header opens near the top of the window and covers the publication name and the menu button while it is open. Escape, or a click outside the menu, closes it and returns to the page.
-- **The menu panel.** If you keep pressing Tab after the last link of the open menu, focus moves on into the page and the menu stays open over it; Escape closes it. See the [navbar's known issues](https://nandovejer.github.io/luz/docs/components/navbar/#known-issues).
+- **The menu panel.** If you keep pressing Tab after the last link of the open menu, focus moves on into the page and the menu stays open over it; Escape closes it. See the [navbar's known issues](https://nandomunoz.github.io/luz/docs/components/navbar/#known-issues).
 - **Sticky bar and enlarged text.** The scroll padding of `.o-sticky` is a minimum: at 300% text, with the bar wrapped to several rows, Safari can leave a field reached with Tab under it. Set `scroll-padding-block-start` on `html` to your header's real height, or leave out `.o-sticky`.
 
 ### Copy the markup
@@ -62,13 +62,13 @@ One modifier. The header is a class of cms on a native `<header>`, laid out by c
 - `.luz-cms-header`: On `<header>`: the blog bar. The page surface, a rule underneath, the gaps of its row, and the anchor its panels open under
 - `.luz-cms-header--masthead`: The newspaper's masthead: three rows in an `.o-stack`, 16 px above and below, not sticky
 - `.luz-cms-header__brand`: The publication's name as a link to the home page, in the heading font, semibold, underlined on hover only. In the bar it takes the free room of the row; in the masthead it is large and centred. A logo `<img>` inside it is 44 px tall in the bar, 88 px in the masthead
-- `.luz-cms-header__actions`: On a `.o-row`: site's [search](https://nandovejer.github.io/luz/docs/site/search/), then its [language switch](https://nandovejer.github.io/luz/docs/site/lang-switch/)
+- `.luz-cms-header__actions`: On a `.o-row`: site's [search](https://nandomunoz.github.io/luz/docs/site/search/), then its [language switch](https://nandomunoz.github.io/luz/docs/site/lang-switch/)
 - `.luz-cms-header__top`: Masthead only, on a `.o-row`: the date at the start and the actions at the end, on one row
 - `.luz-cms-header__date`: Masthead only: today's date in a `<time datetime>`, small and secondary; it wraps to give the actions their room
 - `.luz-cms-header__sections`: Masthead only, on a `.o-row`: the menu button and the navbar between two rules, centred from 769 px; its panel opens under this row
-- `.o-sticky` (core): Keeps the blog bar at the top while the page scrolls, in a window at least 30 rem tall; see [the page and its bars](https://nandovejer.github.io/luz/docs/components/layout/#objects-page). Never on the masthead
+- `.o-sticky` (core): Keeps the blog bar at the top while the page scrolls, in a window at least 30 rem tall; see [the page and its bars](https://nandomunoz.github.io/luz/docs/components/layout/#objects-page). Never on the masthead
 - `.o-container.o-container--inline` (core): The width and gutters of the page, so the header starts where the content starts
-- `.luz-nav-toggle`, `.luz-navbar` (core): The menu button and the sections: see the [navbar](https://nandovejer.github.io/luz/docs/components/navbar/)
+- `.luz-nav-toggle`, `.luz-navbar` (core): The menu button and the sections: see the [navbar](https://nandomunoz.github.io/luz/docs/components/navbar/)
 
 ### How it works
 CSS from `@luz-ds/cms` on core's objects and navbar. No JavaScript, and `@luz-ds/site` is optional.
@@ -78,7 +78,7 @@ CSS from `@luz-ds/cms` on core's objects and navbar. No JavaScript, and `@luz-ds
 - The masthead is not sticky: three rows stuck to the top would take a third of a phone's screen. Its brand is 49 px from 1024 px, 39 px below and 31 px at 640 px and below (`--luz-text-4xl`, `-3xl` and `-2xl`, the steps of the landing hero).
 - The bar, and in the masthead the sections row, name themselves the anchor `--luz-bar`, scoped to themselves. Where the browser supports CSS anchor positioning, the navbar's panel opens under them. Elsewhere it opens at `--luz-bar-h` from the top of the window (see Known issues).
 - With `@luz-ds/site`, the list of its `<luz-lang-switch>` opens under the bar. Without it nothing changes: the rules that refine site's elements match nothing.
-- The [table of contents](https://nandovejer.github.io/luz/docs/cms/toc/) of an article sticks under a bar with `.o-sticky`.
+- The [table of contents](https://nandomunoz.github.io/luz/docs/cms/toc/) of an article sticks under a bar with `.o-sticky`.
 
 ### Without JavaScript
 Nothing changes: the menu is a popover opened by the button's `popovertarget`, with no script, the links are plain links, and site's search shows its link to the A–Z index.
@@ -88,7 +88,7 @@ Nothing changes: the menu is a popover opened by the button's `popovertarget`, w
 - **Keys:** Enter or Space on the menu button opens and closes the panel; Escape closes it and returns focus to the button. The panel is not modal: Tab after its last link moves on.
 - **Names:** the `<nav>` and the menu button are both named "Sections"; the browser exposes the button's expanded state. The section of an article has `aria-current="true"`, the section's own index `aria-current="page"`; both are underlined.
 - **Brand:** a link, never a heading: the story's title is the page's one `h1`. A logo is an `<img>` whose `alt` is the publication's name, with no text beside it.
-- **Landmarks:** a `<header>` that is a direct child of `<body>` is the banner. Put the [skip link](https://nandovejer.github.io/luz/docs/components/skip-link/) before it.
+- **Landmarks:** a `<header>` that is a direct child of `<body>` is the banner. Put the [skip link](https://nandomunoz.github.io/luz/docs/components/skip-link/) before it.
 
 ### When to use
 Use the header at the top of every page of a blog or a newspaper: a reader who lands on a story from a search sees which publication it is and reaches its sections and its search.

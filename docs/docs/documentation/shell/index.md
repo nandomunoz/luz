@@ -32,7 +32,7 @@ No modifier. Three classes on native elements, and three custom properties.
 - `.luz-docs-shell`: On `<body>`, with core's `.o-shell`: the tracks and where each part goes
 - `.luz-docs-nav`: With core's `.luz-sidebar`, on the `<nav>`: the sidebar's column
 - `.luz-docs-main`: With `.o-main`, on the `<main>`: the content's column. Its children keep to the measure
-- `.luz-docs-rail`: On an `<aside>`: the third column from 80rem, above the content below it. See [Rail](https://nandovejer.github.io/luz/docs/documentation/rail/)
+- `.luz-docs-rail`: On an `<aside>`: the third column from 80rem, above the content below it. See [Rail](https://nandomunoz.github.io/luz/docs/documentation/rail/)
 - `--luz-docs-measure`: A line of text: `46rem`. Set it on the shell in your own CSS to change it
 - `--luz-docs-nav-w`, `--luz-docs-rail-w`: The sidebar and the rail: `16.5rem` and `14rem`
 - `--luz-docs-rail-top`: How far from the top the rail sticks. Raise it under a sticky header
@@ -52,7 +52,7 @@ In a browser without the popover API the sidebar stays in the page, above the co
 
 ### Keyboard and ARIA
 - **Order:** the order of the source; the grid does not change it. Skip link, header, sidebar, rail, content, footer. The skip link goes to the content, past the sidebar and the rail.
-- **Skip link:** put the [skip link](https://nandovejer.github.io/luz/docs/components/skip-link/) first, aimed at the `<main>`, so a keyboard user passes the sidebar.
+- **Skip link:** put the [skip link](https://nandomunoz.github.io/luz/docs/components/skip-link/) first, aimed at the `<main>`, so a keyboard user passes the sidebar.
 - **Landmarks:** a `<header>` child of `<body>` is the banner; name the `<nav>` after the site and the `<aside>` "About this page".
 - **Keys:** Enter or Space on the menu button opens the drawer; Escape closes it. The browser does it.
 
@@ -65,5 +65,5 @@ Use the shell for the pages of a documentation site: read one after another, wit
 ### When not to use
 Do not use the shell for a page that is not documentation: it assumes a sidebar and a content column.
 
-- A page with no sidebar uses core's `.o-page`: see [the page and its bars](https://nandovejer.github.io/luz/docs/components/layout/#objects-page).
-- A web application has [App](https://nandovejer.github.io/luz/docs/app/); a blog has [CMS](https://nandovejer.github.io/luz/docs/cms/).
+- A page with no sidebar uses core's `.o-page`: see [the page and its bars](https://nandomunoz.github.io/luz/docs/components/layout/#objects-page).
+- A web application has [App](https://nandomunoz.github.io/luz/docs/app/); a blog has [CMS](https://nandomunoz.github.io/luz/docs/cms/).

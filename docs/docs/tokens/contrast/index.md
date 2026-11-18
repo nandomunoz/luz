@@ -4,7 +4,7 @@ Check your own color overrides against the contrast LUZ promises, with one comma
 
 ### Run it
 
-LUZ keeps its own colors readable in light, dark and high contrast. The moment you override a token, that promise is yours. `check-contrast` reads the `--luz-*` declarations of your stylesheet, puts them over LUZ's tokens as the browser would, and measures the same pairs the component pages list. It needs Node 20 or later and nothing else. `luz-check`, the command of [@luz-ds/check](https://nandovejer.github.io/luz/docs/get-started/ai/), runs the same check on the stylesheets you name, next to its rules for the HTML and CSS of a page.
+LUZ keeps its own colors readable in light, dark and high contrast. The moment you override a token, that promise is yours. `check-contrast` reads the `--luz-*` declarations of your stylesheet, puts them over LUZ's tokens as the browser would, and measures the same pairs the component pages list. It needs Node 20 or later and nothing else. `luz-check`, the command of [@luz-ds/check](https://nandomunoz.github.io/luz/docs/get-started/ai/), runs the same check on the stylesheets you name, next to its rules for the HTML and CSS of a page.
 
 The command
 ```text

@@ -55,6 +55,6 @@ Use pagination when a list is too long for one page and each page can be reached
 ### When not to use
 Do not use pagination for a short list, or for the steps of a task.
 
-- For the parents of the page you are on, use a [breadcrumb](https://nandovejer.github.io/luz/docs/components/breadcrumb/).
-- For the sections of one page, use [tabs](https://nandovejer.github.io/luz/docs/components/tabs/).
+- For the parents of the page you are on, use a [breadcrumb](https://nandomunoz.github.io/luz/docs/components/breadcrumb/).
+- For the sections of one page, use [tabs](https://nandomunoz.github.io/luz/docs/components/tabs/).
 - For a feed that keeps loading on scroll, give a link to the next page as well: it is the only version a keyboard and a screen reader reach.

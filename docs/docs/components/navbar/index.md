@@ -46,7 +46,7 @@ A native `popover` on the `<nav>`, opened by core's `.luz-nav-toggle` with `popo
 - At 768 px and below the panel is fixed under the bar, the width of the window, with a shadow, and a dim layer that starts under the bar so the bar is never dimmed.
 - A panel left open when the window grows stays under the bar until it is closed.
 - Without the popover API the links stay in the row and wrap, and the menu button stays hidden.
-- The submenu of site ([Submenu](https://nandovejer.github.io/luz/docs/site/submenu/)) can go in a list item.
+- The submenu of site ([Submenu](https://nandomunoz.github.io/luz/docs/site/submenu/)) can go in a list item.
 
 ### Without JavaScript
 Nothing changes: the navbar is HTML, a native popover and CSS.
@@ -65,6 +65,6 @@ Use the navbar for the few main links of a site, in the header every page shares
 ### When not to use
 Do not use it for an app with many sections, or for links in the page.
 
-- For many sections, or a hierarchy, use the [sidebar](https://nandovejer.github.io/luz/docs/components/sidebar/).
-- For the place of a page in a hierarchy, use a [breadcrumb](https://nandovejer.github.io/luz/docs/components/breadcrumb/).
-- For the sections of one page, use [tabs](https://nandovejer.github.io/luz/docs/components/tabs/) or a list of in-page links.
+- For many sections, or a hierarchy, use the [sidebar](https://nandomunoz.github.io/luz/docs/components/sidebar/).
+- For the place of a page in a hierarchy, use a [breadcrumb](https://nandomunoz.github.io/luz/docs/components/breadcrumb/).
+- For the sections of one page, use [tabs](https://nandomunoz.github.io/luz/docs/components/tabs/) or a list of in-page links.

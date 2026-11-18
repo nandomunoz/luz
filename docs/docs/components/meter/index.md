@@ -52,8 +52,8 @@ A meter is not interactive and takes no focus.
 Use a meter for a value in a known range, next to its figure, in a few to a few dozen rows that share a scale: a share of a total, a count against a quota.
 
 ### When not to use
-Do not use a meter for a task that is running: use [progress](https://nandovejer.github.io/luz/docs/components/progress/).
+Do not use a meter for a task that is running: use [progress](https://nandomunoz.github.io/luz/docs/components/progress/).
 
-- For a trend over time, use a chart library; keep the [table](https://nandovejer.github.io/luz/docs/components/table/) as its text alternative. LUZ draws no line, area or pie chart.
+- For a trend over time, use a chart library; keep the [table](https://nandomunoz.github.io/luz/docs/components/table/) as its text alternative. LUZ draws no line, area or pie chart.
 - When exact values matter more than the shape, leave the bar out: the figure is already there.
 - Do not use the bar's colour to say good or bad: it is always the brand colour.

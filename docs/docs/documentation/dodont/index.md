@@ -64,6 +64,6 @@ Use Do and don't to teach a rule by contrast: the reader sees the right way next
 ### When not to use
 Do not use it for a rule with nothing to compare, or to show a piece that works.
 
-- To show how a piece looks and is built, use [the example](https://nandovejer.github.io/luz/docs/documentation/example/).
+- To show how a piece looks and is built, use [the example](https://nandomunoz.github.io/luz/docs/documentation/example/).
 - Do not invent a mistake nobody makes to fill the Don't.
 - Do not show a live failure. A contrast or semantics failure goes in code.

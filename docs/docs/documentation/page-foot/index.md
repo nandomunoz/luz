@@ -43,5 +43,5 @@ Use the page foot under the content of every page that people maintain, so a rea
 ### When not to use
 Do not use the page foot for the footer of the site: it belongs to one page.
 
-- The footer of the site is a `<footer>`, a child of the [shell](https://nandovejer.github.io/luz/docs/documentation/shell/).
+- The footer of the site is a `<footer>`, a child of the [shell](https://nandomunoz.github.io/luz/docs/documentation/shell/).
 - Do not show a date that is not kept up to date: a wrong date is worse than none.

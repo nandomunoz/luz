@@ -37,7 +37,7 @@ Rail markup
 ### Variants and options
 No modifier. The rail is an `<aside>` around one box that holds two blocks: the list and the actions.
 
-- `.luz-docs-rail`: On an `<aside>`: the third column of the [shell](https://nandovejer.github.io/luz/docs/documentation/shell/) from 80rem, as tall as the content; below it, above the content
+- `.luz-docs-rail`: On an `<aside>`: the third column of the [shell](https://nandomunoz.github.io/luz/docs/documentation/shell/) from 80rem, as tall as the content; below it, above the content
 - `.luz-docs-rail__inner`: On a `<div>`, the one child of the rail, around the list and the actions: from 80rem it is the sticky box, inside the rail, so it never covers the footer, and it scrolls by itself, with room at its start for a focus ring
 - `.luz-docs-rail__onpage`: On the `<nav>` of the list, a direct child of `__inner`: it scopes the reset of the fold and its title, and is the hook for a script
 - `.luz-docs-rail__fold`: On a native `<details>`. Write `open`, so the list shows without a script. Where the rail is above the content, a script may close it when the page loads
@@ -73,4 +73,4 @@ Use the rail on pages with several sections, so a reader sees the shape of the p
 Do not use the rail on a short page: a list of two links is more to read than the page.
 
 - It lists the sections of one page. The pages of the site go in the sidebar.
-- Nest no deeper than an `h3`. For the contents beside an article, use [the CMS table of contents](https://nandovejer.github.io/luz/docs/cms/toc/).
+- Nest no deeper than an `h3`. For the contents beside an article, use [the CMS table of contents](https://nandomunoz.github.io/luz/docs/cms/toc/).

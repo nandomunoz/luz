@@ -55,11 +55,11 @@ Every control is a native element with a LUZ class. The state comes from native 
 - `.luz-input`: Text, email, number, date, time, colour, file and range inputs and `<textarea>`; 44 px high
 - `.luz-input--error`: A 2 px danger underline; pair it with `aria-invalid="true"`
 - `.luz-input--textarea`: Auto height, at least 80 px, resizes vertically
-- `.luz-select`: A `<select>`, on its own page: [Select](https://nandovejer.github.io/luz/docs/components/select/)
+- `.luz-select`: A `<select>`, on its own page: [Select](https://nandomunoz.github.io/luz/docs/components/select/)
 - `.luz-check-group`, `.luz-check-item`: A list of checkboxes or radios, each with its label
 - `.luz-fieldset`: A bordered group with an upper-case `<legend>`
 - `.luz-toggle`: A switch: a checkbox with `role="switch"` drawn as a track and a thumb
-- `.luz-meter`: A `<meter>` bar, in the brand colour in every state: see [Meter](https://nandovejer.github.io/luz/docs/components/meter/)
+- `.luz-meter`: A `<meter>` bar, in the brand colour in every state: see [Meter](https://nandomunoz.github.io/luz/docs/components/meter/)
 - `.luz-output`: A computed value
 - `disabled`, `readonly`: Faded; read-only also gets a dashed underline
 
@@ -85,7 +85,7 @@ The native keys apply. Tab moves between controls.
 Use these fields to collect input, with the native control that fits the data.
 
 - Text, email, number, date, time: an input of that `type`.
-- One choice from a few (six or fewer): radios. From many: a [select](https://nandovejer.github.io/luz/docs/components/select/).
+- One choice from a few (six or fewer): radios. From many: a [select](https://nandomunoz.github.io/luz/docs/components/select/).
 - Several choices: checkboxes. A setting that applies at once: a switch.
 
 ### When not to use
@@ -93,4 +93,4 @@ Do not rebuild a native control from `<div>` elements.
 
 - Do not use a placeholder as the label: it disappears when the reader types.
 - Do not use a switch inside a form that is sent with a button: use a checkbox.
-- To show how far a task has got, use [progress](https://nandovejer.github.io/luz/docs/components/progress/), not a [meter](https://nandovejer.github.io/luz/docs/components/meter/).
+- To show how far a task has got, use [progress](https://nandomunoz.github.io/luz/docs/components/progress/), not a [meter](https://nandomunoz.github.io/luz/docs/components/meter/).

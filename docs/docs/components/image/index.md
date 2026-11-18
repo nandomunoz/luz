@@ -54,6 +54,6 @@ Use the image frame for a picture in a box of fixed shape, such as a card cover 
 ### When not to use
 Do not use it for an image that must keep its own shape, such as a chart or a screenshot: the frame crops it.
 
-- For a chart or a diagram with a caption, use a [figure](https://nandovejer.github.io/luz/docs/components/figure/).
+- For a chart or a diagram with a caption, use a [figure](https://nandomunoz.github.io/luz/docs/components/figure/).
 - For icons and logos, use an `<img>` or an SVG at its own size.
 - Never let an empty frame stand in for an image that carries information: if it is missing, say so in text.

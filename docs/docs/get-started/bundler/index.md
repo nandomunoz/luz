@@ -23,9 +23,9 @@ import "@luz-ds/landing/css";
 - The tokens come first: every other package needs them.
 - `import "@luz-ds/core"` is the script. It is optional: every LUZ page works without it.
 - To load less CSS, import `@luz-ds/core/base.css` and then one file per component, for example `@luz-ds/core/components/button.css`.
-- To load one script module, import it by name and call its function: see [JavaScript modules](https://nandovejer.github.io/luz/docs/get-started/javascript/).
+- To load one script module, import it by name and call its function: see [JavaScript modules](https://nandomunoz.github.io/luz/docs/get-started/javascript/).
 
-For the lines that match what you are building, with the CDN tags and their integrity hashes, [choose your snippet](https://nandovejer.github.io/luz/docs/get-started/snippet/).
+For the lines that match what you are building, with the CDN tags and their integrity hashes, [choose your snippet](https://nandomunoz.github.io/luz/docs/get-started/snippet/).
 
 Every name above is an entry of the `exports` map of its package. This table lists all of them.
 
@@ -97,7 +97,7 @@ Every CSS file LUZ publishes starts with the same `@layer` statement, which decl
 
 In the Astro build below, the layers came out in the declared order, `luz.tokens` first and `luz.print` last, and an unlayered rule of the consumer came last.
 
-CSS of your own that is outside any layer wins over every layer of LUZ, in any position, with no `!important`. [Cascade layers](https://nandovejer.github.io/luz/docs/get-started/layers/) has the full list and how to override one.
+CSS of your own that is outside any layer wins over every layer of LUZ, in any position, with no `!important`. [Cascade layers](https://nandomunoz.github.io/luz/docs/get-started/layers/) has the full list and how to override one.
 
 ### Astro, step by step
 
@@ -180,7 +180,7 @@ import Base from "../layouts/Base.astro";
 </Base>
 ```
 
-The rule in `site.css` sets the type knob to 1.125rem and wins over LUZ's default without a layer and without `!important`. [Make it yours](https://nandovejer.github.io/luz/docs/get-started/make-it-yours/) has the other knobs.
+The rule in `site.css` sets the type knob to 1.125rem and wins over LUZ's default without a layer and without `!important`. [Make it yours](https://nandomunoz.github.io/luz/docs/get-started/make-it-yours/) has the other knobs.
 
 #### What the build showed
 
@@ -213,7 +213,7 @@ So a framework that renders on the server can import them. In plain Node, with n
 
 To skip ET Book, import `@luz-ds/tokens/tokens.css` instead. It has the same tokens and no `@font-face`, so no font is downloaded.
 
-Then set `--luz-font-body` to the font you use: [Make it yours](https://nandovejer.github.io/luz/docs/get-started/make-it-yours/) shows how.
+Then set `--luz-font-body` to the font you use: [Make it yours](https://nandomunoz.github.io/luz/docs/get-started/make-it-yours/) shows how.
 
 ### A CDN in a framework
 
@@ -221,13 +221,13 @@ You can load LUZ from a CDN in a framework layout instead of importing it. In an
 
 So does a script with `is:inline`. Astro only processes a `<script>` that has no attribute other than `src`.
 
-Use the CDN or the imports, not both: LUZ would load twice. [Choose your snippet](https://nandovejer.github.io/luz/docs/get-started/snippet/) gives the tags with their hashes.
+Use the CDN or the imports, not both: LUZ would load twice. [Choose your snippet](https://nandomunoz.github.io/luz/docs/get-started/snippet/) gives the tags with their hashes.
 
 ### If something does not work
 
 - **A warning about a peer dependency.** `@luz-ds/core` asks for `@luz-ds/tokens` at `^0.1.0`. Install both, at the same version: `npm install @luz-ds/tokens @luz-ds/core`.
 - **The tool cannot resolve `@luz-ds/core/css`.** The export is `./css`, with no file extension. If your tool reports an unresolved import, add the package to `vite.ssr.noExternal`, as [Astro's styling guide](https://docs.astro.build/en/guides/styling/) describes.
-- **The styles come out in the wrong order.** Two copies of LUZ on the page, for example one from a CDN and one from your bundler, put their rules in the same layers: load it once. An `@import` with `layer(luz)` nests the names as `luz.luz.components`: drop the `layer()`. [Cascade layers](https://nandovejer.github.io/luz/docs/get-started/layers/) explains the order.
+- **The styles come out in the wrong order.** Two copies of LUZ on the page, for example one from a CDN and one from your bundler, put their rules in the same layers: load it once. An `@import` with `layer(luz)` nests the names as `luz.luz.components`: drop the `layer()`. [Cascade layers](https://nandomunoz.github.io/luz/docs/get-started/layers/) explains the order.
 
 astro.config.mjs with the package left to the bundler
 ```js

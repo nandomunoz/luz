@@ -31,10 +31,10 @@ The other notes on the reviewer are on the page at the URL above.
 A run with no findings says what the checker did not find in the files it read. It is not a test of the page.
 
 - **It does not run a browser.** It reads files, so anything that depends on how a page renders, such as layout, focus order or the colors a browser works out, is not seen.
-- **Contrast is measured for your tokens only.** It measures the `--luz-*` colors you set in your own color tokens file. A color written straight into a rule is not measured against anything. How the pairs are read is on [Contrast check](https://nandovejer.github.io/luz/docs/tokens/contrast/).
+- **Contrast is measured for your tokens only.** It measures the `--luz-*` colors you set in your own color tokens file. A color written straight into a rule is not measured against anything. How the pairs are read is on [Contrast check](https://nandomunoz.github.io/luz/docs/tokens/contrast/).
 - **A class built at run time is not seen.** A name put together in a script, such as `"luz-" + name`, or written by a template, is not in the file, so it is not checked.
 - **It does not check names, labels, alt text, headings and language.** Whether a button has a name, an image a useful alternative, the headings an order and the page a language is not read, and a run with no findings says nothing about them.
-- **It does not replace testing with a screen reader.** No assistive technology is used, by the command or by the reviewer. What has not been tested is listed in [the accessibility statement](https://nandovejer.github.io/luz/docs/accessibility/#h-a11y-not-tested).
+- **It does not replace testing with a screen reader.** No assistive technology is used, by the command or by the reviewer. What has not been tested is listed in [the accessibility statement](https://nandomunoz.github.io/luz/docs/accessibility/#h-a11y-not-tested).
 - **It does not call a network.** It runs offline, with the data in your `node_modules` or in its own package.
 - **Discovery by `llms.txt` is by link.** This site is not at the root of a host, so an agent does not find the file by itself: give it the URL, as the prompt above does.
 - **Exit code 0 is not an accessibility result.** It says that no rule above blocks in the files that were read.

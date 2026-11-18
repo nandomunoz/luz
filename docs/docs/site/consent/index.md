@@ -11,7 +11,7 @@ Without JavaScript the banner is not shown at all: there is nothing to answer, b
 - It has not been tested with a screen reader.
 
 ### Copy the markup
-Right after the [skip link](https://nandovejer.github.io/luz/docs/components/skip-link/), before a [banner](https://nandovejer.github.io/luz/docs/site/banner/) and the header of the page (a [landing](https://nandovejer.github.io/luz/docs/landing/header/) or [CMS](https://nandovejer.github.io/luz/docs/cms/header/) header): it shows at the bottom of the window, but it comes first in the reading and Tab order. One checkbox per category of optional cookies, its `value` the category’s name.
+Right after the [skip link](https://nandomunoz.github.io/luz/docs/components/skip-link/), before a [banner](https://nandomunoz.github.io/luz/docs/site/banner/) and the header of the page (a [landing](https://nandomunoz.github.io/luz/docs/landing/header/) or [CMS](https://nandomunoz.github.io/luz/docs/cms/header/) header): it shows at the bottom of the window, but it comes first in the reading and Tab order. One checkbox per category of optional cookies, its `value` the category’s name.
 
 `site.min.js` loads the banner’s own file, `consent.min.js`, when the browser is idle; a page without `site.min.js` loads that file on its own.
 
@@ -119,6 +119,6 @@ Use it when your site sets cookies, or stores data in the browser, that it does 
 Do not use it when the site sets only the cookies it needs to work (a session, a basket, a language or colour choice): those need no consent. Say so in the cookie policy and show no banner.
 
 - Do not use it as a wall that hides or blocks the page until the visitor answers.
-- Do not use it for news or a sale: that is a [banner](https://nandovejer.github.io/luz/docs/site/banner/).
+- Do not use it for news or a sale: that is a [banner](https://nandomunoz.github.io/luz/docs/site/banner/).
 
 It replaces a third-party consent script. Nothing in LUZ is removed.

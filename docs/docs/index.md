@@ -6,7 +6,7 @@ Install LUZ, find a component and copy its markup. Every example is live and fol
 
 Beta Names and classes can still change. Pin an exact version. [Read the changelog](https://github.com/nandomunoz/luz/blob/main/CHANGELOG.md)
 
-[Browse the A–Z index](https://nandovejer.github.io/luz/docs/a-z/) Search components, tokens and HTML elements by name.
+[Browse the A–Z index](https://nandomunoz.github.io/luz/docs/a-z/) Search components, tokens and HTML elements by name.
 
 ### Start here
 
@@ -17,10 +17,10 @@ Beta Names and classes can still change. Pin an exact version. [Read the changel
 
 ### More reference
 
-- [Tokens](https://nandovejer.github.io/luz/docs/tokens/) Colors, spacing, type and motion, in light, dark and high contrast.
-- [Site](https://nandovejer.github.io/luz/docs/site/) Page patterns: shell, header, sections, footer and search.
-- [HTML elements](https://nandovejer.github.io/luz/docs/html/) How LUZ styles each of the 116 HTML elements.
-- [Accessibility](https://nandovejer.github.io/luz/docs/accessibility/) What is tested, what is not, and the known issues.
+- [Tokens](https://nandomunoz.github.io/luz/docs/tokens/) Colors, spacing, type and motion, in light, dark and high contrast.
+- [Site](https://nandomunoz.github.io/luz/docs/site/) Page patterns: shell, header, sections, footer and search.
+- [HTML elements](https://nandomunoz.github.io/luz/docs/html/) How LUZ styles each of the 116 HTML elements.
+- [Accessibility](https://nandomunoz.github.io/luz/docs/accessibility/) What is tested, what is not, and the known issues.
 
 ### How these pages work
 

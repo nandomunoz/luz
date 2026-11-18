@@ -104,7 +104,7 @@ The wrapper takes focus (`tabindex="0"`) so keyboard users can scroll it with th
 - Give the wrapper `role="region"` and an `aria-label`, so that focus stop has a name.
 - `scope="col"` on column headers, and `scope="row"` on a header cell that names its row.
 - A sortable heading is a button: Tab reaches it, Enter or Space sorts, and focus stays on it while the rows move. A link that the script replaces keeps the focus it had.
-- `aria-sort` is on the one sorted `<th scope="col">`. Each sort is announced by the status line (`<output>`, role `status`), in the language of the table; the strings are `sortedAsc` and `sortedDesc` of core's strings (see [JavaScript modules](https://nandovejer.github.io/luz/docs/get-started/javascript/); `data-luz-label-sorted-asc` and `data-luz-label-sorted-desc` override them).
+- `aria-sort` is on the one sorted `<th scope="col">`. Each sort is announced by the status line (`<output>`, role `status`), in the language of the table; the strings are `sortedAsc` and `sortedDesc` of core's strings (see [JavaScript modules](https://nandomunoz.github.io/luz/docs/get-started/javascript/); `data-luz-label-sorted-asc` and `data-luz-label-sorted-desc` override them).
 - The column name is the heading's text only: no arrow character, no “ascending” in the markup.
 
 ### When to use
@@ -114,6 +114,6 @@ Use a table to compare records across the same attributes: services and their st
 Do not use a table for layout.
 
 - For one attribute per item, use a list.
-- For a few items of equal weight, use [cards](https://nandovejer.github.io/luz/docs/components/card/).
+- For a few items of equal weight, use [cards](https://nandomunoz.github.io/luz/docs/components/card/).
 - For a data grid (filters, selecting rows, editing cells or thousands of rows), use a library built for it. LUZ's table shows rows and sorts them; it does not manage them. For paginated results, sort on the server.
-- For a trend over time, use a chart library and keep the table as its text alternative. A bar for each row is a [meter](https://nandovejer.github.io/luz/docs/components/meter/) in the cell of its figure.
+- For a trend over time, use a chart library and keep the table as its text alternative. A bar for each row is a [meter](https://nandomunoz.github.io/luz/docs/components/meter/) in the cell of its figure.

@@ -4,7 +4,7 @@ Lay out blocks in a stack, a row, a grid or beside an image, a group of actions,
 
 ### Examples
 
-`.o-shell`, `.o-main` and `.o-container` are page-level: [this page uses them](https://nandovejer.github.io/luz/docs/components/layout/#page-nav).
+`.o-shell`, `.o-main` and `.o-container` are page-level: [this page uses them](https://nandomunoz.github.io/luz/docs/components/layout/#page-nav).
 
 ### Pick an object
 
@@ -46,8 +46,8 @@ Page markup
 ```
 
 - The objects lay out only: the header's surface and divider are the job of your CSS, or of the header of a package for one kind of site.
-- `--luz-bar-h` is the height of a one-row bar of 44 px controls at the default text size: the control, two 4 px paddings and a 1 px divider. The [navbar](https://nandovejer.github.io/luz/docs/components/navbar/) panel opens at that height when nothing anchors it.
-- With `.o-sticky` on the page, the scroll padding of `<html>` is `--luz-bar-h` or 3.5em, whichever is more, plus half a control: a field reached with Tab, or the target of the [skip link](https://nandovejer.github.io/luz/docs/components/skip-link/), stops below the bar. It is a minimum: a bar that wraps to several rows with enlarged text is taller, and Safari can leave a field partly under it at 300 percent text.
+- `--luz-bar-h` is the height of a one-row bar of 44 px controls at the default text size: the control, two 4 px paddings and a 1 px divider. The [navbar](https://nandomunoz.github.io/luz/docs/components/navbar/) panel opens at that height when nothing anchors it.
+- With `.o-sticky` on the page, the scroll padding of `<html>` is `--luz-bar-h` or 3.5em, whichever is more, plus half a control: a field reached with Tab, or the target of the [skip link](https://nandomunoz.github.io/luz/docs/components/skip-link/), stops below the bar. It is a minimum: a bar that wraps to several rows with enlarged text is taller, and Safari can leave a field partly under it at 300 percent text.
 - Below 30 rem of window height the bar scrolls away with the page, so it never takes most of a short screen.
 
 ### Actions and the split grid
@@ -107,7 +107,7 @@ List grid markup
 ```
 
 - Safari can drop the list role from a list without markers, outside a `<nav>`. Give each item a heading, as cards have, so the reader can still move through them.
-- No rule of yours is needed. Inside [prose](https://nandovejer.github.io/luz/docs/components/prose/), which gives lists their markers back, a list with an object keeps none.
+- No rule of yours is needed. Inside [prose](https://nandomunoz.github.io/luz/docs/components/prose/), which gives lists their markers back, a list with an object keeps none.
 
 ### Copy the markup
 
@@ -132,6 +132,6 @@ App shell markup
 </body>
 ```
 
-The footer is a plain `<footer>`, which core places across the bottom: nothing here needs site. For whole pages without a sidebar, use [`.o-page`](https://nandovejer.github.io/luz/docs/components/layout/#objects-page).
+The footer is a plain `<footer>`, which core places across the bottom: nothing here needs site. For whole pages without a sidebar, use [`.o-page`](https://nandomunoz.github.io/luz/docs/components/layout/#objects-page).
 
-[What each package needs](https://nandovejer.github.io/luz/docs/get-started/structure/#needs) lists every piece.
+[What each package needs](https://nandomunoz.github.io/luz/docs/get-started/structure/#needs) lists every piece.
