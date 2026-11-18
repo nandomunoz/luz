@@ -39,7 +39,7 @@ for (const { route, lang } of PAGES) {
       for (const id of ['who', 'hosting', 'storage', 'videos', 'cookie-settings', 'questions']) await expect(page.locator(`h2#${id}`), id).toBeVisible();
       const rows = page.locator('h2#storage ~ div table tbody tr');
       expect(await rows.locator('code').first().textContent()).toBe('luz-theme');
-      await expect(page.locator('main a[href="https://github.com/nandovejer/luz/issues"]')).toHaveCount(1);
+      await expect(page.locator('main a[href="https://github.com/nandomunoz/luz/issues"]')).toHaveCount(1);
     });
 
     test.describe('without JavaScript', () => {

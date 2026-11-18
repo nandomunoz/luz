@@ -38,7 +38,7 @@ export const PAGES_BASE = "/luz/";
 
 /**
  * The published site's root URL: GitHub Pages of the repository
- * github.com/nandovejer/luz (the git remote), at PAGES_BASE. The pages build
+ * github.com/nandomunoz/luz (the git remote), at PAGES_BASE. The pages build
  * writes the home pages' canonical and hreflang alternates with it, absolute
  * as search engines ask; the dev server keeps them root-absolute. A fork or a
  * custom domain changes it with PAGES_BASE.
