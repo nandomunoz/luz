@@ -37,7 +37,7 @@ const checkText = (...args) => member("checkText")(...args);
 
 const CASES = ".claude/evals/prompt-injection/cases.json";
 const IDS = ["start", "landing", "blog", "app", "docs"];
-const SITE = "https://nandovejer.github.io/luz/";
+const SITE = "https://nandomunoz.github.io/luz/";
 const known = { classes: new Set(["luz-btn", "luz-btn--primary", "luz-alert", "luz-alert__title", "o-stack"]), elements: new Set(["luz-mode", "luz-search"]) };
 
 /** Three clean lines, with `bad` as the third: the problem must be on line 3 of the file. */
@@ -107,7 +107,7 @@ describe("checkText: each problem is reported with the file and the line it is o
   it("accepts the site's URLs and the CDN's @luz-ds files, and refuses another file of the CDN", () => {
     expect(onLine3(`See ${SITE}docs/get-started/ and https://cdn.jsdelivr.net/npm/@luz-ds/core@1.0.0/dist/luz.min.css.`)).toEqual([]);
     expect(onLine3("See https://cdn.jsdelivr.net/npm/left-pad@1.0.0/index.js.").length).toBeGreaterThan(0);
-    expect(onLine3("See http://nandovejer.github.io/luz/docs/.").length, "plain http is not the site").toBeGreaterThan(0);
+    expect(onLine3("See http://nandomunoz.github.io/luz/docs/.").length, "plain http is not the site").toBeGreaterThan(0);
   });
 });
 
