@@ -46,11 +46,11 @@ import '@luz-ds/core'   // optional: the JavaScript, starts every behavior
 
 ### Bare HTML elements
 
-The HTML comes out styled with no class: text, links, lists, buttons, fields, `select`, `fieldset`, tables, `details` and `dialog`. A `button` with no `type`, or with `type="submit"`, is the primary action; `type="button"` is the secondary one. The tags that only structure a page (`div`, `section`, `header`, `nav` and the rest) have no style: the layout is yours. A class adds what HTML cannot say, such as `.luz-btn` on an `a`, a danger role, a size or a card. Every rule has zero specificity, so any rule of yours wins. [Which elements have a style with no class](https://nandovejer.github.io/luz/docs/html/#html-styled).
+The HTML comes out styled with no class: text, links, lists, buttons, fields, `select`, `fieldset`, tables, `details` and `dialog`. A `button` with no `type`, or with `type="submit"`, is the primary action; `type="button"` is the secondary one. The tags that only structure a page (`div`, `section`, `header`, `nav` and the rest) have no style: the layout is yours. A class adds what HTML cannot say, such as `.luz-btn` on an `a`, a danger role, a size or a card. Every rule has zero specificity, so any rule of yours wins. [Which elements have a style with no class](https://nandomunoz.github.io/luz/docs/html/#html-styled).
 
 ### In a project that already has a design
 
-Load `luz.conditional.css` instead of `luz.css`: the same file, with the reset and the bare elements only inside `[data-luz]`. The element with `data-luz` takes the font, color and background of the page; objects, components and utilities apply wherever you put their class. [Migrate a project to LUZ](https://nandovejer.github.io/luz/docs/get-started/migrate/) has the steps.
+Load `luz.conditional.css` instead of `luz.css`: the same file, with the reset and the bare elements only inside `[data-luz]`. The element with `data-luz` takes the font, color and background of the page; objects, components and utilities apply wherever you put their class. [Migrate a project to LUZ](https://nandomunoz.github.io/luz/docs/get-started/migrate/) has the steps.
 
 ```html
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@luz-ds/tokens@0.2.1/dist/luz-tokens.css">
@@ -162,7 +162,7 @@ Every stylesheet puts its rules in a layer of one container layer, `luz`: `luz.t
 
 ## Color mode
 
-`<luz-theme-mode>` holds the radios of the color mode (`auto`, `light`, `dark`, `high-contrast`, `name="luz-theme-mode"`). Without JavaScript they change the mode through the tokens; with it, `luz.js` loads `theme-mode.min.js` and the element becomes one round button, fixed at the end corner of the window (`inline` keeps it in the flow, `no-remember` stops it storing the choice under `luz-theme`). It writes `data-mode` on `<html>`, and `data-theme` when the page names no brand, and fires `luz-theme-mode:change`. The optional `theme-boot.min.js`, a classic script in the `<head>`, applies the stored or system mode before the first paint. The markup and the options are on the [Theme mode](https://nandovejer.github.io/luz/docs/components/theme-mode/) page. To give Auto the time of day, wrap it in `<luz-theme-time>` from `@luz-ds/catalog`.
+`<luz-theme-mode>` holds the radios of the color mode (`auto`, `light`, `dark`, `high-contrast`, `name="luz-theme-mode"`). Without JavaScript they change the mode through the tokens; with it, `luz.js` loads `theme-mode.min.js` and the element becomes one round button, fixed at the end corner of the window (`inline` keeps it in the flow, `no-remember` stops it storing the choice under `luz-theme`). It writes `data-mode` on `<html>`, and `data-theme` when the page names no brand, and fires `luz-theme-mode:change`. The optional `theme-boot.min.js`, a classic script in the `<head>`, applies the stored or system mode before the first paint. The markup and the options are on the [Theme mode](https://nandomunoz.github.io/luz/docs/components/theme-mode/) page. To give Auto the time of day, wrap it in `<luz-theme-time>` from `@luz-ds/catalog`.
 
 ## Themes
 
@@ -193,9 +193,9 @@ Older versions: https://github.com/nandomunoz/luz/blob/main/packages/core/CHANGE
 ### Read first
 
 1. `dist/classes.json` in this package: the classes and custom properties its CSS defines. Write only those.
-2. https://nandovejer.github.io/luz/llms.txt: the index of the documentation, short enough for a small context.
-3. https://nandovejer.github.io/luz/llms-full.txt: the same pages in full.
-4. https://nandovejer.github.io/luz/examples/: one standalone page of markup for each component and pattern.
+2. https://nandomunoz.github.io/luz/llms.txt: the index of the documentation, short enough for a small context.
+3. https://nandomunoz.github.io/luz/llms-full.txt: the same pages in full.
+4. https://nandomunoz.github.io/luz/examples/: one standalone page of markup for each component and pattern.
 
 ### Load order
 
