@@ -3,7 +3,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Start here before you write code. A proposal is a problem, not a solution: LUZ adds something only when more than one team needs it and the platform does not already do it. Read [PRINCIPLES.md](https://github.com/nandovejer/luz/blob/main/PRINCIPLES.md) first.
+        Start here before you write code. A proposal is a problem, not a solution: LUZ adds something only when more than one team needs it and the platform does not already do it. Read [PRINCIPLES.md](https://github.com/nandomunoz/luz/blob/main/PRINCIPLES.md) first.
   - type: textarea
     id: problem
     attributes:
