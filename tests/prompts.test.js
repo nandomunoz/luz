@@ -56,7 +56,7 @@ const IDS = ["start", "landing", "blog", "app", "docs"];
 // The tighter target of a prompt, in bytes: a warning over it, never a failure (owner, 2026-11-02)
 const PROMPT_TARGET = 16100;
 const PRESET_OF = { start: null, landing: "landing", blog: "blog", app: "app", docs: "docs" };
-const SITE = "https://nandovejer.github.io/luz/";
+const SITE = "https://nandomunoz.github.io/luz/";
 const CDN = "https://cdn.jsdelivr.net/npm/@luz-ds/";
 
 const prompt = (() => {
@@ -680,7 +680,7 @@ describe("the five are emitted by the build, served in dev and listed in llms.tx
   });
 
   it("the pages build writes the link to a prompt relative to its page, so it still leads to the text when the site is not at the root of its host", () => {
-    // The home's opener and the docs' ones: a root-absolute /prompts/<id>.txt would be nandovejer.github.io/prompts/…, a 404
+    // The home's opener and the docs' ones: a root-absolute /prompts/<id>.txt would be nandomunoz.github.io/prompts/…, a 404
     const hook = plugin(true).transformIndexHtml.handler;
     for (const [file, route, up] of [
       ["apps/docs/pages/get-started/ai.html", "/docs/get-started/ai/", "../../../"],
