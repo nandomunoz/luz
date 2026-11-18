@@ -43,7 +43,7 @@ export const PAGES_BASE = "/luz/";
  * as search engines ask; the dev server keeps them root-absolute. A fork or a
  * custom domain changes it with PAGES_BASE.
  */
-export const SITE_URL = `https://nandovejer.github.io${PAGES_BASE}`;
+export const SITE_URL = `https://nandomunoz.github.io${PAGES_BASE}`;
 
 /**
  * Content-Security-Policy for the published GitHub Pages site. Pages cannot
