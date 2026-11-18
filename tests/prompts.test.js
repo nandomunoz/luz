@@ -52,7 +52,7 @@ const assemble = (id, options = { root }) => member("assemblePrompt")(id, option
 /** The five prompts, in the order llms.txt lists them, and the preset file of each (none for the general one). */
 const IDS = ["start", "landing", "blog", "app", "docs"];
 const PRESET_OF = { start: null, landing: "landing", blog: "blog", app: "app", docs: "docs" };
-const SITE = "https://nandovejer.github.io/luz/";
+const SITE = "https://nandomunoz.github.io/luz/";
 const CDN = "https://cdn.jsdelivr.net/npm/@luz-ds/";
 
 const prompt = (() => {

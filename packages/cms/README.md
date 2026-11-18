@@ -9,7 +9,7 @@ The page structure of one kind of site, a blog, a newspaper or any site of artic
 - You publish articles, posts or stories, each with a title, an author and a date, some long enough to need a table of contents.
 - Not for a landing page (`@luz-ds/landing`), documentation or an app.
 
-The classes go on any element, so a template of any CMS can write them (in a block-editor template, a block's `className`). The post card, the post listing, related posts and the author box need no CSS of their own: they are markup to copy, built from core's card, avatar and pagination, on the [CMS templates](https://nandovejer.github.io/luz/docs/cms/templates/) page of the docs.
+The classes go on any element, so a template of any CMS can write them (in a block-editor template, a block's `className`). The post card, the post listing, related posts and the author box need no CSS of their own: they are markup to copy, built from core's card, avatar and pagination, on the [CMS templates](https://nandomunoz.github.io/luz/docs/cms/templates/) page of the docs.
 
 ## Prerequisites
 
@@ -53,12 +53,12 @@ The body of a story is core's `.luz-prose` (line length and the space between bl
 
 ## Classes included
 
-- `.luz-cms-header` (`__brand`, `__actions`; `--masthead` with `__top`, `__date`, `__sections`) — The top of every page: the publication's name, its sections in core's navbar and the actions, in one row that stays at the top with core's `.o-sticky`; or, with `--masthead`, a newspaper's three rows (date and search, the name, the sections), not sticky. [Docs](https://nandovejer.github.io/luz/docs/cms/header/)
-- `.luz-cms-page-header` (`__title`, `__lead`) — The title of a page that is not an article (about, contact) and one sentence about what it is for. [Docs](https://nandovejer.github.io/luz/docs/cms/page-header/)
+- `.luz-cms-header` (`__brand`, `__actions`; `--masthead` with `__top`, `__date`, `__sections`) — The top of every page: the publication's name, its sections in core's navbar and the actions, in one row that stays at the top with core's `.o-sticky`; or, with `--masthead`, a newspaper's three rows (date and search, the name, the sections), not sticky. [Docs](https://nandomunoz.github.io/luz/docs/cms/header/)
+- `.luz-cms-page-header` (`__title`, `__lead`) — The title of a page that is not an article (about, contact) and one sentence about what it is for. [Docs](https://nandomunoz.github.io/luz/docs/cms/page-header/)
 
-- `.luz-cms-article-header` (`__kicker`, `__title`, `__standfirst`, `__byline`, `__media`) — The top of a story: its section, the title, the standfirst, who wrote it and when, and an optional lead picture. [Docs](https://nandovejer.github.io/luz/docs/cms/article-header/)
-- `.luz-cms-article` (`__layout`) and `.luz-cms-toc` (`__title`, `__list`) — The story and its table of contents: beside the text, staying in view, when the article is 46rem wide or more; above it below that. `--luz-cms-toc-top` sets the space above it while it stays in view (by default under a `.o-sticky` bar of core's `--luz-bar-h`). [Docs](https://nandovejer.github.io/luz/docs/cms/toc/)
-- `.luz-cms-footer` — The end of every page: a rule above, who publishes it and a few links at the two ends of a row; a column at 768 px and below. [Docs](https://nandovejer.github.io/luz/docs/cms/footer/)
+- `.luz-cms-article-header` (`__kicker`, `__title`, `__standfirst`, `__byline`, `__media`) — The top of a story: its section, the title, the standfirst, who wrote it and when, and an optional lead picture. [Docs](https://nandomunoz.github.io/luz/docs/cms/article-header/)
+- `.luz-cms-article` (`__layout`) and `.luz-cms-toc` (`__title`, `__list`) — The story and its table of contents: beside the text, staying in view, when the article is 46rem wide or more; above it below that. `--luz-cms-toc-top` sets the space above it while it stays in view (by default under a `.o-sticky` bar of core's `--luz-bar-h`). [Docs](https://nandomunoz.github.io/luz/docs/cms/toc/)
+- `.luz-cms-footer` — The end of every page: a rule above, who publishes it and a few links at the two ends of a row; a column at 768 px and below. [Docs](https://nandomunoz.github.io/luz/docs/cms/footer/)
 
 <!-- luz:ai-agents:start -->
 ## For AI agents
@@ -74,9 +74,9 @@ Older versions: https://github.com/nandomunoz/luz/blob/main/packages/cms/CHANGEL
 ### Read first
 
 1. `dist/classes.json` in this package: the classes and custom properties its CSS defines. Write only those.
-2. https://nandovejer.github.io/luz/llms.txt: the index of the documentation, short enough for a small context.
-3. https://nandovejer.github.io/luz/llms-full.txt: the same pages in full.
-4. https://nandovejer.github.io/luz/examples/: one standalone page of markup for each component and pattern.
+2. https://nandomunoz.github.io/luz/llms.txt: the index of the documentation, short enough for a small context.
+3. https://nandomunoz.github.io/luz/llms-full.txt: the same pages in full.
+4. https://nandomunoz.github.io/luz/examples/: one standalone page of markup for each component and pattern.
 
 ### Load order
 

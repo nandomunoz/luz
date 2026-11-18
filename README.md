@@ -16,7 +16,7 @@ No framework. No build step for consumers.
 [What each package needs](#what-each-package-needs) ·
 [Components](#components) ·
 [Accessibility](#accessibility) ·
-[Documentation](https://nandovejer.github.io/luz/docs/) ·
+[Documentation](https://nandomunoz.github.io/luz/docs/) ·
 [Work on LUZ](#work-on-luz)
 
 </div>
@@ -26,7 +26,7 @@ No framework. No build step for consumers.
 > [!WARNING]
 > **Beta.** The tokens, components and patterns work and are tested, but names, classes and behavior can still change before the stable release. Pin an exact version and read the changelog before you upgrade.
 
-**Human-first, AI-ready.** LUZ is made for the people who use the page, and it is plain enough for an AI agent to write correctly. **Every change starts with a failing test.** [How LUZ is built](https://nandovejer.github.io/luz/docs/get-started/how-luz-is-built/) says more.
+**Human-first, AI-ready.** LUZ is made for the people who use the page, and it is plain enough for an AI agent to write correctly. **Every change starts with a failing test.** [How LUZ is built](https://nandomunoz.github.io/luz/docs/get-started/how-luz-is-built/) says more.
 
 LUZ (formerly CAI) is built with plain CSS, ES modules and native browser APIs. Adopt only the tokens, add the components, or take whole-page patterns: the three layers are independent packages that stack in one direction. Packages for one kind of site build on top of them.
 
@@ -144,7 +144,7 @@ Published modules: `theme`, `sidebar`, `clipboard`, `modal`, `highlight`, `playe
 
 ## What each package needs
 
-The page shell of a whole page is catalog; the layout objects of an app with a sidebar are core; the hero of a landing page is landing. The full table, checked against the CSS, is on [How LUZ is organised](https://nandovejer.github.io/luz/docs/get-started/structure/#needs).
+The page shell of a whole page is catalog; the layout objects of an app with a sidebar are core; the hero of a landing page is landing. The full table, checked against the CSS, is on [How LUZ is organised](https://nandomunoz.github.io/luz/docs/get-started/structure/#needs).
 
 ## Color modes and themes
 
@@ -182,15 +182,15 @@ Every component has a page in the documentation with a live example, the markup 
 
 ## For AI agents
 
-LUZ is plain HTML and CSS, so an AI coding agent can write it when it knows which names exist. Give it this: read [`llms.txt`](https://nandovejer.github.io/luz/llms.txt) first, use only the classes in the `classes.json` of each package, and run `npx @luz-ds/check@0.2.1` on every HTML and CSS file it writes.
+LUZ is plain HTML and CSS, so an AI coding agent can write it when it knows which names exist. Give it this: read [`llms.txt`](https://nandomunoz.github.io/luz/llms.txt) first, use only the classes in the `classes.json` of each package, and run `npx @luz-ds/check@0.2.1` on every HTML and CSS file it writes.
 
-What an agent can read, what the check reports and what it does not do are on [Working with AI](https://nandovejer.github.io/luz/docs/get-started/ai/). The same page has a prompt you can paste.
+What an agent can read, what the check reports and what it does not do are on [Working with AI](https://nandomunoz.github.io/luz/docs/get-started/ai/). The same page has a prompt you can paste.
 
 ## Accessibility
 
 LUZ aims for WCAG 2.2 level AA: keyboard operation, visible focus, 4.5:1 text contrast in the three modes and a high-contrast mode are part of every component. Form controls are native HTML controls where possible.
 
-Automated checks run on every change. No assistive technology has been used to test this release. The [accessibility statement](https://nandovejer.github.io/luz/docs/accessibility/) lists what is checked, what has not been tested and the known issues.
+Automated checks run on every change. No assistive technology has been used to test this release. The [accessibility statement](https://nandomunoz.github.io/luz/docs/accessibility/) lists what is checked, what has not been tested and the known issues.
 
 ## Use or contribute
 
@@ -198,7 +198,7 @@ LUZ is open source under the MIT licence. Pick the row that fits; [CONTRIBUTING.
 
 | I want to | How |
 | --- | --- |
-| Use it | LUZ is MIT: no registration, no telemetry. Install the packages from npm or load them from a CDN ([Get started](https://nandovejer.github.io/luz/docs/get-started/)). |
+| Use it | LUZ is MIT: no registration, no telemetry. Install the packages from npm or load them from a CDN ([Get started](https://nandomunoz.github.io/luz/docs/get-started/)). |
 | Copy it | Copy any markup, style or script you need, and keep the MIT notice with it. |
 | Fork it | MIT lets you fork, rename and ship it. Keep the notice and say what you changed. |
 | Report a bug | [Open an issue](../../issues/new/choose) with the bug or accessibility form. A security problem goes private: see [SECURITY.md](./SECURITY.md). |

@@ -52,13 +52,13 @@ There is no script: "On this page" is a native `<details>`, the rail stays in vi
 
 ## Classes included
 
-- `.luz-docs-shell` (with `.luz-docs-nav` and `.luz-docs-main`) — The page: core's `.o-shell` with the header, the sidebar, the content, the rail and the footer in three, two or one column; sets `--luz-docs-measure`. [Docs](https://nandovejer.github.io/luz/docs/documentation/shell/)
-- `.luz-docs-page-head` (`__eyebrow`, `__lead`, `__meta`) — The area and group, the h1, one sentence and a row of chips (the files, the script, the modes, the known issues). [Docs](https://nandovejer.github.io/luz/docs/documentation/page-head/)
-- `.luz-docs-rail` (`__inner`, `__onpage`, `__fold`, `__title`, `__list`, `__sub`, `__link`, `__actions`) — "On this page" and the page's actions in one inner box, in view while the page scrolls and never over the footer. [Docs](https://nandovejer.github.io/luz/docs/documentation/rail/)
-- `.luz-docs-example` (`__preview`, `__frame`, `__code`) — A live example and its code in one frame; `--luz-docs-example-w` narrows the frame. [Docs](https://nandovejer.github.io/luz/docs/documentation/example/)
-- `.luz-docs-dodont` (`__item`, `__item--do`, `__item--dont`, `__verdict`, `__stage`) — A Do and a Don't, side by side when there is room, told apart by a word, a mark and the frame. [Docs](https://nandovejer.github.io/luz/docs/documentation/dodont/)
-- `.luz-docs-pager` (`__prev`, `__next`, `__link`, `__label`, `__title`) — Previous and Next as two link blocks. [Docs](https://nandovejer.github.io/luz/docs/documentation/pager/)
-- `.luz-docs-page-foot` — Last updated, Edit this page, Report a problem. [Docs](https://nandovejer.github.io/luz/docs/documentation/page-foot/)
+- `.luz-docs-shell` (with `.luz-docs-nav` and `.luz-docs-main`) — The page: core's `.o-shell` with the header, the sidebar, the content, the rail and the footer in three, two or one column; sets `--luz-docs-measure`. [Docs](https://nandomunoz.github.io/luz/docs/documentation/shell/)
+- `.luz-docs-page-head` (`__eyebrow`, `__lead`, `__meta`) — The area and group, the h1, one sentence and a row of chips (the files, the script, the modes, the known issues). [Docs](https://nandomunoz.github.io/luz/docs/documentation/page-head/)
+- `.luz-docs-rail` (`__inner`, `__onpage`, `__fold`, `__title`, `__list`, `__sub`, `__link`, `__actions`) — "On this page" and the page's actions in one inner box, in view while the page scrolls and never over the footer. [Docs](https://nandomunoz.github.io/luz/docs/documentation/rail/)
+- `.luz-docs-example` (`__preview`, `__frame`, `__code`) — A live example and its code in one frame; `--luz-docs-example-w` narrows the frame. [Docs](https://nandomunoz.github.io/luz/docs/documentation/example/)
+- `.luz-docs-dodont` (`__item`, `__item--do`, `__item--dont`, `__verdict`, `__stage`) — A Do and a Don't, side by side when there is room, told apart by a word, a mark and the frame. [Docs](https://nandomunoz.github.io/luz/docs/documentation/dodont/)
+- `.luz-docs-pager` (`__prev`, `__next`, `__link`, `__label`, `__title`) — Previous and Next as two link blocks. [Docs](https://nandomunoz.github.io/luz/docs/documentation/pager/)
+- `.luz-docs-page-foot` — Last updated, Edit this page, Report a problem. [Docs](https://nandomunoz.github.io/luz/docs/documentation/page-foot/)
 
 <!-- luz:ai-agents:start -->
 ## For AI agents
@@ -74,9 +74,9 @@ Older versions: https://github.com/nandomunoz/luz/blob/main/packages/docs/CHANGE
 ### Read first
 
 1. `dist/classes.json` in this package: the classes and custom properties its CSS defines. Write only those.
-2. https://nandovejer.github.io/luz/llms.txt: the index of the documentation, short enough for a small context.
-3. https://nandovejer.github.io/luz/llms-full.txt: the same pages in full.
-4. https://nandovejer.github.io/luz/examples/: one standalone page of markup for each component and pattern.
+2. https://nandomunoz.github.io/luz/llms.txt: the index of the documentation, short enough for a small context.
+3. https://nandomunoz.github.io/luz/llms-full.txt: the same pages in full.
+4. https://nandomunoz.github.io/luz/examples/: one standalone page of markup for each component and pattern.
 
 ### Load order
 
