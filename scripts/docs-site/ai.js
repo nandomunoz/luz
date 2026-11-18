@@ -819,7 +819,7 @@ function exampleDocument(page, { csp, versions, packages, catalog = [] }) {
     `  <meta http-equiv="Content-Security-Policy" content="${escAttr(csp)}">`,
     '  <meta name="viewport" content="width=device-width, initial-scale=1">',
     `  <title>${escText(title)}: markup examples – LUZ</title>`,
-    `  <!-- Generated from ${docsUrl} by scripts/docs-site/ai.js. Do not edit. MIT licence, github.com/nandovejer/luz.`,
+    `  <!-- Generated from ${docsUrl} by scripts/docs-site/ai.js. Do not edit. MIT licence, github.com/nandomunoz/luz.`,
     `       Loads LUZ ${versions.core} from ../dist/, copied from the packages: the tokens file with no web font, so text uses the system serif.`,
     "       Links in the markup are placeholders. For npm or a CDN, with integrity hashes, see " + `${snippetUrl} -->`,
     ...links,

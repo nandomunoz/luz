@@ -392,7 +392,7 @@ describe("no third-party mark in what is published or served", () => {
     const header = parse(read("apps/site/_partials/header.html"), "header");
     const link = query(header, "a.site-header__github");
     expect(link, "a.site-header__github").toBeTruthy();
-    expect(link.attrs.get("href")).toBe("https://github.com/nandovejer/luz");
+    expect(link.attrs.get("href")).toBe("https://github.com/nandomunoz/luz");
     const svgs = queryAll(link, "svg");
     expect(svgs, "one icon").toHaveLength(1);
     expect(svgs[0].attrs.get("viewbox")).toBe("0 0 24 24");

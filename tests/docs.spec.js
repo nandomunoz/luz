@@ -1076,7 +1076,7 @@ test.describe('Documentation site', () => {
       await expect(drawer).toHaveAttribute('popover', '');
       await expect(page.locator('.luz-nav-toggle[popovertarget="page-nav"]')).toHaveCount(1);
       const hrefs = await drawer.locator('a').evaluateAll((all) => all.map((a) => a.getAttribute('href')));
-      expect(hrefs).toEqual(['/docs/', 'https://github.com/nandovejer/luz']);
+      expect(hrefs).toEqual(['/docs/', 'https://github.com/nandomunoz/luz']);
     });
 
     test('at 390px the menu button opens the drawer and the two site links are reachable', async ({ page }) => {
@@ -1506,14 +1506,14 @@ test.describe('Site header and navigation toggle', () => {
     const row = HEADER.match(/<nav class="site-header__nav"[\s\S]*?<\/nav>/)[0];
     // The row holds Documentation; GitHub is the control after it, and the logo ({{home}}) is the link to the home page
     expect([...row.matchAll(/href="([^"]+)"/g)].map((m) => m[1])).toEqual(['/docs/']);
-    expect(HEADER).toContain('href="https://github.com/nandovejer/luz"');
+    expect(HEADER).toContain('href="https://github.com/nandomunoz/luz"');
     expect(HEADER).toMatch(/class="site-header__brand" href="\{\{home\}\}"/);
     expect(HEADER).toContain('data-luz-search-open');
     // The drawer's site links are the header's, in the same order: a labelled
     // list inside the drawer's nav, not a nav in a nav (a11y.md F4)
     expect(SITE_LINKS).toMatch(/<ul class="page-nav__row" aria-label="\{\{t:site\.label\}\}">/);
     expect(SITE_LINKS).not.toContain('<nav');
-    expect([...SITE_LINKS.matchAll(/href="([^"]+)"/g)].map((m) => m[1])).toEqual(['/docs/', 'https://github.com/nandovejer/luz']);
+    expect([...SITE_LINKS.matchAll(/href="([^"]+)"/g)].map((m) => m[1])).toEqual(['/docs/', 'https://github.com/nandomunoz/luz']);
     for (const [file, partials] of Object.entries(INCLUDERS)) {
       for (const name of partials) expect(read(file), file).toContain(`<!-- luz:include ${name} -->`);
       // tabindex="-1": a scrollable nav is a Tab stop of its own in Firefox
