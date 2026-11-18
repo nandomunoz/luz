@@ -178,7 +178,7 @@ describe("parity: a translation keeps the structure, the code and the figures of
   };
 
   const EN = `<h2 id="intro">Introduction</h2>
-<p>Read <a href="/docs/get-started/">Get started</a>, then jump to <a href="#details">the details</a> or <a href="https://github.com/nandovejer/luz">GitHub</a>. The ratio is 4.5:1 and the size is 16 px; there are 3 steps.</p>
+<p>Read <a href="/docs/get-started/">Get started</a>, then jump to <a href="#details">the details</a> or <a href="https://github.com/nandomunoz/luz">GitHub</a>. The ratio is 4.5:1 and the size is 16 px; there are 3 steps.</p>
 <ul class="docs-list">
   <li>The class <code>.luz-btn</code> styles a button.</li>
   <li>Press <kbd>Tab</kbd> to move; the output reads <samp>Saved</samp> for <var>n</var> items.</li>
@@ -199,7 +199,7 @@ describe("parity: a translation keeps the structure, the code and the figures of
 <!-- luz:generated -->`;
 
   const ES = `<h2 id="intro">Introducción</h2>
-<p>Lee <a href="/docs/get-started/">Primeros pasos</a>, luego salta a <a href="#details">los detalles</a> o a <a href="https://github.com/nandovejer/luz">GitHub</a>. La proporción es 4.5:1 y el tamaño es 16 px; hay 3 pasos.</p>
+<p>Lee <a href="/docs/get-started/">Primeros pasos</a>, luego salta a <a href="#details">los detalles</a> o a <a href="https://github.com/nandomunoz/luz">GitHub</a>. La proporción es 4.5:1 y el tamaño es 16 px; hay 3 pasos.</p>
 <ul class="docs-list">
   <li>La clase <code>.luz-btn</code> da estilo a un botón.</li>
   <li>Pulsa <kbd>Tab</kbd> para moverte; la salida dice <samp>Saved</samp> para <var>n</var> elementos.</li>
@@ -287,7 +287,7 @@ describe("parity: a translation keeps the structure, the code and the figures of
       ["swaps two links", () => swap('href="/docs/get-started/"', 'href="#TMP"').replace('href="#details"', 'href="/docs/get-started/"').replace('href="#TMP"', 'href="#details"')],
       ["removes a link", () => swap('<a href="#details">los detalles</a>', "los detalles")],
       ["adds a link", () => swap("<p>Versión {{version}}.</p>", '<p>Versión {{version}}. <a href="/docs/">Docs</a></p>')],
-      ["changes an external link", () => swap('href="https://github.com/nandovejer/luz"', 'href="https://github.com/nandovejer/luz-ds"')],
+      ["changes an external link", () => swap('href="https://github.com/nandomunoz/luz"', 'href="https://github.com/nandomunoz/luz-ds"')],
     ],
     code: [
       ["translates a comment inside <pre>", () => swap("&lt;!-- one comment --&gt;", "&lt;!-- un comentario --&gt;")],

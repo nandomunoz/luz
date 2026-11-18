@@ -51,7 +51,7 @@ It needs Node 20 or later and nothing else: no dependency, no network, no enviro
 
 No breaking changes in 0.3.2.
 
-Older versions: https://github.com/nandovejer/luz/blob/main/packages/check/CHANGELOG.md
+Older versions: https://github.com/nandomunoz/luz/blob/main/packages/check/CHANGELOG.md
 
 ### Read first
 
