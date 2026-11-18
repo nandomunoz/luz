@@ -61,7 +61,7 @@ The patterns are in `luz.catalog`, with the other catalog components. The order 
 
 #### The color mode is now two elements: `<luz-theme-mode>` in core (a round fixed button that cycles Auto, light, dark and high contrast) and `<luz-theme-time>` in catalog (the same button plus the time of day). **Breaking:** the 0.2.1 names below are gone, with no aliases. `luz-check` names the new one when it finds an old one.
 
-Older versions: https://github.com/nandovejer/luz/blob/main/packages/check/CHANGELOG.md
+Older versions: https://github.com/nandomunoz/luz/blob/main/packages/check/CHANGELOG.md
 
 ### Read first
 
