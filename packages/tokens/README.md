@@ -125,7 +125,7 @@ ET Book ships roman, italic, semi-bold and bold. Sans and mono are system stacks
 
 The patterns are in `luz.catalog`, with the other catalog components. The order of the layers is now `luz.tokens`, `luz.themes`, `luz.settings`, `luz.generic`, `luz.elements`, `luz.objects`, `luz.components`, `luz.utilities`, `luz.catalog`, `luz.print`, and core and tokens repeat that statement in every file. **Breaking:** if your own `@layer` statement names `luz.landing`, `luz.cms`, `luz.app` or `luz.docs`, remove the name.
 
-Older versions: https://github.com/nandovejer/luz/blob/main/packages/tokens/CHANGELOG.md
+Older versions: https://github.com/nandomunoz/luz/blob/main/packages/tokens/CHANGELOG.md
 
 ### Read first
 

@@ -149,7 +149,7 @@ describe("what the page claims", () => {
       expect(text).not.toMatch(/[\w.+-]+@[\w-]+\.[\w.-]+/);
       expect(get().body).not.toMatch(/mailto:/i);
       const hrefs = findAll(parse(get().body), (n) => n.name === "a").map((a) => a.attrs.get("href"));
-      expect(hrefs).toContain("https://github.com/nandovejer/luz/issues");
+      expect(hrefs).toContain("https://github.com/nandomunoz/luz/issues");
     });
 
     it(`${name}: says the site does not set cookies itself, never that it sets none`, () => {
