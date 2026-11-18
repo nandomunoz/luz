@@ -17,7 +17,7 @@
  */
 import { test, expect } from '@playwright/test';
 
-const GITHUB = 'https://github.com/nandovejer/luz';
+const GITHUB = 'https://github.com/nandomunoz/luz';
 const ICONS = '/docs/components/icons/';
 const PAGES = ['/', '/es/', '/ar/', '/docs/', '/404.html'];
 /** What the GitHub mark starts with, as Octicons and Simple Icons write it. */

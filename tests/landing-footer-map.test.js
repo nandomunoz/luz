@@ -17,7 +17,7 @@ import { find, findAll, hasClass, parse, query, queryAll, textOf } from "./helpe
 
 const repo = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (file) => readFileSync(join(repo, file), "utf-8");
-const GITHUB = "https://github.com/nandovejer/luz";
+const GITHUB = "https://github.com/nandomunoz/luz";
 const coreVersion = JSON.parse(read("packages/core/package.json")).version;
 
 const site = scanSite(join(repo, "apps/docs"), repo);
@@ -121,8 +121,8 @@ for (const route of Object.keys(CODES)) {
 
     it("names Nando Muñoz in the licence line as a link to his GitHub, and not Fernando", () => {
       const legal = query(footer, "p.landing-legal");
-      const author = findAll(legal, (n) => n.name === "a").find((a) => a.attrs.get("href") === "https://github.com/nandovejer");
-      expect(author, "a link to https://github.com/nandovejer").toBeTruthy();
+      const author = findAll(legal, (n) => n.name === "a").find((a) => a.attrs.get("href") === "https://github.com/nandomunoz");
+      expect(author, "a link to https://github.com/nandomunoz").toBeTruthy();
       expect(textOf(author)).toBe("Nando Muñoz");
       expect(textOf(legal)).not.toContain("Fernando");
       expect(findAll(legal, (n) => n.name === "a").some((a) => a.attrs.get("href") === `${GITHUB}/blob/main/LICENSE`), "the licence stays a link").toBe(true);
