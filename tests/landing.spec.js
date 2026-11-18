@@ -452,7 +452,7 @@ test.describe('Landing page', () => {
       await expect(primary).toBeInViewport();
       const secondary = hero.locator('a.luz-btn:not(.luz-btn--primary)');
       await expect(secondary).toHaveText('View on GitHub');
-      await expect(secondary).toHaveAttribute('href', 'https://github.com/nandovejer/luz');
+      await expect(secondary).toHaveAttribute('href', 'https://github.com/nandomunoz/luz');
     });
 
     for (const [route, lang] of ROUTES) {
@@ -1219,7 +1219,7 @@ test.describe('Landing page', () => {
       const docs = cols.nth(0).locator('a');
       expect(await docs.count()).toBeGreaterThanOrEqual(3);
       expect(await docs.evaluateAll((all) => all.map((a) => new URL(a.href).pathname.startsWith('/docs/')))).not.toContain(false);
-      await expect(cols.nth(1).locator('a[href="https://github.com/nandovejer/luz"]')).toHaveCount(1);
+      await expect(cols.nth(1).locator('a[href="https://github.com/nandomunoz/luz"]')).toHaveCount(1);
       for (const link of await cols.locator('a').all()) expect((await link.boundingBox())?.height ?? 0).toBeGreaterThanOrEqual(24);
     });
 

@@ -1021,13 +1021,13 @@ test.describe('Site header and navigation toggle', () => {
     expect(HEADER).not.toContain('aria-current');
     const row = HEADER.match(/<nav class="site-header__nav"[\s\S]*?<\/nav>/)[0];
     // {{home}}: the home page in the page's language ("/" on the docs, "/es/" on the Spanish home page)
-    expect([...row.matchAll(/href="([^"]+)"/g)].map((m) => m[1])).toEqual(['{{home}}', '/docs/', 'https://github.com/nandovejer/luz']);
+    expect([...row.matchAll(/href="([^"]+)"/g)].map((m) => m[1])).toEqual(['{{home}}', '/docs/', 'https://github.com/nandomunoz/luz']);
     expect(HEADER).toContain('data-luz-search-open');
     // The drawer's site links are the header's, in the same order: a labelled
     // list inside the drawer's nav, not a nav in a nav (a11y.md F4)
     expect(SITE_LINKS).toContain('<ul aria-labelledby="nav-site">');
     expect(SITE_LINKS).not.toContain('<nav');
-    expect([...SITE_LINKS.matchAll(/href="([^"]+)"/g)].map((m) => m[1])).toEqual(['{{home}}', '/docs/', 'https://github.com/nandovejer/luz']);
+    expect([...SITE_LINKS.matchAll(/href="([^"]+)"/g)].map((m) => m[1])).toEqual(['{{home}}', '/docs/', 'https://github.com/nandomunoz/luz']);
     for (const [file, partials] of Object.entries(INCLUDERS)) {
       for (const name of partials) expect(read(file), file).toContain(`<!-- luz:include ${name} -->`);
       // tabindex="-1": a scrollable nav is a Tab stop of its own in Firefox

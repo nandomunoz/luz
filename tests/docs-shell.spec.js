@@ -67,8 +67,8 @@ test.describe('docs shell, with JavaScript', () => {
     await page.goto(BUTTON);
     const actions = rail(page).locator('.luz-docs-rail__actions').getByText(/^(Copy page as Markdown|Edit this page|Report a problem)$/);
     await expect(actions).toHaveText(['Copy page as Markdown', 'Edit this page', 'Report a problem']);
-    await expect(rail(page).getByRole('link', { name: 'Edit this page', exact: true })).toHaveAttribute('href', 'https://github.com/nandovejer/luz/edit/main/apps/docs/pages/components/button.html');
-    await expect(rail(page).getByRole('link', { name: 'Report a problem', exact: true })).toHaveAttribute('href', 'https://github.com/nandovejer/luz/issues/new?title=Button');
+    await expect(rail(page).getByRole('link', { name: 'Edit this page', exact: true })).toHaveAttribute('href', 'https://github.com/nandomunoz/luz/edit/main/apps/docs/pages/components/button.html');
+    await expect(rail(page).getByRole('link', { name: 'Report a problem', exact: true })).toHaveAttribute('href', 'https://github.com/nandomunoz/luz/issues/new?title=Button');
   });
 
   test('Copy page as Markdown writes the page as Markdown to the clipboard, says so, and stays on the page', async ({ page }) => {
@@ -582,7 +582,7 @@ for (const javaScriptEnabled of [true, false]) {
         expect([...new Set(hrefs)], 'every link named "Report a problem"').toHaveLength(1);
         const issues = page.locator('#site-footer').getByRole('link', { name: 'Issues on GitHub', exact: true });
         await expect(issues).toHaveCount(1);
-        await expect(issues).toHaveAttribute('href', 'https://github.com/nandovejer/luz/issues');
+        await expect(issues).toHaveAttribute('href', 'https://github.com/nandomunoz/luz/issues');
       });
     }
   });

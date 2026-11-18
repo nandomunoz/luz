@@ -90,7 +90,7 @@ Not every name is a promise. These four parts of LUZ are public API: a change to
 - **Attributes**: `data-theme`, `data-mode`, `data-luz-*` and `data-luz-label-*`. Not the attributes the docs site's own scripts use.
 - **Packages**: the `exports` map of each package and the paths of the files it publishes.
 
-In beta, anything may break, and the changeset of the release says how to migrate. Read [What is public API, in VERSIONING.md on GitHub](https://github.com/nandovejer/luz/blob/main/VERSIONING.md) for the whole table.
+In beta, anything may break, and the changeset of the release says how to migrate. Read [What is public API, in VERSIONING.md on GitHub](https://github.com/nandomunoz/luz/blob/main/VERSIONING.md) for the whole table.
 
 ### Reading a file name
 

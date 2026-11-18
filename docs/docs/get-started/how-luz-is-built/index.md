@@ -34,7 +34,7 @@ One command, `pnpm check:all`, runs all of them.
 
 Safari and Firefox are not in that command. People review them before a release, and the open reviews are public.
 
-The rules those checks enforce are in [PRINCIPLES.md](https://github.com/nandovejer/luz/blob/main/PRINCIPLES.md), and [TESTING.md](https://github.com/nandovejer/luz/blob/main/dev/TESTING.md) says how to write the test.
+The rules those checks enforce are in [PRINCIPLES.md](https://github.com/nandomunoz/luz/blob/main/PRINCIPLES.md), and [TESTING.md](https://github.com/nandomunoz/luz/blob/main/dev/TESTING.md) says how to write the test.
 
 ### Zero dependencies
 
