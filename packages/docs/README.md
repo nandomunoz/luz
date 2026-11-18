@@ -69,7 +69,7 @@ There is no script: "On this page" is a native `<details>`, the rail stays in vi
 
 No breaking changes in 0.2.1.
 
-Older versions: https://github.com/nandovejer/luz/blob/main/packages/docs/CHANGELOG.md
+Older versions: https://github.com/nandomunoz/luz/blob/main/packages/docs/CHANGELOG.md
 
 ### Read first
 

@@ -22,7 +22,7 @@ import { find, findAll, hasClass, isInside, parse, query, textOf } from "./helpe
 
 const repo = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (file) => readFileSync(join(repo, file), "utf-8");
-const GITHUB = "https://github.com/nandovejer/luz";
+const GITHUB = "https://github.com/nandomunoz/luz";
 
 const site = scanSite(join(repo, "apps/docs"), repo);
 const landing = landingDocuments(site, "apps/landing/index.html", read("apps/landing/index.html"));

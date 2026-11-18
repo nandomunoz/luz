@@ -69,7 +69,7 @@ The body of a story is core's `.luz-prose` (line length and the space between bl
 
 No breaking changes in 0.2.1.
 
-Older versions: https://github.com/nandovejer/luz/blob/main/packages/cms/CHANGELOG.md
+Older versions: https://github.com/nandomunoz/luz/blob/main/packages/cms/CHANGELOG.md
 
 ### Read first
 

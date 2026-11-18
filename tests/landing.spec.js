@@ -945,7 +945,7 @@ test.describe('Landing page', () => {
 
       const brand = footer(page).locator('.landing-brand');
       await expect(brand.locator('.landing-brand__version')).toContainText(`v${version('core')}`);
-      await expect(brand.locator('.landing-brand__version')).toHaveAttribute('href', 'https://github.com/nandovejer/luz/blob/main/CHANGELOG.md');
+      await expect(brand.locator('.landing-brand__version')).toHaveAttribute('href', 'https://github.com/nandomunoz/luz/blob/main/CHANGELOG.md');
       await expect(brand.locator('.landing-brand__version .u-sr-only')).toContainText(EN['footer.changelog']);
       await expect(brand.locator('.landing-brand__beta')).toHaveText(EN['footer.beta']);
       await expect(brand.locator('svg')).toHaveAttribute('aria-hidden', 'true');
@@ -979,10 +979,10 @@ test.describe('Landing page', () => {
         const links = project.locator('a');
         await expect(links).toHaveText(['GitHub', words['footer.changelog'], words['footer.contributing'], words['footer.reviews']]);
         expect(await links.evaluateAll((all) => all.map((a) => a.getAttribute('href')))).toEqual([
-          'https://github.com/nandovejer/luz',
-          'https://github.com/nandovejer/luz/blob/main/CHANGELOG.md',
-          'https://github.com/nandovejer/luz/blob/main/CONTRIBUTING.md',
-          'https://github.com/nandovejer/luz/blob/main/dev/BROWSER-REVIEWS.md',
+          'https://github.com/nandomunoz/luz',
+          'https://github.com/nandomunoz/luz/blob/main/CHANGELOG.md',
+          'https://github.com/nandomunoz/luz/blob/main/CONTRIBUTING.md',
+          'https://github.com/nandomunoz/luz/blob/main/dev/BROWSER-REVIEWS.md',
         ]);
         // An Arabic reader is told, in the link, that the docs are English
         if (lang === 'ar') for (const a of await docs.locator('a').all()) await expect(a).toHaveAttribute('hreflang', 'en');
@@ -1002,7 +1002,7 @@ test.describe('Landing page', () => {
 
         const legal = footer(page).locator('p.landing-legal');
         await expect(legal).toHaveText(plain(catalog(lang)['footer.legal']));
-        await expect(legal.locator('a[href="https://github.com/nandovejer/luz/blob/main/LICENSE"]')).toHaveCount(1);
+        await expect(legal.locator('a[href="https://github.com/nandomunoz/luz/blob/main/LICENSE"]')).toHaveCount(1);
       });
     }
 

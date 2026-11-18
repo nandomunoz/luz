@@ -66,7 +66,7 @@ There is no script. Add core's and catalog's if you use their behaviours.
 
 No breaking changes in 0.2.1.
 
-Older versions: https://github.com/nandovejer/luz/blob/main/packages/landing/CHANGELOG.md
+Older versions: https://github.com/nandomunoz/luz/blob/main/packages/landing/CHANGELOG.md
 
 ### Read first
 

@@ -170,7 +170,7 @@ The core JS (`luz.js`) provides no-dependency implementations of:
 
 No breaking changes in 0.2.1.
 
-Older versions: https://github.com/nandovejer/luz/blob/main/packages/core/CHANGELOG.md
+Older versions: https://github.com/nandomunoz/luz/blob/main/packages/core/CHANGELOG.md
 
 ### Read first
 

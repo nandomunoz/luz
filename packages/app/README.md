@@ -66,7 +66,7 @@ The view's `h1` and its main action are not in the bar: they are the first row o
 
 No breaking changes in 0.2.1.
 
-Older versions: https://github.com/nandovejer/luz/blob/main/packages/app/CHANGELOG.md
+Older versions: https://github.com/nandomunoz/luz/blob/main/packages/app/CHANGELOG.md
 
 ### Read first
 
