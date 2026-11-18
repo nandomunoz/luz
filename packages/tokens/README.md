@@ -123,7 +123,7 @@ ET Book ships roman, italic, semi-bold and bold. Sans and mono are system stacks
 
 No breaking changes in 0.4.1.
 
-Older versions: https://github.com/nandovejer/luz/blob/main/packages/tokens/CHANGELOG.md
+Older versions: https://github.com/nandomunoz/luz/blob/main/packages/tokens/CHANGELOG.md
 
 ### Read first
 
