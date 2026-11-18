@@ -45,8 +45,8 @@ import { find, findAll, hasClass, isInside, matcher, parse, query, queryAll, que
 import { PATTERN_AREAS, eyebrowPackageOf } from "./helpers/package-areas.js";
 
 const repo = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const EDIT = "https://github.com/nandovejer/luz/edit/main/";
-const ISSUES = "https://github.com/nandovejer/luz/issues/new?title=";
+const EDIT = "https://github.com/nandomunoz/luz/edit/main/";
+const ISSUES = "https://github.com/nandomunoz/luz/issues/new?title=";
 
 /* ---- Helpers ---------------------------------------------------------------- */
 
@@ -840,7 +840,7 @@ describe("the rail: \"On this page\" outside main, then Copy page, Copy link, Ed
       const [copy, copyLink, edit, report] = links;
       expect(copy.attrs.get("href")).toBe("/docs/get-started/fish/index.md");
       expect(copyLink.attrs.get("href")).toBe("/docs/get-started/fish/");
-      expect(edit.attrs.get("href")).toBe("https://github.com/nandovejer/luz/edit/main/apps/docs/pages/get-started/fish.html");
+      expect(edit.attrs.get("href")).toBe("https://github.com/nandomunoz/luz/edit/main/apps/docs/pages/get-started/fish.html");
       expect(report.attrs.get("href")).toBe(`${ISSUES}Fish%20%26%20Chips%3A%20a%2Fb%3F%20Don't`);
     });
   });

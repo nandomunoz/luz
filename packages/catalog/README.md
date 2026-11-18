@@ -188,7 +188,7 @@ Before 0.1, this package also held the page structure. The skip link, the image 
 
 No breaking changes in 0.2.1.
 
-Older versions: https://github.com/nandovejer/luz/blob/main/packages/catalog/CHANGELOG.md
+Older versions: https://github.com/nandomunoz/luz/blob/main/packages/catalog/CHANGELOG.md
 
 ### Read first
 

@@ -7,7 +7,7 @@
 A vanilla design system in plain CSS and ES modules.<br>
 No framework. No build step for consumers.
 
-[![CI](https://github.com/nandovejer/luz/actions/workflows/ci.yml/badge.svg)](https://github.com/nandovejer/luz/actions/workflows/ci.yml)
+[![CI](https://github.com/nandomunoz/luz/actions/workflows/ci.yml/badge.svg)](https://github.com/nandomunoz/luz/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 ![Status: beta](https://img.shields.io/badge/status-beta-orange)
 ![Runtime dependencies](https://img.shields.io/badge/runtime%20dependencies-0-brightgreen)
