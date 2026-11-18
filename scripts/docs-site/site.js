@@ -644,7 +644,7 @@ export function renderBreadcrumb(site, page) {
 }
 
 /** Where the source of the site is: the rail's and the page foot's Edit and Report. */
-export const REPO_URL = "https://github.com/nandovejer/luz";
+export const REPO_URL = "https://github.com/nandomunoz/luz";
 
 /**
  * A component or a pattern page: the pages whose head ends with the chips.

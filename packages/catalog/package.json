@@ -24,12 +24,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/nandovejer/luz.git",
+    "url": "https://github.com/nandomunoz/luz.git",
     "directory": "packages/catalog"
   },
-  "homepage": "https://github.com/nandovejer/luz#readme",
+  "homepage": "https://github.com/nandomunoz/luz#readme",
   "bugs": {
-    "url": "https://github.com/nandovejer/luz/issues"
+    "url": "https://github.com/nandomunoz/luz/issues"
   },
   "keywords": [
     "design-system",

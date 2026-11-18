@@ -21,7 +21,7 @@ import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { faded } from './helpers/settle.js';
 
-const GITHUB = 'https://github.com/nandovejer/luz';
+const GITHUB = 'https://github.com/nandomunoz/luz';
 const HOME = '/';
 const DOCS = '/docs/';
 const COMPONENT = '/docs/components/button/';
