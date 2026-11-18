@@ -220,7 +220,7 @@ This package also holds four components that were core's: the navbar, the sideba
 
 No breaking changes in 0.4.1.
 
-Older versions: https://github.com/nandovejer/luz/blob/main/packages/catalog/CHANGELOG.md
+Older versions: https://github.com/nandomunoz/luz/blob/main/packages/catalog/CHANGELOG.md
 
 ### Read first
 
