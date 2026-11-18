@@ -44,9 +44,9 @@
 }
 
 .luz-input--textarea {
-  height: auto;
+  block-size: auto;
   padding: var(--luz-space-xs) var(--luz-space-sm);
-  min-height: 80px;
+  min-block-size: 80px;
   resize: vertical;
 }
 
@@ -55,7 +55,7 @@
    -------------------------------------------------------------------------- */
 
 .luz-input[type="range"] {
-  height: auto;
+  block-size: auto;
   padding: var(--luz-space-2xs) 0;
   border-block-end: none;
   background: transparent;
@@ -74,10 +74,10 @@
    -------------------------------------------------------------------------- */
 
 .luz-input[type="color"] {
-  height: var(--luz-control-md);
+  block-size: var(--luz-control-md);
   padding: var(--luz-space-3xs) var(--luz-space-2xs);
   cursor: pointer;
-  width: 64px;
+  inline-size: 64px;
   border-block-end: 1px solid var(--luz-input-border);
   background: var(--luz-input-bg);
 }
@@ -87,7 +87,7 @@
    -------------------------------------------------------------------------- */
 
 .luz-input[type="file"] {
-  height: auto;
+  block-size: auto;
   padding: var(--luz-space-xs) var(--luz-space-sm);
   cursor: pointer;
   font-size: var(--luz-text-sm);
@@ -122,7 +122,7 @@
   font-weight: 500;
   color: var(--luz-brand-primary);
   font-variant-numeric: tabular-nums;
-  min-width: 2.5em;
+  min-inline-size: 2.5em;
   text-align: end;
 }
 
@@ -150,8 +150,8 @@
 .luz-check-item input[type="checkbox"],
 .luz-check-item input[type="radio"] {
   appearance: none;
-  width: 18px;
-  height: 18px;
+  inline-size: 18px;
+  block-size: 18px;
   border: 2px solid var(--luz-outline);
   border-radius: var(--luz-radius-sm);
   background: transparent;
@@ -177,8 +177,8 @@
   position: absolute;
   inset-inline-start: 4px;
   top: 1px;
-  width: 6px;
-  height: 10px;
+  inline-size: 6px;
+  block-size: 10px;
   /* Check glyph drawn with two borders, then rotated: physical on purpose, a
      check mark is not mirrored in right-to-left text */
   border: solid var(--luz-text-on-fill);
@@ -195,8 +195,8 @@
   position: absolute;
   inset-inline-start: 3px;
   top: 3px;
-  width: 8px;
-  height: 8px;
+  inline-size: 8px;
+  block-size: 8px;
   border-radius: 50%;
   background: var(--luz-brand-primary);
 }

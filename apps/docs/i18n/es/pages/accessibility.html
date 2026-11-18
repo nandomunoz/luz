@@ -1,7 +1,7 @@
 <!-- luz:page
 title: Declaración de accesibilidad
 description: LUZ aspira a cumplir WCAG 2.2 nivel AA. Aquí se explica qué se comprueba en cada cambio, qué no se ha probado y cuáles son los problemas conocidos. Última revisión: 7 de noviembre de 2026.
-source: ffec3d569dfd
+source: 5291dd94b8db
 reviewed: false
 -->
     <div class="docs-block docs-prose-chapter" id="accessibility">
@@ -97,9 +97,10 @@ reviewed: false
         <li><strong>Textos en un idioma que LUZ sí incluye.</strong> El archivo de español se carga cuando una página lo declara. Si no se puede cargar, las etiquetas que añaden los scripts de LUZ aparecen en inglés dentro de una página marcada con otro idioma, y un lector de pantalla las lee con la voz de ese idioma. La página y el texto escrito en ella no se ven afectados. Las etiquetas se escriben cuando llega el archivo o tras dos segundos sin él. Si se hace clic antes de que llegue el idioma, el anuncio aparece en inglés; si llega tarde, se mezclan las etiquetas en inglés escritas al inicio con las etiquetas en español que se escriben al cambiar de estado, como al reproducir o pausar. No se ha probado con NVDA, JAWS, VoiceOver, TalkBack ni Orca. Los módulos independientes (<code class="luz-code-inline">/highlight</code>, <code class="luz-code-inline">/player</code>, <code class="luz-code-inline">/theme</code>, <code class="luz-code-inline">/clipboard</code>) solo incluyen inglés: una página en español que los importe directamente debe llamar a <code class="luz-code-inline">loadLocales()</code> o <code class="luz-code-inline">registerLocale()</code>.</li>
         <li><strong>Botón.</strong> <code class="luz-code-inline">.luz-btn</code> no ajusta el texto de su etiqueta (<code class="luz-code-inline">white-space: nowrap</code>), así que un botón con una etiqueta larga puede desbordar su contenedor a 320 píxeles de ancho con el texto al 130 % (WCAG 1.4.10, Reajuste). Acorta la etiqueta o define <code class="luz-code-inline">white-space: normal</code> en tu propia capa.</li>
         <li><strong>Botón de copia.</strong> Si el navegador no permite copiar, se anuncia el error a los lectores de pantalla, pero no se muestra ningún mensaje junto al botón.</li>
+        <li><strong>Meter, progress y range sin clase.</strong> La pista que dibuja el navegador mide de 1,1:1 a 2,1:1 frente a la página en claro y en alto contraste (Chromium), por debajo del 3:1 del criterio 1.4.11 de WCAG 2.2 (Contraste de elementos no textuales, nivel AA); el relleno y el control deslizante superan 3:1. Usa <code class="luz-code-inline">.luz-meter</code> o <code class="luz-code-inline">.luz-progress</code>, y da al range su valor en su etiqueta o en un <code class="luz-code-inline">&lt;output&gt;</code>.</li>
       </ul>
 
       <h2 id="h-a11y-report">Informar de un problema de accesibilidad</h2>
-      <p>Si algo no funciona para ti, <a href="https://github.com/nandovejer/luz/issues">abre una incidencia en GitHub</a> y explica qué intentabas hacer, qué navegador y qué tecnología de asistencia usas.</p>
+      <p>Si algo no funciona para ti, <a href="https://github.com/nandomunoz/luz/issues">abre una incidencia en GitHub</a> y explica qué intentabas hacer, qué navegador y qué tecnología de asistencia usas.</p>
     
     </div>

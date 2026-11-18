@@ -19,7 +19,7 @@
   border-radius: var(--luz-radius-md);
   cursor: pointer;
   /* min-height: the label can grow with the user's font size */
-  min-height: var(--luz-control-lg);
+  min-block-size: var(--luz-control-lg);
   padding: 0 var(--luz-space-lg);
   text-decoration: none;
   transition: background var(--luz-duration-fast),
@@ -95,13 +95,13 @@
 
 /* Sizes */
 .luz-btn--sm {
-  min-height: var(--luz-control-md);
+  min-block-size: var(--luz-control-md);
   font-size: var(--luz-text-sm);
   padding: 0 var(--luz-space-sm);
 }
 
 .luz-btn--lg {
-  min-height: var(--luz-control-xl);
+  min-block-size: var(--luz-control-xl);
   font-size: var(--luz-text-base);
   padding: 0 var(--luz-space-xl);
 }

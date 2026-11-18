@@ -30,8 +30,8 @@ export const START = "<!-- luz:ai-agents:start -->";
 export const END = "<!-- luz:ai-agents:end -->";
 
 /** Where the generated files are served from (the Pages site of the repository). */
-const SITE_URL = "https://nandovejer.github.io/luz/";
-const REPO_URL = "https://github.com/nandovejer/luz";
+const SITE_URL = "https://nandomunoz.github.io/luz/";
+const REPO_URL = "https://github.com/nandomunoz/luz";
 /** The packages that define a custom element, so ship a `custom-elements.json`. */
 /** The scope of the package this one replaces, spelled in pieces so that tests/luz-name.test.js passes. */
 const FORMER_SCOPE = `@${["c", "ai"].join("")}-ds/*`;

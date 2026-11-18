@@ -79,7 +79,7 @@
 
 .luz-player-progress-row--audio {
   flex: 1;
-  min-width: 0;
+  min-inline-size: 0;
 }
 
 .luz-player-time {

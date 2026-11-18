@@ -90,4 +90,38 @@ describe("DESIGN.md", () => {
       for (const file of cssUnder(join(root, dir))) expect(readFileSync(file, "utf-8"), file).not.toMatch(/luz-exception:[^\n]*chart/i);
     }
   });
+
+  // The bare controls audit (audit-fixes plan, phase 1): two items of "Open" are closed, one by a fix and one by a decision written under its rules
+  const openSection = (text) => text.split(/^## Open$/m)[1] ?? "";
+
+  it("no longer lists the bare checkbox and radio in dark as open: the fix is in core", () => {
+    expect(openSection(readFileSync(DESIGN, "utf-8"))).not.toMatch(/Checkbox and radio in dark/i);
+  });
+
+  it("no longer lists the bare meter, progress and range as open: they are exceptions under their rules", () => {
+    expect(openSection(readFileSync(DESIGN, "utf-8"))).not.toMatch(/Meter, progress and range/i);
+  });
+
+  it("DR-2 writes that the track of a bare meter, progress and range is below 3:1 and sends to .luz-meter and .luz-progress, with its date", () => {
+    const exceptions = exceptionsOf(readFileSync(DESIGN, "utf-8"), "DR-2");
+    const at = exceptions.search(/bare `meter`/);
+    expect(at, "DR-2 names the bare meter").toBeGreaterThanOrEqual(0);
+    const text = exceptions.slice(at);
+    expect(text).toMatch(/`progress`/);
+    expect(text).toMatch(/input\[type="range"\]/);
+    expect(text).toMatch(/below 3:1/);
+    expect(text).toMatch(/`\.luz-meter`/);
+    expect(text).toMatch(/`\.luz-progress`/);
+    expect(text).toMatch(/\((proposed|decided) 20\d\d-\d\d-\d\d\b/);
+  });
+
+  it("DR-10 writes that the bare meter paints the browser's green and that .luz-meter does not, with its date", () => {
+    const exceptions = exceptionsOf(readFileSync(DESIGN, "utf-8"), "DR-10");
+    const at = exceptions.search(/bare `meter`/);
+    expect(at, "DR-10 names the bare meter").toBeGreaterThanOrEqual(0);
+    const text = exceptions.slice(at);
+    expect(text).toMatch(/green/);
+    expect(text).toMatch(/`\.luz-meter`/);
+    expect(text).toMatch(/\((proposed|decided) 20\d\d-\d\d-\d\d\b/);
+  });
 });

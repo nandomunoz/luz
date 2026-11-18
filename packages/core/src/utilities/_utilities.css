@@ -55,21 +55,21 @@
 }
 .u-flex-1 {
   flex: 1;
-  min-width: 0;
+  min-inline-size: 0;
 }
 
 /* Spacing (margin-bottom) */
 .u-mb-0 {
-  margin-bottom: 0;
+  margin-block-end: 0;
 }
 .u-mb-sm {
-  margin-bottom: var(--luz-space-xs);
+  margin-block-end: var(--luz-space-xs);
 }
 .u-mb-md {
-  margin-bottom: var(--luz-space-md);
+  margin-block-end: var(--luz-space-md);
 }
 .u-mb-lg {
-  margin-bottom: var(--luz-space-xl);
+  margin-block-end: var(--luz-space-xl);
 }
 
 /* State */
