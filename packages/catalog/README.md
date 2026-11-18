@@ -103,7 +103,7 @@ Each tag is the block; its parts are `.luz-<tag>__<part>`.
 
 ## Search
 
-A button shaped like a field ("Search docs…", <kbd>Ctrl K</kbd>) opens a native `<dialog>` with a field and the results as links, grouped under Pages, Sections and HTML elements (8 per group at most). Ctrl+K and ⌘K open it too, also before its script has loaded. Without JavaScript the button stays hidden and a plain link to your index page shows in its place. Every fixed text is in your markup, and the few the script writes (the count, "no results", loading, error) are `data-luz-label-*` attributes on the dialog, in the page's language. The full markup, the keyboard model and the index format are on the [Search page of the docs](https://nandovejer.github.io/luz/docs/catalog/search/).
+A button shaped like a field ("Search docs…", <kbd>Ctrl K</kbd>) opens a native `<dialog>` with a field and the results as links, grouped under Pages, Sections and HTML elements (8 per group at most). Ctrl+K and ⌘K open it too, also before its script has loaded. Without JavaScript the button stays hidden and a plain link to your index page shows in its place. Every fixed text is in your markup, and the few the script writes (the count, "no results", loading, error) are `data-luz-label-*` attributes on the dialog, in the page's language. The full markup, the keyboard model and the index format are on the [Search page of the docs](https://nandomunoz.github.io/luz/docs/catalog/search/).
 
 The index is a JSON file on the same origin (`data-luz-search-src`), format version 1, with URLs relative to the file:
 
@@ -120,7 +120,7 @@ Each item is `[text, url, meta?, lang?]`. The component fetches it only from the
 
 A band fixed at the bottom of the window asks once whether the site may use optional cookies: Accept and Reject side by side, with the same style, and a `<details>` with one checkbox per category. It is `hidden` in the markup and `cookie-consent.js` shows it when no answer is stored, when the stored one has expired (180 days by default, `data-luz-consent-days`, 395 at most), or when it offers a category the stored answer was not asked about. It does not take focus, and while it shows it reserves the page's height, so it covers nothing; Escape is not an answer. Without JavaScript it stays hidden: none of your scripts run either, and the cookie policy is a link on every page.
 
-The answer is stored in `localStorage` under `luz-consent` (or `data-luz-consent-key`, starting with `luz-`), as `{"version":1,"expires":<ms>,"asked":[…],"granted":[…]}`. Read it with `getConsent()`, which returns `{ asked, granted, expires }` or `null`, and listen for `luz:consent` on `document`, dispatched with the same object as `detail` on every new answer. A button with `data-luz-consent-open` (and `hidden`) shows the banner again. The script writes no text. Full markup on the [Cookie consent page of the docs](https://nandovejer.github.io/luz/docs/catalog/cookie-consent/).
+The answer is stored in `localStorage` under `luz-consent` (or `data-luz-consent-key`, starting with `luz-`), as `{"version":1,"expires":<ms>,"asked":[…],"granted":[…]}`. Read it with `getConsent()`, which returns `{ asked, granted, expires }` or `null`, and listen for `luz:consent` on `document`, dispatched with the same object as `detail` on every new answer. A button with `data-luz-consent-open` (and `hidden`) shows the banner again. The script writes no text. Full markup on the [Cookie consent page of the docs](https://nandomunoz.github.io/luz/docs/catalog/cookie-consent/).
 
 ```js
 import { getConsent } from "@luz-ds/catalog/cookie-consent";
@@ -145,7 +145,7 @@ document.addEventListener("luz:consent", (e) => (granted(e.detail) ? startMeasur
 </luz-color-mode>
 ```
 
-The element has `mode` (`"auto"`, `"light"`, `"dark"` or `"high-contrast"`), `light` (the phase, or `null` without the clock) and `preview(phase | hour | null)`, which shows another hour of the day with the clock (and returns `false` without it). It dispatches `luz-color-mode:change`, bubbling, after it starts and on every change, with `{ mode, theme, light, remembered, simulated }`. Full markup, the boot snippet for `<head>` and a theme with a day and a night light on the [Color mode page of the docs](https://nandovejer.github.io/luz/docs/catalog/color-mode/).
+The element has `mode` (`"auto"`, `"light"`, `"dark"` or `"high-contrast"`), `light` (the phase, or `null` without the clock) and `preview(phase | hour | null)`, which shows another hour of the day with the clock (and returns `false` without it). It dispatches `luz-color-mode:change`, bubbling, after it starts and on every change, with `{ mode, theme, light, remembered, simulated }`. Full markup, the boot snippet for `<head>` and a theme with a day and a night light on the [Color mode page of the docs](https://nandomunoz.github.io/luz/docs/catalog/color-mode/).
 
 ## Patterns of a kind of site
 
@@ -162,26 +162,26 @@ import '@luz-ds/catalog/components/hero.css'
 
 | Fits best | File in `components/` | Block | Docs page |
 | --- | --- | --- | --- |
-| Landing page, blog or newspaper | `site-header.css` | `.luz-site-header` (`--publication` for a blog) | [site-header](https://nandovejer.github.io/luz/docs/catalog/site-header/) |
-| Landing page | `hero.css` | `.luz-hero` | [hero](https://nandovejer.github.io/luz/docs/catalog/hero/) |
+| Landing page, blog or newspaper | `site-header.css` | `.luz-site-header` (`--publication` for a blog) | [site-header](https://nandomunoz.github.io/luz/docs/catalog/site-header/) |
+| Landing page | `hero.css` | `.luz-hero` | [hero](https://nandomunoz.github.io/luz/docs/catalog/hero/) |
 | Landing page | `main.css` | `.luz-main` | none |
-| Landing page | `section.css` | `.luz-section` | [section](https://nandovejer.github.io/luz/docs/catalog/section/) |
-| Landing page | `stat.css` | `.luz-stat` | [stat](https://nandovejer.github.io/luz/docs/catalog/stat/) |
-| Landing page, blog or newspaper | `site-footer.css` | `.luz-site-footer` | [site-footer](https://nandovejer.github.io/luz/docs/catalog/site-footer/) |
+| Landing page | `section.css` | `.luz-section` | [section](https://nandomunoz.github.io/luz/docs/catalog/section/) |
+| Landing page | `stat.css` | `.luz-stat` | [stat](https://nandomunoz.github.io/luz/docs/catalog/stat/) |
+| Landing page, blog or newspaper | `site-footer.css` | `.luz-site-footer` | [site-footer](https://nandomunoz.github.io/luz/docs/catalog/site-footer/) |
 | Landing page | `glow.css` | `.luz-glow` | none |
-| Blog or newspaper | `masthead.css` | `.luz-masthead` | [masthead](https://nandovejer.github.io/luz/docs/catalog/masthead/) |
-| Blog or newspaper | `page-header.css` | `.luz-page-header` | [page-header](https://nandovejer.github.io/luz/docs/catalog/page-header/) |
-| Blog or newspaper | `article-header.css` | `.luz-article-header` | [article-header](https://nandovejer.github.io/luz/docs/catalog/article-header/) |
-| Blog or newspaper | `article.css` | `.luz-article`, `.luz-toc` | [toc](https://nandovejer.github.io/luz/docs/catalog/toc/) |
-| Web application | `app-bar.css` | `.luz-app-bar` | [app-bar](https://nandovejer.github.io/luz/docs/catalog/app-bar/) |
-| Web application | `dashboard.css` | `.luz-dashboard` | [dashboard](https://nandovejer.github.io/luz/docs/catalog/dashboard/) |
-| Documentation site | `docs-layout.css` | `.luz-docs-layout` | [docs-layout](https://nandovejer.github.io/luz/docs/catalog/docs-layout/) |
-| Documentation site | `doc-header.css` | `.luz-doc-header` | [doc-header](https://nandovejer.github.io/luz/docs/catalog/doc-header/) |
-| Documentation site | `page-rail.css` | `.luz-page-rail` | [page-rail](https://nandovejer.github.io/luz/docs/catalog/page-rail/) |
-| Documentation site | `example.css` | `.luz-example` | [example](https://nandovejer.github.io/luz/docs/catalog/example/) |
-| Documentation site | `do-dont.css` | `.luz-do-dont` | [do-dont](https://nandovejer.github.io/luz/docs/catalog/do-dont/) |
-| Documentation site | `pager.css` | `.luz-pager` | [pager](https://nandovejer.github.io/luz/docs/catalog/pager/) |
-| Documentation site | `page-footer.css` | `.luz-page-footer` | [page-footer](https://nandovejer.github.io/luz/docs/catalog/page-footer/) |
+| Blog or newspaper | `masthead.css` | `.luz-masthead` | [masthead](https://nandomunoz.github.io/luz/docs/catalog/masthead/) |
+| Blog or newspaper | `page-header.css` | `.luz-page-header` | [page-header](https://nandomunoz.github.io/luz/docs/catalog/page-header/) |
+| Blog or newspaper | `article-header.css` | `.luz-article-header` | [article-header](https://nandomunoz.github.io/luz/docs/catalog/article-header/) |
+| Blog or newspaper | `article.css` | `.luz-article`, `.luz-toc` | [toc](https://nandomunoz.github.io/luz/docs/catalog/toc/) |
+| Web application | `app-bar.css` | `.luz-app-bar` | [app-bar](https://nandomunoz.github.io/luz/docs/catalog/app-bar/) |
+| Web application | `dashboard.css` | `.luz-dashboard` | [dashboard](https://nandomunoz.github.io/luz/docs/catalog/dashboard/) |
+| Documentation site | `docs-layout.css` | `.luz-docs-layout` | [docs-layout](https://nandomunoz.github.io/luz/docs/catalog/docs-layout/) |
+| Documentation site | `doc-header.css` | `.luz-doc-header` | [doc-header](https://nandomunoz.github.io/luz/docs/catalog/doc-header/) |
+| Documentation site | `page-rail.css` | `.luz-page-rail` | [page-rail](https://nandomunoz.github.io/luz/docs/catalog/page-rail/) |
+| Documentation site | `example.css` | `.luz-example` | [example](https://nandomunoz.github.io/luz/docs/catalog/example/) |
+| Documentation site | `do-dont.css` | `.luz-do-dont` | [do-dont](https://nandomunoz.github.io/luz/docs/catalog/do-dont/) |
+| Documentation site | `pager.css` | `.luz-pager` | [pager](https://nandomunoz.github.io/luz/docs/catalog/pager/) |
+| Documentation site | `page-footer.css` | `.luz-page-footer` | [page-footer](https://nandomunoz.github.io/luz/docs/catalog/page-footer/) |
 
 Load `hero.css` with `section.css`: the head of a section shares its rules. The blog and the newspaper work with any CMS.
 
@@ -206,9 +206,9 @@ Older versions: https://github.com/nandomunoz/luz/blob/main/packages/catalog/CHA
 
 1. `dist/classes.json` in this package: the classes and custom properties its CSS defines. Write only those.
 2. `dist/custom-elements.json` in this package: the `<luz-*>` elements it defines, with their attributes.
-3. https://nandovejer.github.io/luz/llms.txt: the index of the documentation, short enough for a small context.
-4. https://nandovejer.github.io/luz/llms-full.txt: the same pages in full.
-5. https://nandovejer.github.io/luz/examples/: one standalone page of markup for each component and pattern.
+3. https://nandomunoz.github.io/luz/llms.txt: the index of the documentation, short enough for a small context.
+4. https://nandomunoz.github.io/luz/llms-full.txt: the same pages in full.
+5. https://nandomunoz.github.io/luz/examples/: one standalone page of markup for each component and pattern.
 
 ### Load order
 

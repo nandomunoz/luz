@@ -297,7 +297,7 @@ export const MESSAGES = {
   },
 };
 
-export const SITE_URL = "https://nandovejer.github.io/luz/";
+export const SITE_URL = "https://nandomunoz.github.io/luz/";
 
 // Where a finding sends the reader: a route of the docs site and a fragment
 // that is an id on it. The rules table of "Working with AI" (step 13) is the
