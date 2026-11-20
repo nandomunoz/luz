@@ -827,11 +827,11 @@ a:hover .link::after {
 /* The terminal fills in, line by line, quickly */
 .motion [data-type] .ln {
   opacity: 0;
-  transition: opacity 0.15s linear calc(var(--li) * 60ms + 0.1s);
 }
 
 .motion [data-type].is-in .ln {
   opacity: 1;
+  transition: opacity 0.15s linear calc(var(--li) * 45ms + 0.1s);
 }
 
 @keyframes appear {
@@ -1081,4 +1081,112 @@ a:hover .link::after {
 /* A struck word keeps its line once it is split into words */
 .mani__say s .w > span {
   text-decoration: line-through 2px var(--blue);
+}
+
+/* ---- Start in your terminal --------------------------------------------- */
+
+.split--start {
+  align-items: start;
+}
+
+.install--dark {
+  margin-block: 2rem 0.5rem;
+  border-color: rgb(255 255 255 / 25%);
+  background: rgb(255 255 255 / 6%);
+  color: var(--white);
+}
+
+.install--dark code::before {
+  color: #7383a6;
+}
+
+.install--dark .copy {
+  background: var(--white);
+  color: var(--ink);
+}
+
+.split p.ai-line {
+  margin-block-start: 2rem;
+  padding: 1.1rem 1.25rem;
+  border: 1px solid rgb(255 255 255 / 18%);
+  border-inline-start: 4px solid var(--blue-hi);
+  font-size: 1.125rem;
+  line-height: 1.5;
+}
+
+.ai-line strong {
+  color: var(--white);
+  font-weight: 600;
+}
+
+.ai-line a {
+  display: inline-block;
+  margin-inline-start: 0.25rem;
+  color: var(--blue-hi);
+}
+
+.ai-line code,
+.split dd code {
+  color: var(--white);
+}
+
+.term-modes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0 0 0.75rem;
+  padding: 0;
+  border: 0;
+}
+
+.term-modes label {
+  position: relative;
+  padding: 0.45rem 0.9rem;
+  border: 1px solid rgb(255 255 255 / 22%);
+  font-size: 1rem;
+  color: #b8c2d8;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.term-modes input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.term-modes label:hover {
+  border-color: rgb(255 255 255 / 55%);
+  color: var(--white);
+}
+
+.term-modes label:has(:checked) {
+  border-color: var(--white);
+  background: var(--white);
+  color: var(--ink);
+}
+
+.term-modes label:has(:focus-visible) {
+  outline: 2px solid var(--white);
+  outline-offset: 3px;
+}
+
+.term__pane {
+  display: none;
+}
+
+.split:has([value="tty"]:checked) .term__pane--tty,
+.split:has([value="a11y"]:checked) .term__pane--a11y,
+.split:has([value="json"]:checked) .term__pane--json {
+  display: block;
+}
+
+.term .wa {
+  color: #f2c94c;
+}
+
+.term pre {
+  font-size: 0.8125rem;
+  line-height: 1.65;
 }

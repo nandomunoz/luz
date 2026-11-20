@@ -58,7 +58,7 @@ const NAV = [
   {
     label: "Get started",
     items: [
-      { label: "A first page", href: "docs/get-started.html", own: true },
+      { label: "Set it up", href: "docs/get-started.html", own: true },
       { label: "Make it yours", href: "docs/get-started.html" },
       { label: "Migrate a project", href: "docs/get-started.html" },
     ],
@@ -66,9 +66,9 @@ const NAV = [
   {
     label: "Work with AI",
     items: [
-      { label: "The five prompts", href: "docs/get-started.html" },
-      { label: "llms.txt", href: "docs/get-started.html" },
-      { label: "The validator", href: "docs/get-started.html" },
+      { label: "Use Luz with an AI", href: "docs/ai.html", own: true },
+      { label: "Every flag", href: "docs/ai.html" },
+      { label: "No terminal?", href: "docs/ai.html" },
     ],
   },
   {

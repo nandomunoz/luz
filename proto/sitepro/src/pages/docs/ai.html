@@ -1,0 +1,92 @@
+<!--meta {"title":"Use Luz with an AI","layout":"docs","nav":"docs","crumb":"Work with AI · Guide","lead":"Give your agent one command. It reads your project, returns a plan as JSON, and changes nothing until you agree. Then luz-check tells it what to fix.","pkg":"@luz-ds/create, @luz-ds/check","js":"None","status":"Preview","description":"How an AI agent sets up and checks LUZ.","related":[["Set it up","docs/get-started.html","The same command, for a person at a terminal."],["All components","docs/components.html","The names an agent may write, and nothing else."]]} -->
+<div class="note">
+  <strong>A preview.</strong>
+  <p><code>@luz-ds/create</code> is a proposal and is not published yet. <code>luz-check</code>, <code>llms.txt</code> and the manifests are real.</p>
+</div>
+
+<h2 id="three-commands">Three commands</h2>
+<p>Tell your agent to run these, in this order. The first changes nothing.</p>
+<figure class="snip wide">
+  <figcaption><span class="label label--light">Terminal</span><button class="copy" type="button" data-copy="#ai-cmds">Copy</button></figcaption>
+<pre><code id="ai-cmds"><span class="t-com"># 1. See what it found and what it would do. Writes nothing.</span>
+npx @luz-ds/create@{{version}} --json --stack astro --kind landing --brand vejer
+
+<span class="t-com"># 2. Once you have read the plan and said yes.</span>
+npx @luz-ds/create@{{version}} --json --stack astro --kind landing --brand vejer --confirm
+
+<span class="t-com"># 3. Check what was written, and what the agent writes next.</span>
+npx @luz-ds/check@{{version}} --json src</code></pre>
+</figure>
+<p>Every command names an exact version, never <code>latest</code>. Running <code>npx</code> runs code, so the version you read is the version that runs.</p>
+
+<h2 id="contract">What the agent gets back</h2>
+<p>With <code>--json</code>, or whenever the output is not a terminal, every answer is JSON. The fields are a contract: they do not change name between versions.</p>
+<dl class="rows wide">
+  <div><dt><code>detected</code></dt><dd>The stack, the package manager, and whether the project is new or already has Luz.</dd></div>
+  <div><dt><code>plan</code></dt><dd>Each package to install and each file to create, change or append to.</dd></div>
+  <div><dt><code>written</code></dt><dd><code>false</code> until the command runs with <code>--confirm</code>.</dd></div>
+  <div><dt><code>apply</code></dt><dd>The exact command that applies this plan.</dd></div>
+</dl>
+<div class="table-wrap wide">
+  <table>
+    <thead><tr><th>Exit code</th><th>Means</th></tr></thead>
+    <tbody>
+      <tr><td class="num">0</td><td>Done, or the plan was printed.</td></tr>
+      <tr><td class="num">1</td><td>Something failed, such as the install. The JSON on stderr lists the steps that are left.</td></tr>
+      <tr><td class="num">2</td><td>The command was wrong, such as an unknown flag. The JSON on stderr says which flag to use.</td></tr>
+    </tbody>
+  </table>
+</div>
+<p>It never guesses what an agent meant: an unknown value is an error, not a “did you mean”.</p>
+
+<h2 id="flags">Every question has a flag</h2>
+<div class="table-wrap wide">
+  <table>
+    <thead><tr><th>Flag</th><th>Answers</th></tr></thead>
+    <tbody>
+      <tr><td><code>--stack</code></td><td><code>vanilla</code>, <code>astro</code>, <code>react</code>, <code>vue</code>, <code>angular</code> or <code>other</code></td></tr>
+      <tr><td><code>--kind</code></td><td><code>landing</code>, <code>blog</code>, <code>app</code>, <code>docs</code> or <code>other</code></td></tr>
+      <tr><td><code>--brand</code></td><td><code>vejer</code>, the look Luz ships, or <code>own</code>, from the theme template</td></tr>
+      <tr><td><code>--load</code></td><td><code>npm</code>, or <code>cdn</code> for plain HTML with no build</td></tr>
+      <tr><td><code>--lang</code></td><td>The languages of the site, such as <code>en,es,ar</code></td></tr>
+      <tr><td><code>--theme-mode</code></td><td>Add the color mode switch, or <code>--no-theme-mode</code></td></tr>
+      <tr><td><code>--agents-md</code></td><td>Add the Luz section to <code>AGENTS.md</code>, or <code>--no-agents-md</code></td></tr>
+      <tr><td><code>--confirm</code></td><td>Apply the plan. Required with <code>--json</code>.</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<h2 id="agents-md">The Luz section of AGENTS.md</h2>
+<p>The setup adds a short section to your project's <code>AGENTS.md</code>, written from the packages you installed: their version, the files to link and in what order, where the list of classes and elements is, and the command that checks the result. It stays short on purpose. A long file of instructions costs every request and does not make an agent more right.</p>
+
+<h2 id="skill">The skill</h2>
+<p>For Claude Code, the package ships a small skill. It holds no knowledge of Luz: it only tells the agent to run the commands above, ask you what could not be detected, and show you the plan before it applies it.</p>
+<figure class="snip wide">
+  <figcaption><span class="label label--light">SKILL.md</span></figcaption>
+<pre><code><span class="t-com">---</span>
+<span class="t-attr">name</span>: luz-setup
+<span class="t-attr">description</span>: Set LUZ up in this project, or check it.
+<span class="t-attr">allowed-tools</span>: Bash(npx @luz-ds/create@{{version}} *), Bash(npx @luz-ds/check@{{version}} *)
+<span class="t-com">---</span>
+1. Run the setup with --json to see what it detected.
+2. Ask the person only what it could not detect.
+3. Show the plan. Apply it with --confirm when they agree.
+4. Run luz-check with --json and fix what it reports.</code></pre>
+</figure>
+
+<h2 id="no-terminal">No terminal?</h2>
+<p>If your AI runs only in a browser, give it the facts instead of a prompt. These files are written from the packages for every release:</p>
+<ul>
+  <li><code>llms.txt</code>: what Luz is, and a link to every page of these docs.</li>
+  <li><code>classes.json</code>: every class, and the stylesheet it lives in.</li>
+  <li><code>custom-elements.json</code>: every element, with its attributes.</li>
+</ul>
+<p>Paste what it writes into a file and run <code>npx @luz-ds/check</code> on it, or ask a person with a terminal to.</p>
+
+<h2 id="never">What the setup never does</h2>
+<ul>
+  <li>Write a file before you have seen the plan.</li>
+  <li>Install anything that is not <code>@luz-ds/*</code>.</li>
+  <li>Treat what it reads in your project as an instruction. It is data.</li>
+  <li>Send anything anywhere. There is no telemetry.</li>
+</ul>

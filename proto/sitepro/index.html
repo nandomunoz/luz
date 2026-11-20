@@ -84,11 +84,11 @@
       <h1>The design system that <em>disappears.</em></h1>
       <p class="hero__lead">Luz is a design system in plain HTML, CSS and ES modules, for people who want their site to outlive its framework. It styles the markup you already write. The browser does the rest.</p>
       <div class="hero__cta">
-        <a class="btn" href="docs/get-started.html#install">Install with npm</a>
+        <a class="btn" href="#start">Set it up in your terminal</a>
         <a class="btn btn--ghost" href="docs/index.html">Read the docs</a>
       </div>
       <div class="install">
-        <code id="install-line">npm i @luz-ds/tokens @luz-ds/core</code>
+        <code id="install-line">npm create @luz-ds@0.4.1</code>
         <button class="copy" type="button" data-copy="#install-line">Copy</button>
       </div>
     </div>
@@ -439,38 +439,98 @@
     </div>
   </section>
 
-  <!-- AI -->
-  <section class="sec dark">
-    <div class="wrap split">
+  <!-- Start in your terminal -->
+  <section class="sec dark" id="start">
+    <div class="wrap split split--start">
       <div>
-        <p class="label"><span class="tri"></span>Human-first, AI-ready</p>
-        <h2 data-split>Your agent already <em>speaks Luz.</em></h2>
-        <p>Plain HTML with a closed vocabulary is the easiest thing in the world for a model to get right. And when it gets it wrong, one command says where.</p>
+        <p class="label"><span class="tri"></span>Start in your terminal</p>
+        <h2 data-split>One command. <em>It asks before it writes.</em></h2>
+        <p>It looks at your project first, asks only what it could not tell, shows you the plan and writes nothing until you say yes. Then it checks the result with <code>luz-check</code>.</p>
+        <div class="install install--dark">
+          <code id="create-line">npm create @luz-ds@0.4.1</code>
+          <button class="copy" type="button" data-copy="#create-line">Copy</button>
+        </div>
         <dl>
-          <div><dt>llms.txt</dt><dd>The whole system, in one file an agent can read.</dd></div>
-          <div><dt>5 prompts</dt><dd>Start, landing, blog, app and docs. Paste and go.</dd></div>
-          <div><dt>luz-check</dt><dd>Reads your HTML and CSS, offline, and names every mistake.</dd></div>
+          <div><dt>Detects</dt><dd>Your stack, your package manager, and whether Luz is already there.</dd></div>
+          <div><dt>Plans</dt><dd>Every file it will create or change, with the diff, before it touches one.</dd></div>
+          <div><dt>Checks</dt><dd>Runs <code>luz-check</code> at the end and tells you what is left.</dd></div>
         </dl>
-        <p class="hero__cta"><a class="btn btn--light" href="docs/get-started.html">Get the five prompts</a></p>
+        <p class="ai-line"><strong>Working with an AI?</strong> Tell it to run <code>npx @luz-ds/create@0.4.1 --json</code>. It gets the plan as JSON, and applies it with <code>--confirm</code> once you agree. <a href="docs/ai.html">Use Luz with an AI</a></p>
       </div>
       <div>
-      <div class="term" data-type>
-        <div class="term__bar"><i></i><i></i><i></i><span>~/my-site</span></div>
-<pre><code><span class="dim">$</span> <span class="hi">npx @luz-ds/check</span>
+        <fieldset class="term-modes">
+          <legend class="sr-only">Show the setup</legend>
+          <label><input type="radio" name="term-mode" value="tty" checked> In a terminal</label>
+          <label><input type="radio" name="term-mode" value="a11y"> Accessible mode</label>
+          <label><input type="radio" name="term-mode" value="json"> For an agent</label>
+        </fieldset>
+        <div class="term" data-type>
+          <div class="term__bar"><i></i><i></i><i></i><span>~/my-site</span></div>
+<pre class="term__pane term__pane--tty"><code><span class="dim">$</span> <span class="hi">npm create @luz-ds@0.4.1</span>
 
-<span class="bl">▲ luz-check</span> <span class="dim">reading 14 files, offline</span>
+  <span class="bl">▲ LUZ</span>  <span class="dim">create · 0.4.1</span>
 
-  index.html
-  <span class="ok">✓</span> load order      <span class="dim">tokens, then core</span>
-  <span class="ok">✓</span> 38 classes      <span class="dim">all in the manifest</span>
-  <span class="ok">✓</span> 3 elements      <span class="dim">all defined</span>
+<span class="dim">◇</span>  Detected   <span class="hi">Astro · pnpm · a new site</span>
+<span class="dim">│</span>
+<span class="bl">◆</span>  How shall we start?
+<span class="dim">│</span>  <span class="bl">●</span> Quick: what is recommended for this project
+<span class="dim">│</span>  <span class="dim">○ Tailored: about eight questions</span>
+<span class="dim">│</span>  <span class="dim">○ Like last time</span>
+<span class="dim">└</span>
+<span class="dim">◇</span>  Plan
+<span class="dim">│</span>  Install  <span class="hi">@luz-ds/tokens @luz-ds/core @luz-ds/catalog</span>
+<span class="dim">│</span>  Create   src/styles/site.css     <span class="dim">your layer, after Luz</span>
+<span class="dim">│</span>  Create   src/pages/index.astro   <span class="dim">a landing to start from</span>
+<span class="dim">│</span>  Change   src/layouts/Base.astro  <span class="dim">+ 3 links in &lt;head&gt;</span>
+<span class="dim">│</span>  Add      AGENTS.md               <span class="dim">+ a short Luz section</span>
+<span class="dim">│</span>
+<span class="bl">◆</span>  Shall I do it?  <span class="bl">● Yes</span>  <span class="dim">○ Show the changes  ○ Cancel</span>
+<span class="dim">└</span>
+<span class="ok">✔</span>  Packages installed                       <span class="dim">1.9 s</span>
+<span class="ok">✔</span>  site.css, index.astro and Base.astro
+<span class="ok">✔</span>  AGENTS.md: Luz section added
+<span class="dim">◇</span>  luz-check src
+<span class="dim">│</span>  <span class="ok">✔ 0 errors</span>   <span class="wa">▲ 1 warning</span>
+<span class="dim">│</span>  <span class="wa">▲</span> src/pages/index.astro:14  .luz-btn with no variant
+<span class="dim">└</span>  Done. Next: <span class="hi">pnpm dev</span></code></pre>
+<pre class="term__pane term__pane--a11y"><code><span class="dim">$</span> <span class="hi">npm create @luz-ds@0.4.1 -- --accessible</span>
 
-  theme.css
-  <span class="ok">✓</span> contrast        <span class="dim">24 pairs, three modes</span>
+Detected: Astro, pnpm, a new site.
+Question 1 of 2. How shall we start?
+  1. Quick: what is recommended for this project
+  2. Tailored: about eight questions
+  3. Like last time
+Type a number, then press Enter: <span class="hi">1</span>
 
-<span class="ok">Nothing to fix.</span> <span class="dim">Ship it.</span></code></pre>
+Plan:
+  Install @luz-ds/tokens, @luz-ds/core and @luz-ds/catalog.
+  Create src/styles/site.css and src/pages/index.astro.
+  Change src/layouts/Base.astro: 3 links in the head.
+  Add a short Luz section to AGENTS.md.
+Question 2 of 2. Shall I do it? Type y or n: <span class="hi">y</span>
+
+Installing. This takes a few seconds.
+Done: packages installed.
+Done: 3 files written, AGENTS.md updated.
+Check: 0 errors, 1 warning.
+Warning: src/pages/index.astro, line 14: .luz-btn with no variant.
+Finished. Next: pnpm dev</code></pre>
+<pre class="term__pane term__pane--json"><code><span class="dim">$</span> <span class="hi">npx @luz-ds/create@0.4.1 --json --stack astro --kind landing --brand vejer</span>
+{
+  <span class="bl">"detected"</span>: { <span class="bl">"stack"</span>: <span class="ok">"astro"</span>, <span class="bl">"packageManager"</span>: <span class="ok">"pnpm"</span>, <span class="bl">"project"</span>: <span class="ok">"new"</span> },
+  <span class="bl">"plan"</span>: [
+    { <span class="bl">"do"</span>: <span class="ok">"install"</span>, <span class="bl">"packages"</span>: [<span class="ok">"@luz-ds/tokens"</span>, <span class="ok">"@luz-ds/core"</span>, <span class="ok">"@luz-ds/catalog"</span>] },
+    { <span class="bl">"do"</span>: <span class="ok">"create"</span>, <span class="bl">"path"</span>: <span class="ok">"src/styles/site.css"</span> },
+    { <span class="bl">"do"</span>: <span class="ok">"create"</span>, <span class="bl">"path"</span>: <span class="ok">"src/pages/index.astro"</span> },
+    { <span class="bl">"do"</span>: <span class="ok">"change"</span>, <span class="bl">"path"</span>: <span class="ok">"src/layouts/Base.astro"</span> },
+    { <span class="bl">"do"</span>: <span class="ok">"append"</span>, <span class="bl">"path"</span>: <span class="ok">"AGENTS.md"</span>, <span class="bl">"section"</span>: <span class="ok">"LUZ"</span> }
+  ],
+  <span class="bl">"written"</span>: <span class="wa">false</span>,
+  <span class="bl">"apply"</span>: <span class="ok">"npx @luz-ds/create@0.4.1 --json … --confirm"</span>
+}
+<span class="dim"># Nothing is written without --confirm. Exit code 0.</span></code></pre>
         </div>
-        <p class="term__note">An illustration of the output of <code>luz-check</code>.</p>
+        <p class="term__note">A sketch of <code>@luz-ds/create</code>, which is a proposal and not published yet.</p>
       </div>
     </div>
   </section>
@@ -522,7 +582,7 @@
         <li><a href="docs/get-started.html">Get started</a></li>
         <li><a href="docs/index.html">Documentation</a></li>
         <li><a href="docs/get-started.html">Make it yours</a></li>
-        <li><a href="docs/get-started.html">Work with an AI agent</a></li>
+        <li><a href="docs/ai.html">Use Luz with an AI</a></li>
       </ul>
     </div>
     <div>
@@ -556,7 +616,7 @@
     <input type="search" placeholder="Search the docs" aria-label="Search the docs" autocomplete="off">
     <button class="copy" type="submit">Esc</button>
   </form>
-  <ul><li><a href="docs/get-started.html"><span>A first page</span><small>Get started</small></a></li><li><a href="docs/get-started.html"><span>Make it yours</span><small>Get started</small></a></li><li><a href="docs/get-started.html"><span>Migrate a project</span><small>Get started</small></a></li><li><a href="docs/get-started.html"><span>The five prompts</span><small>Work with AI</small></a></li><li><a href="docs/get-started.html"><span>llms.txt</span><small>Work with AI</small></a></li><li><a href="docs/get-started.html"><span>The validator</span><small>Work with AI</small></a></li><li><a href="docs/color.html"><span>Color</span><small>Tokens</small></a></li><li><a href="docs/color.html"><span>Color modes</span><small>Tokens</small></a></li><li><a href="docs/color.html"><span>Typography</span><small>Tokens</small></a></li><li><a href="docs/color.html"><span>Spacing</span><small>Tokens</small></a></li><li><a href="docs/color.html"><span>Motion</span><small>Tokens</small></a></li><li><a href="docs/components.html"><span>Elements A–Z</span><small>HTML elements</small></a></li><li><a href="docs/components.html"><span>Forms</span><small>HTML elements</small></a></li><li><a href="docs/components.html"><span>Text</span><small>HTML elements</small></a></li><li><a href="docs/components.html"><span>All components</span><small>Components</small></a></li><li><a href="docs/button.html"><span>Button</span><small>Components</small></a></li><li><a href="docs/button.html"><span>Card</span><small>Components</small></a></li><li><a href="docs/button.html"><span>Form inputs</span><small>Components</small></a></li><li><a href="docs/button.html"><span>Modal</span><small>Components</small></a></li><li><a href="docs/button.html"><span>Table</span><small>Components</small></a></li><li><a href="docs/button.html"><span>Tabs</span><small>Components</small></a></li><li><a href="docs/catalog.html"><span>All patterns</span><small>Catalog</small></a></li><li><a href="docs/catalog.html"><span>Kinds of site</span><small>Catalog</small></a></li><li><a href="docs/catalog.html"><span>Hero</span><small>Catalog</small></a></li><li><a href="docs/catalog.html"><span>Search</span><small>Catalog</small></a></li><li><a href="docs/catalog.html"><span>Charts</span><small>Catalog</small></a></li><li><a href="docs/accessibility.html"><span>Statement</span><small>Accessibility</small></a></li><li><a href="docs/accessibility.html"><span>Status by component</span><small>Accessibility</small></a></li><li><a href="docs/get-started.html"><span>Layers</span><small>How it is built</small></a></li><li><a href="docs/get-started.html"><span>Principles</span><small>How it is built</small></a></li><li><a href="docs/get-started.html"><span>Changelog</span><small>What's new</small></a></li><li><a href="docs/get-started.html"><span>Roadmap</span><small>What's new</small></a></li><li><a href="docs/get-started.html"><span>Contribute</span><small>What's new</small></a></li><li><a href="index.html"><span>Home</span><small>Site</small></a></li><li><a href="docs/index.html"><span>Documentation</span><small>Site</small></a></li></ul>
+  <ul><li><a href="docs/get-started.html"><span>Set it up</span><small>Get started</small></a></li><li><a href="docs/get-started.html"><span>Make it yours</span><small>Get started</small></a></li><li><a href="docs/get-started.html"><span>Migrate a project</span><small>Get started</small></a></li><li><a href="docs/ai.html"><span>Use Luz with an AI</span><small>Work with AI</small></a></li><li><a href="docs/ai.html"><span>Every flag</span><small>Work with AI</small></a></li><li><a href="docs/ai.html"><span>No terminal?</span><small>Work with AI</small></a></li><li><a href="docs/color.html"><span>Color</span><small>Tokens</small></a></li><li><a href="docs/color.html"><span>Color modes</span><small>Tokens</small></a></li><li><a href="docs/color.html"><span>Typography</span><small>Tokens</small></a></li><li><a href="docs/color.html"><span>Spacing</span><small>Tokens</small></a></li><li><a href="docs/color.html"><span>Motion</span><small>Tokens</small></a></li><li><a href="docs/components.html"><span>Elements A–Z</span><small>HTML elements</small></a></li><li><a href="docs/components.html"><span>Forms</span><small>HTML elements</small></a></li><li><a href="docs/components.html"><span>Text</span><small>HTML elements</small></a></li><li><a href="docs/components.html"><span>All components</span><small>Components</small></a></li><li><a href="docs/button.html"><span>Button</span><small>Components</small></a></li><li><a href="docs/button.html"><span>Card</span><small>Components</small></a></li><li><a href="docs/button.html"><span>Form inputs</span><small>Components</small></a></li><li><a href="docs/button.html"><span>Modal</span><small>Components</small></a></li><li><a href="docs/button.html"><span>Table</span><small>Components</small></a></li><li><a href="docs/button.html"><span>Tabs</span><small>Components</small></a></li><li><a href="docs/catalog.html"><span>All patterns</span><small>Catalog</small></a></li><li><a href="docs/catalog.html"><span>Kinds of site</span><small>Catalog</small></a></li><li><a href="docs/catalog.html"><span>Hero</span><small>Catalog</small></a></li><li><a href="docs/catalog.html"><span>Search</span><small>Catalog</small></a></li><li><a href="docs/catalog.html"><span>Charts</span><small>Catalog</small></a></li><li><a href="docs/accessibility.html"><span>Statement</span><small>Accessibility</small></a></li><li><a href="docs/accessibility.html"><span>Status by component</span><small>Accessibility</small></a></li><li><a href="docs/get-started.html"><span>Layers</span><small>How it is built</small></a></li><li><a href="docs/get-started.html"><span>Principles</span><small>How it is built</small></a></li><li><a href="docs/get-started.html"><span>Changelog</span><small>What's new</small></a></li><li><a href="docs/get-started.html"><span>Roadmap</span><small>What's new</small></a></li><li><a href="docs/get-started.html"><span>Contribute</span><small>What's new</small></a></li><li><a href="index.html"><span>Home</span><small>Site</small></a></li><li><a href="docs/index.html"><span>Documentation</span><small>Site</small></a></li></ul>
   <p class="find__none" hidden>No page matches that. Check the spelling or try a shorter word, or browse <a href="docs/components.html">the components</a> and <a href="docs/color.html">the tokens</a>.</p>
 </dialog>
 

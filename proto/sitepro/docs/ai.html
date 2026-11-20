@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Use Luz with an AI · LUZ</title>
+<meta name="description" content="How an AI agent sets up and checks LUZ.">
+<meta name="robots" content="noindex">
+<link rel="alternate" type="text/markdown" href="ai.md">
+<link rel="icon" href="../assets/mark.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../assets/site.css">
+<link rel="stylesheet" href="../assets/docs.css">
+<link rel="stylesheet" href="../assets/motion.css">
+<script defer src="../assets/site.js"></script>
+<script defer src="../assets/motion.js"></script>
+</head>
+<body class="is-docs">
+<a class="skip" href="#main">Skip to the content</a>
+<header class="head">
+  <div class="wrap head__in">
+    <a class="brand" href="../index.html" aria-label="LUZ, home">
+      <svg viewBox="0 0 32 28" aria-hidden="true"><path d="M16 0 32 28H0z" fill="#2b66f0"/><path d="M16 0v28H0z" fill="#6f9bff"/><path d="M16 14l8 14H8z" fill="#f4f3ef"/></svg>
+      <span>Luz</span>
+      <small>0.4.1 beta</small>
+    </a>
+    <nav aria-label="Main">
+      <ul class="nav">
+        <li><a href="../docs/index.html" aria-current="page">Docs</a></li>
+        <li><a href="../docs/components.html">Components</a></li>
+        <li><a href="../docs/catalog.html">Catalog</a></li>
+        <li><a href="../docs/color.html">Tokens</a></li>
+        <li><a href="../docs/accessibility.html">Accessibility</a></li>
+      </ul>
+    </nav>
+    <div class="head__act">
+      <button class="kbd-btn" type="button" data-find-open>Search the docs <kbd>Ctrl K</kbd></button>
+      <a class="btn btn--sm" href="../docs/get-started.html#install">Install</a>
+    </div>
+    <details class="menu">
+      <summary aria-label="Menu"><span></span></summary>
+      <div class="menu__panel">
+        <ul>
+          <li><a href="../docs/index.html">Docs</a></li>
+          <li><a href="../docs/components.html">Components</a></li>
+          <li><a href="../docs/catalog.html">Catalog</a></li>
+          <li><a href="../docs/color.html">Tokens</a></li>
+          <li><a href="../docs/accessibility.html">Accessibility</a></li>
+          <li><a href="../docs/get-started.html">Get started</a></li>
+        </ul>
+      </div>
+    </details>
+  </div>
+</header>
+
+<div class="docs wrap">
+  <details class="docs__menu">
+    <summary><span class="tri"></span>Browse the docs</summary>
+    <nav class="side" aria-label="Documentation">
+<details><summary><span>Get started</span></summary><ul><li><a href="../docs/get-started.html">Set it up</a></li><li><a href="../docs/get-started.html">Make it yours</a></li><li><a href="../docs/get-started.html">Migrate a project</a></li></ul></details>
+<details open><summary><span>Work with AI</span></summary><ul><li><a href="../docs/ai.html" aria-current="page">Use Luz with an AI</a></li><li><a href="../docs/ai.html">Every flag</a></li><li><a href="../docs/ai.html">No terminal?</a></li></ul></details>
+<details><summary><span>Tokens<code>@luz-ds/tokens</code></span></summary><ul><li><a href="../docs/color.html">Color</a></li><li><a href="../docs/color.html">Color modes</a></li><li><a href="../docs/color.html">Typography</a></li><li><a href="../docs/color.html">Spacing</a></li><li><a href="../docs/color.html">Motion</a></li></ul></details>
+<details><summary><span>HTML elements<code>@luz-ds/core</code></span></summary><ul><li><a href="../docs/components.html">Elements A–Z</a></li><li><a href="../docs/components.html">Forms</a></li><li><a href="../docs/components.html">Text</a></li></ul></details>
+<details><summary><span>Components<code>@luz-ds/core</code></span></summary><ul><li><a href="../docs/components.html">All components</a></li><li><a href="../docs/button.html">Button</a></li><li><a href="../docs/button.html">Card</a></li><li><a href="../docs/button.html">Form inputs</a></li><li><a href="../docs/button.html">Modal</a></li><li><a href="../docs/button.html">Table</a></li><li><a href="../docs/button.html">Tabs</a></li></ul></details>
+<details><summary><span>Catalog<code>@luz-ds/catalog</code></span></summary><ul><li><a href="../docs/catalog.html">All patterns</a></li><li><a href="../docs/catalog.html">Kinds of site</a></li><li><a href="../docs/catalog.html">Hero</a></li><li><a href="../docs/catalog.html">Search</a></li><li><a href="../docs/catalog.html">Charts</a></li></ul></details>
+<details><summary><span>Accessibility</span></summary><ul><li><a href="../docs/accessibility.html">Statement</a></li><li><a href="../docs/accessibility.html">Status by component</a></li></ul></details>
+<details><summary><span>How it is built</span></summary><ul><li><a href="../docs/get-started.html">Layers</a></li><li><a href="../docs/get-started.html">Principles</a></li></ul></details>
+<details><summary><span>What's new</span></summary><ul><li><a href="../docs/get-started.html">Changelog</a></li><li><a href="../docs/get-started.html">Roadmap</a></li><li><a href="../docs/get-started.html">Contribute</a></li></ul></details>
+    </nav>
+  </details>
+  <aside class="docs__side">
+    <nav class="side" aria-label="Documentation">
+<details><summary><span>Get started</span></summary><ul><li><a href="../docs/get-started.html">Set it up</a></li><li><a href="../docs/get-started.html">Make it yours</a></li><li><a href="../docs/get-started.html">Migrate a project</a></li></ul></details>
+<details open><summary><span>Work with AI</span></summary><ul><li><a href="../docs/ai.html" aria-current="page">Use Luz with an AI</a></li><li><a href="../docs/ai.html">Every flag</a></li><li><a href="../docs/ai.html">No terminal?</a></li></ul></details>
+<details><summary><span>Tokens<code>@luz-ds/tokens</code></span></summary><ul><li><a href="../docs/color.html">Color</a></li><li><a href="../docs/color.html">Color modes</a></li><li><a href="../docs/color.html">Typography</a></li><li><a href="../docs/color.html">Spacing</a></li><li><a href="../docs/color.html">Motion</a></li></ul></details>
+<details><summary><span>HTML elements<code>@luz-ds/core</code></span></summary><ul><li><a href="../docs/components.html">Elements A–Z</a></li><li><a href="../docs/components.html">Forms</a></li><li><a href="../docs/components.html">Text</a></li></ul></details>
+<details><summary><span>Components<code>@luz-ds/core</code></span></summary><ul><li><a href="../docs/components.html">All components</a></li><li><a href="../docs/button.html">Button</a></li><li><a href="../docs/button.html">Card</a></li><li><a href="../docs/button.html">Form inputs</a></li><li><a href="../docs/button.html">Modal</a></li><li><a href="../docs/button.html">Table</a></li><li><a href="../docs/button.html">Tabs</a></li></ul></details>
+<details><summary><span>Catalog<code>@luz-ds/catalog</code></span></summary><ul><li><a href="../docs/catalog.html">All patterns</a></li><li><a href="../docs/catalog.html">Kinds of site</a></li><li><a href="../docs/catalog.html">Hero</a></li><li><a href="../docs/catalog.html">Search</a></li><li><a href="../docs/catalog.html">Charts</a></li></ul></details>
+<details><summary><span>Accessibility</span></summary><ul><li><a href="../docs/accessibility.html">Statement</a></li><li><a href="../docs/accessibility.html">Status by component</a></li></ul></details>
+<details><summary><span>How it is built</span></summary><ul><li><a href="../docs/get-started.html">Layers</a></li><li><a href="../docs/get-started.html">Principles</a></li></ul></details>
+<details><summary><span>What's new</span></summary><ul><li><a href="../docs/get-started.html">Changelog</a></li><li><a href="../docs/get-started.html">Roadmap</a></li><li><a href="../docs/get-started.html">Contribute</a></li></ul></details>
+    </nav>
+  </aside>
+  <main class="docs__main" id="main">
+    <header class="doc-head">
+      <p class="label">Work with AI · Guide</p>
+      <h1>Use Luz with an AI</h1>
+      <p class="doc-head__lead">Give your agent one command. It reads your project, returns a plan as JSON, and changes nothing until you agree. Then luz-check tells it what to fix.</p>
+<dl class="doc-facts"><div><dt>Package</dt><dd><code>@luz-ds/create, @luz-ds/check</code></dd></div><div><dt>JavaScript</dt><dd>None</dd></div><div><dt>Status</dt><dd>Preview</dd></div></dl>
+      <p class="doc-acts"><a href="https://github.com/nandovejer/luz/edit/main/proto/sitepro/src/pages/docs/ai.html">Edit on GitHub</a><button type="button" data-copy-md>Copy as Markdown</button></p>
+    </header>
+    <div class="prose">
+<div class="note">
+  <strong>A preview.</strong>
+  <p><code>@luz-ds/create</code> is a proposal and is not published yet. <code>luz-check</code>, <code>llms.txt</code> and the manifests are real.</p>
+</div>
+
+<h2 id="three-commands">Three commands</h2>
+<p>Tell your agent to run these, in this order. The first changes nothing.</p>
+<figure class="snip wide">
+  <figcaption><span class="label label--light">Terminal</span><button class="copy" type="button" data-copy="#ai-cmds">Copy</button></figcaption>
+<pre><code id="ai-cmds"><span class="t-com"># 1. See what it found and what it would do. Writes nothing.</span>
+npx @luz-ds/create@0.4.1 --json --stack astro --kind landing --brand vejer
+
+<span class="t-com"># 2. Once you have read the plan and said yes.</span>
+npx @luz-ds/create@0.4.1 --json --stack astro --kind landing --brand vejer --confirm
+
+<span class="t-com"># 3. Check what was written, and what the agent writes next.</span>
+npx @luz-ds/check@0.4.1 --json src</code></pre>
+</figure>
+<p>Every command names an exact version, never <code>latest</code>. Running <code>npx</code> runs code, so the version you read is the version that runs.</p>
+
+<h2 id="contract">What the agent gets back</h2>
+<p>With <code>--json</code>, or whenever the output is not a terminal, every answer is JSON. The fields are a contract: they do not change name between versions.</p>
+<dl class="rows wide">
+  <div><dt><code>detected</code></dt><dd>The stack, the package manager, and whether the project is new or already has Luz.</dd></div>
+  <div><dt><code>plan</code></dt><dd>Each package to install and each file to create, change or append to.</dd></div>
+  <div><dt><code>written</code></dt><dd><code>false</code> until the command runs with <code>--confirm</code>.</dd></div>
+  <div><dt><code>apply</code></dt><dd>The exact command that applies this plan.</dd></div>
+</dl>
+<div class="table-wrap wide">
+  <table>
+    <thead><tr><th>Exit code</th><th>Means</th></tr></thead>
+    <tbody>
+      <tr><td class="num">0</td><td>Done, or the plan was printed.</td></tr>
+      <tr><td class="num">1</td><td>Something failed, such as the install. The JSON on stderr lists the steps that are left.</td></tr>
+      <tr><td class="num">2</td><td>The command was wrong, such as an unknown flag. The JSON on stderr says which flag to use.</td></tr>
+    </tbody>
+  </table>
+</div>
+<p>It never guesses what an agent meant: an unknown value is an error, not a “did you mean”.</p>
+
+<h2 id="flags">Every question has a flag</h2>
+<div class="table-wrap wide">
+  <table>
+    <thead><tr><th>Flag</th><th>Answers</th></tr></thead>
+    <tbody>
+      <tr><td><code>--stack</code></td><td><code>vanilla</code>, <code>astro</code>, <code>react</code>, <code>vue</code>, <code>angular</code> or <code>other</code></td></tr>
+      <tr><td><code>--kind</code></td><td><code>landing</code>, <code>blog</code>, <code>app</code>, <code>docs</code> or <code>other</code></td></tr>
+      <tr><td><code>--brand</code></td><td><code>vejer</code>, the look Luz ships, or <code>own</code>, from the theme template</td></tr>
+      <tr><td><code>--load</code></td><td><code>npm</code>, or <code>cdn</code> for plain HTML with no build</td></tr>
+      <tr><td><code>--lang</code></td><td>The languages of the site, such as <code>en,es,ar</code></td></tr>
+      <tr><td><code>--theme-mode</code></td><td>Add the color mode switch, or <code>--no-theme-mode</code></td></tr>
+      <tr><td><code>--agents-md</code></td><td>Add the Luz section to <code>AGENTS.md</code>, or <code>--no-agents-md</code></td></tr>
+      <tr><td><code>--confirm</code></td><td>Apply the plan. Required with <code>--json</code>.</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<h2 id="agents-md">The Luz section of AGENTS.md</h2>
+<p>The setup adds a short section to your project's <code>AGENTS.md</code>, written from the packages you installed: their version, the files to link and in what order, where the list of classes and elements is, and the command that checks the result. It stays short on purpose. A long file of instructions costs every request and does not make an agent more right.</p>
+
+<h2 id="skill">The skill</h2>
+<p>For Claude Code, the package ships a small skill. It holds no knowledge of Luz: it only tells the agent to run the commands above, ask you what could not be detected, and show you the plan before it applies it.</p>
+<figure class="snip wide">
+  <figcaption><span class="label label--light">SKILL.md</span></figcaption>
+<pre><code><span class="t-com">---</span>
+<span class="t-attr">name</span>: luz-setup
+<span class="t-attr">description</span>: Set LUZ up in this project, or check it.
+<span class="t-attr">allowed-tools</span>: Bash(npx @luz-ds/create@0.4.1 *), Bash(npx @luz-ds/check@0.4.1 *)
+<span class="t-com">---</span>
+1. Run the setup with --json to see what it detected.
+2. Ask the person only what it could not detect.
+3. Show the plan. Apply it with --confirm when they agree.
+4. Run luz-check with --json and fix what it reports.</code></pre>
+</figure>
+
+<h2 id="no-terminal">No terminal?</h2>
+<p>If your AI runs only in a browser, give it the facts instead of a prompt. These files are written from the packages for every release:</p>
+<ul>
+  <li><code>llms.txt</code>: what Luz is, and a link to every page of these docs.</li>
+  <li><code>classes.json</code>: every class, and the stylesheet it lives in.</li>
+  <li><code>custom-elements.json</code>: every element, with its attributes.</li>
+</ul>
+<p>Paste what it writes into a file and run <code>npx @luz-ds/check</code> on it, or ask a person with a terminal to.</p>
+
+<h2 id="never">What the setup never does</h2>
+<ul>
+  <li>Write a file before you have seen the plan.</li>
+  <li>Install anything that is not <code>@luz-ds/*</code>.</li>
+  <li>Treat what it reads in your project as an instruction. It is data.</li>
+  <li>Send anything anywhere. There is no telemetry.</li>
+</ul>
+
+    </div>
+<section class="related" aria-labelledby="related-h"><h2 class="label label--ink" id="related-h">Related pages</h2><ul><li><a href="../docs/get-started.html"><strong>Set it up</strong><span>The same command, for a person at a terminal.</span></a></li><li><a href="../docs/components.html"><strong>All components</strong><span>The names an agent may write, and nothing else.</span></a></li></ul></section>
+<nav class="pager" aria-label="Previous and next page"><a class="pager__a pager__a--prev" rel="prev" href="../docs/get-started.html"><span class="label label--ink">Previous</span><strong>Set it up</strong><small>Get started</small></a><a class="pager__a pager__a--next" rel="next" href="../docs/color.html"><span class="label label--ink">Next</span><strong>Color</strong><small>Tokens</small></a></nav>
+  </main>
+  <aside class="docs__rail" aria-label="On this page">
+    <p class="label label--ink">On this page</p>
+<ul data-spy><li><a href="#three-commands">Three commands</a></li><li><a href="#contract">What the agent gets back</a></li><li><a href="#flags">Every question has a flag</a></li><li><a href="#agents-md">The Luz section of AGENTS.md</a></li><li><a href="#skill">The skill</a></li><li><a href="#no-terminal">No terminal?</a></li><li><a href="#never">What the setup never does</a></li></ul>
+  </aside>
+</div>
+
+<footer class="foot">
+  <div class="wrap foot__end">
+    <span>© 2026 LUZ 0.4.1 beta. MIT licensed.</span>
+    <span><a href="https://github.com/nandovejer/luz">GitHub</a> · <a href="https://www.npmjs.com/package/@luz-ds/core">npm</a> · <a href="../docs/accessibility.html">Accessibility</a></span>
+  </div>
+</footer>
+
+<dialog class="find" aria-label="Search the site">
+  <form method="dialog">
+    <input type="search" placeholder="Search the docs" aria-label="Search the docs" autocomplete="off">
+    <button class="copy" type="submit">Esc</button>
+  </form>
+  <ul><li><a href="#three-commands"><span>Three commands</span><small>On this page</small></a></li><li><a href="#contract"><span>What the agent gets back</span><small>On this page</small></a></li><li><a href="#flags"><span>Every question has a flag</span><small>On this page</small></a></li><li><a href="#agents-md"><span>The Luz section of AGENTS.md</span><small>On this page</small></a></li><li><a href="#skill"><span>The skill</span><small>On this page</small></a></li><li><a href="#no-terminal"><span>No terminal?</span><small>On this page</small></a></li><li><a href="#never"><span>What the setup never does</span><small>On this page</small></a></li><li><a href="../docs/get-started.html"><span>Set it up</span><small>Get started</small></a></li><li><a href="../docs/get-started.html"><span>Make it yours</span><small>Get started</small></a></li><li><a href="../docs/get-started.html"><span>Migrate a project</span><small>Get started</small></a></li><li><a href="../docs/ai.html"><span>Use Luz with an AI</span><small>Work with AI</small></a></li><li><a href="../docs/ai.html"><span>Every flag</span><small>Work with AI</small></a></li><li><a href="../docs/ai.html"><span>No terminal?</span><small>Work with AI</small></a></li><li><a href="../docs/color.html"><span>Color</span><small>Tokens</small></a></li><li><a href="../docs/color.html"><span>Color modes</span><small>Tokens</small></a></li><li><a href="../docs/color.html"><span>Typography</span><small>Tokens</small></a></li><li><a href="../docs/color.html"><span>Spacing</span><small>Tokens</small></a></li><li><a href="../docs/color.html"><span>Motion</span><small>Tokens</small></a></li><li><a href="../docs/components.html"><span>Elements A–Z</span><small>HTML elements</small></a></li><li><a href="../docs/components.html"><span>Forms</span><small>HTML elements</small></a></li><li><a href="../docs/components.html"><span>Text</span><small>HTML elements</small></a></li><li><a href="../docs/components.html"><span>All components</span><small>Components</small></a></li><li><a href="../docs/button.html"><span>Button</span><small>Components</small></a></li><li><a href="../docs/button.html"><span>Card</span><small>Components</small></a></li><li><a href="../docs/button.html"><span>Form inputs</span><small>Components</small></a></li><li><a href="../docs/button.html"><span>Modal</span><small>Components</small></a></li><li><a href="../docs/button.html"><span>Table</span><small>Components</small></a></li><li><a href="../docs/button.html"><span>Tabs</span><small>Components</small></a></li><li><a href="../docs/catalog.html"><span>All patterns</span><small>Catalog</small></a></li><li><a href="../docs/catalog.html"><span>Kinds of site</span><small>Catalog</small></a></li><li><a href="../docs/catalog.html"><span>Hero</span><small>Catalog</small></a></li><li><a href="../docs/catalog.html"><span>Search</span><small>Catalog</small></a></li><li><a href="../docs/catalog.html"><span>Charts</span><small>Catalog</small></a></li><li><a href="../docs/accessibility.html"><span>Statement</span><small>Accessibility</small></a></li><li><a href="../docs/accessibility.html"><span>Status by component</span><small>Accessibility</small></a></li><li><a href="../docs/get-started.html"><span>Layers</span><small>How it is built</small></a></li><li><a href="../docs/get-started.html"><span>Principles</span><small>How it is built</small></a></li><li><a href="../docs/get-started.html"><span>Changelog</span><small>What's new</small></a></li><li><a href="../docs/get-started.html"><span>Roadmap</span><small>What's new</small></a></li><li><a href="../docs/get-started.html"><span>Contribute</span><small>What's new</small></a></li><li><a href="../index.html"><span>Home</span><small>Site</small></a></li><li><a href="../docs/index.html"><span>Documentation</span><small>Site</small></a></li></ul>
+  <p class="find__none" hidden>No page matches that. Check the spelling or try a shorter word, or browse <a href="../docs/components.html">the components</a> and <a href="../docs/color.html">the tokens</a>.</p>
+</dialog>
+
+</body>
+</html>

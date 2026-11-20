@@ -106,12 +106,22 @@
 
   /* ---- The terminal: one line at a time --------------------------------- */
   for (const term of document.querySelectorAll("[data-type]")) {
-    const code = term.querySelector("code");
-    if (!code) continue;
-    code.innerHTML = code.innerHTML
-      .split("\n")
-      .map((line, i) => `<span class="ln" style="--li:${i}">${line}</span>`)
-      .join("\n");
+    for (const code of term.querySelectorAll("code")) {
+      code.innerHTML = code.innerHTML
+        .split("\n")
+        .map((line, i) => `<span class="ln" style="--li:${i}">${line}</span>`)
+        .join("\n");
+    }
+  }
+
+  /* Switching the view of the terminal types the new one again */
+  for (const radio of document.querySelectorAll('input[name="term-mode"]')) {
+    radio.addEventListener("change", () => {
+      const term = document.querySelector("[data-type]");
+      if (!term || calm) return;
+      term.classList.remove("is-in");
+      requestAnimationFrame(() => requestAnimationFrame(() => term.classList.add("is-in")));
+    });
   }
 
   /* ---- Numbers count up ------------------------------------------------- */
