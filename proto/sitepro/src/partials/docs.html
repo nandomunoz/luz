@@ -1,0 +1,30 @@
+<div class="docs wrap">
+  <details class="docs__menu">
+    <summary><span class="tri"></span>Browse the docs</summary>
+    <nav class="side" aria-label="Documentation">
+{{sidebar}}
+    </nav>
+  </details>
+  <aside class="docs__side">
+    <nav class="side" aria-label="Documentation">
+{{sidebar}}
+    </nav>
+  </aside>
+  <main class="docs__main" id="main">
+    <header class="doc-head">
+      <p class="label">{{crumb}}</p>
+      <h1>{{title}}</h1>
+      <p class="doc-head__lead">{{lead}}</p>
+{{facts}}
+    </header>
+    <div class="prose">
+{{body}}
+    </div>
+{{related}}
+{{pager}}
+  </main>
+  <aside class="docs__rail" aria-label="On this page">
+    <p class="label label--ink">On this page</p>
+{{rail}}
+  </aside>
+</div>

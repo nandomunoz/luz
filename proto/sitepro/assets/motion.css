@@ -1,0 +1,1084 @@
+/* ==========================================================================
+   LUZ — site mock-up: motion, the new sections, and the transitions
+   Every movement lives under prefers-reduced-motion: no-preference. A state
+   that hides something before it moves in is keyed on .motion, the class
+   motion.js puts on <html>: with no script, or with reduced motion, the page
+   is simply there.
+   ========================================================================== */
+
+:root {
+  interpolate-size: allow-keywords;
+  --ease-out: cubic-bezier(0.2, 0, 0, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ---- Inline art --------------------------------------------------------- */
+
+.art {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.hero__art,
+.lost__art,
+.portal__art,
+.band__art {
+  overflow: hidden;
+}
+
+.art .t {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+}
+
+/* The light that follows the pointer */
+.hero::after,
+.lost::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(42rem circle at var(--px, 72%) var(--py, 28%), rgb(255 255 255 / 55%), transparent 60%);
+  mix-blend-mode: soft-light;
+  pointer-events: none;
+}
+
+/* ---- Floating pieces over the hero -------------------------------------- */
+
+.floats {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.fl {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid rgb(255 255 255 / 70%);
+  background: rgb(255 255 255 / 72%);
+  backdrop-filter: blur(10px) saturate(1.3);
+  box-shadow: 14px 22px 40px rgb(11 23 48 / 18%);
+  font-size: 1rem;
+}
+
+.fl--1 {
+  inset-inline-start: 57%;
+  top: 30%;
+}
+
+.fl--2 {
+  inset-inline-start: 82%;
+  top: 22%;
+}
+
+.fl--3 {
+  inset-inline-start: 66%;
+  top: 60%;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
+}
+
+.fl--3 code {
+  color: var(--blue-lo);
+  font-size: 0.9375rem;
+}
+
+.fl--3 span {
+  font-size: 0.875rem;
+  color: var(--ink-3);
+}
+
+.fl--4 {
+  inset-inline-start: 86%;
+  top: 74%;
+  padding: 0.5rem;
+}
+
+.fl .x-check input {
+  pointer-events: none;
+}
+
+@media (width < 75rem) {
+  .floats {
+    display: none;
+  }
+}
+
+/* ---- The marquee -------------------------------------------------------- */
+
+.marq {
+  display: flex;
+  overflow: hidden;
+  border-block-end: 1px solid var(--blue-lo);
+  background: var(--blue);
+  color: var(--white);
+  mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+}
+
+.marq ul {
+  display: flex;
+  flex: none;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.marq li {
+  display: flex;
+  align-items: center;
+  padding: 1.1rem 0;
+  font-size: clamp(1.5rem, 1.2rem + 1vw, 2.25rem);
+  font-style: italic;
+  white-space: nowrap;
+}
+
+.marq li::after {
+  content: "";
+  width: 0.5em;
+  height: 0.44em;
+  margin-inline: 1.4em;
+  background: rgb(255 255 255 / 55%);
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+
+.marq {
+  position: relative;
+}
+
+.marq__pause {
+  position: absolute;
+  inset-inline-end: 1rem;
+  top: 50%;
+  z-index: 1;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.5rem;
+  padding: 0.3rem 0.9rem;
+  border: 1px solid rgb(255 255 255 / 70%);
+  border-radius: 2px;
+  background: var(--blue-lo);
+  color: var(--white);
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  translate: 0 -50%;
+}
+
+.marq__pause::before {
+  content: "";
+  width: 0.6rem;
+  height: 0.7rem;
+  border-inline: 3px solid currentcolor;
+}
+
+.marq__pause[aria-pressed="true"]::before {
+  border: 0;
+  background: currentcolor;
+  clip-path: polygon(0 0, 100% 50%, 0 100%);
+}
+
+.marq__pause:hover {
+  background: var(--ink);
+}
+
+/* ---- Layers: the scroll story ------------------------------------------- */
+
+.stack {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+  gap: clamp(2rem, 6vw, 6rem);
+  align-items: start;
+}
+
+.stack__fig {
+  position: sticky;
+  top: calc(var(--header) + 12vh);
+}
+
+.stack__fig svg {
+  width: 100%;
+  max-width: 28rem;
+  overflow: visible;
+}
+
+.stack .s {
+  fill: var(--blue);
+  stroke: var(--line-2);
+  stroke-width: 1;
+  fill-opacity: 0.06;
+  transition: fill-opacity 0.4s var(--ease-out), fill 0.4s;
+}
+
+.stack .s2 {
+  fill: var(--blue-hi);
+}
+
+.stack .s3 {
+  fill: var(--ink);
+}
+
+.stack .sl {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 1.6px;
+  fill: var(--ink-3);
+  transition: fill 0.4s;
+}
+
+.stack[data-step="1"] .s1,
+.stack[data-step="2"] :is(.s1, .s2),
+.stack[data-step="3"] :is(.s1, .s2, .s3) {
+  fill-opacity: 1;
+  stroke: transparent;
+}
+
+.stack[data-step="1"] .sl1,
+.stack[data-step="2"] .sl2,
+.stack[data-step="3"] .sl3 {
+  fill: var(--blue-lo);
+}
+
+.stack__count {
+  margin-block-start: 1.5rem;
+  font-family: var(--mono);
+  font-size: var(--step--1);
+  letter-spacing: 0.12em;
+  color: var(--ink-3);
+}
+
+.stack__count span {
+  font-size: 2.5rem;
+  font-family: var(--serif);
+  letter-spacing: 0;
+  color: var(--blue);
+}
+
+.stack__list {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.stack .layer {
+  border: 1px solid var(--line-2);
+  background: var(--white);
+  transition: opacity 0.3s var(--ease-out), translate 0.3s var(--ease-out), box-shadow 0.3s, border-color 0.3s;
+}
+
+.stack .layer h3 {
+  font-size: var(--step-3);
+}
+
+.motion .stack .layer {
+  opacity: 0.4;
+}
+
+.motion .stack .layer.is-current {
+  opacity: 1;
+  border-color: var(--ink);
+  box-shadow: 16px 22px 44px rgb(11 23 48 / 12%);
+  translate: -0.5rem 0;
+}
+
+@media (width >= 62rem) {
+  .motion .stack .layer {
+    min-height: 62vh;
+  }
+}
+
+@media (width < 62rem) {
+  .stack {
+    grid-template-columns: 1fr;
+  }
+
+  .stack__fig {
+    display: none;
+  }
+
+  .motion .stack .layer {
+    opacity: 1;
+  }
+}
+
+/* ---- The playground ----------------------------------------------------- */
+
+.bento {
+  --b-bg: var(--paper);
+  --b-card: var(--white);
+  --b-fg: var(--ink);
+  --b-mute: var(--ink-2);
+  --b-line: var(--line-2);
+  --b-ac: var(--blue);
+  --b-at: var(--white);
+
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--line-2);
+  background: var(--b-bg);
+  color: var(--b-fg);
+  transition: background-color 0.5s var(--ease-out), color 0.5s var(--ease-out);
+}
+
+.bento:has([value="dark"]:checked) {
+  --b-bg: #060e20;
+  --b-card: #0f1d3a;
+  --b-fg: #eef1f7;
+  --b-mute: #b8c2d8;
+  --b-line: rgb(255 255 255 / 16%);
+  --b-ac: var(--blue-hi);
+  --b-at: var(--ink);
+}
+
+.bento:has([value="contrast"]:checked) {
+  --b-bg: #000;
+  --b-card: #000;
+  --b-fg: #fff;
+  --b-mute: #fff;
+  --b-line: #fff;
+  --b-ac: #fff;
+  --b-at: #000;
+}
+
+.b {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-width: 0;
+  margin: 0;
+  padding: 1.5rem;
+  border: 1px solid var(--b-line);
+  background: var(--b-card);
+  transition: background-color 0.5s var(--ease-out), border-color 0.5s var(--ease-out), translate 0.3s var(--ease-out), box-shadow 0.3s;
+}
+
+.b:hover {
+  translate: 0 -3px;
+  box-shadow: 10px 16px 30px rgb(11 23 48 / 12%);
+}
+
+.b h3 {
+  font-size: 1.625rem;
+  line-height: 1.1;
+}
+
+.b .label {
+  color: var(--b-mute);
+}
+
+.b--modes {
+  grid-column: span 6;
+  grid-row: span 2;
+  justify-content: space-between;
+  background:
+    linear-gradient(var(--b-card), var(--b-card)) padding-box;
+}
+
+.b--modes h3 {
+  font-size: var(--step-3);
+  max-width: 11ch;
+}
+
+.b--modes legend {
+  float: left;
+  padding: 0;
+}
+
+.b--modes legend + * {
+  clear: left;
+}
+
+.seg {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding: 0.3rem;
+  border: 1px solid var(--b-line);
+}
+
+.seg label {
+  position: relative;
+  flex: 1;
+  padding: 0.55rem 0.9rem;
+  font-size: 1.0625rem;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.3s var(--ease-out), color 0.3s;
+}
+
+.seg input {
+  position: absolute;
+  opacity: 0;
+  inset: 0;
+  cursor: pointer;
+}
+
+.seg label:has(:checked) {
+  background: var(--b-ac);
+  color: var(--b-at);
+}
+
+.seg label:has(:focus-visible) {
+  outline: 2px solid var(--b-ac);
+  outline-offset: 2px;
+}
+
+.b__code {
+  align-self: flex-start;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--b-line);
+  color: var(--b-mute);
+  font-size: 0.875rem;
+}
+
+.b__mode {
+  color: var(--b-ac);
+}
+
+.b__mode::after {
+  content: "light";
+}
+
+.bento:has([value="dark"]:checked) .b__mode::after {
+  content: "dark";
+}
+
+.bento:has([value="contrast"]:checked) .b__mode::after {
+  content: "high-contrast";
+}
+
+.b__mode {
+  font-size: 0;
+}
+
+.b__mode::after {
+  font-size: 0.875rem;
+}
+
+.b--acc {
+  grid-column: span 6;
+  gap: 0;
+}
+
+.b--acc .label {
+  margin-block-end: 0.5rem;
+}
+
+.b--acc details {
+  border-block-start: 1px solid var(--b-line);
+}
+
+.b--acc summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-block: 0.7rem;
+  font-size: 1.1875rem;
+  list-style: none;
+  cursor: pointer;
+}
+
+.b--acc summary::-webkit-details-marker {
+  display: none;
+}
+
+.b--acc summary::after {
+  content: "";
+  flex: none;
+  width: 0.6rem;
+  height: 0.5rem;
+  background: var(--b-ac);
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  transition: rotate 0.25s var(--ease-out);
+}
+
+.b--acc details[open] summary::after {
+  rotate: 180deg;
+}
+
+.b--acc details p {
+  padding-block-end: 0.8rem;
+  color: var(--b-mute);
+  font-size: 1.0625rem;
+}
+
+.b--meter {
+  grid-column: span 3;
+}
+
+.b__big {
+  font-size: 3.5rem;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.b meter {
+  width: 100%;
+  height: 0.75rem;
+}
+
+.b__range {
+  display: grid;
+  gap: 0.3rem;
+  font-size: 0.9375rem;
+  color: var(--b-mute);
+}
+
+.b__range input {
+  width: 100%;
+  accent-color: var(--b-ac);
+}
+
+.b--toast {
+  grid-column: span 3;
+}
+
+.b--dialog {
+  grid-column: span 4;
+  justify-content: space-between;
+}
+
+.b--toast,
+.b--dialog {
+  justify-content: space-between;
+}
+
+.b--toast h3,
+.b--dialog h3 {
+  font-size: 1.375rem;
+}
+
+.b .x-btn {
+  align-self: flex-start;
+  border-color: var(--b-ac);
+  background: var(--b-ac);
+  color: var(--b-at);
+}
+
+.b .x-btn--2 {
+  background: transparent;
+  color: var(--b-ac);
+}
+
+.b--form {
+  grid-column: span 8;
+}
+
+.b--form .x-input {
+  border-color: var(--b-mute);
+  background: var(--b-card);
+  color: var(--b-fg);
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.b--form .x-input:user-invalid {
+  border-color: var(--no);
+  box-shadow: inset 4px 0 0 var(--no);
+}
+
+.b__hint {
+  font-size: 0.9375rem;
+  color: var(--b-mute);
+}
+
+.b__error {
+  display: none;
+  color: var(--no);
+  font-size: 1rem;
+}
+
+.b__error strong {
+  font-weight: 600;
+}
+
+.b--form:has(:user-invalid) .b__error {
+  display: block;
+}
+
+.bento:has([value="dark"]:checked) .b__error,
+.bento:has([value="contrast"]:checked) .b__error {
+  color: #ff9c8a;
+}
+
+@media (width < 75rem) {
+  .bento {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .b--modes,
+  .b--acc {
+    grid-column: span 4;
+    grid-row: auto;
+  }
+
+  .b--meter,
+  .b--form,
+  .b--toast,
+  .b--dialog {
+    grid-column: span 2;
+  }
+}
+
+@media (width < 40rem) {
+  .bento {
+    grid-template-columns: 1fr;
+  }
+
+  .b {
+    grid-column: auto !important;
+  }
+}
+
+.b-dialog {
+  width: min(28rem, calc(100vw - 2rem));
+  padding: 2rem;
+  border: 1px solid var(--ink);
+  background: var(--white);
+  color: var(--ink);
+  box-shadow: 22px 30px 70px rgb(11 23 48 / 30%);
+}
+
+.b-dialog::backdrop {
+  background: rgb(11 23 48 / 45%);
+  backdrop-filter: blur(3px);
+}
+
+.b-dialog h3 {
+  font-size: 1.875rem;
+}
+
+.b-dialog p {
+  margin-block: 0.75rem 1.5rem;
+  color: var(--ink-2);
+}
+
+.toasts {
+  position: fixed;
+  inset-inline-end: 1.5rem;
+  bottom: 1.5rem;
+  z-index: 90;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.9rem 1.25rem;
+  background: var(--ink);
+  color: var(--paper);
+  font-size: 1.0625rem;
+  box-shadow: 14px 20px 40px rgb(11 23 48 / 30%);
+}
+
+.toast button {
+  margin-inline-start: 0.75rem;
+  padding: 0.25rem 0.6rem;
+  border: 1px solid rgb(255 255 255 / 50%);
+  border-radius: 2px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 0.9375rem;
+  cursor: pointer;
+}
+
+.toast button:hover {
+  background: rgb(255 255 255 / 12%);
+}
+
+.toast::before {
+  content: "";
+  width: 0.7rem;
+  height: 0.6rem;
+  background: var(--blue-hi);
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+
+/* ---- Small interactions everyone gets ----------------------------------- */
+
+.head {
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.head.is-scrolled {
+  box-shadow: 0 10px 30px rgb(11 23 48 / 8%);
+}
+
+.btn {
+  background-image: linear-gradient(var(--blue), var(--blue));
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: 0% 100%;
+  transition: background-size 0.25s var(--ease-out), border-color 0.2s, color 0.2s;
+}
+
+.btn:hover {
+  background-color: var(--ink);
+  background-size: 100% 100%;
+}
+
+.btn--ghost {
+  background-image: linear-gradient(var(--ink), var(--ink));
+}
+
+.btn--ghost:hover {
+  border-color: var(--ink);
+  background-color: transparent;
+  color: var(--paper);
+}
+
+.btn--light {
+  background-image: linear-gradient(var(--ink), var(--ink));
+}
+
+.btn--light:hover {
+  background-color: var(--white);
+}
+
+.btn--line {
+  background-image: linear-gradient(var(--white), var(--white));
+}
+
+.btn--line:hover {
+  background-color: transparent;
+  color: var(--blue-deep);
+}
+
+.kind__fig {
+  transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transition: transform 0.25s var(--ease-out), box-shadow 0.25s var(--ease-out);
+}
+
+.kind:hover .kind__fig {
+  transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateY(-6px);
+}
+
+.feat svg {
+  transition: rotate 0.3s var(--ease-out), scale 0.3s var(--ease-out);
+}
+
+.feat:hover svg {
+  rotate: -8deg;
+  scale: 1.12;
+}
+
+.feat {
+  transition: background-color 0.3s;
+}
+
+.feat:hover {
+  background: var(--white);
+}
+
+.link::after {
+  transition: translate 0.3s var(--ease-spring);
+}
+
+.link:hover::after,
+a:hover .link::after {
+  translate: 0.3em 0;
+}
+
+/* The sidebar of the docs opens and closes smoothly */
+.side details::details-content,
+.b--acc details::details-content {
+  block-size: 0;
+  overflow-y: clip;
+  transition: block-size 0.25s var(--ease-out), content-visibility 0.25s allow-discrete;
+}
+
+.side details[open]::details-content,
+.b--acc details[open]::details-content {
+  block-size: auto;
+}
+
+/* ---- Motion ----------------------------------------------------------
+   GUIA-VISUAL-UX-UI.md, section 14: short (200-450 ms), decelerating on the
+   way in and faster on the way out, nothing that loops past five seconds
+   without a way to stop it, no parallax. With reduced motion every rise
+   becomes a plain fade. */
+
+/* Everyone with the script: blocks fade in */
+.motion [data-reveal],
+.motion [data-stagger] > * {
+  opacity: 0;
+  transition:
+    opacity 0.35s var(--ease-out) calc(var(--si, 0) * 50ms + var(--rd, 0s)),
+    translate 0.45s var(--ease-out) calc(var(--si, 0) * 50ms + var(--rd, 0s));
+}
+
+.motion [data-reveal].is-in,
+.motion [data-stagger].is-in > * {
+  opacity: 1;
+}
+
+/* The terminal fills in, line by line, quickly */
+.motion [data-type] .ln {
+  opacity: 0;
+  transition: opacity 0.15s linear calc(var(--li) * 60ms + 0.1s);
+}
+
+.motion [data-type].is-in .ln {
+  opacity: 1;
+}
+
+@keyframes appear {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+.toast {
+  animation: fade 0.25s var(--ease-out) both;
+}
+
+/* The marquee's pause: only where the marquee moves */
+.marq__pause {
+  display: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .motion .marq__pause {
+    display: inline-flex;
+  }
+
+  /* Pages cross-fade into each other; the header stays put (Chromium only) */
+  @view-transition {
+    navigation: auto;
+  }
+
+  .head {
+    view-transition-name: head;
+  }
+
+  .docs__side {
+    view-transition-name: side;
+  }
+
+  ::view-transition-old(root) {
+    animation: vt-out 0.2s var(--ease-out) both;
+  }
+
+  ::view-transition-new(root) {
+    animation: vt-in 0.35s var(--ease-out) both;
+  }
+
+  @keyframes vt-out {
+    to {
+      opacity: 0;
+    }
+  }
+
+  @keyframes vt-in {
+    from {
+      opacity: 0;
+      translate: 0 0.75rem;
+    }
+  }
+
+  /* Reading progress, drawn by the reader's own scroll */
+  @supports (animation-timeline: scroll()) {
+    .head::after {
+      content: "";
+      position: absolute;
+      inset-inline: 0;
+      bottom: -1px;
+      height: 2px;
+      background: linear-gradient(90deg, var(--blue-hi), var(--blue));
+      transform-origin: 0 50%;
+      animation: progress linear both;
+      animation-timeline: scroll(root);
+    }
+
+    @keyframes progress {
+      from {
+        scale: 0 1;
+      }
+
+      to {
+        scale: 1 1;
+      }
+    }
+  }
+
+  /* The art assembles once, in under two seconds, then holds still */
+  .art .l {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: draw 1.4s var(--ease-out) forwards;
+  }
+
+  .art .g {
+    animation: fade 0.6s var(--ease-out) 0.1s both;
+  }
+
+  .art .x {
+    animation: fade 0.4s var(--ease-out) 1.2s both;
+  }
+
+  .art .t {
+    animation: drop 0.45s var(--ease-out) calc(0.15s + var(--d) * 0.8s) both;
+  }
+
+  @keyframes draw {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  @keyframes drop {
+    from {
+      opacity: 0;
+      scale: 0.6;
+      rotate: -20deg;
+    }
+  }
+
+  .fl {
+    animation: pop 0.4s var(--ease-out) both;
+  }
+
+  .fl--1 {
+    animation-delay: 0.7s;
+  }
+
+  .fl--2 {
+    animation-delay: 0.8s;
+  }
+
+  .fl--3 {
+    animation-delay: 0.9s;
+  }
+
+  .fl--4 {
+    animation-delay: 1s;
+  }
+
+  @keyframes pop {
+    from {
+      opacity: 0;
+      translate: 0 0.75rem;
+    }
+  }
+
+  /* The marquee runs, and stops on hover, on focus or with its button */
+  .marq ul {
+    animation: marq 60s linear infinite;
+  }
+
+  .marq:is(:hover, :focus-within) ul,
+  .marq:has([aria-pressed="true"]) ul {
+    animation-play-state: paused;
+  }
+
+  @keyframes marq {
+    to {
+      translate: -100% 0;
+    }
+  }
+
+  /* The big triangle of the 404 leans toward the pointer */
+  .lost__num svg {
+    rotate: calc(var(--mx, 0) * 10deg);
+    transition: rotate 0.4s var(--ease-out);
+  }
+
+  /* Blocks rise a little as they fade in */
+  .motion [data-reveal],
+  .motion [data-stagger] > * {
+    translate: 0 0.75rem;
+  }
+
+  .motion [data-reveal].is-in,
+  .motion [data-stagger].is-in > * {
+    translate: 0 0;
+  }
+
+  /* Section titles: words rise into place. Never the first screen, which
+     must be readable at once (GUIA-VISUAL-UX-UI.md, section 8). */
+  .motion [data-split] .w {
+    display: inline-block;
+    overflow: clip;
+    overflow-clip-margin: 0.15em;
+    vertical-align: bottom;
+    padding-block-end: 0.12em;
+    margin-block-end: -0.12em;
+  }
+
+  .motion [data-split] .w > span {
+    display: inline-block;
+    translate: 0 105%;
+    transition: translate 0.45s var(--ease-out) calc(var(--wi) * 30ms);
+  }
+
+  .motion [data-split].is-in .w > span {
+    translate: 0 0;
+  }
+
+  /* Toasts come in from below and leave faster than they came */
+  .toast {
+    animation: toast-in 0.3s var(--ease-out) both;
+  }
+
+  .toast.is-leaving {
+    animation: toast-out 0.2s ease-in both;
+  }
+
+  @keyframes toast-in {
+    from {
+      opacity: 0;
+      translate: 0 1rem;
+    }
+  }
+
+  @keyframes toast-out {
+    to {
+      opacity: 0;
+      translate: 1.5rem 0;
+    }
+  }
+
+  .b-dialog[open],
+  .find[open] {
+    animation: lift 0.25s var(--ease-out) both;
+  }
+
+  .b-dialog[open]::backdrop,
+  .find[open]::backdrop {
+    animation: fade 0.2s ease both;
+  }
+
+  @keyframes lift {
+    from {
+      opacity: 0;
+      translate: 0 0.75rem;
+    }
+  }
+}
+
+/* A struck word keeps its line once it is split into words */
+.mani__say s .w > span {
+  text-decoration: line-through 2px var(--blue);
+}

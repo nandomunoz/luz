@@ -1,0 +1,99 @@
+<!--meta {"title": "A first page", "layout": "docs", "nav": "docs", "crumb": "Get started · Tutorial", "heading": "A styled page in one minute", "lead": "Install two packages, link two stylesheets and write the HTML you already know. That is the whole setup.", "description": "Install LUZ and write a first page.", "pkg": "@luz-ds/tokens, @luz-ds/core", "js": "Optional", "related": [["Color", "docs/color.html", "The tokens, starting with the ones you will change first."], ["All components", "docs/components.html", "Every piece of core, by what you want to do."], ["Statement", "docs/accessibility.html", "What we promise about accessibility, and what we do not."]]} -->
+<div class="note note--warn">
+  <strong>Luz is in beta.</strong>
+  <p>Everything here works and is tested, but names can still change before 1.0. Pin an exact version and read the changelog before you upgrade.</p>
+</div>
+
+<h2 id="choose">Choose a level</h2>
+<p>Luz is three packages that stack in one direction. Each needs the one below it and nothing above it, so you can stop at any level.</p>
+<div class="table-wrap wide">
+  <table>
+    <thead><tr><th>You want</th><th>Install</th><th>Load, in order</th></tr></thead>
+    <tbody>
+      <tr><th>The tokens only</th><td><code>@luz-ds/tokens</code></td><td><code>luz-tokens.css</code></td></tr>
+      <tr><th>Tokens and components</th><td><code>@luz-ds/tokens</code> <code>@luz-ds/core</code></td><td><code>luz-tokens.css</code>, <code>luz.css</code></td></tr>
+      <tr><th>The page patterns too</th><td>the two above and <code>@luz-ds/catalog</code></td><td>the two above, then one stylesheet per pattern</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<h2 id="install">Install it</h2>
+<ol class="steps">
+  <li>
+    <h3>Add the packages</h3>
+    <p>With npm, pnpm or Yarn. There is nothing else to install, because Luz has no dependencies of its own.</p>
+    <figure class="snip">
+      <figcaption><span class="label label--light">Terminal</span><button class="copy" type="button" data-copy="#gs-npm">Copy</button></figcaption>
+<pre><code id="gs-npm">npm install @luz-ds/tokens @luz-ds/core</code></pre>
+    </figure>
+    <p>No build step? Skip this and <a href="#cdn">link the files from a CDN</a>.</p>
+  </li>
+  <li>
+    <h3>Link the stylesheets</h3>
+    <p>Tokens first, then core. The order matters: core reads the tokens.</p>
+    <figure class="snip">
+      <figcaption><span class="label label--light">index.html</span><button class="copy" type="button" data-copy="#gs-link">Copy</button></figcaption>
+<pre><code id="gs-link"><span class="t-tag">&lt;link</span> <span class="t-attr">rel</span>=<span class="t-str">"stylesheet"</span> <span class="t-attr">href</span>=<span class="t-str">"node_modules/@luz-ds/tokens/dist/luz-tokens.css"</span><span class="t-tag">&gt;</span>
+<span class="t-tag">&lt;link</span> <span class="t-attr">rel</span>=<span class="t-str">"stylesheet"</span> <span class="t-attr">href</span>=<span class="t-str">"node_modules/@luz-ds/core/dist/luz.css"</span><span class="t-tag">&gt;</span></code></pre>
+    </figure>
+  </li>
+  <li>
+    <h3>Write HTML</h3>
+    <p>No class, no attribute. Text, controls and tables come out finished.</p>
+    <div class="stage">
+      <div class="stage__in">
+        <form class="x-form" onsubmit="return false">
+          <label class="x-field">Your name <input class="x-input" type="text" autocomplete="name"></label>
+          <button class="x-btn" type="submit">Say hello</button>
+        </form>
+      </div>
+    </div>
+    <figure class="snip">
+      <figcaption><span class="label label--light">HTML</span><button class="copy" type="button" data-copy="#gs-html">Copy</button></figcaption>
+<pre><code id="gs-html"><span class="t-tag">&lt;form&gt;</span>
+  <span class="t-tag">&lt;label&gt;</span>
+    Your name
+    <span class="t-tag">&lt;input</span> <span class="t-attr">type</span>=<span class="t-str">"text"</span><span class="t-tag">&gt;</span>
+  <span class="t-tag">&lt;/label&gt;</span>
+  <span class="t-tag">&lt;button&gt;</span>Say hello<span class="t-tag">&lt;/button&gt;</span>
+<span class="t-tag">&lt;/form&gt;</span></code></pre>
+    </figure>
+  </li>
+  <li>
+    <h3>Add a class when HTML runs out of words</h3>
+    <p>A link that should look like a button. A smaller size. A component with markup of its own. That is what classes are for, and they all start with <code>luz-</code>.</p>
+    <figure class="snip">
+      <figcaption><span class="label label--light">HTML</span><button class="copy" type="button" data-copy="#gs-class">Copy</button></figcaption>
+<pre><code id="gs-class"><span class="t-tag">&lt;a</span> <span class="t-attr">class</span>=<span class="t-str">"luz-btn luz-btn--secondary"</span> <span class="t-attr">href</span>=<span class="t-str">"/pricing/"</span><span class="t-tag">&gt;</span>See pricing<span class="t-tag">&lt;/a&gt;</span></code></pre>
+    </figure>
+  </li>
+</ol>
+
+<h2 id="cdn">Or use a CDN</h2>
+<p>Two lines in the <code>&lt;head&gt;</code>, and nothing on your disk. Good for a prototype, a CodePen or a page with no build. The link names an exact version, never <code>latest</code>, and carries the integrity hash of the file. The docs write both for you.</p>
+<figure class="snip wide">
+  <figcaption><span class="label label--light">index.html</span><button class="copy" type="button" data-copy="#gs-cdn">Copy</button></figcaption>
+<pre><code id="gs-cdn"><span class="t-tag">&lt;link</span> <span class="t-attr">rel</span>=<span class="t-str">"stylesheet"</span> <span class="t-attr">href</span>=<span class="t-str">"https://cdn.jsdelivr.net/npm/@luz-ds/tokens@{{version}}/dist/luz-tokens.min.css"</span>
+      <span class="t-attr">integrity</span>=<span class="t-str">"sha384-…"</span> <span class="t-attr">crossorigin</span>=<span class="t-str">"anonymous"</span><span class="t-tag">&gt;</span>
+<span class="t-tag">&lt;link</span> <span class="t-attr">rel</span>=<span class="t-str">"stylesheet"</span> <span class="t-attr">href</span>=<span class="t-str">"https://cdn.jsdelivr.net/npm/@luz-ds/core@{{version}}/dist/luz.min.css"</span>
+      <span class="t-attr">integrity</span>=<span class="t-str">"sha384-…"</span> <span class="t-attr">crossorigin</span>=<span class="t-str">"anonymous"</span><span class="t-tag">&gt;</span></code></pre>
+</figure>
+
+<h2 id="javascript">Add the JavaScript, if you want it</h2>
+<p>Every component works without a script. The script adds the comforts: tabs that switch in place, a table that sorts, a toast that announces itself.</p>
+<figure class="snip">
+  <figcaption><span class="label label--light">HTML</span><button class="copy" type="button" data-copy="#gs-js">Copy</button></figcaption>
+<pre><code id="gs-js"><span class="t-tag">&lt;script</span> <span class="t-attr">type</span>=<span class="t-str">"module"</span> <span class="t-attr">src</span>=<span class="t-str">"node_modules/@luz-ds/core/dist/luz.js"</span><span class="t-tag">&gt;&lt;/script&gt;</span></code></pre>
+</figure>
+<div class="note">
+  <strong>Already have a design?</strong>
+  <p>Load <code>luz.conditional.css</code> instead and mark a region with <code>data-luz</code>. Luz stays inside it, and you migrate one region at a time.</p>
+</div>
+
+<h2 id="next">Where to go next</h2>
+<ul>
+  <li><a href="{{root}}docs/color.html">Meet the tokens</a>, starting with color.</li>
+  <li><a href="{{root}}docs/components.html">Browse the components</a> of core.</li>
+  <li><a href="{{root}}docs/catalog.html">Pick the patterns</a> of the site you are making.</li>
+  <li><a href="{{root}}docs/accessibility.html">Read what we promise</a> about accessibility, and what we do not.</li>
+</ul>

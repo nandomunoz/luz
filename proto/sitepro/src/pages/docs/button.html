@@ -1,0 +1,114 @@
+<!--meta {"title": "Button", "layout": "docs", "nav": "components", "crumb": "Components · Actions and input", "lead": "The one thing on the page you want people to do. A native button, finished, with no class at all.", "description": "The LUZ button: example, markup, variants, keyboard and design guidance.", "pkg": "@luz-ds/core", "file": "components/button.css", "js": "None", "status": "Stable", "related": [["Form inputs", "docs/button.html", "The fields a button usually sends."], ["Color", "docs/color.html", "The brand tokens the button reads."], ["Statement", "docs/accessibility.html", "How this component was tested."]]} -->
+<h2 id="example">Example</h2>
+<div class="stage wide">
+  <div class="stage__in">
+    <button class="x-btn" type="button">Save changes</button>
+    <button class="x-btn x-btn--2" type="button">Cancel</button>
+    <button class="x-btn x-btn--danger" type="button">Delete</button>
+  </div>
+  <div class="stage__bar"><span class="label label--ink">Live · try the keyboard</span><span class="x-tag">Light</span></div>
+</div>
+
+<h2 id="known-issues">Known issues</h2>
+<p>None known.</p>
+
+
+<div class="tabpanel" id="code-panel">
+  <h2 id="code">Code</h2>
+
+  <h3 id="markup">Copy the markup</h3>
+  <p>A <code>&lt;button&gt;</code> needs nothing. Use the class when the element is not a button, or when you need a variant HTML cannot say.</p>
+  <figure class="snip">
+    <figcaption><span class="label label--light">HTML</span><button class="copy" type="button" data-copy="#btn-markup">Copy</button></figcaption>
+<pre><code id="btn-markup"><span class="t-com">&lt;!-- Primary: a button with no type, or type="submit" --&gt;</span>
+<span class="t-tag">&lt;button&gt;</span>Save changes<span class="t-tag">&lt;/button&gt;</span>
+
+<span class="t-com">&lt;!-- Secondary: type="button" or type="reset" --&gt;</span>
+<span class="t-tag">&lt;button</span> <span class="t-attr">type</span>=<span class="t-str">"button"</span><span class="t-tag">&gt;</span>Cancel<span class="t-tag">&lt;/button&gt;</span>
+
+<span class="t-com">&lt;!-- A link that looks like a button --&gt;</span>
+<span class="t-tag">&lt;a</span> <span class="t-attr">class</span>=<span class="t-str">"luz-btn"</span> <span class="t-attr">href</span>=<span class="t-str">"/start/"</span><span class="t-tag">&gt;</span>Get started<span class="t-tag">&lt;/a&gt;</span></code></pre>
+  </figure>
+
+  <h3 id="variants">Variants and options</h3>
+  <div class="table-wrap wide">
+    <table>
+      <thead><tr><th>Class</th><th>Looks like</th><th>Use it for</th></tr></thead>
+      <tbody>
+        <tr><td><code>luz-btn</code></td><td><span class="x-btn x-btn--sm">Primary</span></td><td>The main action. One per view.</td></tr>
+        <tr><td><code>luz-btn--secondary</code></td><td><span class="x-btn x-btn--2 x-btn--sm">Secondary</span></td><td>Everything else that is still an action.</td></tr>
+        <tr><td><code>luz-btn--danger</code></td><td><span class="x-btn x-btn--danger x-btn--sm">Delete</span></td><td>An action that destroys something.</td></tr>
+        <tr><td><code>luz-btn--sm</code></td><td><span class="x-btn x-btn--sm">Small</span></td><td>Dense rows and toolbars.</td></tr>
+        <tr><td><code>luz-btn--lg</code></td><td><span class="x-btn x-btn--lg">Large</span></td><td>The call to action of a hero.</td></tr>
+        <tr><td><code>luz-btn--block</code></td><td>Full width</td><td>Narrow screens and forms in a column.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 id="how">How it works</h3>
+  <p>Luz tells variants apart by meaning, not by class. A button that submits is primary. A button that does not is secondary. You say which one with the <code>type</code> attribute you were already writing.</p>
+
+  <h3 id="no-js">Without JavaScript</h3>
+  <p>The button has no script. It is the same with JavaScript on or off.</p>
+
+  <h3 id="keyboard">Keyboard and ARIA</h3>
+  <dl class="rows wide">
+    <div><dt><kbd>Tab</kbd></dt><dd>Moves focus to the button. The focus ring is always visible.</dd></div>
+    <div><dt><kbd>Enter</kbd> <kbd>Space</kbd></dt><dd>Activates it. A link styled as a button answers to <kbd>Enter</kbd> only, as every link does.</dd></div>
+    <div><dt><code>disabled</code></dt><dd>Takes the button out of the tab order and lowers its contrast. Avoid it in forms. In a toolbar, <code>aria-disabled="true"</code> keeps it focusable.</dd></div>
+    <div><dt><code>aria-pressed</code></dt><dd>For a toggle. The pressed state has a border as well as a color.</dd></div>
+  </dl>
+</div>
+
+<div class="tabpanel" id="design-panel">
+  <h2 id="design">Design</h2>
+
+  <h3 id="when">When to use</h3>
+  <ul>
+    <li>To submit a form, or to do something on the page.</li>
+    <li>To start a task: open a dialog, add a row, send a message.</li>
+  </ul>
+
+  <h3 id="when-not">When not to use</h3>
+  <ul>
+    <li>To go somewhere. That is a link, even when it looks like a button.</li>
+    <li>For a second primary action. If everything is primary, nothing is.</li>
+    <li>Switched off to stop a form being sent. Leave it on, and when it is pressed, say what is missing.</li>
+  </ul>
+
+  <h3 id="do-dont">Do and don't</h3>
+  <div class="dodont wide">
+    <figure>
+      <figcaption><strong>Do</strong>Start with a verb and say what happens next.</figcaption>
+      <div class="stage__in" inert aria-hidden="true"><span class="x-btn">Save changes</span><span class="x-btn x-btn--2">Cancel</span></div>
+    </figure>
+    <figure>
+      <figcaption><strong>Don't</strong>Use two primary buttons, or a label that needs the page to make sense.</figcaption>
+      <div class="stage__in" inert aria-hidden="true"><span class="x-btn">OK</span><span class="x-btn">Yes</span></div>
+    </figure>
+  </div>
+
+  <h3 id="content">Writing the content</h3>
+  <p>Two or three words. Sentence case. A verb first: “Save changes”, not “Changes”. Never “Click here”.</p>
+
+  <h3 id="contrast">Contrast and focus</h3>
+  <div class="table-wrap wide">
+    <table>
+      <thead><tr><th>Part</th><th>Color on background</th><th>Light</th><th>Needs</th></tr></thead>
+      <tbody>
+        <tr><td>Primary label</td><td><span class="sw" style="--c:#fff"></span> on <span class="sw" style="--c:#2b66f0"></span></td><td class="num">{{cr:ffffff/2b66f0}}</td><td><span class="pass">4.5:1</span></td></tr>
+        <tr><td>Secondary label</td><td><span class="sw" style="--c:#1f4fd0"></span> on <span class="sw" style="--c:#fff"></span></td><td class="num">{{cr:1f4fd0/ffffff}}</td><td><span class="pass">4.5:1</span></td></tr>
+        <tr><td>Danger label</td><td><span class="sw" style="--c:#fff"></span> on <span class="sw" style="--c:#a8321f"></span></td><td class="num">{{cr:ffffff/a8321f}}</td><td><span class="pass">4.5:1</span></td></tr>
+        <tr><td>Focus ring</td><td><span class="sw" style="--c:#2b66f0"></span> on <span class="sw" style="--c:#f4f3ef"></span></td><td class="num">{{cr:2b66f0/f4f3ef}}</td><td><span class="pass">3:1</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 id="tokens">Tokens it uses</h3>
+  <dl class="rows wide">
+    <div><dt>Color</dt><dd><code>--luz-brand-fill</code> <code>--luz-brand-fill-hover</code> <code>--luz-brand-fill-active</code> <code>--luz-focus-ring</code></dd></div>
+    <div><dt>Space</dt><dd><code>--luz-space-2</code> <code>--luz-space-4</code></dd></div>
+    <div><dt>Type</dt><dd><code>--luz-text-md</code> <code>--luz-font-sans</code></dd></div>
+    <div><dt>Motion</dt><dd><code>--luz-duration-fast</code></dd></div>
+  </dl>
+</div>

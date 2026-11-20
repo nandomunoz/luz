@@ -1,0 +1,59 @@
+<!--meta {"title":"Accessibility statement","layout":"docs","nav":"a11y","crumb":"Accessibility · Reference","heading":"What we promise, and what we do not","lead":"Luz aims for WCAG 2.2 level AA in every piece it ships. This page says how that is checked, where it falls short, and how to tell us when we are wrong.","status":"Reviewed for {{version}} beta","description":"The accessibility statement of LUZ.","related":[["Color","docs/color.html","The contrast of every pair, measured by the build."],["Button","docs/button.html","A component page, with its keyboard and its known issues."]]} -->
+<dl class="score wide">
+  <div><dt>AA</dt><dd>WCAG 2.2 is the baseline, with EN 301 549 as its reference.</dd></div>
+  <div><dt>3</dt><dd>color modes, each with its contrast measured before a release.</dd></div>
+  <div><dt>2×</dt><dd>Every component is tested with JavaScript on and with it off.</dd></div>
+</dl>
+
+<h2 id="promise">What every piece does</h2>
+<ul>
+  <li>Works with the keyboard alone, with a focus ring that is never removed.</li>
+  <li>Reflows at 400% zoom, down to a width of 320 pixels.</li>
+  <li>Holds in forced colors and under reduced motion.</li>
+  <li>Never uses color as the only signal of a state.</li>
+  <li>Takes its name from the page: a <code>label</code>, visible text, then ARIA as a last resort.</li>
+</ul>
+
+<h2 id="how">How it is tested</h2>
+<div class="table-wrap wide">
+  <table>
+    <thead><tr><th>Check</th><th>How</th><th>When</th></tr></thead>
+    <tbody>
+      <tr><th>Automated rules</th><td>axe, on every component and every page of this site</td><td>Every pull request</td></tr>
+      <tr><th>Contrast</th><td>Every pair a component uses, in the three modes</td><td>Every pull request</td></tr>
+      <tr><th>Keyboard and no JavaScript</th><td>Browser tests, in two projects</td><td>Every pull request</td></tr>
+      <tr><th>Screen readers</th><td>By hand. Only the combinations really used are listed</td><td>Before a release</td></tr>
+    </tbody>
+  </table>
+</div>
+<div class="note">
+  <strong>An automated test is not a person.</strong>
+  <p>A green check finds about a third of the problems. The rest is found by hand, and by you.</p>
+</div>
+
+<h2 id="status">Status by component</h2>
+<p>What was done for each piece, not what we hope is true.</p>
+<div class="table-wrap wide">
+  <table>
+    <thead><tr><th>Component</th><th>Automated</th><th>Keyboard</th><th>Screen reader</th></tr></thead>
+    <tbody>
+      <tr><th><a href="{{root}}docs/button.html">Button</a></th><td><span class="state state--ok">Tested</span></td><td><span class="state state--ok">Tested</span></td><td><span class="state state--ok">Tested</span></td></tr>
+      <tr><th><a href="{{root}}docs/button.html">Form inputs</a></th><td><span class="state state--ok">Tested</span></td><td><span class="state state--ok">Tested</span></td><td><span class="state state--ok">Tested</span></td></tr>
+      <tr><th><a href="{{root}}docs/button.html">Modal</a></th><td><span class="state state--ok">Tested</span></td><td><span class="state state--ok">Tested</span></td><td><span class="state state--part">Partly</span></td></tr>
+      <tr><th><a href="{{root}}docs/button.html">Tabs</a></th><td><span class="state state--ok">Tested</span></td><td><span class="state state--ok">Tested</span></td><td><span class="state state--part">Partly</span></td></tr>
+      <tr><th><a href="{{root}}docs/button.html">Toast</a></th><td><span class="state state--ok">Tested</span></td><td><span class="state state--part">Partly</span></td><td><span class="state state--no">Not yet</span></td></tr>
+    </tbody>
+  </table>
+</div>
+<p><small>The rows of this mock-up are examples. On the real page the build writes them from the test records.</small></p>
+
+<h2 id="gaps">Where it falls short</h2>
+<p>A confirmed problem is published here, with the criterion it fails, until it is fixed.</p>
+<dl class="rows wide">
+  <div><dt>Custom themes</dt><dd>Luz guarantees the look it ships. A theme of your own is yours to check, with the contrast tool in the box.</dd></div>
+  <div><dt>Screen readers</dt><dd>Not every component has been read with every combination. The table above says which.</dd></div>
+  <div><dt>Beta</dt><dd>Markup can still change before 1.0. Each change is in the changelog.</dd></div>
+</dl>
+
+<h2 id="report">Tell us</h2>
+<p>If something does not work for you, that is a bug, and it goes first. <a href="{{github}}/issues">Open an issue on GitHub</a> and say what you were trying to do. You do not need to know which criterion failed.</p>

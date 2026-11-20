@@ -1,0 +1,50 @@
+<!--meta {"title":"Catalog","layout":"docs","nav":"catalog","crumb":"Catalog · Reference","heading":"Patterns for a whole site","lead":"The {{n-catalog}} pieces that act for a site as a whole, and the page structure of four kinds of site. One stylesheet each: link the ones you use.","pkg":"@luz-ds/catalog","js":"Only where a pattern needs it","description":"The patterns of the LUZ catalog.","related":[["All components","docs/components.html","The pieces of core that every pattern is made of."],["A first page","docs/get-started.html","Install Luz before you link a pattern."]]} -->
+<h2 id="kinds">Start from a kind of site</h2>
+<p>A pattern says which kinds of site it fits best. Pick yours and you get the short list.</p>
+<ul class="filter wide" aria-label="Kinds of site">
+  <li><a href="#page-structure" aria-current="true">Landing page</a></li>
+  <li><a href="#page-structure">Blog or newspaper</a></li>
+  <li><a href="#page-structure">Web application</a></li>
+  <li><a href="#page-structure">Documentation</a></li>
+</ul>
+
+<h2 id="page-structure">Page structure</h2>
+<ul class="plist wide">
+  <li><a href="#page-structure"><strong>Site header</strong><span>The top of every page: the name, the links, the action.</span><span class="x-row"><span class="x-tag x-tag--ink">Landing</span><span class="x-tag x-tag--ink">Blog</span></span></a></li>
+  <li><a href="#page-structure"><strong>Hero</strong><span>One sentence, one action, at the top of the home page.</span><span class="x-row"><span class="x-tag x-tag--ink">Landing</span></span></a></li>
+  <li><a href="#page-structure"><strong>Masthead</strong><span>The name of a publication, as a newspaper sets it.</span><span class="x-row"><span class="x-tag x-tag--ink">Blog</span></span></a></li>
+  <li><a href="#page-structure"><strong>App bar</strong><span>The bar of a web application, with its tools.</span><span class="x-row"><span class="x-tag x-tag--ink">App</span></span></a></li>
+  <li><a href="#page-structure"><strong>Docs layout</strong><span>Sidebar, article and page rail. The layout of this page.</span><span class="x-row"><span class="x-tag x-tag--ink">Docs</span></span></a></li>
+  <li><a href="#page-structure"><strong>Site footer</strong><span>The map of the site, the licence, the small print.</span><span class="x-row"><span class="x-tag x-tag--ink">Landing</span><span class="x-tag x-tag--ink">Blog</span></span></a></li>
+</ul>
+
+<h2 id="navigation">Navigation</h2>
+<ul class="plist wide">
+  <li><a href="#navigation"><strong>Navbar</strong><span>The links of the site, in a row that folds on a small screen.</span><span class="x-row"><span class="x-tag x-tag--ink">All</span></span></a></li>
+  <li><a href="#navigation"><strong>Sidebar</strong><span>Grouped links with a scroll spy. A native popover on a phone.</span><span class="x-row"><span class="x-tag x-tag--ink">Docs</span><span class="x-tag x-tag--ink">App</span></span></a></li>
+  <li><a href="#navigation"><strong>Pager</strong><span>Previous and next, at the end of a page.</span><span class="x-row"><span class="x-tag x-tag--ink">Docs</span><span class="x-tag x-tag--ink">Blog</span></span></a></li>
+</ul>
+
+<h2 id="site-wide">Site-wide</h2>
+<ul class="plist wide">
+  <li><a href="#site-wide"><strong>Search</strong><span>Searches the site in a native dialog. A plain link without JavaScript.</span><span class="x-row"><span class="x-tag">Script</span></span></a></li>
+  <li><a href="#site-wide"><strong>Cookie consent</strong><span>Asks the site's cookie question once, and remembers the answer.</span><span class="x-row"><span class="x-tag">Script</span></span></a></li>
+  <li><a href="#site-wide"><strong>Language switch</strong><span>The languages of the site, as links.</span><span class="x-row"><span class="x-tag x-tag--ink">CSS only</span></span></a></li>
+  <li><a href="#site-wide"><strong>Announcement</strong><span>One thing every visitor should know.</span><span class="x-row"><span class="x-tag x-tag--ink">CSS only</span></span></a></li>
+</ul>
+
+<h2 id="charts">Charts</h2>
+<p>Every chart is a stylesheet over a native list, table or <code>meter</code> that stays in the page. Turn the CSS off and the data is still there.</p>
+<ul class="plist wide">
+  <li><a href="#charts"><strong>Bar list</strong><span>A ranked list with a bar behind each row.</span><span class="x-row"><span class="x-tag x-tag--ink">App</span></span></a></li>
+  <li><a href="#charts"><strong>Column chart</strong><span>Values over time, drawn from a table.</span><span class="x-row"><span class="x-tag x-tag--ink">App</span></span></a></li>
+  <li><a href="#charts"><strong>Heat map</strong><span>A grid of days, a shade per value.</span><span class="x-row"><span class="x-tag x-tag--ink">App</span></span></a></li>
+</ul>
+
+<h2 id="use">Link a pattern</h2>
+<p>After core, one line per pattern the page uses.</p>
+<figure class="snip">
+  <figcaption><span class="label label--light">HTML</span><button class="copy" type="button" data-copy="#cat-code">Copy</button></figcaption>
+<pre><code id="cat-code"><span class="t-tag">&lt;link</span> <span class="t-attr">rel</span>=<span class="t-str">"stylesheet"</span> <span class="t-attr">href</span>=<span class="t-str">"@luz-ds/catalog/components/hero.css"</span><span class="t-tag">&gt;</span>
+<span class="t-tag">&lt;link</span> <span class="t-attr">rel</span>=<span class="t-str">"stylesheet"</span> <span class="t-attr">href</span>=<span class="t-str">"@luz-ds/catalog/components/search.css"</span><span class="t-tag">&gt;</span></code></pre>
+</figure>

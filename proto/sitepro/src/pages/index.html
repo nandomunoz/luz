@@ -1,0 +1,423 @@
+<!--meta {"title":"LUZ","layout":"site","description":"LUZ is a modular design system in plain HTML, CSS and ES modules. No build step, no dependencies, no framework to outlive."} -->
+<main id="main">
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero__art" data-parallax>{{art:hero}}</div>
+    <div class="floats" inert aria-hidden="true">
+      <div class="fl fl--1" style="--z:26"><span class="x-btn">Save changes</span></div>
+      <div class="fl fl--2" style="--z:40"><span class="x-check"><input type="checkbox" checked> Dark mode</span></div>
+      <div class="fl fl--3" style="--z:18"><code>&lt;button&gt;</code><span>no class needed</span></div>
+      <div class="fl fl--4" style="--z:32"><span class="x-tag x-tag--solid">WCAG 2.2 AA</span></div>
+    </div>
+    <div class="wrap hero__in">
+      <p class="label"><span class="tri"></span>Luz {{version}} beta · Open source, MIT</p>
+      <h1>The design system that <em>disappears.</em></h1>
+      <p class="hero__lead">Luz is a design system in plain HTML, CSS and ES modules, for people who want their site to outlive its framework. It styles the markup you already write. The browser does the rest.</p>
+      <div class="hero__cta">
+        <a class="btn" href="{{root}}docs/get-started.html#install">Install with npm</a>
+        <a class="btn btn--ghost" href="{{root}}docs/index.html">Read the docs</a>
+      </div>
+      <div class="install">
+        <code id="install-line">npm i @luz-ds/tokens @luz-ds/core</code>
+        <button class="copy" type="button" data-copy="#install-line">Copy</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Marquee -->
+  <div class="marq" role="region" aria-label="Some of the pieces">
+    <button class="marq__pause" type="button" aria-pressed="false">Pause</button>
+    <ul><li>Accordion</li><li>Alert</li><li>Avatar</li><li>Breadcrumb</li><li>Button</li><li>Card</li><li>Code</li><li>Dropdown</li><li>Figure</li><li>Form&nbsp;inputs</li><li>Hero</li><li>Masthead</li><li>Meter</li><li>Modal</li><li>Navbar</li><li>Pager</li><li>Progress</li><li>Search</li><li>Sidebar</li><li>Table</li><li>Tabs</li><li>Tag</li><li>Timeline</li><li>Toast</li><li>Tooltip</li></ul>
+    <ul aria-hidden="true"><li>Accordion</li><li>Alert</li><li>Avatar</li><li>Breadcrumb</li><li>Button</li><li>Card</li><li>Code</li><li>Dropdown</li><li>Figure</li><li>Form&nbsp;inputs</li><li>Hero</li><li>Masthead</li><li>Meter</li><li>Modal</li><li>Navbar</li><li>Pager</li><li>Progress</li><li>Search</li><li>Sidebar</li><li>Table</li><li>Tabs</li><li>Tag</li><li>Timeline</li><li>Toast</li><li>Tooltip</li></ul>
+  </div>
+
+  <!-- Write this, get that -->
+  <section class="sec sec--tight sec--white">
+    <div class="wrap">
+      <div class="sec__head">
+        <p class="label"><span class="tri"></span>The proof, not the promise</p>
+        <h2 data-split>Write this. <em>Get that.</em></h2>
+        <p>No component library to import and no props to memorise. The markup on the left is all there is. Go on, type in the form.</p>
+      </div>
+      <div class="duo">
+        <div class="duo__code">
+          <div class="duo__bar"><span class="label label--light">index.html</span><button class="copy" type="button" data-copy="#duo-code">Copy</button></div>
+<pre><code id="duo-code"><span class="t-com">&lt;!-- No classes. No JavaScript. --&gt;</span>
+<span class="t-tag">&lt;link</span> <span class="t-attr">rel</span>=<span class="t-str">"stylesheet"</span> <span class="t-attr">href</span>=<span class="t-str">"luz-tokens.css"</span><span class="t-tag">&gt;</span>
+<span class="t-tag">&lt;link</span> <span class="t-attr">rel</span>=<span class="t-str">"stylesheet"</span> <span class="t-attr">href</span>=<span class="t-str">"luz.css"</span><span class="t-tag">&gt;</span>
+
+<span class="t-tag">&lt;form&gt;</span>
+  <span class="t-tag">&lt;h3&gt;</span>Join the beta<span class="t-tag">&lt;/h3&gt;</span>
+
+  <span class="t-tag">&lt;label&gt;</span>
+    Work email
+    <span class="t-tag">&lt;input</span> <span class="t-attr">type</span>=<span class="t-str">"email"</span> <span class="t-attr">required</span><span class="t-tag">&gt;</span>
+  <span class="t-tag">&lt;/label&gt;</span>
+
+  <span class="t-tag">&lt;label&gt;</span>
+    <span class="t-tag">&lt;input</span> <span class="t-attr">type</span>=<span class="t-str">"checkbox"</span><span class="t-tag">&gt;</span>
+    Tell me when 1.0 ships
+  <span class="t-tag">&lt;/label&gt;</span>
+
+  <span class="t-tag">&lt;button&gt;</span>Request access<span class="t-tag">&lt;/button&gt;</span>
+<span class="t-tag">&lt;/form&gt;</span></code></pre>
+        </div>
+        <div class="duo__out">
+          <div class="duo__bar"><span class="label label--ink">In the browser</span><span class="x-tag">Live</span></div>
+          <div class="duo__stage">
+            <form class="x-form" onsubmit="return false">
+              <h3>Join the beta</h3>
+              <label class="x-field">Work email <input class="x-input" type="email"></label>
+              <label class="x-check"><input type="checkbox"> Tell me when 1.0 ships</label>
+              <button class="x-btn" type="submit">Request access</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Facts -->
+  <dl class="facts">
+    <div class="fact"><dt><span data-count>0</span></dt><dd>runtime dependencies. Nothing to audit, nothing to upgrade, nothing to break.</dd></div>
+    <div class="fact"><dt><span data-count>{{kb-core}}</span><small> KB</small></dt><dd>is the ceiling of the whole core stylesheet, minified and gzipped.</dd></div>
+    <div class="fact"><dt><span data-count>{{n-total}}</span></dt><dd>components and patterns, each tested with JavaScript on and off.</dd></div>
+    <div class="fact"><dt><span data-count>3</span></dt><dd>color modes in the box: light, dark and high contrast.</dd></div>
+  </dl>
+  <p class="source">Figures written by the build from the packages and <code>budgets.json</code>, never typed.</p>
+
+  <!-- Layers -->
+  <section class="sec sec--line">
+    <div class="wrap">
+      <div class="sec__head">
+        <p class="label"><span class="tri"></span>Modular by design</p>
+        <h2 data-split>Three layers. Take one, <em>or take them all.</em></h2>
+        <p>Each package needs the one below it and nothing above it. Adopt a level, stop there, and come back when the project grows.</p>
+      </div>
+      <div class="stack" data-stack data-step="3">
+        <div class="stack__fig" aria-hidden="true">
+          <svg viewBox="0 0 360 312">
+            <path class="s s3" d="M180 4 236 100H124z"/>
+            <path class="s s2" d="M118 110h124l56 96H62z"/>
+            <path class="s s1" d="M56 216h248l56 96H0z"/>
+            <text class="sl sl3" x="250" y="66">CATALOG</text>
+            <text class="sl sl2" x="312" y="172">CORE</text>
+            <text class="sl sl1" x="0" y="206">TOKENS</text>
+          </svg>
+          <p class="stack__count"><span data-step-num>3</span> / 3</p>
+        </div>
+        <div class="stack__list">
+        <article class="layer" data-layer>
+          <p class="label label--ink">Layer 01</p>
+          <h3>Tokens</h3>
+          <code>@luz-ds/tokens</code>
+          <p>The decisions, as CSS custom properties. Color, type, space and motion, in three modes.</p>
+          <ul><li>Standalone, with no peers</li><li>Three knobs set the whole scale</li><li>A contrast checker for your theme</li></ul>
+          <div class="layer__foot"><span class="label label--ink">{{kb-tokens}} KB max</span><a class="link" href="{{root}}docs/color.html">Explore tokens</a></div>
+        </article>
+        <article class="layer" data-layer>
+          <p class="label label--ink">Layer 02</p>
+          <h3>Core</h3>
+          <code>@luz-ds/core</code>
+          <p>Bare HTML, styled. Then the layout objects and the components every page needs.</p>
+          <ul><li>Classless by default</li><li>{{n-core}} components, from accordion to tooltip</li><li>Optional JavaScript, in ES modules</li></ul>
+          <div class="layer__foot"><span class="label label--ink">{{kb-core}} KB max</span><a class="link" href="{{root}}docs/components.html">Browse core</a></div>
+        </article>
+        <article class="layer" data-layer>
+          <p class="label label--ink">Layer 03</p>
+          <h3>Catalog</h3>
+          <code>@luz-ds/catalog</code>
+          <p>The pieces that act for a whole site, and the patterns of a landing page, a blog, an app and a docs site.</p>
+          <ul><li>{{n-catalog}} patterns, linked one by one</li><li>Search, charts and navigation</li><li>Loads only what the page uses</li></ul>
+          <div class="layer__foot"><span class="label label--ink">No bundle</span><a class="link" href="{{root}}docs/catalog.html">Open the catalog</a></div>
+        </article>
+        </div>
+      </div>
+      <ul class="doors" aria-label="Go straight to" data-stagger>
+        <li><a href="{{root}}docs/color.html"><strong>Tokens</strong><span>Color, type, space, motion</span></a></li>
+        <li><a href="{{root}}docs/components.html"><strong>HTML elements</strong><span>What you get with no class</span></a></li>
+        <li><a href="{{root}}docs/components.html"><strong>Components</strong><span>{{n-core}} pieces of core</span></a></li>
+        <li><a href="{{root}}docs/catalog.html"><strong>Catalog</strong><span>{{n-catalog}} patterns, by kind of site</span></a></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Playground -->
+  <section class="sec sec--white sec--line">
+    <div class="wrap">
+      <div class="sec__head">
+        <p class="label"><span class="tri"></span>Play with it</p>
+        <h2 data-split>Real components. <em>Go on, touch them.</em></h2>
+        <p>Nothing here is a picture. Every piece below is native HTML, styled, and most of it needs no script at all.</p>
+      </div>
+      <div class="bento">
+        <fieldset class="b b--modes">
+          <legend class="label label--ink">Color mode</legend>
+          <h3>One attribute changes everything.</h3>
+          <div class="seg">
+            <label><input type="radio" name="bento-mode" value="light" checked> Light</label>
+            <label><input type="radio" name="bento-mode" value="dark"> Dark</label>
+            <label><input type="radio" name="bento-mode" value="contrast"> High contrast</label>
+          </div>
+          <code class="b__code">&lt;html data-theme="<span class="b__mode">light</span>"&gt;</code>
+        </fieldset>
+
+        <div class="b b--acc">
+          <p class="label label--ink">Accordion · native details</p>
+          <details open><summary>Do I need a build step?</summary><p>No. Two link tags and you are live.</p></details>
+          <details><summary>Does it work without JavaScript?</summary><p>Every component. Scripts only add comfort.</p></details>
+          <details><summary>Can I bring my own brand?</summary><p>Turn three knobs, or write a theme from the template.</p></details>
+        </div>
+
+        <div class="b b--meter">
+          <p class="label label--ink">Meter · native</p>
+          <h3>Storage used</h3>
+          <div class="b__big"><output id="b-out" for="b-range">62%</output></div>
+          <meter id="b-meter" min="0" max="100" low="70" high="90" optimum="20" value="62">62%</meter>
+          <label class="b__range">Drag me <input id="b-range" type="range" min="0" max="100" value="62" data-meter="#b-meter" data-out="#b-out"></label>
+        </div>
+
+        <div class="b b--toast">
+          <p class="label label--ink">Toast</p>
+          <h3>Say one thing, and wait.</h3>
+          <button class="x-btn" type="button" data-toast="Link copied to the clipboard">Copy the link</button>
+        </div>
+
+        <div class="b b--dialog">
+          <p class="label label--ink">Modal · native dialog</p>
+          <h3>Escape just works.</h3>
+          <button class="x-btn x-btn--2" type="button" data-open="#b-dialog">Open the dialog</button>
+        </div>
+
+        <form class="b b--form" onsubmit="return false">
+          <p class="label label--ink">Form · native validation</p>
+          <label class="x-field">Work email <span class="b__hint">For example, name@example.com</span><input class="x-input" type="email" required></label>
+          <p class="b__error"><strong>Error:</strong> Enter an email address in the right format, like name@example.com.</p>
+          <p class="b__hint">Type something that is not an email, then leave the field. The error waits until you do.</p>
+        </form>
+      </div>
+      <dialog class="b-dialog" id="b-dialog" aria-labelledby="b-dialog-h">
+        <form method="dialog">
+          <h3 id="b-dialog-h">Delete this draft?</h3>
+          <p>It goes for good. The browser handles the focus, the backdrop and the Escape key.</p>
+          <div class="x-row"><button class="x-btn x-btn--2" value="cancel" autofocus>Keep the draft</button><button class="x-btn x-btn--danger" value="delete">Delete the draft</button></div>
+        </form>
+      </dialog>
+      <div class="toasts" role="status" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- Manifesto -->
+  <section class="sec sec--line">
+    <div class="wrap mani">
+      <p class="label"><span class="tri"></span>Why Luz</p>
+      <p class="mani__say" data-split>Most design systems ask you to learn <s>them</s>. Luz asks you to remember <em>HTML.</em></p>
+      <div class="trio" data-stagger>
+        <div>
+          <p class="label label--ink">01</p>
+          <h3>No class required</h3>
+          <p>A button is a <code>&lt;button&gt;</code>. A table is a <code>&lt;table&gt;</code>. Write the element and it arrives finished. A class only adds what HTML cannot say.</p>
+        </div>
+        <div>
+          <p class="label label--ink">02</p>
+          <h3>No script required</h3>
+          <p>Dialogs, popovers and accordions are the browser's own. JavaScript improves the page. It is never the reason the page works.</p>
+        </div>
+        <div>
+          <p class="label label--ink">03</p>
+          <h3>No build required</h3>
+          <p>Two <code>&lt;link&gt;</code> tags and you are live. Use a bundler if you like one. Luz will never ask for it.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="sec sec--line">
+    <div class="wrap">
+      <div class="sec__head">
+        <p class="label"><span class="tri"></span>What you get</p>
+        <h2 data-split>Everything a page needs. <em>Nothing it doesn't.</em></h2>
+      </div>
+      <div class="feats" data-stagger>
+        <article class="feat">
+          <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 4 46 42H2z" fill="none" stroke="#0b1730"/><path d="M24 20 35 39H13z" fill="#2b66f0"/></svg>
+          <h3>Your CSS always wins</h3>
+          <p>Everything ships in named cascade layers, and bare elements have zero specificity. Override anything with one plain rule. No <code>!important</code>, no fight.</p>
+        </article>
+        <article class="feat">
+          <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M17 8 32 34H2z" fill="#2b66f0"/><path d="M31 16 46 42H16z" fill="none" stroke="#0b1730"/></svg>
+          <h3>Works with JavaScript off</h3>
+          <p>Every component is tested twice: once with scripts, once without. The page your reader gets on a bad day still works.</p>
+        </article>
+        <article class="feat">
+          <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 4 35 23H13z" fill="#6f9bff"/><path d="M13 23h22l11 19H2z" fill="#2b66f0"/><path d="M24 23 35 42H13z" fill="#0b1730"/></svg>
+          <h3>Three modes, one source</h3>
+          <p>Light, dark and high contrast come from the same semantic tokens. Every pair of colors is measured before it ships.</p>
+        </article>
+        <article class="feat">
+          <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 4 46 42H2z" fill="none" stroke="#0b1730"/><path d="M24 4 35 23H13z" fill="#2b66f0"/><path d="M13 23 24 42H2z" fill="#6f9bff"/></svg>
+          <h3>Pay for what you link</h3>
+          <p>One stylesheet per piece. A page that uses the hero and the search loads the hero and the search, and not one byte of the rest.</p>
+        </article>
+        <article class="feat">
+          <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 4 46 42H2z" fill="#2b66f0"/><path d="m16 30 6 6 11-14" fill="none" stroke="#fff" stroke-width="2.5"/></svg>
+          <h3>Tested first, always</h3>
+          <p>Every change starts life as a failing test. If it is in the box, something already tried to break it.</p>
+        </article>
+        <article class="feat">
+          <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M8 30 15 42H1z" fill="#6f9bff"/><path d="M24 20 37 42H11z" fill="none" stroke="#0b1730"/><path d="M36 10 47 29H25z" fill="#2b66f0"/></svg>
+          <h3>Yours in three knobs</h3>
+          <p>Type base, type ratio, space unit. Turn them and the whole system follows. The brand, and the last word, stay yours.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Kinds of site -->
+  <section class="sec sec--white sec--line">
+    <div class="wrap">
+      <div class="sec__head">
+        <p class="label"><span class="tri"></span>Kinds of site</p>
+        <h2 data-split>One system. <em>Four ways to begin.</em></h2>
+        <p>The catalog knows the shape of the site you are about to make. Start from the pattern, then make it unmistakably yours.</p>
+      </div>
+      <div class="kinds" data-stagger>
+        <a class="kind" href="{{root}}docs/catalog.html">
+          <div class="kind__fig"><svg viewBox="0 0 240 300" aria-hidden="true">
+            <rect class="w-ink" x="20" y="22" width="26" height="5"/><rect class="w-line" x="150" y="22" width="18" height="5"/><rect class="w-line" x="176" y="22" width="18" height="5"/><rect class="w-line" x="202" y="22" width="18" height="5"/>
+            <rect class="w-ink" x="20" y="70" width="150" height="14"/><rect class="w-ink" x="20" y="92" width="110" height="14"/><rect class="w-line" x="20" y="124" width="130" height="5"/><rect class="w-line" x="20" y="135" width="100" height="5"/>
+            <rect class="w-blue" x="20" y="158" width="56" height="18"/>
+            <path class="w-wash" d="M240 150v150H66z"/><path class="w-blue" d="M240 196v104H120z"/><path class="w-hi" d="M180 248l30 52h-60z"/>
+          </svg></div>
+          <h3>Landing page</h3>
+          <p>Site header, hero, sections, footer.</p>
+        </a>
+        <a class="kind" href="{{root}}docs/catalog.html">
+          <div class="kind__fig"><svg viewBox="0 0 240 300" aria-hidden="true">
+            <rect class="w-ink" x="70" y="26" width="100" height="12"/><rect class="w-line" x="20" y="52" width="200" height="1"/>
+            <rect class="w-wash" x="20" y="70" width="120" height="86"/><path class="w-blue" d="M80 96l34 60H46z"/>
+            <rect class="w-ink" x="20" y="168" width="120" height="9"/><rect class="w-line" x="20" y="186" width="120" height="4"/><rect class="w-line" x="20" y="196" width="104" height="4"/><rect class="w-line" x="20" y="206" width="114" height="4"/>
+            <rect class="w-ink" x="156" y="70" width="64" height="7"/><rect class="w-line" x="156" y="86" width="64" height="4"/><rect class="w-line" x="156" y="96" width="50" height="4"/>
+            <rect class="w-ink" x="156" y="124" width="64" height="7"/><rect class="w-line" x="156" y="140" width="64" height="4"/><rect class="w-line" x="156" y="150" width="44" height="4"/>
+            <rect class="w-ink" x="156" y="178" width="64" height="7"/><rect class="w-line" x="156" y="194" width="64" height="4"/><rect class="w-line" x="156" y="204" width="56" height="4"/>
+            <rect class="w-line" x="20" y="232" width="200" height="1"/><rect class="w-line" x="20" y="248" width="60" height="4"/><rect class="w-line" x="90" y="248" width="60" height="4"/><rect class="w-line" x="160" y="248" width="60" height="4"/>
+          </svg></div>
+          <h3>Blog or newspaper</h3>
+          <p>Masthead, article, table of contents.</p>
+        </a>
+        <a class="kind" href="{{root}}docs/catalog.html">
+          <div class="kind__fig"><svg viewBox="0 0 240 300" aria-hidden="true">
+            <rect class="w-paper" x="0" y="0" width="56" height="300"/><rect class="w-ink" x="14" y="24" width="26" height="5"/><rect class="w-blue" x="14" y="56" width="28" height="5"/><rect class="w-line" x="14" y="72" width="24" height="5"/><rect class="w-line" x="14" y="88" width="28" height="5"/><rect class="w-line" x="14" y="104" width="20" height="5"/>
+            <rect class="w-ink" x="72" y="24" width="70" height="9"/>
+            <rect class="w-wash" x="72" y="50" width="44" height="40"/><rect class="w-wash" x="124" y="50" width="44" height="40"/><rect class="w-wash" x="176" y="50" width="44" height="40"/>
+            <rect class="w-ink" x="80" y="60" width="20" height="8"/><rect class="w-ink" x="132" y="60" width="16" height="8"/><rect class="w-ink" x="184" y="60" width="24" height="8"/>
+            <path class="w-hi" d="M72 200l30-44 26 26 34-58 28 36 30-22v62z"/><path class="w-blue" d="M72 200l30-20 26 8 34-40 28 26 30-12v38z"/>
+            <rect class="w-line" x="72" y="200" width="148" height="1"/>
+            <rect class="w-line" x="72" y="222" width="148" height="4"/><rect class="w-line" x="72" y="238" width="148" height="4"/><rect class="w-line" x="72" y="254" width="148" height="4"/><rect class="w-line" x="72" y="270" width="100" height="4"/>
+          </svg></div>
+          <h3>Web application</h3>
+          <p>App bar, dashboard, charts, data views.</p>
+        </a>
+        <a class="kind" href="{{root}}docs/catalog.html">
+          <div class="kind__fig"><svg viewBox="0 0 240 300" aria-hidden="true">
+            <rect class="w-ink" x="16" y="20" width="24" height="5"/><rect class="w-line" x="0" y="40" width="240" height="1"/>
+            <rect class="w-line" x="16" y="60" width="38" height="4"/><rect class="w-blue" x="16" y="74" width="30" height="4"/><rect class="w-line" x="16" y="88" width="36" height="4"/><rect class="w-line" x="16" y="102" width="26" height="4"/><rect class="w-line" x="16" y="130" width="38" height="4"/><rect class="w-line" x="16" y="144" width="30" height="4"/><rect class="w-line" x="16" y="158" width="34" height="4"/>
+            <rect class="w-ink" x="74" y="60" width="90" height="12"/><rect class="w-line" x="74" y="84" width="110" height="4"/><rect class="w-line" x="74" y="94" width="96" height="4"/>
+            <rect class="w-ink" x="74" y="116" width="112" height="56"/><rect class="w-hi" x="84" y="128" width="50" height="4"/><rect class="w-paper" x="84" y="140" width="76" height="4"/><rect class="w-paper" x="84" y="152" width="40" height="4"/>
+            <rect class="w-line" x="74" y="188" width="112" height="4"/><rect class="w-line" x="74" y="198" width="100" height="4"/><rect class="w-line" x="74" y="208" width="108" height="4"/>
+            <rect class="w-wash" x="74" y="228" width="112" height="40"/><path class="w-blue" d="M86 240l8 14H78z"/><rect class="w-ink" x="102" y="240" width="60" height="4"/><rect class="w-line" x="102" y="250" width="72" height="4"/>
+            <rect class="w-line" x="200" y="60" width="24" height="4"/><rect class="w-line" x="200" y="72" width="20" height="4"/><rect class="w-line" x="200" y="84" width="24" height="4"/>
+          </svg></div>
+          <h3>Documentation</h3>
+          <p>Docs layout, page rail, pager.</p>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Accessibility -->
+  <section class="sec sec--line">
+    <div class="wrap">
+      <div class="sec__head">
+        <p class="label"><span class="tri"></span>Accessibility</p>
+        <h2 data-split>Accessible, and honest <em>about the gaps.</em></h2>
+        <p>WCAG 2.2 AA is the baseline of every piece. Where Luz falls short, the statement says so in public, with the criterion it fails.</p>
+      </div>
+      <div class="honest" data-stagger>
+        <div>
+          <p class="label label--ink">What holds</p>
+          <h3>Tested on every component</h3>
+          <ul>
+            <li>Keyboard only, with a focus ring you can always see.</li>
+            <li>Reflow at 400% zoom, down to 320 pixels.</li>
+            <li>Forced colors and reduced motion.</li>
+            <li>Contrast measured in the three modes, by the build.</li>
+          </ul>
+        </div>
+        <div>
+          <p class="label label--ink">What does not, yet</p>
+          <h3>Known and written down</h3>
+          <ul>
+            <li>A custom theme is yours to check. The contrast tool is in the box.</li>
+            <li>Screen reader tests are by hand, and listed per release.</li>
+            <li>Luz is in beta: a name can still change before 1.0.</li>
+          </ul>
+          <p class="honest__more"><a class="link" href="{{root}}docs/accessibility.html">Read the accessibility statement</a></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI -->
+  <section class="sec dark">
+    <div class="wrap split">
+      <div>
+        <p class="label"><span class="tri"></span>Human-first, AI-ready</p>
+        <h2 data-split>Your agent already <em>speaks Luz.</em></h2>
+        <p>Plain HTML with a closed vocabulary is the easiest thing in the world for a model to get right. And when it gets it wrong, one command says where.</p>
+        <dl>
+          <div><dt>llms.txt</dt><dd>The whole system, in one file an agent can read.</dd></div>
+          <div><dt>5 prompts</dt><dd>Start, landing, blog, app and docs. Paste and go.</dd></div>
+          <div><dt>luz-check</dt><dd>Reads your HTML and CSS, offline, and names every mistake.</dd></div>
+        </dl>
+        <p class="hero__cta"><a class="btn btn--light" href="{{root}}docs/get-started.html">Get the five prompts</a></p>
+      </div>
+      <div>
+      <div class="term" data-type>
+        <div class="term__bar"><i></i><i></i><i></i><span>~/my-site</span></div>
+<pre><code><span class="dim">$</span> <span class="hi">npx @luz-ds/check</span>
+
+<span class="bl">▲ luz-check</span> <span class="dim">reading 14 files, offline</span>
+
+  index.html
+  <span class="ok">✓</span> load order      <span class="dim">tokens, then core</span>
+  <span class="ok">✓</span> 38 classes      <span class="dim">all in the manifest</span>
+  <span class="ok">✓</span> 3 elements      <span class="dim">all defined</span>
+
+  theme.css
+  <span class="ok">✓</span> contrast        <span class="dim">24 pairs, three modes</span>
+
+<span class="ok">Nothing to fix.</span> <span class="dim">Ship it.</span></code></pre>
+        </div>
+        <p class="term__note">An illustration of the output of <code>luz-check</code>.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Closing band -->
+  <section class="band">
+    <div class="band__art">{{art:band}}</div>
+    <div class="wrap band__in">
+      <p class="label label--light"><span class="tri"></span>Open source · MIT</p>
+      <h2 data-split>Let there be <em>light.</em></h2>
+      <p>Two link tags from now, your HTML looks finished. Everything after that is yours to decide.</p>
+      <div class="hero__cta">
+        <a class="btn btn--light" href="{{root}}docs/get-started.html">Write your first page</a>
+        <a class="btn btn--line" href="https://github.com/nandovejer/luz">Star on GitHub</a>
+      </div>
+    </div>
+  </section>
+
+</main>

@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Button · LUZ</title>
+<meta name="description" content="The LUZ button: example, markup, variants, keyboard and design guidance.">
+<meta name="robots" content="noindex">
+<link rel="alternate" type="text/markdown" href="button.md">
+<link rel="icon" href="../assets/mark.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../assets/site.css">
+<link rel="stylesheet" href="../assets/docs.css">
+<link rel="stylesheet" href="../assets/motion.css">
+<script defer src="../assets/site.js"></script>
+<script defer src="../assets/motion.js"></script>
+</head>
+<body class="is-docs">
+<a class="skip" href="#main">Skip to the content</a>
+<header class="head">
+  <div class="wrap head__in">
+    <a class="brand" href="../index.html" aria-label="LUZ, home">
+      <svg viewBox="0 0 32 28" aria-hidden="true"><path d="M16 0 32 28H0z" fill="#2b66f0"/><path d="M16 0v28H0z" fill="#6f9bff"/><path d="M16 14l8 14H8z" fill="#f4f3ef"/></svg>
+      <span>Luz</span>
+      <small>0.4.1 beta</small>
+    </a>
+    <nav aria-label="Main">
+      <ul class="nav">
+        <li><a href="../docs/index.html">Docs</a></li>
+        <li><a href="../docs/components.html" aria-current="page">Components</a></li>
+        <li><a href="../docs/catalog.html">Catalog</a></li>
+        <li><a href="../docs/color.html">Tokens</a></li>
+        <li><a href="../docs/accessibility.html">Accessibility</a></li>
+      </ul>
+    </nav>
+    <div class="head__act">
+      <button class="kbd-btn" type="button" data-find-open>Search the docs <kbd>Ctrl K</kbd></button>
+      <a class="btn btn--sm" href="../docs/get-started.html#install">Install</a>
+    </div>
+    <details class="menu">
+      <summary aria-label="Menu"><span></span></summary>
+      <div class="menu__panel">
+        <ul>
+          <li><a href="../docs/index.html">Docs</a></li>
+          <li><a href="../docs/components.html">Components</a></li>
+          <li><a href="../docs/catalog.html">Catalog</a></li>
+          <li><a href="../docs/color.html">Tokens</a></li>
+          <li><a href="../docs/accessibility.html">Accessibility</a></li>
+          <li><a href="../docs/get-started.html">Get started</a></li>
+        </ul>
+      </div>
+    </details>
+  </div>
+</header>
+
+<div class="docs wrap">
+  <details class="docs__menu">
+    <summary><span class="tri"></span>Browse the docs</summary>
+    <nav class="side" aria-label="Documentation">
+<details><summary><span>Get started</span></summary><ul><li><a href="../docs/get-started.html">A first page</a></li><li><a href="../docs/get-started.html">Make it yours</a></li><li><a href="../docs/get-started.html">Migrate a project</a></li></ul></details>
+<details><summary><span>Work with AI</span></summary><ul><li><a href="../docs/get-started.html">The five prompts</a></li><li><a href="../docs/get-started.html">llms.txt</a></li><li><a href="../docs/get-started.html">The validator</a></li></ul></details>
+<details><summary><span>Tokens<code>@luz-ds/tokens</code></span></summary><ul><li><a href="../docs/color.html">Color</a></li><li><a href="../docs/color.html">Color modes</a></li><li><a href="../docs/color.html">Typography</a></li><li><a href="../docs/color.html">Spacing</a></li><li><a href="../docs/color.html">Motion</a></li></ul></details>
+<details><summary><span>HTML elements<code>@luz-ds/core</code></span></summary><ul><li><a href="../docs/components.html">Elements A–Z</a></li><li><a href="../docs/components.html">Forms</a></li><li><a href="../docs/components.html">Text</a></li></ul></details>
+<details open><summary><span>Components<code>@luz-ds/core</code></span></summary><ul><li><a href="../docs/components.html">All components</a></li><li><a href="../docs/button.html" aria-current="page">Button</a></li><li><a href="../docs/button.html">Card</a></li><li><a href="../docs/button.html">Form inputs</a></li><li><a href="../docs/button.html">Modal</a></li><li><a href="../docs/button.html">Table</a></li><li><a href="../docs/button.html">Tabs</a></li></ul></details>
+<details><summary><span>Catalog<code>@luz-ds/catalog</code></span></summary><ul><li><a href="../docs/catalog.html">All patterns</a></li><li><a href="../docs/catalog.html">Kinds of site</a></li><li><a href="../docs/catalog.html">Hero</a></li><li><a href="../docs/catalog.html">Search</a></li><li><a href="../docs/catalog.html">Charts</a></li></ul></details>
+<details><summary><span>Accessibility</span></summary><ul><li><a href="../docs/accessibility.html">Statement</a></li><li><a href="../docs/accessibility.html">Status by component</a></li></ul></details>
+<details><summary><span>How it is built</span></summary><ul><li><a href="../docs/get-started.html">Layers</a></li><li><a href="../docs/get-started.html">Principles</a></li></ul></details>
+<details><summary><span>What's new</span></summary><ul><li><a href="../docs/get-started.html">Changelog</a></li><li><a href="../docs/get-started.html">Roadmap</a></li><li><a href="../docs/get-started.html">Contribute</a></li></ul></details>
+    </nav>
+  </details>
+  <aside class="docs__side">
+    <nav class="side" aria-label="Documentation">
+<details><summary><span>Get started</span></summary><ul><li><a href="../docs/get-started.html">A first page</a></li><li><a href="../docs/get-started.html">Make it yours</a></li><li><a href="../docs/get-started.html">Migrate a project</a></li></ul></details>
+<details><summary><span>Work with AI</span></summary><ul><li><a href="../docs/get-started.html">The five prompts</a></li><li><a href="../docs/get-started.html">llms.txt</a></li><li><a href="../docs/get-started.html">The validator</a></li></ul></details>
+<details><summary><span>Tokens<code>@luz-ds/tokens</code></span></summary><ul><li><a href="../docs/color.html">Color</a></li><li><a href="../docs/color.html">Color modes</a></li><li><a href="../docs/color.html">Typography</a></li><li><a href="../docs/color.html">Spacing</a></li><li><a href="../docs/color.html">Motion</a></li></ul></details>
+<details><summary><span>HTML elements<code>@luz-ds/core</code></span></summary><ul><li><a href="../docs/components.html">Elements A–Z</a></li><li><a href="../docs/components.html">Forms</a></li><li><a href="../docs/components.html">Text</a></li></ul></details>
+<details open><summary><span>Components<code>@luz-ds/core</code></span></summary><ul><li><a href="../docs/components.html">All components</a></li><li><a href="../docs/button.html" aria-current="page">Button</a></li><li><a href="../docs/button.html">Card</a></li><li><a href="../docs/button.html">Form inputs</a></li><li><a href="../docs/button.html">Modal</a></li><li><a href="../docs/button.html">Table</a></li><li><a href="../docs/button.html">Tabs</a></li></ul></details>
+<details><summary><span>Catalog<code>@luz-ds/catalog</code></span></summary><ul><li><a href="../docs/catalog.html">All patterns</a></li><li><a href="../docs/catalog.html">Kinds of site</a></li><li><a href="../docs/catalog.html">Hero</a></li><li><a href="../docs/catalog.html">Search</a></li><li><a href="../docs/catalog.html">Charts</a></li></ul></details>
+<details><summary><span>Accessibility</span></summary><ul><li><a href="../docs/accessibility.html">Statement</a></li><li><a href="../docs/accessibility.html">Status by component</a></li></ul></details>
+<details><summary><span>How it is built</span></summary><ul><li><a href="../docs/get-started.html">Layers</a></li><li><a href="../docs/get-started.html">Principles</a></li></ul></details>
+<details><summary><span>What's new</span></summary><ul><li><a href="../docs/get-started.html">Changelog</a></li><li><a href="../docs/get-started.html">Roadmap</a></li><li><a href="../docs/get-started.html">Contribute</a></li></ul></details>
+    </nav>
+  </aside>
+  <main class="docs__main" id="main">
+    <header class="doc-head">
+      <p class="label">Components · Actions and input</p>
+      <h1>Button</h1>
+      <p class="doc-head__lead">The one thing on the page you want people to do. A native button, finished, with no class at all.</p>
+<dl class="doc-facts"><div><dt>Package</dt><dd><code>@luz-ds/core</code></dd></div><div><dt>File</dt><dd><code>components/button.css</code></dd></div><div><dt>JavaScript</dt><dd>None</dd></div><div><dt>Status</dt><dd>Stable</dd></div></dl>
+      <p class="doc-acts"><a href="https://github.com/nandovejer/luz/edit/main/proto/sitepro/src/pages/docs/button.html">Edit on GitHub</a><button type="button" data-copy-md>Copy as Markdown</button></p>
+    </header>
+    <div class="prose">
+<h2 id="example">Example</h2>
+<div class="stage wide">
+  <div class="stage__in">
+    <button class="x-btn" type="button">Save changes</button>
+    <button class="x-btn x-btn--2" type="button">Cancel</button>
+    <button class="x-btn x-btn--danger" type="button">Delete</button>
+  </div>
+  <div class="stage__bar"><span class="label label--ink">Live · try the keyboard</span><span class="x-tag">Light</span></div>
+</div>
+
+<h2 id="known-issues">Known issues</h2>
+<p>None known.</p>
+
+
+<div class="tabpanel" id="code-panel">
+  <h2 id="code">Code</h2>
+
+  <h3 id="markup">Copy the markup</h3>
+  <p>A <code>&lt;button&gt;</code> needs nothing. Use the class when the element is not a button, or when you need a variant HTML cannot say.</p>
+  <figure class="snip">
+    <figcaption><span class="label label--light">HTML</span><button class="copy" type="button" data-copy="#btn-markup">Copy</button></figcaption>
+<pre><code id="btn-markup"><span class="t-com">&lt;!-- Primary: a button with no type, or type="submit" --&gt;</span>
+<span class="t-tag">&lt;button&gt;</span>Save changes<span class="t-tag">&lt;/button&gt;</span>
+
+<span class="t-com">&lt;!-- Secondary: type="button" or type="reset" --&gt;</span>
+<span class="t-tag">&lt;button</span> <span class="t-attr">type</span>=<span class="t-str">"button"</span><span class="t-tag">&gt;</span>Cancel<span class="t-tag">&lt;/button&gt;</span>
+
+<span class="t-com">&lt;!-- A link that looks like a button --&gt;</span>
+<span class="t-tag">&lt;a</span> <span class="t-attr">class</span>=<span class="t-str">"luz-btn"</span> <span class="t-attr">href</span>=<span class="t-str">"/start/"</span><span class="t-tag">&gt;</span>Get started<span class="t-tag">&lt;/a&gt;</span></code></pre>
+  </figure>
+
+  <h3 id="variants">Variants and options</h3>
+  <div class="table-wrap wide">
+    <table>
+      <thead><tr><th>Class</th><th>Looks like</th><th>Use it for</th></tr></thead>
+      <tbody>
+        <tr><td><code>luz-btn</code></td><td><span class="x-btn x-btn--sm">Primary</span></td><td>The main action. One per view.</td></tr>
+        <tr><td><code>luz-btn--secondary</code></td><td><span class="x-btn x-btn--2 x-btn--sm">Secondary</span></td><td>Everything else that is still an action.</td></tr>
+        <tr><td><code>luz-btn--danger</code></td><td><span class="x-btn x-btn--danger x-btn--sm">Delete</span></td><td>An action that destroys something.</td></tr>
+        <tr><td><code>luz-btn--sm</code></td><td><span class="x-btn x-btn--sm">Small</span></td><td>Dense rows and toolbars.</td></tr>
+        <tr><td><code>luz-btn--lg</code></td><td><span class="x-btn x-btn--lg">Large</span></td><td>The call to action of a hero.</td></tr>
+        <tr><td><code>luz-btn--block</code></td><td>Full width</td><td>Narrow screens and forms in a column.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 id="how">How it works</h3>
+  <p>Luz tells variants apart by meaning, not by class. A button that submits is primary. A button that does not is secondary. You say which one with the <code>type</code> attribute you were already writing.</p>
+
+  <h3 id="no-js">Without JavaScript</h3>
+  <p>The button has no script. It is the same with JavaScript on or off.</p>
+
+  <h3 id="keyboard">Keyboard and ARIA</h3>
+  <dl class="rows wide">
+    <div><dt><kbd>Tab</kbd></dt><dd>Moves focus to the button. The focus ring is always visible.</dd></div>
+    <div><dt><kbd>Enter</kbd> <kbd>Space</kbd></dt><dd>Activates it. A link styled as a button answers to <kbd>Enter</kbd> only, as every link does.</dd></div>
+    <div><dt><code>disabled</code></dt><dd>Takes the button out of the tab order and lowers its contrast. Avoid it in forms. In a toolbar, <code>aria-disabled="true"</code> keeps it focusable.</dd></div>
+    <div><dt><code>aria-pressed</code></dt><dd>For a toggle. The pressed state has a border as well as a color.</dd></div>
+  </dl>
+</div>
+
+<div class="tabpanel" id="design-panel">
+  <h2 id="design">Design</h2>
+
+  <h3 id="when">When to use</h3>
+  <ul>
+    <li>To submit a form, or to do something on the page.</li>
+    <li>To start a task: open a dialog, add a row, send a message.</li>
+  </ul>
+
+  <h3 id="when-not">When not to use</h3>
+  <ul>
+    <li>To go somewhere. That is a link, even when it looks like a button.</li>
+    <li>For a second primary action. If everything is primary, nothing is.</li>
+    <li>Switched off to stop a form being sent. Leave it on, and when it is pressed, say what is missing.</li>
+  </ul>
+
+  <h3 id="do-dont">Do and don't</h3>
+  <div class="dodont wide">
+    <figure>
+      <figcaption><strong>Do</strong>Start with a verb and say what happens next.</figcaption>
+      <div class="stage__in" inert aria-hidden="true"><span class="x-btn">Save changes</span><span class="x-btn x-btn--2">Cancel</span></div>
+    </figure>
+    <figure>
+      <figcaption><strong>Don't</strong>Use two primary buttons, or a label that needs the page to make sense.</figcaption>
+      <div class="stage__in" inert aria-hidden="true"><span class="x-btn">OK</span><span class="x-btn">Yes</span></div>
+    </figure>
+  </div>
+
+  <h3 id="content">Writing the content</h3>
+  <p>Two or three words. Sentence case. A verb first: “Save changes”, not “Changes”. Never “Click here”.</p>
+
+  <h3 id="contrast">Contrast and focus</h3>
+  <div class="table-wrap wide">
+    <table>
+      <thead><tr><th>Part</th><th>Color on background</th><th>Light</th><th>Needs</th></tr></thead>
+      <tbody>
+        <tr><td>Primary label</td><td><span class="sw" style="--c:#fff"></span> on <span class="sw" style="--c:#2b66f0"></span></td><td class="num">4.92:1</td><td><span class="pass">4.5:1</span></td></tr>
+        <tr><td>Secondary label</td><td><span class="sw" style="--c:#1f4fd0"></span> on <span class="sw" style="--c:#fff"></span></td><td class="num">6.80:1</td><td><span class="pass">4.5:1</span></td></tr>
+        <tr><td>Danger label</td><td><span class="sw" style="--c:#fff"></span> on <span class="sw" style="--c:#a8321f"></span></td><td class="num">6.68:1</td><td><span class="pass">4.5:1</span></td></tr>
+        <tr><td>Focus ring</td><td><span class="sw" style="--c:#2b66f0"></span> on <span class="sw" style="--c:#f4f3ef"></span></td><td class="num">4.43:1</td><td><span class="pass">3:1</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 id="tokens">Tokens it uses</h3>
+  <dl class="rows wide">
+    <div><dt>Color</dt><dd><code>--luz-brand-fill</code> <code>--luz-brand-fill-hover</code> <code>--luz-brand-fill-active</code> <code>--luz-focus-ring</code></dd></div>
+    <div><dt>Space</dt><dd><code>--luz-space-2</code> <code>--luz-space-4</code></dd></div>
+    <div><dt>Type</dt><dd><code>--luz-text-md</code> <code>--luz-font-sans</code></dd></div>
+    <div><dt>Motion</dt><dd><code>--luz-duration-fast</code></dd></div>
+  </dl>
+</div>
+
+    </div>
+<section class="related" aria-labelledby="related-h"><h2 class="label label--ink" id="related-h">Related pages</h2><ul><li><a href="../docs/button.html"><strong>Form inputs</strong><span>The fields a button usually sends.</span></a></li><li><a href="../docs/color.html"><strong>Color</strong><span>The brand tokens the button reads.</span></a></li><li><a href="../docs/accessibility.html"><strong>Statement</strong><span>How this component was tested.</span></a></li></ul></section>
+<nav class="pager" aria-label="Previous and next page"><a class="pager__a pager__a--prev" rel="prev" href="../docs/components.html"><span class="label label--ink">Previous</span><strong>All components</strong><small>Components</small></a><a class="pager__a pager__a--next" rel="next" href="../docs/catalog.html"><span class="label label--ink">Next</span><strong>All patterns</strong><small>Catalog</small></a></nav>
+  </main>
+  <aside class="docs__rail" aria-label="On this page">
+    <p class="label label--ink">On this page</p>
+<ul data-spy><li><a href="#example">Example</a></li><li><a href="#known-issues">Known issues</a></li><li><a href="#code">Code</a></li><li><a href="#design">Design</a></li></ul>
+  </aside>
+</div>
+
+<footer class="foot">
+  <div class="wrap foot__end">
+    <span>© 2026 LUZ 0.4.1 beta. MIT licensed.</span>
+    <span><a href="https://github.com/nandovejer/luz">GitHub</a> · <a href="https://www.npmjs.com/package/@luz-ds/core">npm</a> · <a href="../docs/accessibility.html">Accessibility</a></span>
+  </div>
+</footer>
+
+<dialog class="find" aria-label="Search the site">
+  <form method="dialog">
+    <input type="search" placeholder="Search the docs" aria-label="Search the docs" autocomplete="off">
+    <button class="copy" type="submit">Esc</button>
+  </form>
+  <ul><li><a href="#example"><span>Example</span><small>On this page</small></a></li><li><a href="#known-issues"><span>Known issues</span><small>On this page</small></a></li><li><a href="#code"><span>Code</span><small>On this page</small></a></li><li><a href="#design"><span>Design</span><small>On this page</small></a></li><li><a href="../docs/get-started.html"><span>A first page</span><small>Get started</small></a></li><li><a href="../docs/get-started.html"><span>Make it yours</span><small>Get started</small></a></li><li><a href="../docs/get-started.html"><span>Migrate a project</span><small>Get started</small></a></li><li><a href="../docs/get-started.html"><span>The five prompts</span><small>Work with AI</small></a></li><li><a href="../docs/get-started.html"><span>llms.txt</span><small>Work with AI</small></a></li><li><a href="../docs/get-started.html"><span>The validator</span><small>Work with AI</small></a></li><li><a href="../docs/color.html"><span>Color</span><small>Tokens</small></a></li><li><a href="../docs/color.html"><span>Color modes</span><small>Tokens</small></a></li><li><a href="../docs/color.html"><span>Typography</span><small>Tokens</small></a></li><li><a href="../docs/color.html"><span>Spacing</span><small>Tokens</small></a></li><li><a href="../docs/color.html"><span>Motion</span><small>Tokens</small></a></li><li><a href="../docs/components.html"><span>Elements A–Z</span><small>HTML elements</small></a></li><li><a href="../docs/components.html"><span>Forms</span><small>HTML elements</small></a></li><li><a href="../docs/components.html"><span>Text</span><small>HTML elements</small></a></li><li><a href="../docs/components.html"><span>All components</span><small>Components</small></a></li><li><a href="../docs/button.html"><span>Button</span><small>Components</small></a></li><li><a href="../docs/button.html"><span>Card</span><small>Components</small></a></li><li><a href="../docs/button.html"><span>Form inputs</span><small>Components</small></a></li><li><a href="../docs/button.html"><span>Modal</span><small>Components</small></a></li><li><a href="../docs/button.html"><span>Table</span><small>Components</small></a></li><li><a href="../docs/button.html"><span>Tabs</span><small>Components</small></a></li><li><a href="../docs/catalog.html"><span>All patterns</span><small>Catalog</small></a></li><li><a href="../docs/catalog.html"><span>Kinds of site</span><small>Catalog</small></a></li><li><a href="../docs/catalog.html"><span>Hero</span><small>Catalog</small></a></li><li><a href="../docs/catalog.html"><span>Search</span><small>Catalog</small></a></li><li><a href="../docs/catalog.html"><span>Charts</span><small>Catalog</small></a></li><li><a href="../docs/accessibility.html"><span>Statement</span><small>Accessibility</small></a></li><li><a href="../docs/accessibility.html"><span>Status by component</span><small>Accessibility</small></a></li><li><a href="../docs/get-started.html"><span>Layers</span><small>How it is built</small></a></li><li><a href="../docs/get-started.html"><span>Principles</span><small>How it is built</small></a></li><li><a href="../docs/get-started.html"><span>Changelog</span><small>What's new</small></a></li><li><a href="../docs/get-started.html"><span>Roadmap</span><small>What's new</small></a></li><li><a href="../docs/get-started.html"><span>Contribute</span><small>What's new</small></a></li><li><a href="../index.html"><span>Home</span><small>Site</small></a></li><li><a href="../docs/index.html"><span>Documentation</span><small>Site</small></a></li></ul>
+  <p class="find__none" hidden>No page matches that. Check the spelling or try a shorter word, or browse <a href="../docs/components.html">the components</a> and <a href="../docs/color.html">the tokens</a>.</p>
+</dialog>
+
+</body>
+</html>
