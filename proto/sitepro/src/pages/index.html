@@ -3,17 +3,13 @@
 
   <!-- Hero -->
   <section class="hero">
-    <div class="hero__art" data-parallax>{{art:hero}}</div>
-    <div class="floats" inert aria-hidden="true">
-      <div class="fl fl--1" style="--z:26"><span class="x-btn">Save changes</span></div>
-      <div class="fl fl--2" style="--z:40"><span class="x-check"><input type="checkbox" checked> Dark mode</span></div>
-      <div class="fl fl--3" style="--z:18"><code>&lt;button&gt;</code><span>no class needed</span></div>
-      <div class="fl fl--4" style="--z:32"><span class="x-tag x-tag--solid">WCAG 2.2 AA</span></div>
-    </div>
+    <div class="hero__art" data-parallax>{{scale}}</div>
     <div class="wrap hero__in">
-      <p class="label"><span class="tri"></span>Luz {{version}} beta · Open source, MIT</p>
+      <p class="label">Luz {{version}} beta · Open source, MIT</p>
       <h1>The design system that <em>disappears.</em></h1>
-      <p class="hero__lead">Luz is a design system in plain HTML, CSS and ES modules, for people who want their site to outlive its framework. It styles the markup you already write. The browser does the rest.</p>
+      <p class="hero__lead">Plain HTML, CSS and ES modules. Luz styles the markup you already write, and the browser does the rest.</p>
+    </div>
+    <div class="wrap hero__foot">
       <div class="hero__cta">
         <a class="btn" href="#start">Set it up in your terminal</a>
         <a class="btn btn--ghost" href="{{root}}docs/index.html">Read the docs</a>
@@ -22,6 +18,7 @@
         <code id="install-line">npm create @luz-ds@{{version}}</code>
         <button class="copy" type="button" data-copy="#install-line">Copy</button>
       </div>
+      <p class="hero__note">Behind this text: the type scale of Luz, one column per step, drawn from <code>tokens.json</code>. The blue one is the body text.</p>
     </div>
   </section>
 
@@ -36,7 +33,7 @@
   <section class="sec sec--tight sec--white">
     <div class="wrap">
       <div class="sec__head">
-        <p class="label"><span class="tri"></span>The proof, not the promise</p>
+        <p class="label">The proof, not the promise</p>
         <h2 data-split>Write this. <em>Get that.</em></h2>
         <p>No component library to import and no props to memorise. The markup on the left is all there is. Go on, type in the form.</p>
       </div>
@@ -88,52 +85,68 @@
   <p class="source">Figures written by the build from the packages and <code>budgets.json</code>, never typed.</p>
 
   <!-- Layers -->
-  <section class="sec sec--line">
+  <section class="sheets-sec dark">
+    <div class="wrap sec__head sec__head--center">
+      <p class="label">Modular by design</p>
+      <h2 data-split>Three layers. <em>Take one, or take them all.</em></h2>
+      <p>Each package needs the one below it and nothing above it. Adopt a level, stop there, and come back when the project grows.</p>
+    </div>
+    <div class="wrap sheets">
+      <article class="sheet" style="--i:0">
+        <header class="sheet__bar">
+          <span class="sheet__num">01</span>
+          <h3>Tokens <span>· @luz-ds/tokens</span></h3>
+          <a class="btn btn--ghost btn--sm" href="{{root}}docs/color.html">Explore tokens</a>
+        </header>
+        <div class="sheet__body">
+          <p class="sheet__say" data-split>The decisions, <em>as plain custom properties.</em></p>
+          <div class="sheet__grid">
+            <p class="label label--ink">Standalone<br>{{kb-tokens}} KB max</p>
+            <ul><li>Color, type, space and motion, in three modes</li><li>Three knobs set the whole scale</li><li>A contrast checker for your own theme</li></ul>
+<pre class="sheet__code"><code><span class="t-tag">:root</span> {
+  <span class="t-attr">--luz-type-base</span>: 1rem;
+  <span class="t-attr">--luz-type-ratio</span>: 1.25;
+  <span class="t-attr">--luz-space-unit</span>: 0.25rem;
+}</code></pre>
+          </div>
+        </div>
+      </article>
+      <article class="sheet" style="--i:1">
+        <header class="sheet__bar">
+          <span class="sheet__num">02</span>
+          <h3>Core <span>· @luz-ds/core</span></h3>
+          <a class="btn btn--ghost btn--sm" href="{{root}}docs/components.html">Browse core</a>
+        </header>
+        <div class="sheet__body">
+          <p class="sheet__say" data-split>Bare HTML, <em>finished.</em></p>
+          <div class="sheet__grid">
+            <p class="label label--ink">Needs tokens<br>{{kb-core}} KB max</p>
+            <ul><li>Every element styled with no class</li><li>{{n-core}} components, from accordion to tooltip</li><li>Optional JavaScript, in ES modules</li></ul>
+<pre class="sheet__code"><code><span class="t-tag">&lt;button&gt;</span>Save<span class="t-tag">&lt;/button&gt;</span>
+<span class="t-tag">&lt;table&gt;</span>…<span class="t-tag">&lt;/table&gt;</span>
+<span class="t-tag">&lt;dialog&gt;</span>…<span class="t-tag">&lt;/dialog&gt;</span>
+<span class="t-com">&lt;!-- No class. Done. --&gt;</span></code></pre>
+          </div>
+        </div>
+      </article>
+      <article class="sheet" style="--i:2">
+        <header class="sheet__bar">
+          <span class="sheet__num">03</span>
+          <h3>Catalog <span>· @luz-ds/catalog</span></h3>
+          <a class="btn btn--ghost btn--sm" href="{{root}}docs/catalog.html">Open the catalog</a>
+        </header>
+        <div class="sheet__body">
+          <p class="sheet__say" data-split>A whole site, <em>one stylesheet at a time.</em></p>
+          <div class="sheet__grid">
+            <p class="label label--ink">Needs core<br>No bundle</p>
+            <ul><li>{{n-catalog}} patterns, linked one by one</li><li>Search, charts and navigation</li><li>Landing, blog, app and docs</li></ul>
+<pre class="sheet__code"><code><span class="t-tag">&lt;link</span> <span class="t-attr">rel</span>=<span class="t-str">"stylesheet"</span>
+  <span class="t-attr">href</span>=<span class="t-str">"…/catalog/components/hero.css"</span><span class="t-tag">&gt;</span></code></pre>
+          </div>
+        </div>
+      </article>
+    </div>
     <div class="wrap">
-      <div class="sec__head">
-        <p class="label"><span class="tri"></span>Modular by design</p>
-        <h2 data-split>Three layers. Take one, <em>or take them all.</em></h2>
-        <p>Each package needs the one below it and nothing above it. Adopt a level, stop there, and come back when the project grows.</p>
-      </div>
-      <div class="stack" data-stack data-step="3">
-        <div class="stack__fig" aria-hidden="true">
-          <svg viewBox="0 0 360 312">
-            <path class="s s3" d="M180 4 236 100H124z"/>
-            <path class="s s2" d="M118 110h124l56 96H62z"/>
-            <path class="s s1" d="M56 216h248l56 96H0z"/>
-            <text class="sl sl3" x="250" y="66">CATALOG</text>
-            <text class="sl sl2" x="312" y="172">CORE</text>
-            <text class="sl sl1" x="0" y="206">TOKENS</text>
-          </svg>
-          <p class="stack__count"><span data-step-num>3</span> / 3</p>
-        </div>
-        <div class="stack__list">
-        <article class="layer" data-layer>
-          <p class="label label--ink">Layer 01</p>
-          <h3>Tokens</h3>
-          <code>@luz-ds/tokens</code>
-          <p>The decisions, as CSS custom properties. Color, type, space and motion, in three modes.</p>
-          <ul><li>Standalone, with no peers</li><li>Three knobs set the whole scale</li><li>A contrast checker for your theme</li></ul>
-          <div class="layer__foot"><span class="label label--ink">{{kb-tokens}} KB max</span><a class="link" href="{{root}}docs/color.html">Explore tokens</a></div>
-        </article>
-        <article class="layer" data-layer>
-          <p class="label label--ink">Layer 02</p>
-          <h3>Core</h3>
-          <code>@luz-ds/core</code>
-          <p>Bare HTML, styled. Then the layout objects and the components every page needs.</p>
-          <ul><li>Classless by default</li><li>{{n-core}} components, from accordion to tooltip</li><li>Optional JavaScript, in ES modules</li></ul>
-          <div class="layer__foot"><span class="label label--ink">{{kb-core}} KB max</span><a class="link" href="{{root}}docs/components.html">Browse core</a></div>
-        </article>
-        <article class="layer" data-layer>
-          <p class="label label--ink">Layer 03</p>
-          <h3>Catalog</h3>
-          <code>@luz-ds/catalog</code>
-          <p>The pieces that act for a whole site, and the patterns of a landing page, a blog, an app and a docs site.</p>
-          <ul><li>{{n-catalog}} patterns, linked one by one</li><li>Search, charts and navigation</li><li>Loads only what the page uses</li></ul>
-          <div class="layer__foot"><span class="label label--ink">No bundle</span><a class="link" href="{{root}}docs/catalog.html">Open the catalog</a></div>
-        </article>
-        </div>
-      </div>
       <ul class="doors" aria-label="Go straight to" data-stagger>
         <li><a href="{{root}}docs/color.html"><strong>Tokens</strong><span>Color, type, space, motion</span></a></li>
         <li><a href="{{root}}docs/components.html"><strong>HTML elements</strong><span>What you get with no class</span></a></li>
@@ -147,7 +160,7 @@
   <section class="sec sec--white sec--line">
     <div class="wrap">
       <div class="sec__head">
-        <p class="label"><span class="tri"></span>Play with it</p>
+        <p class="label">Play with it</p>
         <h2 data-split>Real components. <em>Go on, touch them.</em></h2>
         <p>Nothing here is a picture. Every piece below is native HTML, styled, and most of it needs no script at all.</p>
       </div>
@@ -211,7 +224,7 @@
   <!-- Manifesto -->
   <section class="sec sec--line">
     <div class="wrap mani">
-      <p class="label"><span class="tri"></span>Why Luz</p>
+      <p class="label">Why Luz</p>
       <p class="mani__say" data-split>Most design systems ask you to learn <s>them</s>. Luz asks you to remember <em>HTML.</em></p>
       <div class="trio" data-stagger>
         <div>
@@ -234,42 +247,48 @@
   </section>
 
   <!-- Features -->
-  <section class="sec sec--line">
+  <section class="sec dark">
     <div class="wrap">
-      <div class="sec__head">
-        <p class="label"><span class="tri"></span>What you get</p>
+      <div class="sec__head sec__head--center">
+        <p class="label">What you get</p>
         <h2 data-split>Everything a page needs. <em>Nothing it doesn't.</em></h2>
       </div>
-      <div class="feats" data-stagger>
-        <article class="feat">
-          <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 4 46 42H2z" fill="none" stroke="#0b1730"/><path d="M24 20 35 39H13z" fill="#2b66f0"/></svg>
+      <div class="cards" data-stagger>
+        <article class="card">
+          <svg class="card__fig" viewBox="0 0 240 120" aria-hidden="true"><g stroke="currentColor" fill="none" vector-effect="non-scaling-stroke"><path d="M10 20h220M10 44h220M10 68h220M10 92h220"/></g><path class="ac" d="M10 92h220" fill="none"/><g font-family="ui-monospace,monospace" font-size="8" fill="currentColor" opacity=".6"><text x="10" y="15">luz.tokens</text><text x="10" y="39">luz.elements</text><text x="10" y="63">luz.components</text><text x="10" y="87">your css</text></g></svg>
           <h3>Your CSS always wins</h3>
-          <p>Everything ships in named cascade layers, and bare elements have zero specificity. Override anything with one plain rule. No <code>!important</code>, no fight.</p>
+          <p>Named cascade layers, and bare elements at zero specificity. Override anything with one plain rule, no <code>!important</code>.</p>
+          <footer class="card__foot"><span>Cascade layers</span><span class="card__num">01</span></footer>
         </article>
-        <article class="feat">
-          <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M17 8 32 34H2z" fill="#2b66f0"/><path d="M31 16 46 42H16z" fill="none" stroke="#0b1730"/></svg>
+        <article class="card">
+          <svg class="card__fig" viewBox="0 0 240 120" aria-hidden="true"><g stroke="currentColor" fill="none" vector-effect="non-scaling-stroke"><rect x="10" y="10" width="40" height="100"/><rect x="58" y="10" width="40" height="100"/><rect x="106" y="10" width="40" height="100"/><rect x="154" y="10" width="40" height="100"/></g><rect class="ac" x="202" y="10" width="28" height="100" fill="none"/></svg>
           <h3>Works with JavaScript off</h3>
-          <p>Every component is tested twice: once with scripts, once without. The page your reader gets on a bad day still works.</p>
+          <p>Every component is tested twice, with scripts and without. The page your reader gets on a bad day still works.</p>
+          <footer class="card__foot"><span>No-JS tested</span><span class="card__num">02</span></footer>
         </article>
-        <article class="feat">
-          <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 4 35 23H13z" fill="#6f9bff"/><path d="M13 23h22l11 19H2z" fill="#2b66f0"/><path d="M24 23 35 42H13z" fill="#0b1730"/></svg>
+        <article class="card">
+          <svg class="card__fig" viewBox="0 0 240 120" aria-hidden="true"><g stroke="currentColor" fill="none" vector-effect="non-scaling-stroke"><rect x="40" y="20" width="80" height="80"/><rect x="80" y="20" width="80" height="80"/></g><rect class="ac" x="120" y="20" width="80" height="80" fill="none"/></svg>
           <h3>Three modes, one source</h3>
-          <p>Light, dark and high contrast come from the same semantic tokens. Every pair of colors is measured before it ships.</p>
+          <p>Light, dark and high contrast from the same semantic tokens, every pair measured before it ships.</p>
+          <footer class="card__foot"><span>Color modes</span><span class="card__num">03</span></footer>
         </article>
-        <article class="feat">
-          <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 4 46 42H2z" fill="none" stroke="#0b1730"/><path d="M24 4 35 23H13z" fill="#2b66f0"/><path d="M13 23 24 42H2z" fill="#6f9bff"/></svg>
+        <article class="card">
+          <svg class="card__fig" viewBox="0 0 240 120" aria-hidden="true"><g stroke="currentColor" fill="none" vector-effect="non-scaling-stroke"><rect x="10" y="12" width="20" height="20"/><rect x="38" y="12" width="20" height="20"/><rect x="66" y="12" width="20" height="20"/><rect x="94" y="12" width="20" height="20"/><rect x="122" y="12" width="20" height="20"/><rect x="150" y="12" width="20" height="20"/><rect x="178" y="12" width="20" height="20"/><rect x="206" y="12" width="20" height="20"/><rect x="10" y="40" width="20" height="20"/><rect x="38" y="40" width="20" height="20"/><rect x="66" y="40" width="20" height="20"/><rect x="94" y="40" width="20" height="20"/><rect x="122" y="40" width="20" height="20"/><rect x="150" y="40" width="20" height="20"/><rect x="178" y="40" width="20" height="20"/><rect x="206" y="40" width="20" height="20"/><rect x="10" y="68" width="20" height="20"/><rect x="38" y="68" width="20" height="20"/><rect x="66" y="68" width="20" height="20"/><rect x="94" y="68" width="20" height="20"/><rect x="122" y="68" width="20" height="20"/><rect x="150" y="68" width="20" height="20"/><rect x="178" y="68" width="20" height="20"/><rect x="206" y="68" width="20" height="20"/><rect x="10" y="96" width="20" height="20"/><rect x="38" y="96" width="20" height="20"/><rect x="66" y="96" width="20" height="20"/><rect x="94" y="96" width="20" height="20"/><rect x="122" y="96" width="20" height="20"/><rect x="150" y="96" width="20" height="20"/><rect x="178" y="96" width="20" height="20"/><rect x="206" y="96" width="20" height="20"/></g><rect class="ac" x="66" y="40" width="20" height="20" fill="none"/><rect class="ac" x="150" y="68" width="20" height="20" fill="none"/></svg>
           <h3>Pay for what you link</h3>
-          <p>One stylesheet per piece. A page that uses the hero and the search loads the hero and the search, and not one byte of the rest.</p>
+          <p>One stylesheet per piece. A page with the hero and the search loads those two, and not one byte more.</p>
+          <footer class="card__foot"><span>One file each</span><span class="card__num">04</span></footer>
         </article>
-        <article class="feat">
-          <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 4 46 42H2z" fill="#2b66f0"/><path d="m16 30 6 6 11-14" fill="none" stroke="#fff" stroke-width="2.5"/></svg>
+        <article class="card">
+          <svg class="card__fig" viewBox="0 0 240 120" aria-hidden="true"><g stroke="currentColor" fill="none" vector-effect="non-scaling-stroke"><path d="M10 110h220M10 10v100"/><path d="M10 96 60 80 100 88 150 40 190 52 230 16" opacity=".35"/></g><path class="ac" d="M10 100 60 92 100 70 150 60 190 30 230 22" fill="none"/></svg>
           <h3>Tested first, always</h3>
           <p>Every change starts life as a failing test. If it is in the box, something already tried to break it.</p>
+          <footer class="card__foot"><span>Test first</span><span class="card__num">05</span></footer>
         </article>
-        <article class="feat">
-          <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M8 30 15 42H1z" fill="#6f9bff"/><path d="M24 20 37 42H11z" fill="none" stroke="#0b1730"/><path d="M36 10 47 29H25z" fill="#2b66f0"/></svg>
+        <article class="card">
+          <svg class="card__fig" viewBox="0 0 240 120" aria-hidden="true"><g stroke="currentColor" fill="none" vector-effect="non-scaling-stroke"><path d="M20 30h200M20 60h200M20 90h200"/><rect x="66" y="24" width="12" height="12"/><rect x="150" y="54" width="12" height="12"/></g><rect class="ac" x="110" y="84" width="12" height="12" fill="none"/></svg>
           <h3>Yours in three knobs</h3>
-          <p>Type base, type ratio, space unit. Turn them and the whole system follows. The brand, and the last word, stay yours.</p>
+          <p>Type base, type ratio, space unit. Turn them and the whole system follows.</p>
+          <footer class="card__foot"><span>Three knobs</span><span class="card__num">06</span></footer>
         </article>
       </div>
     </div>
@@ -279,7 +298,7 @@
   <section class="sec sec--white sec--line">
     <div class="wrap">
       <div class="sec__head">
-        <p class="label"><span class="tri"></span>Kinds of site</p>
+        <p class="label">Kinds of site</p>
         <h2 data-split>One system. <em>Four ways to begin.</em></h2>
         <p>The catalog knows the shape of the site you are about to make. Start from the pattern, then make it unmistakably yours.</p>
       </div>
@@ -289,7 +308,7 @@
             <rect class="w-ink" x="20" y="22" width="26" height="5"/><rect class="w-line" x="150" y="22" width="18" height="5"/><rect class="w-line" x="176" y="22" width="18" height="5"/><rect class="w-line" x="202" y="22" width="18" height="5"/>
             <rect class="w-ink" x="20" y="70" width="150" height="14"/><rect class="w-ink" x="20" y="92" width="110" height="14"/><rect class="w-line" x="20" y="124" width="130" height="5"/><rect class="w-line" x="20" y="135" width="100" height="5"/>
             <rect class="w-blue" x="20" y="158" width="56" height="18"/>
-            <path class="w-wash" d="M240 150v150H66z"/><path class="w-blue" d="M240 196v104H120z"/><path class="w-hi" d="M180 248l30 52h-60z"/>
+            <rect class="w-wash" x="132" y="196" width="20" height="104"/><rect class="w-wash" x="156" y="166" width="20" height="134"/><rect class="w-blue" x="180" y="140" width="20" height="160"/><rect class="w-wash" x="204" y="210" width="20" height="90"/>
           </svg></div>
           <h3>Landing page</h3>
           <p>Site header, hero, sections, footer.</p>
@@ -297,7 +316,7 @@
         <a class="kind" href="{{root}}docs/catalog.html">
           <div class="kind__fig"><svg viewBox="0 0 240 300" aria-hidden="true">
             <rect class="w-ink" x="70" y="26" width="100" height="12"/><rect class="w-line" x="20" y="52" width="200" height="1"/>
-            <rect class="w-wash" x="20" y="70" width="120" height="86"/><path class="w-blue" d="M80 96l34 60H46z"/>
+            <rect class="w-wash" x="20" y="70" width="120" height="86"/><rect class="w-blue" x="64" y="100" width="32" height="40"/>
             <rect class="w-ink" x="20" y="168" width="120" height="9"/><rect class="w-line" x="20" y="186" width="120" height="4"/><rect class="w-line" x="20" y="196" width="104" height="4"/><rect class="w-line" x="20" y="206" width="114" height="4"/>
             <rect class="w-ink" x="156" y="70" width="64" height="7"/><rect class="w-line" x="156" y="86" width="64" height="4"/><rect class="w-line" x="156" y="96" width="50" height="4"/>
             <rect class="w-ink" x="156" y="124" width="64" height="7"/><rect class="w-line" x="156" y="140" width="64" height="4"/><rect class="w-line" x="156" y="150" width="44" height="4"/>
@@ -313,7 +332,7 @@
             <rect class="w-ink" x="72" y="24" width="70" height="9"/>
             <rect class="w-wash" x="72" y="50" width="44" height="40"/><rect class="w-wash" x="124" y="50" width="44" height="40"/><rect class="w-wash" x="176" y="50" width="44" height="40"/>
             <rect class="w-ink" x="80" y="60" width="20" height="8"/><rect class="w-ink" x="132" y="60" width="16" height="8"/><rect class="w-ink" x="184" y="60" width="24" height="8"/>
-            <path class="w-hi" d="M72 200l30-44 26 26 34-58 28 36 30-22v62z"/><path class="w-blue" d="M72 200l30-20 26 8 34-40 28 26 30-12v38z"/>
+            <rect class="w-wash" x="72" y="160" width="22" height="40"/><rect class="w-wash" x="100" y="140" width="22" height="60"/><rect class="w-blue" x="128" y="118" width="22" height="82"/><rect class="w-wash" x="156" y="150" width="22" height="50"/><rect class="w-wash" x="184" y="130" width="22" height="70"/>
             <rect class="w-line" x="72" y="200" width="148" height="1"/>
             <rect class="w-line" x="72" y="222" width="148" height="4"/><rect class="w-line" x="72" y="238" width="148" height="4"/><rect class="w-line" x="72" y="254" width="148" height="4"/><rect class="w-line" x="72" y="270" width="100" height="4"/>
           </svg></div>
@@ -327,7 +346,7 @@
             <rect class="w-ink" x="74" y="60" width="90" height="12"/><rect class="w-line" x="74" y="84" width="110" height="4"/><rect class="w-line" x="74" y="94" width="96" height="4"/>
             <rect class="w-ink" x="74" y="116" width="112" height="56"/><rect class="w-hi" x="84" y="128" width="50" height="4"/><rect class="w-paper" x="84" y="140" width="76" height="4"/><rect class="w-paper" x="84" y="152" width="40" height="4"/>
             <rect class="w-line" x="74" y="188" width="112" height="4"/><rect class="w-line" x="74" y="198" width="100" height="4"/><rect class="w-line" x="74" y="208" width="108" height="4"/>
-            <rect class="w-wash" x="74" y="228" width="112" height="40"/><path class="w-blue" d="M86 240l8 14H78z"/><rect class="w-ink" x="102" y="240" width="60" height="4"/><rect class="w-line" x="102" y="250" width="72" height="4"/>
+            <rect class="w-wash" x="74" y="228" width="112" height="40"/><rect class="w-blue" x="80" y="240" width="12" height="12"/><rect class="w-ink" x="102" y="240" width="60" height="4"/><rect class="w-line" x="102" y="250" width="72" height="4"/>
             <rect class="w-line" x="200" y="60" width="24" height="4"/><rect class="w-line" x="200" y="72" width="20" height="4"/><rect class="w-line" x="200" y="84" width="24" height="4"/>
           </svg></div>
           <h3>Documentation</h3>
@@ -341,7 +360,7 @@
   <section class="sec sec--line">
     <div class="wrap">
       <div class="sec__head">
-        <p class="label"><span class="tri"></span>Accessibility</p>
+        <p class="label">Accessibility</p>
         <h2 data-split>Accessible, and honest <em>about the gaps.</em></h2>
         <p>WCAG 2.2 AA is the baseline of every piece. Where Luz falls short, the statement says so in public, with the criterion it fails.</p>
       </div>
@@ -374,7 +393,7 @@
   <section class="sec dark" id="start">
     <div class="wrap split split--start">
       <div>
-        <p class="label"><span class="tri"></span>Start in your terminal</p>
+        <p class="label">Start in your terminal</p>
         <h2 data-split>One command. <em>It asks before it writes.</em></h2>
         <p>It looks at your project first, asks only what it could not tell, shows you the plan and writes nothing until you say yes. Then it checks the result with <code>luz-check</code>.</p>
         <div class="install install--dark">
@@ -468,9 +487,9 @@ Finished. Next: pnpm dev</code></pre>
 
   <!-- Closing band -->
   <section class="band">
-    <div class="band__art">{{art:band}}</div>
+    <div class="band__art">{{scale:dark}}</div>
     <div class="wrap band__in">
-      <p class="label label--light"><span class="tri"></span>Open source · MIT</p>
+      <p class="label label--light">Open source · MIT</p>
       <h2 data-split>Let there be <em>light.</em></h2>
       <p>Two link tags from now, your HTML looks finished. Everything after that is yours to decide.</p>
       <div class="hero__cta">

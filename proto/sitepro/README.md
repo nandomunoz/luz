@@ -34,7 +34,8 @@ node proto/sitepro/tools/build.mjs
 - `src/pages/` has one fragment per page, with its facts in a first-line `<!--meta {…} -->`.
 - `src/partials/` has the shell, the header, the footers, the docs layout and the search.
 - `assets/site.css` and `assets/docs.css` are the styles; `assets/site.js` is the script.
-- `tools/art.mjs` draws the triangle field; `tools/build-art.mjs` composes the four pictures in `assets/art/`.
+- `assets/look.css` is the look, loaded last: monochrome, ET Book, mono labels, one blue.
+- The art is the type scale of LUZ: `{{scale}}` draws one outlined column per step of `tokens.json`, as tall as its size.
 
 The build has no dependency. It reads the version, the number of components and
 the weight ceilings from the repository, and it computes every contrast ratio
@@ -60,12 +61,11 @@ the weight ceilings from the repository, and it computes every contrast ratio
 `assets/motion.css` and `assets/motion.js` follow
 `.claude/worktree/proto/proto/GUIA-VISUAL-UX-UI.md`, section 14:
 
-- The art of the hero, the docs and the 404 is inline SVG. It assembles once,
-  in under two seconds, and then holds still. The pointer only moves its light.
-- Sections fade in and rise a little as they arrive; section titles rise word
-  by word. The first screen is readable at once, with no animation to wait for.
+- The art is HTML columns drawn from the type scale; it holds still.
+- Sections fade in and rise a little as they arrive; section titles ink in letter
+  by letter as you scroll (colour, not motion). The first screen is readable at once, with no animation to wait for.
 - The marquee is the only loop. It stops on hover, on focus and with its Pause button.
-- The three layers fill a pyramid as you scroll past them; the figures count
+- The three layers are sheets that stack as you scroll; the figures count
   up; the terminal fills in line by line.
 - Pages cross-fade into each other (view transitions, Chromium only), and a
   thin bar under the header shows how far you have read.

@@ -12,7 +12,6 @@
 import { mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
-import "./build-art.mjs";
 
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const REPO = join(ROOT, "../..");
@@ -242,13 +241,33 @@ function searchIndex(body, isDocs) {
   return [...here, ...pages].join("");
 }
 
-/** {{art:hero}} puts the picture in the page, so CSS and the pointer can move its tiles. */
+/* ---- The art: the type scale of LUZ, drawn as columns --------------------
+   {{scale}}, {{scale:low}}, {{scale:lost}}, {{scale:dark}}. Each column is a
+   step of the scale in tokens.json, as tall as its size; the body step is
+   the one in colour. Nothing is drawn by hand: change the scale and the
+   picture follows. */
+const SCALE = Object.entries(json("packages/tokens/tokens.json").typography)
+  .filter(([k, v]) => k.startsWith("text-") && v.value)
+  .map(([k, v]) => ({ name: k, rem: parseFloat(v.value) }));
+const ORDER = ["text-sm", "text-lg", "text-2xl", "text-4xl", "text-3xl", "text-xl", "text-base", "text-md", "text-xs"];
+
+function scaleArt(variant = "") {
+  const max = Math.max(...SCALE.map((s) => s.rem));
+  const cols = ORDER.map((name, i) => {
+    const step = SCALE.find((s) => s.name === name);
+    if (!step) throw new Error(`tokens.json has no ${name}`);
+    const h = Math.round((step.rem / max) * 1000) / 10;
+    const px = Math.round(step.rem * 16);
+    const lost = variant === "lost" && name === "text-4xl";
+    const cls = ["col", name === "text-base" ? "col--body" : "", lost ? "col--lost" : ""].filter(Boolean).join(" ");
+    const label = lost ? "404<br>not found" : `${name.replace("text-", "")}<br>${px}px`;
+    return `<div class="${cls}" style="--h:${h}%;--i:${i}"><span>${label}</span></div>`;
+  }).join("");
+  return `<div class="cols${variant ? ` cols--${variant}` : ""}" aria-hidden="true">${cols}</div>`;
+}
+
 function inlineArt(text) {
-  return text.replace(/\{\{art:([\w-]+)\}\}/g, (all, name) =>
-    readFileSync(join(ROOT, "assets/art", `${name}.svg`), "utf-8")
-      .trim()
-      .replace(/^<svg ([^>]*?) width="\d+" height="\d+"/, `<svg class="art art--${name}" aria-hidden="true" focusable="false" $1`),
-  );
+  return text.replace(/\{\{scale(?::([\w-]+))?\}\}/g, (all, variant) => scaleArt(variant));
 }
 
 let count = 0;

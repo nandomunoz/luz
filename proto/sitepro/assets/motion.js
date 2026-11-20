@@ -60,27 +60,26 @@
   root.classList.add("motion");
   const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  /* ---- Split headings into words ---------------------------------------- */
+  /* ---- Ink: a heading darkens letter by letter as it comes into view ---- */
+  // Colour, not motion: it follows the reader's own scroll, and a heading is
+  // fully inked by the time it reaches the middle of the screen.
+  const inked = [];
   for (const el of document.querySelectorAll("[data-split]")) {
-    let i = 0;
+    const chars = [];
     const walk = (node) => {
       for (const child of [...node.childNodes]) {
         if (child.nodeType === Node.TEXT_NODE) {
-          const parts = child.textContent.split(/(\s+)/);
           const frag = document.createDocumentFragment();
-          for (const part of parts) {
-            if (!part) continue;
-            if (/^\s+$/.test(part)) {
-              frag.append(part);
+          for (const ch of child.textContent) {
+            if (/\s/.test(ch)) {
+              frag.append(ch);
               continue;
             }
-            const outer = document.createElement("span");
-            outer.className = "w";
-            const inner = document.createElement("span");
-            inner.style.setProperty("--wi", i++);
-            inner.textContent = part;
-            outer.append(inner);
-            frag.append(outer);
+            const span = document.createElement("span");
+            span.className = "ch";
+            span.textContent = ch;
+            chars.push(span);
+            frag.append(span);
           }
           child.replaceWith(frag);
         } else if (child.nodeType === Node.ELEMENT_NODE) {
@@ -89,7 +88,26 @@
       }
     };
     walk(el);
+    el.setAttribute("aria-label", el.textContent.replace(/\s+/g, " ").trim());
+    inked.push({ el, chars, lit: 0 });
   }
+  let inkFrame = 0;
+  const ink = () => {
+    inkFrame = 0;
+    const vh = innerHeight;
+    for (const item of inked) {
+      const rect = item.el.getBoundingClientRect();
+      const p = Math.min(1, Math.max(0, (vh * 0.95 - rect.top) / (vh * 0.4 + rect.height)));
+      const lit = Math.round(p * item.chars.length);
+      if (lit === item.lit) continue;
+      const [from, to] = lit > item.lit ? [item.lit, lit] : [lit, item.lit];
+      for (let i = from; i < to; i++) item.chars[i].classList.toggle("on", i < lit);
+      item.lit = lit;
+    }
+  };
+  addEventListener("scroll", () => (inkFrame ||= requestAnimationFrame(ink)), { passive: true });
+  addEventListener("resize", () => (inkFrame ||= requestAnimationFrame(ink)));
+  ink();
 
   /* ---- Stagger the children of a group ---------------------------------- */
   for (const group of document.querySelectorAll("[data-stagger]")) {
