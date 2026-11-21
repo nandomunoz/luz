@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en" class="static">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LUZ: plain HTML is enough</title>
+<meta name="description" content="LUZ is a design system in plain HTML, CSS and ES modules. Light, Usable and Zero-dependency. Version 0.4.1, beta, MIT.">
+<meta name="color-scheme" content="dark">
+<link rel="preload" href="../../../../packages/tokens/fonts/serif/ETBook-Roman.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="style.css">
+<script>if (!matchMedia("(prefers-reduced-motion: reduce)").matches) document.documentElement.className = "morph";</script>
+<script type="module" src="main.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="top">
+  <a class="brand" href="./" aria-label="LUZ home"><span class="brand__mark" aria-hidden="true">&lt;/&gt;</span><span>luz</span></a>
+  <span class="top__ver">0.4.1 <span>beta</span></span>
+  <nav class="top__nav" aria-label="Main">
+    <a href="../../docs/index.html">Docs</a>
+    <a href="../../docs/get-started.html">Get started</a>
+  </nav>
+  <button class="flip" type="button" data-flip hidden><span class="flip__dot" aria-hidden="true"></span><span class="flip__label">View source</span></button>
+</header>
+
+<main id="main">
+
+  <!-- 1. The page is its own source -->
+  <section class="ch ch--hero" id="top" data-ch="hero" data-file="index.html" aria-labelledby="hero-h">
+    <div class="stage">
+      <div class="win">
+        <div class="win__bar" aria-hidden="true">
+          <span class="dots"><i></i><i></i><i></i></span>
+          <span class="tab">index.html</span>
+          <span class="pill"><span class="pill__label">source</span> <span class="pill__pct">0%</span></span>
+        </div>
+        <div class="win__body">
+          <div class="paper" aria-hidden="true"></div>
+          <pre class="src src--hero" aria-hidden="true" style="counter-reset: ln 0; --cols: 45; --rows: 16"><code><span class="ln"><span class="lc"><span class="tg p">&lt;</span><span class="tg tn">!doctype</span> <span class="tg an">html</span><span class="tg p">&gt;</span></span></span><span class="ln"><span class="lc"><span class="tg p">&lt;</span><span class="tg tn">html</span> <span class="tg an">lang</span><span class="tg p">=</span><span class="tg av">"en"</span><span class="tg p">&gt;</span></span></span><span class="ln"><span class="lc"><span class="tg p">&lt;</span><span class="tg tn">link</span> <span class="tg an">rel</span><span class="tg p">=</span><span class="tg av">"stylesheet"</span> <span class="tg an">href</span><span class="tg p">=</span><span class="tg av">"luz.css"</span><span class="tg p">&gt;</span></span></span><span class="ln"><span class="lc"> </span></span><span class="ln"><span class="lc"><span class="tg p">&lt;</span><span class="tg tn">main</span><span class="tg p">&gt;</span></span></span><span class="ln" data-k="ver"><span class="lc">  <span class="tg p">&lt;</span><span class="tg tn">p</span><span class="tg p">&gt;</span><span class="tx">v0.4.1 · beta · MIT</span><span class="tg p">&lt;/</span><span class="tg tn">p</span><span class="tg p">&gt;</span></span></span><span class="ln" data-k="h1"><span class="lc">  <span class="tg p">&lt;</span><span class="tg tn">h1</span><span class="tg p">&gt;</span><span class="tx">Plain HTML</span></span></span><span class="ln" data-k="h1"><span class="lc">      <span class="tx">is enough.</span><span class="tg p">&lt;/</span><span class="tg tn">h1</span><span class="tg p">&gt;</span></span></span><span class="ln" data-k="lead"><span class="lc">  <span class="tg p">&lt;</span><span class="tg tn">p</span><span class="tg p">&gt;</span><span class="tx">LUZ is a design system</span></span></span><span class="ln" data-k="lead"><span class="lc">     <span class="tx">in plain HTML, CSS and</span></span></span><span class="ln" data-k="lead"><span class="lc">     <span class="tx">ES modules.</span><span class="tg p">&lt;/</span><span class="tg tn">p</span><span class="tg p">&gt;</span></span></span><span class="ln" data-k="luz"><span class="lc">  <span class="tg p">&lt;</span><span class="tg tn">p</span><span class="tg p">&gt;</span><span class="tx">Light, Usable and</span></span></span><span class="ln" data-k="luz"><span class="lc">     <span class="tx">Zero-dependency.</span><span class="tg p">&lt;/</span><span class="tg tn">p</span><span class="tg p">&gt;</span></span></span><span class="ln" data-k="cta1"><span class="lc">  <span class="tg p">&lt;</span><span class="tg tn">a</span> <span class="tg an">href</span><span class="tg p">=</span><span class="tg av">"get-started"</span><span class="tg p">&gt;</span><span class="tx">Get started</span><span class="tg p">&lt;/</span><span class="tg tn">a</span><span class="tg p">&gt;</span></span></span><span class="ln" data-k="cta2"><span class="lc">  <span class="tg p">&lt;</span><span class="tg tn">a</span> <span class="tg an">href</span><span class="tg p">=</span><span class="tg av">"docs"</span><span class="tg p">&gt;</span><span class="tx">Read the docs</span><span class="tg p">&lt;/</span><span class="tg tn">a</span><span class="tg p">&gt;</span></span></span><span class="ln"><span class="lc"><span class="tg p">&lt;/</span><span class="tg tn">main</span><span class="tg p">&gt;</span></span></span></code></pre>
+          <div class="out out--hero">
+            <p class="hero__eyebrow" data-from="ver">v0.4.1 · beta · MIT</p>
+            <h1 id="hero-h" data-from="h1">Plain HTML is&nbsp;enough.<span class="caret" aria-hidden="true"></span></h1>
+            <p class="hero__lead" data-from="lead">LUZ is a design system in plain HTML, CSS and ES modules.</p>
+            <p class="hero__luz" data-from="luz"><b>L</b>ight, <b>U</b>sable and <b>Z</b>ero-dependency.</p>
+            <p class="hero__ctas">
+              <a class="btn btn--primary" data-from="cta1" href="../../docs/get-started.html">Get started</a>
+              <a class="btn" data-from="cta2" href="../../docs/index.html">Read the docs</a>
+            </p>
+          </div>
+        </div>
+      </div>
+      <p class="hint" aria-hidden="true"><span>Scroll to render</span> <i></i></p>
+    </div>
+  </section>
+
+  <!-- 2. Bare elements -->
+  <section class="ch ch--el" id="elements" data-ch="el" data-file="index.html" aria-labelledby="el-h">
+    <div class="stage">
+      <div class="intro">
+        <p class="eyebrow">@luz-ds/core · elements</p>
+        <h2 id="el-h">Write the element. That is the API.</h2>
+        <p>A bare button, table or dialog comes out finished: no class, no attribute. Layout objects and 29 components add the rest, with optional JavaScript.</p>
+        <p class="intro__meta"><span>11.5 KB</span> ceiling, min+gzip</p>
+      </div>
+      <div class="win">
+        <div class="win__bar" aria-hidden="true">
+          <span class="dots"><i></i><i></i><i></i></span>
+          <span class="tab">index.html</span>
+          <span class="pill"><span class="pill__label">source</span> <span class="pill__pct">0%</span></span>
+        </div>
+        <div class="win__body">
+          <div class="paper" aria-hidden="true"></div>
+          <pre class="src" aria-hidden="true" style="counter-reset: ln 16; --cols: 49; --rows: 17"><code><span class="ln"><span class="lc"><span class="tg p">&lt;</span><span class="tg tn">form</span><span class="tg p">&gt;</span></span></span><span class="ln" data-k="lab"><span class="lc">  <span class="tg p">&lt;</span><span class="tg tn">label</span> <span class="tg an">for</span><span class="tg p">=</span><span class="tg av">"email"</span><span class="tg p">&gt;</span><span class="tx">Email</span><span class="tg p">&lt;/</span><span class="tg tn">label</span><span class="tg p">&gt;</span></span></span><span class="ln" data-k="inp"><span class="lc">  <span class="tg p">&lt;</span><span class="tg tn">input</span> <span class="tg an">id</span><span class="tg p">=</span><span class="tg av">"email"</span> <span class="tg an">type</span><span class="tg p">=</span><span class="tg av">"email"</span><span class="tg p">&gt;</span></span></span><span class="ln" data-k="b1"><span class="lc">  <span class="tg p">&lt;</span><span class="tg tn">button</span><span class="tg p">&gt;</span><span class="tx">Subscribe</span><span class="tg p">&lt;/</span><span class="tg tn">button</span><span class="tg p">&gt;</span></span></span><span class="ln" data-k="b2"><span class="lc">  <span class="tg p">&lt;</span><span class="tg tn">button</span> <span class="tg an">type</span><span class="tg p">=</span><span class="tg av">"reset"</span><span class="tg p">&gt;</span><span class="tx">Clear</span><span class="tg p">&lt;/</span><span class="tg tn">button</span><span class="tg p">&gt;</span></span></span><span class="ln"><span class="lc"><span class="tg p">&lt;/</span><span class="tg tn">form</span><span class="tg p">&gt;</span></span></span><span class="ln"><span class="lc"> </span></span><span class="ln" data-k="tbl"><span class="lc"><span class="tg p">&lt;</span><span class="tg tn">table</span><span class="tg p">&gt;</span></span></span><span class="ln" data-k="tbl"><span class="lc">  <span class="tg p">&lt;</span><span class="tg tn">tr</span><span class="tg p">&gt;</span><span class="tg p">&lt;</span><span class="tg tn">th</span><span class="tg p">&gt;</span><span class="tx">Package</span><span class="tg p">&lt;/</span><span class="tg tn">th</span><span class="tg p">&gt;</span><span class="tg p">&lt;</span><span class="tg tn">th</span><span class="tg p">&gt;</span><span class="tx">Ceiling</span><span class="tg p">&lt;/</span><span class="tg tn">th</span><span class="tg p">&gt;</span><span class="tg p">&lt;/</span><span class="tg tn">tr</span><span class="tg p">&gt;</span></span></span><span class="ln" data-k="tbl"><span class="lc">  <span class="tg p">&lt;</span><span class="tg tn">tr</span><span class="tg p">&gt;</span><span class="tg p">&lt;</span><span class="tg tn">td</span><span class="tg p">&gt;</span><span class="tx">tokens</span><span class="tg p">&lt;/</span><span class="tg tn">td</span><span class="tg p">&gt;</span><span class="tg p">&lt;</span><span class="tg tn">td</span><span class="tg p">&gt;</span><span class="tx">5 KB</span><span class="tg p">&lt;/</span><span class="tg tn">td</span><span class="tg p">&gt;</span><span class="tg p">&lt;/</span><span class="tg tn">tr</span><span class="tg p">&gt;</span></span></span><span class="ln" data-k="tbl"><span class="lc">  <span class="tg p">&lt;</span><span class="tg tn">tr</span><span class="tg p">&gt;</span><span class="tg p">&lt;</span><span class="tg tn">td</span><span class="tg p">&gt;</span><span class="tx">core</span><span class="tg p">&lt;/</span><span class="tg tn">td</span><span class="tg p">&gt;</span><span class="tg p">&lt;</span><span class="tg tn">td</span><span class="tg p">&gt;</span><span class="tx">11.5 KB</span><span class="tg p">&lt;/</span><span class="tg tn">td</span><span class="tg p">&gt;</span><span class="tg p">&lt;/</span><span class="tg tn">tr</span><span class="tg p">&gt;</span></span></span><span class="ln" data-k="tbl"><span class="lc"><span class="tg p">&lt;/</span><span class="tg tn">table</span><span class="tg p">&gt;</span></span></span><span class="ln"><span class="lc"> </span></span><span class="ln" data-k="dlg"><span class="lc"><span class="tg p">&lt;</span><span class="tg tn">dialog</span> <span class="tg an">open</span><span class="tg p">&gt;</span></span></span><span class="ln" data-k="dlg"><span class="lc">  <span class="tg p">&lt;</span><span class="tg tn">p</span><span class="tg p">&gt;</span><span class="tx">Saved. No class needed.</span><span class="tg p">&lt;/</span><span class="tg tn">p</span><span class="tg p">&gt;</span></span></span><span class="ln" data-k="dlg"><span class="lc">  <span class="tg p">&lt;</span><span class="tg tn">button</span><span class="tg p">&gt;</span><span class="tx">OK</span><span class="tg p">&lt;/</span><span class="tg tn">button</span><span class="tg p">&gt;</span></span></span><span class="ln" data-k="dlg"><span class="lc"><span class="tg p">&lt;/</span><span class="tg tn">dialog</span><span class="tg p">&gt;</span></span></span></code></pre>
+          <div class="out out--el">
+            <form class="el-form" action="#elements" data-demo>
+              <label for="demo-email" data-from="lab">Email</label>
+              <input id="demo-email" type="email" required autocomplete="email" placeholder="you@example.com" data-from="inp">
+              <span class="el-row"><button data-from="b1">Subscribe</button> <button type="reset" data-from="b2">Clear</button></span>
+            </form>
+            <table class="el-table" data-from="tbl">
+              <caption>Ceilings, min+gzip</caption>
+              <tr><th scope="col">Package</th><th scope="col">Ceiling</th></tr>
+              <tr><td>tokens</td><td>5 KB</td></tr>
+              <tr><td>core</td><td>11.5 KB</td></tr>
+            </table>
+            <div class="el-scrim" aria-hidden="true" data-fade></div>
+            <dialog open class="el-dlg" data-from="dlg" aria-labelledby="dlg-t">
+              <form method="dialog"><p id="dlg-t">Saved. No class needed.</p><button>OK</button></form>
+            </dialog>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. Three packages, three build steps -->
+  <section class="ch ch--build" id="build" data-ch="build" data-file="page.html" aria-labelledby="build-h">
+    <div class="stage">
+      <div class="intro">
+        <p class="eyebrow">Three packages that stack</p>
+        <h2 id="build-h">Same markup. Three build steps.</h2>
+        <ol class="steps">
+          <li data-step="1"><span class="steps__n" aria-hidden="true">01</span><h3>@luz-ds/tokens</h3><p>Design tokens as CSS custom properties, in three colour modes: light, dark and high contrast. 5 KB ceiling.</p></li>
+          <li data-step="2"><span class="steps__n" aria-hidden="true">02</span><h3>@luz-ds/core</h3><p>Bare HTML elements styled with no class, layout objects and 29 components. Optional JS. 11.5 KB ceiling.</p></li>
+          <li data-step="3"><span class="steps__n" aria-hidden="true">03</span><h3>@luz-ds/catalog</h3><p>41 site-wide pieces and page patterns for landing, blog, app and docs sites. One stylesheet each, no bundle.</p></li>
+        </ol>
+      </div>
+      <div class="win win--build">
+        <div class="win__bar" aria-hidden="true">
+          <span class="dots"><i></i><i></i><i></i></span>
+          <span class="tab">page.html</span>
+          <span class="pipe"><b data-p="1">tokens</b><b data-p="2">core</b><b data-p="3">catalog</b><span class="pipe__bar"><span></span></span></span>
+        </div>
+        <div class="win__body split">
+          <pre class="src src--build" aria-hidden="true" style="counter-reset: ln 0; --cols: 63; --rows: 23"><code><span class="ln"><span class="lc"><span class="tg p">&lt;</span><span class="tg tn">head</span><span class="tg p">&gt;</span></span></span><span class="ln" data-step="1"><span class="lc alt"><span class="a0">  <span class="tg cm">&lt;!-- 01 tokens: not linked yet --&gt;</span></span><span class="a1">  <span class="tg p">&lt;</span><span class="tg tn">link</span> <span class="tg an">rel</span><span class="tg p">=</span><span class="tg av">"stylesheet"</span> <span class="tg an">href</span><span class="tg p">=</span><span class="tg av">"tokens.css"</span><span class="tg p">&gt;</span></span></span></span><span class="ln" data-step="2"><span class="lc alt"><span class="a0">  <span class="tg cm">&lt;!-- 02 core: not linked yet --&gt;</span></span><span class="a1">  <span class="tg p">&lt;</span><span class="tg tn">link</span> <span class="tg an">rel</span><span class="tg p">=</span><span class="tg av">"stylesheet"</span> <span class="tg an">href</span><span class="tg p">=</span><span class="tg av">"luz.css"</span><span class="tg p">&gt;</span></span></span></span><span class="ln" data-step="3"><span class="lc alt"><span class="a0">  <span class="tg cm">&lt;!-- 03 catalog: not linked yet --&gt;</span></span><span class="a1">  <span class="tg p">&lt;</span><span class="tg tn">link</span> <span class="tg an">rel</span><span class="tg p">=</span><span class="tg av">"stylesheet"</span> <span class="tg an">href</span><span class="tg p">=</span><span class="tg av">"site-header.css"</span><span class="tg p">&gt;</span></span></span></span><span class="ln" data-step="3"><span class="lc alt"><span class="a0">  </span><span class="a1">  <span class="tg p">&lt;</span><span class="tg tn">link</span> <span class="tg an">rel</span><span class="tg p">=</span><span class="tg av">"stylesheet"</span> <span class="tg an">href</span><span class="tg p">=</span><span class="tg av">"hero.css"</span><span class="tg p">&gt;</span></span></span></span><span class="ln" data-step="3"><span class="lc alt"><span class="a0">  </span><span class="a1">  <span class="tg p">&lt;</span><span class="tg tn">link</span> <span class="tg an">rel</span><span class="tg p">=</span><span class="tg av">"stylesheet"</span> <span class="tg an">href</span><span class="tg p">=</span><span class="tg av">"site-footer.css"</span><span class="tg p">&gt;</span></span></span></span><span class="ln"><span class="lc"><span class="tg p">&lt;/</span><span class="tg tn">head</span><span class="tg p">&gt;</span></span></span><span class="ln" data-step="3"><span class="lc alt"><span class="a0"><span class="tg p">&lt;</span><span class="tg tn">header</span><span class="tg p">&gt;</span></span><span class="a1"><span class="tg p">&lt;</span><span class="tg tn">header</span> <span class="tg an">class</span><span class="tg p">=</span><span class="tg av">"luz-site-header"</span><span class="tg p">&gt;</span></span></span></span><span class="ln"><span class="lc">  <span class="tg p">&lt;</span><span class="tg tn">strong</span><span class="tg p">&gt;</span><span class="tx">Harbor</span><span class="tg p">&lt;/</span><span class="tg tn">strong</span><span class="tg p">&gt;</span></span></span><span class="ln"><span class="lc">  <span class="tg p">&lt;</span><span class="tg tn">nav</span><span class="tg p">&gt;</span><span class="tg p">&lt;</span><span class="tg tn">a</span> <span class="tg an">href</span><span class="tg p">=</span><span class="tg av">"#"</span><span class="tg p">&gt;</span><span class="tx">Docs</span><span class="tg p">&lt;/</span><span class="tg tn">a</span><span class="tg p">&gt;</span> <span class="tg p">&lt;</span><span class="tg tn">a</span> <span class="tg an">href</span><span class="tg p">=</span><span class="tg av">"#"</span><span class="tg p">&gt;</span><span class="tx">Pricing</span><span class="tg p">&lt;/</span><span class="tg tn">a</span><span class="tg p">&gt;</span><span class="tg p">&lt;/</span><span class="tg tn">nav</span><span class="tg p">&gt;</span></span></span><span class="ln"><span class="lc"><span class="tg p">&lt;/</span><span class="tg tn">header</span><span class="tg p">&gt;</span></span></span><span class="ln" data-step="3"><span class="lc alt"><span class="a0"><span class="tg p">&lt;</span><span class="tg tn">section</span><span class="tg p">&gt;</span></span><span class="a1"><span class="tg p">&lt;</span><span class="tg tn">section</span> <span class="tg an">class</span><span class="tg p">=</span><span class="tg av">"luz-hero"</span><span class="tg p">&gt;</span></span></span></span><span class="ln"><span class="lc">  <span class="tg p">&lt;</span><span class="tg tn">h1</span><span class="tg p">&gt;</span><span class="tx">Ship calm software.</span><span class="tg p">&lt;/</span><span class="tg tn">h1</span><span class="tg p">&gt;</span></span></span><span class="ln"><span class="lc">  <span class="tg p">&lt;</span><span class="tg tn">p</span><span class="tg p">&gt;</span><span class="tx">A small tool for small teams.</span><span class="tg p">&lt;/</span><span class="tg tn">p</span><span class="tg p">&gt;</span></span></span><span class="ln"><span class="lc">  <span class="tg p">&lt;</span><span class="tg tn">input</span> <span class="tg an">type</span><span class="tg p">=</span><span class="tg av">"email"</span> <span class="tg an">placeholder</span><span class="tg p">=</span><span class="tg av">"you@team.com"</span><span class="tg p">&gt;</span></span></span><span class="ln"><span class="lc">  <span class="tg p">&lt;</span><span class="tg tn">button</span><span class="tg p">&gt;</span><span class="tx">Join the beta</span><span class="tg p">&lt;/</span><span class="tg tn">button</span><span class="tg p">&gt;</span></span></span><span class="ln"><span class="lc"><span class="tg p">&lt;/</span><span class="tg tn">section</span><span class="tg p">&gt;</span></span></span><span class="ln"><span class="lc"><span class="tg p">&lt;</span><span class="tg tn">ul</span><span class="tg p">&gt;</span></span></span><span class="ln"><span class="lc">  <span class="tg p">&lt;</span><span class="tg tn">li</span><span class="tg p">&gt;</span><span class="tx">Fast</span><span class="tg p">&lt;/</span><span class="tg tn">li</span><span class="tg p">&gt;</span> <span class="tg p">&lt;</span><span class="tg tn">li</span><span class="tg p">&gt;</span><span class="tx">Quiet</span><span class="tg p">&lt;/</span><span class="tg tn">li</span><span class="tg p">&gt;</span> <span class="tg p">&lt;</span><span class="tg tn">li</span><span class="tg p">&gt;</span><span class="tx">Yours</span><span class="tg p">&lt;/</span><span class="tg tn">li</span><span class="tg p">&gt;</span></span></span><span class="ln"><span class="lc"><span class="tg p">&lt;/</span><span class="tg tn">ul</span><span class="tg p">&gt;</span></span></span><span class="ln" data-step="3"><span class="lc alt"><span class="a0"><span class="tg p">&lt;</span><span class="tg tn">footer</span><span class="tg p">&gt;</span></span><span class="a1"><span class="tg p">&lt;</span><span class="tg tn">footer</span> <span class="tg an">class</span><span class="tg p">=</span><span class="tg av">"luz-site-footer"</span><span class="tg p">&gt;</span></span></span></span><span class="ln"><span class="lc">  <span class="tg p">&lt;</span><span class="tg tn">p</span><span class="tg p">&gt;</span><span class="tx">© 2026 Harbor</span><span class="tg p">&lt;/</span><span class="tg tn">p</span><span class="tg p">&gt;</span></span></span><span class="ln"><span class="lc"><span class="tg p">&lt;/</span><span class="tg tn">footer</span><span class="tg p">&gt;</span></span></span></code></pre>
+          <div class="pv" aria-hidden="true" inert>
+            
+    <div class="layer l0">
+      <div class="mp">
+        <header class="mp__head"><strong>Harbor</strong> <nav><a href="#">Docs</a> <a href="#">Pricing</a></nav></header>
+        <section class="mp__hero"><div class="mp__h">Ship calm software.</div><p>A small tool for small teams.</p><p class="mp__form"><input type="email" placeholder="you@team.com" tabindex="-1"> <button tabindex="-1">Join the beta</button></p></section>
+        <ul class="mp__list"><li>Fast</li> <li>Quiet</li> <li>Yours</li></ul>
+        <footer class="mp__foot"><p>© 2026 Harbor</p></footer>
+      </div>
+      <div class="scanline"></div>
+    </div>
+    <div class="layer l1">
+      <div class="mp">
+        <header class="mp__head"><strong>Harbor</strong> <nav><a href="#">Docs</a> <a href="#">Pricing</a></nav></header>
+        <section class="mp__hero"><div class="mp__h">Ship calm software.</div><p>A small tool for small teams.</p><p class="mp__form"><input type="email" placeholder="you@team.com" tabindex="-1"> <button tabindex="-1">Join the beta</button></p></section>
+        <ul class="mp__list"><li>Fast</li> <li>Quiet</li> <li>Yours</li></ul>
+        <footer class="mp__foot"><p>© 2026 Harbor</p></footer>
+      </div>
+      <div class="tray">
+        <p class="tray__t">:root</p>
+        <span class="chip" data-a="drop" style="--c:#fbf8f2"><i></i>--luz-surface-page</span>
+        <span class="chip" data-a="drop" style="--c:#231c16"><i></i>--luz-text-primary</span>
+        <span class="chip" data-a="drop" style="--c:#2365a6"><i></i>--luz-brand-primary</span>
+        <span class="chip" data-a="drop" style="--c:#e3d4b8"><i></i>--luz-divider</span>
+        <span class="modes" data-a="drop"><b class="m-l">Aa</b><b class="m-d">Aa</b><b class="m-h">Aa</b></span>
+      </div>
+      <div class="scanline"></div>
+    </div>
+    <div class="layer l2">
+      <div class="mp">
+        <header class="mp__head" data-a="pop"><strong>Harbor</strong> <nav><a href="#">Docs</a> <a href="#">Pricing</a></nav></header>
+        <section class="mp__hero" data-a="pop"><div class="mp__h">Ship calm software.</div><p>A small tool for small teams.</p><p class="mp__form"><input type="email" placeholder="you@team.com" tabindex="-1"> <button tabindex="-1">Join the beta</button></p></section>
+        <ul class="mp__list" data-a="up"><li>Fast</li> <li>Quiet</li> <li>Yours</li></ul>
+        <footer class="mp__foot" data-a="up"><p>© 2026 Harbor</p></footer>
+      </div>
+      <div class="scanline"></div>
+    </div>
+    <div class="layer l3">
+      <div class="mp">
+        <header class="mp__head" data-a="down"><strong>Harbor</strong> <nav><a href="#">Docs</a> <a href="#">Pricing</a></nav></header>
+        <section class="mp__hero" data-a="pop"><div class="mp__h">Ship calm software.</div><p>A small tool for small teams.</p><p class="mp__form"><input type="email" placeholder="you@team.com" tabindex="-1"> <button tabindex="-1">Join the beta</button></p></section>
+        <ul class="mp__list" data-a="up"><li>Fast</li> <li>Quiet</li> <li>Yours</li></ul>
+        <footer class="mp__foot" data-a="up"><p>© 2026 Harbor</p></footer>
+      </div>
+      <div class="scanline"></div>
+    </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. Two views -->
+  <section class="views" id="views" aria-labelledby="views-h">
+    <p class="eyebrow">Midway check</p>
+    <h2 id="views-h">Same file. Two views.</h2>
+    <p class="views__lead"><span class="if-morph">Everything on this page is plain HTML. Flip it and read the markup underneath.</span><span class="if-static">Everything on this page is plain HTML: each result above sits next to the markup that made it.</span></p>
+    <button class="flip flip--big" type="button" data-flip hidden><span class="flip__dot" aria-hidden="true"></span><span class="flip__label">View source</span></button>
+  </section>
+
+  <!-- 5. Facts -->
+  <section class="facts" id="facts" aria-labelledby="facts-h">
+    <p class="eyebrow">The short version</p>
+    <h2 id="facts-h">What you get. What you do not.</h2>
+    <dl class="facts__grid">
+      <div class="fact"><dt>Runtime dependencies</dt><dd><span class="fact__big">0</span> Nothing to install at runtime. Nothing to audit later.</dd></div>
+      <div class="fact"><dt>JavaScript off</dt><dd><span class="fact__big">Works</span> Scripts only enhance what the browser already does.</dd></div>
+      <div class="fact"><dt>Accessibility</dt><dd><span class="fact__big">WCAG 2.2 AA</span> The baseline, not the stretch goal.</dd></div>
+      <div class="fact"><dt>Tests</dt><dd><span class="fact__big">Red first</span> Every change starts with a failing test.</dd></div>
+      <div class="fact"><dt>Weight ceilings</dt><dd><span class="fact__big">5 + 11.5 KB</span> Tokens and core, min+gzip.</dd></div>
+      <div class="fact"><dt>Licence</dt><dd><span class="fact__big">MIT</span> Version 0.4.1, in beta.</dd></div>
+    </dl>
+  </section>
+
+  <!-- 6. Setup -->
+  <section class="setup" id="setup" aria-labelledby="setup-h">
+    <p class="eyebrow">Setup</p>
+    <h2 id="setup-h">One command to start.</h2>
+    <div class="term">
+      <div class="term__bar" aria-hidden="true"><span class="dots"><i></i><i></i><i></i></span><span>terminal</span></div>
+      <div class="term__body">
+        <div class="term__row">
+          <code><span class="term__ps" aria-hidden="true">$ </span><span class="term__cmd" id="cmd-create">npm create @luz-ds@0.4.1</span></code>
+          <button class="copy" type="button" data-copy="cmd-create" aria-label="Copy npm create @luz-ds@0.4.1">Copy</button>
+        </div>
+        <p class="term__note"># A proposed setup command for 0.4.1.</p>
+        <div class="term__row">
+          <code><span class="term__ps" aria-hidden="true">$ </span><span class="term__cmd" id="cmd-check">npx @luz-ds/check</span></code>
+          <button class="copy" type="button" data-copy="cmd-check" aria-label="Copy npx @luz-ds/check">Copy</button>
+        </div>
+        <p class="term__note"># Reads your HTML and CSS, offline.</p>
+      </div>
+    </div>
+    <p class="setup__ctas">
+      <a class="btn btn--primary btn--dark" href="../../docs/get-started.html">Get started</a>
+      <a class="btn btn--ghost" href="../../docs/index.html">Read the docs</a>
+    </p>
+  </section>
+
+</main>
+
+<footer class="foot">
+  <p class="foot__word" aria-hidden="true">&lt;luz&gt;</p>
+  <p>Light, Usable and Zero-dependency. A design system in plain HTML, CSS and ES modules.</p>
+  <p class="foot__meta">Version 0.4.1 · beta · MIT</p>
+  <nav aria-label="Footer"><a href="../../docs/index.html">Docs</a> <a href="../../docs/get-started.html">Get started</a></nav>
+</footer>
+
+<div class="mini" aria-hidden="true"><div class="mini__doc"></div><div class="mini__view"></div></div>
+<div class="status" aria-hidden="true">
+  <span class="status__file"><i></i><span data-s="file">index.html</span></span>
+  <span data-s="ln">Ln 1–17</span>
+  <span class="status__gap"></span>
+  <span class="status__lang">HTML · UTF-8</span>
+  <span class="status__r"><span data-s="mode">rendered</span> <span data-s="pct">0%</span></span>
+</div>
+<div class="scan" aria-hidden="true"></div>
+<p class="sr-only" id="live" aria-live="polite"></p>
+</body>
+</html>

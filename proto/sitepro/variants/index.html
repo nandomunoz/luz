@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LUZ home: five variants</title>
+<meta name="robots" content="noindex">
+<style>
+  @font-face {
+    font-family: "ET Book";
+    font-weight: 400;
+    font-display: swap;
+    src: url("../../../packages/tokens/fonts/serif/ETBook-Roman.woff2") format("woff2");
+  }
+
+  @font-face {
+    font-family: "ET Book";
+    font-style: italic;
+    font-weight: 400;
+    font-display: swap;
+    src: url("../../../packages/tokens/fonts/serif/ETBook-Italic.woff2") format("woff2");
+  }
+
+  :root {
+    --paper: #eeeeec;
+    --ink: #141414;
+    --ink-3: #5e5e5b;
+    --line: rgb(20 20 20 / 14%);
+    --blue: #2f55ff;
+    --mono: ui-monospace, "SF Mono", menlo, consolas, monospace;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "ET Book", georgia, serif;
+    font-size: 1.1875rem;
+    line-height: 1.5;
+  }
+
+  main {
+    max-width: 72rem;
+    margin-inline: auto;
+    padding: clamp(3rem, 8vw, 6rem) clamp(1rem, 4vw, 3rem);
+  }
+
+  .label {
+    margin: 0;
+    font-family: var(--mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  h1 {
+    margin: 1rem 0 0.75rem;
+    font-size: clamp(2.75rem, 1.5rem + 5vw, 5.5rem);
+    font-weight: 400;
+    line-height: 0.95;
+    letter-spacing: -0.035em;
+  }
+
+  h1 em {
+    color: var(--ink-3);
+  }
+
+  main > p {
+    max-width: 34rem;
+    color: #3d3d3b;
+  }
+
+  ol {
+    margin: 3rem 0 0;
+    padding: 0;
+    list-style: none;
+    border-block-start: 1px solid var(--ink);
+  }
+
+  a {
+    display: grid;
+    grid-template-columns: 3rem minmax(0, 1fr) auto;
+    gap: 0.25rem 1.5rem;
+    align-items: baseline;
+    padding-block: 1.4rem;
+    border-block-end: 1px solid var(--line);
+    color: inherit;
+    text-decoration: none;
+  }
+
+  a:hover strong,
+  a:focus-visible strong {
+    text-decoration: underline;
+    text-decoration-color: var(--blue);
+    text-underline-offset: 0.15em;
+  }
+
+  a:focus-visible {
+    outline: 2px solid var(--blue);
+    outline-offset: 4px;
+  }
+
+  .n {
+    font-family: var(--mono);
+    font-size: 1rem;
+    color: var(--blue);
+  }
+
+  strong {
+    font-size: clamp(1.75rem, 1.2rem + 1.6vw, 2.5rem);
+    font-weight: 400;
+    letter-spacing: -0.02em;
+  }
+
+  span.d {
+    grid-column: 2;
+    color: var(--ink-3);
+    font-size: 1.0625rem;
+  }
+
+  span.t {
+    grid-row: 1;
+    grid-column: 3;
+    font-family: var(--mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  footer {
+    margin-block-start: 3rem;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--ink-3);
+  }
+
+  footer a {
+    display: inline;
+    padding: 0;
+    border: 0;
+    text-decoration: underline;
+  }
+</style>
+</head>
+<body>
+<main>
+  <p class="label">Proto · sitepro · Home only</p>
+  <h1>Five homes. <em>Nothing in common.</em></h1>
+  <p>Five experiments for the home page of LUZ, each with its own idea, motion and scroll. Each one is a single folder, vanilla HTML, CSS and JavaScript, with no library.</p>
+  <ol>
+    <li><a href="1-prism/"><span class="n">01</span><strong>Prism</strong><span class="t">WebGL · 3D</span><span class="d">A glass prism in the dark splits a beam of light into the three packages as you scroll.</span></a></li>
+    <li><a href="2-city/"><span class="n">02</span><strong>City</strong><span class="t">CSS 3D</span><span class="d">An isometric city of components, flown over by a camera on your scroll.</span></a></li>
+    <li><a href="3-darkroom/"><span class="n">03</span><strong>Darkroom</strong><span class="t">Light · mask</span><span class="d">Your pointer is a lamp in a dark room; scroll until dawn and the interface is real.</span></a></li>
+    <li><a href="4-source/"><span class="n">04</span><strong>Source</strong><span class="t">Scroll · morph</span><span class="d">The page starts as its own HTML and renders itself as you read.</span></a></li>
+    <li><a href="5-broadsheet/"><span class="n">05</span><strong>Broadsheet</strong><span class="t">Horizontal · print</span><span class="d">A special edition newspaper, read sideways, with pages that turn.</span></a></li>
+  </ol>
+  <footer>The designed site is at <a href="../index.html">proto/sitepro</a>.</footer>
+</main>
+</body>
+</html>

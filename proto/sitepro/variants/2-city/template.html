@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en" data-mode="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LUZ City</title>
+<meta name="description" content="LUZ is Light, Usable and Zero-dependency: a design system in plain HTML, CSS and ES modules. Three packages that stack: tokens, core and catalog.">
+<meta name="color-scheme" content="light dark">
+<script>
+  (function () {
+    var d = document.documentElement, m = null;
+    d.classList.add("js");
+    try { m = localStorage.getItem("luz-city-mode"); } catch (e) {}
+    if (m !== "light" && m !== "dark" && m !== "contrast") {
+      m = matchMedia("(prefers-contrast: more)").matches ? "contrast"
+        : matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    }
+    d.setAttribute("data-mode", m);
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) d.classList.add("rm");
+  })();
+</script>
+<link rel="preload" href="../../../../packages/tokens/fonts/serif/ETBook-Roman.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="style.css">
+<script type="module" src="main.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="top">
+  <a class="brand" href="#top" aria-label="LUZ, back to the top">
+    <span class="brand__mark" aria-hidden="true"><i></i><i></i><i></i></span>
+    <span class="brand__name">LUZ</span>
+    <span class="brand__ver">0.4.1 beta</span>
+  </a>
+  <nav class="top__nav" aria-label="Main">
+    <a href="../../docs/get-started.html">Get started</a>
+    <a href="../../docs/index.html">Docs</a>
+  </nav>
+  <div class="modes" role="group" aria-label="City lighting (colour mode)">
+    <button type="button" class="modes__btn" data-mode="light" aria-pressed="true">
+      <svg aria-hidden="true" viewBox="0 0 20 20"><circle cx="10" cy="10" r="3.6"/><path d="M10 1.5v2.6M10 15.9v2.6M1.5 10h2.6M15.9 10h2.6M4 4l1.8 1.8M14.2 14.2 16 16M4 16l1.8-1.8M14.2 5.8 16 4"/></svg>
+      <span>Day</span>
+    </button>
+    <button type="button" class="modes__btn" data-mode="dark" aria-pressed="false">
+      <svg aria-hidden="true" viewBox="0 0 20 20"><path d="M15.8 12.6A6.6 6.6 0 0 1 7.4 4.2a6.6 6.6 0 1 0 8.4 8.4Z"/></svg>
+      <span>Night</span>
+    </button>
+    <button type="button" class="modes__btn" data-mode="contrast" aria-pressed="false">
+      <svg aria-hidden="true" viewBox="0 0 20 20"><circle cx="10" cy="10" r="7.2"/><path d="M10 2.8v14.4A7.2 7.2 0 0 0 10 2.8Z" class="fill"/></svg>
+      <span>Contrast</span>
+    </button>
+  </div>
+</header>
+
+<main id="main">
+  <div class="scrolly">
+    <div class="stage" id="stage">
+      <div class="sky" aria-hidden="true"></div>
+      <div class="world" id="world">
+<!-- CITY -->
+      </div>
+      <p class="legend" aria-hidden="true"><span class="legend__bar"></span>Height = stylesheet size, gzipped</p>
+    </div>
+
+    <div class="chapters">
+      <section class="ch ch--hero" id="top" data-cam="0" aria-labelledby="hero-title">
+        <div class="ch__body">
+          <p class="eyebrow"><span class="pill">v0.4.1</span> Beta · MIT · Zero dependencies</p>
+          <h1 id="hero-title" class="hero__title">A design system you can <em>build a city on.</em></h1>
+          <p class="lede"><strong>LUZ</strong> is Light, Usable and Zero-dependency: a design system in plain HTML, CSS and ES modules. Three packages that stack, from the ground up.</p>
+          <div class="cta">
+            <a class="btn btn--primary" href="../../docs/get-started.html">Get started <span aria-hidden="true">→</span></a>
+            <a class="btn" href="../../docs/index.html">Read the docs</a>
+          </div>
+          <div class="cmd">
+            <code id="cmd-create">npm create @luz-ds@0.4.1</code>
+            <button type="button" class="cmd__copy" data-copy="cmd-create">Copy<span class="vh"> the setup command</span></button>
+          </div>
+          <p class="cmd__note">Proposed setup command.<span class="needs-motion"> Scroll to tour the city.</span></p>
+        </div>
+      </section>
+
+      <section class="ch" id="tokens" data-cam="1" aria-labelledby="tokens-title">
+        <div class="ch__body card">
+          <p class="kicker"><span>01</span> The ground</p>
+          <h2 id="tokens-title">Tokens pave every street.</h2>
+          <p><code>@luz-ds/tokens</code> is the design language as CSS custom properties: colour, type, space and motion. Everything else stands on it.</p>
+          <p>Three colour modes ship in the box: light, dark and high contrast.<span class="needs-js"> Relight the city:</span></p>
+          <div class="mode-demo" role="group" aria-label="Try the three colour modes">
+            <button type="button" class="chip" data-mode="light" aria-pressed="true">Light</button>
+            <button type="button" class="chip" data-mode="dark" aria-pressed="false">Dark</button>
+            <button type="button" class="chip" data-mode="contrast" aria-pressed="false">High contrast</button>
+          </div>
+          <dl class="facts">
+            <div><dt>Ceiling</dt><dd>5 KB <small>min+gzip</small></dd></div>
+            <div><dt>Colour modes</dt><dd>3</dd></div>
+          </dl>
+          <p class="note">The paving is the real palette: one row per colour family, one tile per step, raised by its step.</p>
+        </div>
+      </section>
+
+      <section class="ch" id="core" data-cam="2" aria-labelledby="core-title">
+        <div class="ch__body card">
+          <p class="kicker"><span>02</span> The buildings</p>
+          <h2 id="core-title">Write HTML. It already stands.</h2>
+          <p>A <code>&lt;button&gt;</code>, a <code>&lt;table&gt;</code>, a <code>&lt;dialog&gt;</code>: <code>@luz-ds/core</code> styles bare elements with no class, then adds layout objects and components. JavaScript is optional and only enhances what the browser already does.</p>
+          <dl class="facts">
+            <div><dt>Components</dt><dd>29</dd></div>
+            <div><dt>Ceiling</dt><dd>11.5 KB <small>min+gzip</small></dd></div>
+          </dl>
+          <p class="note">Each building is a component. Hover one, or tab into the district and walk it with the arrow keys.</p>
+        </div>
+      </section>
+
+      <section class="ch" id="catalog" data-cam="3" aria-labelledby="catalog-title">
+        <div class="ch__body card">
+          <p class="kicker"><span>03</span> The skyline</p>
+          <h2 id="catalog-title">Raise only the towers you need.</h2>
+          <p><code>@luz-ds/catalog</code> adds the pieces that act for a whole site and the page patterns of landing pages, blogs, apps and docs. One stylesheet each, no bundle: link what you use, after core.</p>
+          <dl class="facts">
+            <div><dt>Pieces</dt><dd>41</dd></div>
+            <div><dt>Bundle</dt><dd>None</dd></div>
+          </dl>
+          <p class="note">Charts, navbar, search, timeline, terminal and more. Every tower is one file.</p>
+        </div>
+      </section>
+
+      <section class="ch" id="rules" data-cam="4" aria-labelledby="rules-title">
+        <div class="ch__body card">
+          <p class="kicker"><span>04</span> Building code</p>
+          <h2 id="rules-title">A city with rules it never bends.</h2>
+          <ul class="rules">
+            <li><b>0</b><span>runtime dependencies. Nothing to audit but the platform.</span></li>
+            <li><b>JS off</b><span>and it still works. Scripts only enhance.</span></li>
+            <li><b>WCAG 2.2 AA</b><span>is the baseline, not the goal.</span></li>
+            <li><b>Red first</b><span>every change starts with a failing test.</span></li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="ch ch--end" id="start" data-cam="5" aria-labelledby="start-title">
+        <div class="ch__body card">
+          <p class="kicker"><span>05</span> Break ground</p>
+          <h2 id="start-title">Your site, on solid ground.</h2>
+          <ol class="steps">
+            <li>
+              <span class="steps__label">Set up a project <small>(proposed)</small></span>
+              <div class="cmd">
+                <code id="cmd-create-2">npm create @luz-ds@0.4.1</code>
+                <button type="button" class="cmd__copy" data-copy="cmd-create-2">Copy<span class="vh"> the setup command</span></button>
+              </div>
+            </li>
+            <li>
+              <span class="steps__label">Check your HTML and CSS, offline</span>
+              <div class="cmd">
+                <code id="cmd-check">npx @luz-ds/check</code>
+                <button type="button" class="cmd__copy" data-copy="cmd-check">Copy<span class="vh"> the check command</span></button>
+              </div>
+            </li>
+          </ol>
+          <div class="cta">
+            <a class="btn btn--primary" href="../../docs/get-started.html">Get started <span aria-hidden="true">→</span></a>
+            <a class="btn" href="../../docs/index.html">Browse the docs</a>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <nav class="map" aria-label="City districts">
+    <ol>
+      <li><a href="#top"><span>Overview</span></a></li>
+      <li><a href="#tokens"><span>Tokens</span></a></li>
+      <li><a href="#core"><span>Core</span></a></li>
+      <li><a href="#catalog"><span>Catalog</span></a></li>
+      <li><a href="#rules"><span>Rules</span></a></li>
+      <li><a href="#start"><span>Start</span></a></li>
+    </ol>
+  </nav>
+</main>
+
+<footer class="foot">
+  <p><strong>LUZ</strong> 0.4.1 · Light, Usable and Zero-dependency · MIT</p>
+  <p class="foot__links"><a href="../../docs/index.html">Docs</a> <a href="../../docs/get-started.html">Get started</a></p>
+</footer>
+
+<div class="tip" id="tip" aria-hidden="true"><b class="tip__name"></b><span class="tip__meta"></span></div>
+<p class="vh" id="status" role="status" aria-live="polite"></p>
+</body>
+</html>
