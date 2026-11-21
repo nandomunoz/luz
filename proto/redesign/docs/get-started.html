@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Set it up · LUZ</title>
+<meta name="description" content="Install LUZ and write a first page.">
+<meta name="robots" content="noindex">
+<link rel="alternate" type="text/markdown" href="get-started.md">
+<link rel="icon" href="../assets/mark.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../assets/site.css">
+<link rel="stylesheet" href="../assets/docs.css">
+<link rel="stylesheet" href="../assets/motion.css">
+<link rel="stylesheet" href="../assets/look.css">
+<script defer src="../assets/site.js"></script>
+<script defer src="../assets/motion.js"></script>
+</head>
+<body class="is-docs">
+<a class="skip" href="#main">Skip to the content</a>
+<header class="head">
+  <div class="wrap head__in">
+    <a class="brand" href="../index.html" aria-label="LUZ, home">
+      <svg viewBox="0 0 28 28" aria-hidden="true"><rect x="1.5" y="15.5" width="7" height="11" fill="none" stroke="currentColor"/><rect x="10.5" y="8.5" width="7" height="18" fill="none" stroke="currentColor"/><rect x="19.5" y="1.5" width="7" height="25" fill="#2f55ff"/></svg>
+      <span>Luz</span>
+      <small>0.4.1 beta</small>
+    </a>
+    <nav aria-label="Main">
+      <ul class="nav">
+        <li><a href="../docs/index.html" aria-current="page">Docs</a></li>
+        <li><a href="../docs/components.html">Components</a></li>
+        <li><a href="../docs/catalog.html">Catalog</a></li>
+        <li><a href="../docs/color.html">Tokens</a></li>
+        <li><a href="../docs/accessibility.html">Accessibility</a></li>
+      </ul>
+    </nav>
+    <div class="head__act">
+      <nav class="lang" aria-label="Language"><a href="../docs/get-started.html" lang="en" hreflang="en" aria-current="true">EN</a><a href="../es/docs/get-started.html" lang="es" hreflang="es">ES</a></nav>
+      <button class="kbd-btn" type="button" data-find-open>Search the docs <kbd>Ctrl K</kbd></button>
+      <a class="btn btn--sm" href="../docs/get-started.html#install">Install</a>
+    </div>
+    <details class="menu">
+      <summary aria-label="Menu"><span></span></summary>
+      <div class="menu__panel">
+        <nav class="lang" aria-label="Language"><a href="../docs/get-started.html" lang="en" hreflang="en" aria-current="true">EN</a><a href="../es/docs/get-started.html" lang="es" hreflang="es">ES</a></nav>
+        <ul>
+          <li><a href="../docs/index.html">Docs</a></li>
+          <li><a href="../docs/components.html">Components</a></li>
+          <li><a href="../docs/catalog.html">Catalog</a></li>
+          <li><a href="../docs/color.html">Tokens</a></li>
+          <li><a href="../docs/accessibility.html">Accessibility</a></li>
+          <li><a href="../docs/get-started.html">Get started</a></li>
+        </ul>
+      </div>
+    </details>
+  </div>
+</header>
+
+<div class="docs wrap">
+  <details class="docs__menu">
+    <summary>Browse the docs</summary>
+    <nav class="side" aria-label="Documentation">
+<details open><summary><span>Get started</span></summary><ul><li><a href="../docs/get-started.html" aria-current="page">Set it up</a></li><li><a href="../docs/get-started.html">Make it yours</a></li><li><a href="../docs/get-started.html">Migrate a project</a></li></ul></details>
+<details><summary><span>Work with AI</span></summary><ul><li><a href="../docs/ai.html">Use Luz with an AI</a></li><li><a href="../docs/ai.html">Every flag</a></li><li><a href="../docs/ai.html">No terminal?</a></li></ul></details>
+<details><summary><span>Tokens<code>@luz-ds/tokens</code></span></summary><ul><li><a href="../docs/color.html">Color</a></li><li><a href="../docs/color.html">Color modes</a></li><li><a href="../docs/color.html">Typography</a></li><li><a href="../docs/color.html">Spacing</a></li><li><a href="../docs/color.html">Motion</a></li></ul></details>
+<details><summary><span>HTML elements<code>@luz-ds/core</code></span></summary><ul><li><a href="../docs/components.html">Elements A–Z</a></li><li><a href="../docs/components.html">Forms</a></li><li><a href="../docs/components.html">Text</a></li></ul></details>
+<details><summary><span>Components<code>@luz-ds/core</code></span></summary><ul><li><a href="../docs/components.html">All components</a></li><li><a href="../docs/button.html">Button</a></li><li><a href="../docs/button.html">Card</a></li><li><a href="../docs/button.html">Form inputs</a></li><li><a href="../docs/button.html">Modal</a></li><li><a href="../docs/button.html">Table</a></li><li><a href="../docs/button.html">Tabs</a></li></ul></details>
+<details><summary><span>Catalog<code>@luz-ds/catalog</code></span></summary><ul><li><a href="../docs/catalog.html">All patterns</a></li><li><a href="../docs/catalog.html">Kinds of site</a></li><li><a href="../docs/catalog.html">Hero</a></li><li><a href="../docs/catalog.html">Search</a></li><li><a href="../docs/catalog.html">Charts</a></li></ul></details>
+<details><summary><span>Accessibility</span></summary><ul><li><a href="../docs/accessibility.html">Statement</a></li><li><a href="../docs/accessibility.html">Status by component</a></li></ul></details>
+<details><summary><span>How it is built</span></summary><ul><li><a href="../docs/get-started.html">Layers</a></li><li><a href="../docs/get-started.html">Principles</a></li></ul></details>
+<details><summary><span>What's new</span></summary><ul><li><a href="../docs/get-started.html">Changelog</a></li><li><a href="../docs/get-started.html">Roadmap</a></li><li><a href="../docs/get-started.html">Contribute</a></li></ul></details>
+    </nav>
+  </details>
+  <aside class="docs__side">
+    <nav class="side" aria-label="Documentation">
+<details open><summary><span>Get started</span></summary><ul><li><a href="../docs/get-started.html" aria-current="page">Set it up</a></li><li><a href="../docs/get-started.html">Make it yours</a></li><li><a href="../docs/get-started.html">Migrate a project</a></li></ul></details>
+<details><summary><span>Work with AI</span></summary><ul><li><a href="../docs/ai.html">Use Luz with an AI</a></li><li><a href="../docs/ai.html">Every flag</a></li><li><a href="../docs/ai.html">No terminal?</a></li></ul></details>
+<details><summary><span>Tokens<code>@luz-ds/tokens</code></span></summary><ul><li><a href="../docs/color.html">Color</a></li><li><a href="../docs/color.html">Color modes</a></li><li><a href="../docs/color.html">Typography</a></li><li><a href="../docs/color.html">Spacing</a></li><li><a href="../docs/color.html">Motion</a></li></ul></details>
+<details><summary><span>HTML elements<code>@luz-ds/core</code></span></summary><ul><li><a href="../docs/components.html">Elements A–Z</a></li><li><a href="../docs/components.html">Forms</a></li><li><a href="../docs/components.html">Text</a></li></ul></details>
+<details><summary><span>Components<code>@luz-ds/core</code></span></summary><ul><li><a href="../docs/components.html">All components</a></li><li><a href="../docs/button.html">Button</a></li><li><a href="../docs/button.html">Card</a></li><li><a href="../docs/button.html">Form inputs</a></li><li><a href="../docs/button.html">Modal</a></li><li><a href="../docs/button.html">Table</a></li><li><a href="../docs/button.html">Tabs</a></li></ul></details>
+<details><summary><span>Catalog<code>@luz-ds/catalog</code></span></summary><ul><li><a href="../docs/catalog.html">All patterns</a></li><li><a href="../docs/catalog.html">Kinds of site</a></li><li><a href="../docs/catalog.html">Hero</a></li><li><a href="../docs/catalog.html">Search</a></li><li><a href="../docs/catalog.html">Charts</a></li></ul></details>
+<details><summary><span>Accessibility</span></summary><ul><li><a href="../docs/accessibility.html">Statement</a></li><li><a href="../docs/accessibility.html">Status by component</a></li></ul></details>
+<details><summary><span>How it is built</span></summary><ul><li><a href="../docs/get-started.html">Layers</a></li><li><a href="../docs/get-started.html">Principles</a></li></ul></details>
+<details><summary><span>What's new</span></summary><ul><li><a href="../docs/get-started.html">Changelog</a></li><li><a href="../docs/get-started.html">Roadmap</a></li><li><a href="../docs/get-started.html">Contribute</a></li></ul></details>
+    </nav>
+  </aside>
+  <main class="docs__main" id="main">
+    <header class="doc-head">
+      <p class="label">Get started · Tutorial</p>
+      <h1>Set Luz up in one command</h1>
+      <p class="doc-head__lead">Run one command in your project. It looks first, asks only what it cannot tell, shows you the plan, and writes nothing until you say yes.</p>
+<dl class="doc-facts"><div><dt>Package</dt><dd><code>@luz-ds/tokens, @luz-ds/core</code></dd></div><div><dt>JavaScript</dt><dd>Optional</dd></div></dl>
+      <p class="doc-acts"><a href="https://github.com/nandovejer/luz/edit/main/proto/redesign/src/pages/docs/get-started.html">Edit on GitHub</a><button type="button" data-copy-md>Copy as Markdown</button></p>
+    </header>
+    <div class="prose">
+<div class="note note--warn">
+  <strong>Luz is in beta.</strong>
+  <p>Everything here works and is tested, but names can still change before 1.0. Pin an exact version and read the changelog before you upgrade.</p>
+</div>
+
+<h2 id="setup">Run the setup</h2>
+<p>In the folder of your project, new or not:</p>
+<figure class="snip">
+  <figcaption><span class="label label--light">Terminal</span><button class="copy" type="button" data-copy="#gs-create">Copy</button></figcaption>
+<pre><code id="gs-create">npm create @luz-ds@0.4.1</code></pre>
+</figure>
+<ol class="steps">
+  <li>
+    <h3>It looks at your project</h3>
+    <p>Your stack (plain HTML, Astro, React, Vue or Angular), your package manager, the language of your pages, and whether Luz or another CSS framework is already there. What it finds becomes the default answer, never a final one.</p>
+  </li>
+  <li>
+    <h3>It asks what it could not tell</h3>
+    <p>Choose <strong>Quick</strong> for what is recommended, or <strong>Tailored</strong> for about eight questions: the kind of site, your brand, your languages, a color mode switch, and a short Luz section for your <code>AGENTS.md</code>.</p>
+  </li>
+  <li>
+    <h3>It shows you the plan</h3>
+    <p>Every package it will install, every file it will create, and the diff of every file it will change. Nothing is written until you say yes.</p>
+  </li>
+  <li>
+    <h3>It does it, then checks it</h3>
+    <p>It installs, writes, and runs <code>luz-check</code> on the result. If the install fails, it prints the steps that are left, so the project is never half done.</p>
+  </li>
+</ol>
+<div class="table-wrap wide">
+  <table>
+    <thead><tr><th>When you want to</th><th>Add</th></tr></thead>
+    <tbody>
+      <tr><td>Take what is recommended, with no questions</td><td><code>--yes</code></td></tr>
+      <tr><td>See the plan and the diffs, and write nothing</td><td><code>--dry-run</code></td></tr>
+      <tr><td>Answer numbered questions, with no boxes and no spinners</td><td><code>--accessible</code></td></tr>
+      <tr><td>Write the files, but install nothing</td><td><code>--no-install</code></td></tr>
+      <tr><td>Turn colour off</td><td><code>--no-color</code>, or <code>NO_COLOR=1</code></td></tr>
+    </tbody>
+  </table>
+</div>
+<p>Run it again at any time: it never installs twice, and in a project that already has Luz it offers only what is missing. Every question has a flag, listed in <a href="../docs/ai.html#flags">Use Luz with an AI</a>.</p>
+<div class="note">
+  <strong>A preview.</strong>
+  <p><code>@luz-ds/create</code> is a proposal and is not published yet. Until it is, set Luz up by hand, below.</p>
+</div>
+
+<h2 id="by-hand">Or set it up by hand</h2>
+<p>Everything the setup does, you can do in three steps.</p>
+
+<h3 id="choose">Choose a level</h3>
+<p>Luz is three packages that stack in one direction. Each needs the one below it and nothing above it, so you can stop at any level.</p>
+<div class="table-wrap wide">
+  <table>
+    <thead><tr><th>You want</th><th>Install</th><th>Load, in order</th></tr></thead>
+    <tbody>
+      <tr><th>The tokens only</th><td><code>@luz-ds/tokens</code></td><td><code>luz-tokens.css</code></td></tr>
+      <tr><th>Tokens and components</th><td><code>@luz-ds/tokens</code> <code>@luz-ds/core</code></td><td><code>luz-tokens.css</code>, <code>luz.css</code></td></tr>
+      <tr><th>The page patterns too</th><td>the two above and <code>@luz-ds/catalog</code></td><td>the two above, then one stylesheet per pattern</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<h3 id="install">Install it</h3>
+<ol class="steps">
+  <li>
+    <h3>Add the packages</h3>
+    <p>With npm, pnpm or Yarn. There is nothing else to install, because Luz has no dependencies of its own.</p>
+    <figure class="snip">
+      <figcaption><span class="label label--light">Terminal</span><button class="copy" type="button" data-copy="#gs-npm">Copy</button></figcaption>
+<pre><code id="gs-npm">npm install @luz-ds/tokens @luz-ds/core</code></pre>
+    </figure>
+    <p>No build step? Skip this and <a href="#cdn">link the files from a CDN</a>.</p>
+  </li>
+  <li>
+    <h3>Link the stylesheets</h3>
+    <p>Tokens first, then core. The order matters: core reads the tokens.</p>
+    <figure class="snip">
+      <figcaption><span class="label label--light">index.html</span><button class="copy" type="button" data-copy="#gs-link">Copy</button></figcaption>
+<pre><code id="gs-link"><span class="t-tag">&lt;link</span> <span class="t-attr">rel</span>=<span class="t-str">"stylesheet"</span> <span class="t-attr">href</span>=<span class="t-str">"node_modules/@luz-ds/tokens/dist/luz-tokens.css"</span><span class="t-tag">&gt;</span>
+<span class="t-tag">&lt;link</span> <span class="t-attr">rel</span>=<span class="t-str">"stylesheet"</span> <span class="t-attr">href</span>=<span class="t-str">"node_modules/@luz-ds/core/dist/luz.css"</span><span class="t-tag">&gt;</span></code></pre>
+    </figure>
+  </li>
+  <li>
+    <h3>Write HTML</h3>
+    <p>No class, no attribute. Text, controls and tables come out finished.</p>
+    <div class="stage">
+      <div class="stage__in">
+        <form class="x-form" onsubmit="return false">
+          <label class="x-field">Your name <input class="x-input" type="text" autocomplete="name"></label>
+          <button class="x-btn" type="submit">Say hello</button>
+        </form>
+      </div>
+    </div>
+    <figure class="snip">
+      <figcaption><span class="label label--light">HTML</span><button class="copy" type="button" data-copy="#gs-html">Copy</button></figcaption>
+<pre><code id="gs-html"><span class="t-tag">&lt;form&gt;</span>
+  <span class="t-tag">&lt;label&gt;</span>
+    Your name
+    <span class="t-tag">&lt;input</span> <span class="t-attr">type</span>=<span class="t-str">"text"</span><span class="t-tag">&gt;</span>
+  <span class="t-tag">&lt;/label&gt;</span>
+  <span class="t-tag">&lt;button&gt;</span>Say hello<span class="t-tag">&lt;/button&gt;</span>
+<span class="t-tag">&lt;/form&gt;</span></code></pre>
+    </figure>
+  </li>
+  <li>
+    <h3>Add a class when HTML runs out of words</h3>
+    <p>A link that should look like a button. A smaller size. A component with markup of its own. That is what classes are for, and they all start with <code>luz-</code>.</p>
+    <figure class="snip">
+      <figcaption><span class="label label--light">HTML</span><button class="copy" type="button" data-copy="#gs-class">Copy</button></figcaption>
+<pre><code id="gs-class"><span class="t-tag">&lt;a</span> <span class="t-attr">class</span>=<span class="t-str">"luz-btn luz-btn--secondary"</span> <span class="t-attr">href</span>=<span class="t-str">"/pricing/"</span><span class="t-tag">&gt;</span>See pricing<span class="t-tag">&lt;/a&gt;</span></code></pre>
+    </figure>
+  </li>
+</ol>
+
+<h2 id="cdn">Or use a CDN</h2>
+<p>Two lines in the <code>&lt;head&gt;</code>, and nothing on your disk. Good for a prototype, a CodePen or a page with no build. The link names an exact version, never <code>latest</code>, and carries the integrity hash of the file. The docs write both for you.</p>
+<figure class="snip wide">
+  <figcaption><span class="label label--light">index.html</span><button class="copy" type="button" data-copy="#gs-cdn">Copy</button></figcaption>
+<pre><code id="gs-cdn"><span class="t-tag">&lt;link</span> <span class="t-attr">rel</span>=<span class="t-str">"stylesheet"</span> <span class="t-attr">href</span>=<span class="t-str">"https://cdn.jsdelivr.net/npm/@luz-ds/tokens@0.4.1/dist/luz-tokens.min.css"</span>
+      <span class="t-attr">integrity</span>=<span class="t-str">"sha384-…"</span> <span class="t-attr">crossorigin</span>=<span class="t-str">"anonymous"</span><span class="t-tag">&gt;</span>
+<span class="t-tag">&lt;link</span> <span class="t-attr">rel</span>=<span class="t-str">"stylesheet"</span> <span class="t-attr">href</span>=<span class="t-str">"https://cdn.jsdelivr.net/npm/@luz-ds/core@0.4.1/dist/luz.min.css"</span>
+      <span class="t-attr">integrity</span>=<span class="t-str">"sha384-…"</span> <span class="t-attr">crossorigin</span>=<span class="t-str">"anonymous"</span><span class="t-tag">&gt;</span></code></pre>
+</figure>
+
+<h2 id="javascript">Add the JavaScript, if you want it</h2>
+<p>Every component works without a script. The script adds the comforts: tabs that switch in place, a table that sorts, a toast that announces itself.</p>
+<figure class="snip">
+  <figcaption><span class="label label--light">HTML</span><button class="copy" type="button" data-copy="#gs-js">Copy</button></figcaption>
+<pre><code id="gs-js"><span class="t-tag">&lt;script</span> <span class="t-attr">type</span>=<span class="t-str">"module"</span> <span class="t-attr">src</span>=<span class="t-str">"node_modules/@luz-ds/core/dist/luz.js"</span><span class="t-tag">&gt;&lt;/script&gt;</span></code></pre>
+</figure>
+<div class="note">
+  <strong>Already have a design?</strong>
+  <p>Load <code>luz.conditional.css</code> instead and mark a region with <code>data-luz</code>. Luz stays inside it, and you migrate one region at a time.</p>
+</div>
+
+<h2 id="next">Where to go next</h2>
+<ul>
+  <li><a href="../docs/color.html">Meet the tokens</a>, starting with color.</li>
+  <li><a href="../docs/components.html">Browse the components</a> of core.</li>
+  <li><a href="../docs/catalog.html">Pick the patterns</a> of the site you are making.</li>
+  <li><a href="../docs/accessibility.html">Read what we promise</a> about accessibility, and what we do not.</li>
+</ul>
+
+    </div>
+<section class="related" aria-labelledby="related-h"><h2 class="label label--ink" id="related-h">Related pages</h2><ul><li><a href="../docs/ai.html"><strong>Use Luz with an AI</strong><span>Hand the same command to your agent, with a plan in JSON.</span></a></li><li><a href="../docs/color.html"><strong>Color</strong><span>The tokens, starting with the ones you will change first.</span></a></li><li><a href="../docs/components.html"><strong>All components</strong><span>Every piece of core, by what you want to do.</span></a></li><li><a href="../docs/accessibility.html"><strong>Statement</strong><span>What we promise about accessibility, and what we do not.</span></a></li></ul></section>
+<nav class="pager" aria-label="Previous and next page"><span></span><a class="pager__a pager__a--next" rel="next" href="../docs/ai.html"><span class="label label--ink">Next</span><strong>Use Luz with an AI</strong><small>Work with AI</small></a></nav>
+  </main>
+  <aside class="docs__rail" aria-label="On this page">
+    <p class="label label--ink">On this page</p>
+<ul data-spy><li><a href="#setup">Run the setup</a></li><li><a href="#by-hand">Or set it up by hand</a></li><li><a href="#cdn">Or use a CDN</a></li><li><a href="#javascript">Add the JavaScript, if you want it</a></li><li><a href="#next">Where to go next</a></li></ul>
+  </aside>
+</div>
+
+<footer class="foot">
+  <div class="wrap foot__end">
+    <span>© 2026 LUZ 0.4.1 beta. MIT licensed.</span>
+    <span><a href="https://github.com/nandovejer/luz">GitHub</a> · <a href="https://www.npmjs.com/package/@luz-ds/core">npm</a> · <a href="../docs/accessibility.html">Accessibility</a></span>
+  </div>
+</footer>
+
+<dialog class="find" aria-label="Search the site">
+  <form method="dialog">
+    <input type="search" placeholder="Search the docs" aria-label="Search the docs" autocomplete="off">
+    <button class="copy" type="submit">Esc</button>
+  </form>
+  <ul><li><a href="#setup"><span>Run the setup</span><small>On this page</small></a></li><li><a href="#by-hand"><span>Or set it up by hand</span><small>On this page</small></a></li><li><a href="#cdn"><span>Or use a CDN</span><small>On this page</small></a></li><li><a href="#javascript"><span>Add the JavaScript, if you want it</span><small>On this page</small></a></li><li><a href="#next"><span>Where to go next</span><small>On this page</small></a></li><li><a href="../docs/get-started.html"><span>Set it up</span><small>Get started</small></a></li><li><a href="../docs/get-started.html"><span>Make it yours</span><small>Get started</small></a></li><li><a href="../docs/get-started.html"><span>Migrate a project</span><small>Get started</small></a></li><li><a href="../docs/ai.html"><span>Use Luz with an AI</span><small>Work with AI</small></a></li><li><a href="../docs/ai.html"><span>Every flag</span><small>Work with AI</small></a></li><li><a href="../docs/ai.html"><span>No terminal?</span><small>Work with AI</small></a></li><li><a href="../docs/color.html"><span>Color</span><small>Tokens</small></a></li><li><a href="../docs/color.html"><span>Color modes</span><small>Tokens</small></a></li><li><a href="../docs/color.html"><span>Typography</span><small>Tokens</small></a></li><li><a href="../docs/color.html"><span>Spacing</span><small>Tokens</small></a></li><li><a href="../docs/color.html"><span>Motion</span><small>Tokens</small></a></li><li><a href="../docs/components.html"><span>Elements A–Z</span><small>HTML elements</small></a></li><li><a href="../docs/components.html"><span>Forms</span><small>HTML elements</small></a></li><li><a href="../docs/components.html"><span>Text</span><small>HTML elements</small></a></li><li><a href="../docs/components.html"><span>All components</span><small>Components</small></a></li><li><a href="../docs/button.html"><span>Button</span><small>Components</small></a></li><li><a href="../docs/button.html"><span>Card</span><small>Components</small></a></li><li><a href="../docs/button.html"><span>Form inputs</span><small>Components</small></a></li><li><a href="../docs/button.html"><span>Modal</span><small>Components</small></a></li><li><a href="../docs/button.html"><span>Table</span><small>Components</small></a></li><li><a href="../docs/button.html"><span>Tabs</span><small>Components</small></a></li><li><a href="../docs/catalog.html"><span>All patterns</span><small>Catalog</small></a></li><li><a href="../docs/catalog.html"><span>Kinds of site</span><small>Catalog</small></a></li><li><a href="../docs/catalog.html"><span>Hero</span><small>Catalog</small></a></li><li><a href="../docs/catalog.html"><span>Search</span><small>Catalog</small></a></li><li><a href="../docs/catalog.html"><span>Charts</span><small>Catalog</small></a></li><li><a href="../docs/accessibility.html"><span>Statement</span><small>Accessibility</small></a></li><li><a href="../docs/accessibility.html"><span>Status by component</span><small>Accessibility</small></a></li><li><a href="../docs/get-started.html"><span>Layers</span><small>How it is built</small></a></li><li><a href="../docs/get-started.html"><span>Principles</span><small>How it is built</small></a></li><li><a href="../docs/get-started.html"><span>Changelog</span><small>What's new</small></a></li><li><a href="../docs/get-started.html"><span>Roadmap</span><small>What's new</small></a></li><li><a href="../docs/get-started.html"><span>Contribute</span><small>What's new</small></a></li><li><a href="../index.html"><span>Home</span><small>Site</small></a></li><li><a href="../docs/index.html"><span>Documentation</span><small>Site</small></a></li></ul>
+  <p class="find__none" hidden>No page matches that. Check the spelling or try a shorter word, or browse <a href="../docs/components.html">the components</a> and <a href="../docs/color.html">the tokens</a>.</p>
+</dialog>
+
+</body>
+</html>
