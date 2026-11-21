@@ -1,0 +1,614 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LUZ — un sistema de diseño en HTML, CSS y módulos ES</title>
+<meta name="description" content="LUZ es un sistema de diseño modular en HTML, CSS y módulos ES. Sin paso de compilación, sin dependencias, sin un framework que sobrevivir.">
+<meta name="robots" content="noindex">
+
+<link rel="icon" href="../assets/mark.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../assets/site.css">
+<link rel="stylesheet" href="../assets/docs.css">
+<link rel="stylesheet" href="../assets/motion.css">
+<link rel="stylesheet" href="../assets/look.css">
+<script defer src="../assets/site.js"></script>
+<script defer src="../assets/motion.js"></script>
+</head>
+<body class="is-site">
+<a class="skip" href="#main">Saltar al contenido</a>
+<header class="head">
+  <div class="wrap head__in">
+    <a class="brand" href="../es/index.html" aria-label="LUZ, inicio">
+      <svg viewBox="0 0 28 28" aria-hidden="true"><rect x="1.5" y="15.5" width="7" height="11" fill="none" stroke="currentColor"/><rect x="10.5" y="8.5" width="7" height="18" fill="none" stroke="currentColor"/><rect x="19.5" y="1.5" width="7" height="25" fill="#2f55ff"/></svg>
+      <span>Luz</span>
+      <small>0.4.1 beta</small>
+    </a>
+    <nav aria-label="Principal">
+      <ul class="nav">
+        <li><a href="../es/docs/index.html">Docs</a></li>
+        <li><a href="../es/docs/components.html">Componentes</a></li>
+        <li><a href="../es/docs/catalog.html">Catálogo</a></li>
+        <li><a href="../es/docs/color.html">Tokens</a></li>
+        <li><a href="../es/docs/accessibility.html">Accesibilidad</a></li>
+      </ul>
+    </nav>
+    <div class="head__act">
+      <nav class="lang" aria-label="Idioma"><a href="../index.html" lang="en" hreflang="en">EN</a><a href="../es/index.html" lang="es" hreflang="es" aria-current="true">ES</a></nav>
+      <button class="kbd-btn" type="button" data-find-open>Buscar <kbd>Ctrl K</kbd></button>
+      <a class="btn btn--sm" href="../es/docs/get-started.html#install">Instala</a>
+    </div>
+    <details class="menu">
+      <summary aria-label="Menú"><span></span></summary>
+      <div class="menu__panel">
+        <nav class="lang" aria-label="Idioma"><a href="../index.html" lang="en" hreflang="en">EN</a><a href="../es/index.html" lang="es" hreflang="es" aria-current="true">ES</a></nav>
+        <ul>
+          <li><a href="../es/docs/index.html">Docs</a></li>
+          <li><a href="../es/docs/components.html">Componentes</a></li>
+          <li><a href="../es/docs/catalog.html">Catálogo</a></li>
+          <li><a href="../es/docs/color.html">Tokens</a></li>
+          <li><a href="../es/docs/accessibility.html">Accesibilidad</a></li>
+          <li><a href="../es/docs/get-started.html">Primeros pasos</a></li>
+        </ul>
+      </div>
+    </details>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero__art" data-parallax><div class="cols" aria-hidden="true"><div class="col" style="--h:28.6%;--i:0"><span>sm<br>14px</span></div><div class="col" style="--h:40.8%;--i:1"><span>lg<br>20px</span></div><div class="col" style="--h:63.3%;--i:2"><span>2xl<br>31px</span></div><div class="col" style="--h:100%;--i:3"><span>4xl<br>49px</span></div><div class="col" style="--h:79.6%;--i:4"><span>3xl<br>39px</span></div><div class="col" style="--h:51%;--i:5"><span>xl<br>25px</span></div><div class="col col--body" style="--h:32.7%;--i:6"><span>base<br>16px</span></div><div class="col" style="--h:30.6%;--i:7"><span>md<br>15px</span></div><div class="col" style="--h:24.5%;--i:8"><span>xs<br>12px</span></div></div></div>
+    <div class="wrap hero__in">
+      <p class="label">Luz 0.4.1 beta · Código abierto, MIT</p>
+      <h1>El sistema de diseño que <em>desaparece.</em></h1>
+      <p class="hero__lead">HTML, CSS y módulos ES sin más. Luz da estilo al marcado que ya escribes, y el navegador hace el resto.</p>
+    </div>
+    <div class="wrap hero__foot">
+      <div class="hero__cta">
+        <a class="btn" href="#start">Instálalo en tu terminal</a>
+        <a class="btn btn--ghost" href="../es/docs/index.html">Lee la documentación</a>
+      </div>
+      <div class="install">
+        <code id="install-line">npm create @luz-ds@0.4.1</code>
+        <button class="copy" type="button" data-copy="#install-line">Copiar</button>
+      </div>
+      <p class="hero__note">Detrás de este texto: la escala tipográfica de Luz, una columna por paso, dibujada a partir de <code>tokens.json</code>. La azul es el texto del cuerpo.</p>
+    </div>
+  </section>
+
+  <!-- Marquee -->
+  <div class="marq" role="region" aria-label="Algunas de las piezas">
+    <button class="marq__pause" type="button" aria-pressed="false">Pausa</button>
+    <ul><li>Acordeón</li><li>Alerta</li><li>Avatar</li><li>Migas de pan</li><li>Botón</li><li>Tarjeta</li><li>Código</li><li>Desplegable</li><li>Figura</li><li>Campos de formulario</li><li>Hero</li><li>Cabecera editorial</li><li>Medidor</li><li>Modal</li><li>Barra de navegación</li><li>Paginador</li><li>Progreso</li><li>Buscar</li><li>Barra lateral</li><li>Tabla</li><li>Pestañas</li><li>Etiqueta</li><li>Línea de tiempo</li><li>Aviso</li><li>Tooltip</li></ul>
+    <ul aria-hidden="true"><li>Acordeón</li><li>Alerta</li><li>Avatar</li><li>Migas de pan</li><li>Botón</li><li>Tarjeta</li><li>Código</li><li>Desplegable</li><li>Figura</li><li>Campos de formulario</li><li>Hero</li><li>Cabecera editorial</li><li>Medidor</li><li>Modal</li><li>Barra de navegación</li><li>Paginador</li><li>Progreso</li><li>Buscar</li><li>Barra lateral</li><li>Tabla</li><li>Pestañas</li><li>Etiqueta</li><li>Línea de tiempo</li><li>Aviso</li><li>Tooltip</li></ul>
+  </div>
+
+  <!-- Write this, get that -->
+  <section class="sec sec--tight sec--white">
+    <div class="wrap">
+      <div class="sec__head">
+        <p class="label">La prueba, no la promesa</p>
+        <h2 data-split>Escribe esto. <em>Obtén eso.</em></h2>
+        <p>Sin biblioteca de componentes que importar ni props que memorizar. El marcado de la izquierda es todo lo que hay. Prueba, escribe en el formulario.</p>
+      </div>
+      <div class="duo">
+        <div class="duo__code">
+          <div class="duo__bar"><span class="label label--light">index.html</span><button class="copy" type="button" data-copy="#duo-code">Copiar</button></div>
+<pre><code id="duo-code"><span class="t-com">&lt;!-- No classes. No JavaScript. --&gt;</span>
+<span class="t-tag">&lt;link</span> <span class="t-attr">rel</span>=<span class="t-str">"stylesheet"</span> <span class="t-attr">href</span>=<span class="t-str">"luz-tokens.css"</span><span class="t-tag">&gt;</span>
+<span class="t-tag">&lt;link</span> <span class="t-attr">rel</span>=<span class="t-str">"stylesheet"</span> <span class="t-attr">href</span>=<span class="t-str">"luz.css"</span><span class="t-tag">&gt;</span>
+
+<span class="t-tag">&lt;form&gt;</span>
+  <span class="t-tag">&lt;h3&gt;</span>Join the beta<span class="t-tag">&lt;/h3&gt;</span>
+
+  <span class="t-tag">&lt;label&gt;</span>
+    Work email
+    <span class="t-tag">&lt;input</span> <span class="t-attr">type</span>=<span class="t-str">"email"</span> <span class="t-attr">required</span><span class="t-tag">&gt;</span>
+  <span class="t-tag">&lt;/label&gt;</span>
+
+  <span class="t-tag">&lt;label&gt;</span>
+    <span class="t-tag">&lt;input</span> <span class="t-attr">type</span>=<span class="t-str">"checkbox"</span><span class="t-tag">&gt;</span>
+    Tell me when 1.0 ships
+  <span class="t-tag">&lt;/label&gt;</span>
+
+  <span class="t-tag">&lt;button&gt;</span>Request access<span class="t-tag">&lt;/button&gt;</span>
+<span class="t-tag">&lt;/form&gt;</span></code></pre>
+        </div>
+        <div class="duo__out">
+          <div class="duo__bar"><span class="label label--ink">En el navegador</span><span class="x-tag">En vivo</span></div>
+          <div class="duo__stage">
+            <form class="x-form" onsubmit="return false">
+              <h3>Únete a la beta</h3>
+              <label class="x-field">Correo de trabajo <input class="x-input" type="email"></label>
+              <label class="x-check"><input type="checkbox"> Avísame cuando salga la 1.0</label>
+              <button class="x-btn" type="submit">Solicitar acceso</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Facts -->
+  <dl class="facts">
+    <div class="fact"><dt><span data-count>0</span></dt><dd>dependencias en tiempo de ejecución. Nada que auditar, nada que actualizar, nada que se rompa.</dd></div>
+    <div class="fact"><dt><span data-count>11.5</span><small> KB</small></dt><dd>es el techo de toda la hoja de estilos de core, minificada y comprimida con gzip.</dd></div>
+    <div class="fact"><dt><span data-count>70</span></dt><dd>componentes y patrones, cada uno probado con JavaScript activado y desactivado.</dd></div>
+    <div class="fact"><dt><span data-count>3</span></dt><dd>modos de color incluidos: claro, oscuro y alto contraste.</dd></div>
+  </dl>
+  <p class="source">Cifras escritas por el build a partir de los paquetes y de <code>budgets.json</code>, nunca tecleadas.</p>
+
+  <!-- Layers -->
+  <section class="sheets-sec dark">
+    <div class="wrap sec__head sec__head--center">
+      <p class="label">Modular por diseño</p>
+      <h2 data-split>Tres capas. <em>Usa una, o usa todas.</em></h2>
+      <p>Cada paquete necesita el de abajo y nada de lo de arriba. Adopta un nivel, quédate ahí y vuelve cuando el proyecto crezca.</p>
+    </div>
+    <div class="wrap sheets">
+      <article class="sheet" style="--i:0">
+        <header class="sheet__bar">
+          <span class="sheet__num">01</span>
+          <h3>Tokens <span>· @luz-ds/tokens</span></h3>
+          <a class="btn btn--ghost btn--sm" href="../es/docs/color.html">Explorar los tokens</a>
+        </header>
+        <div class="sheet__body">
+          <p class="sheet__say" data-split>Las decisiones, <em>como simples propiedades personalizadas.</em></p>
+          <div class="sheet__grid">
+            <p class="label label--ink">Independiente<br>5 KB máx.</p>
+            <ul><li>Color, tipografía, espacio y movimiento, en tres modos</li><li>Tres mandos fijan toda la escala</li><li>Un comprobador de contraste para tu propio tema</li></ul>
+<pre class="sheet__code"><code><span class="t-tag">:root</span> {
+  <span class="t-attr">--luz-type-base</span>: 1rem;
+  <span class="t-attr">--luz-type-ratio</span>: 1.25;
+  <span class="t-attr">--luz-space-unit</span>: 0.25rem;
+}</code></pre>
+          </div>
+        </div>
+      </article>
+      <article class="sheet" style="--i:1">
+        <header class="sheet__bar">
+          <span class="sheet__num">02</span>
+          <h3>Core <span>· @luz-ds/core</span></h3>
+          <a class="btn btn--ghost btn--sm" href="../es/docs/components.html">Explorar core</a>
+        </header>
+        <div class="sheet__body">
+          <p class="sheet__say" data-split>HTML sin más, <em>terminado.</em></p>
+          <div class="sheet__grid">
+            <p class="label label--ink">Necesita tokens<br>11.5 KB máx.</p>
+            <ul><li>Cada elemento con estilo y sin clase</li><li>29 componentes, del acordeón al tooltip</li><li>JavaScript opcional, en módulos ES</li></ul>
+<pre class="sheet__code"><code><span class="t-tag">&lt;button&gt;</span>Save<span class="t-tag">&lt;/button&gt;</span>
+<span class="t-tag">&lt;table&gt;</span>…<span class="t-tag">&lt;/table&gt;</span>
+<span class="t-tag">&lt;dialog&gt;</span>…<span class="t-tag">&lt;/dialog&gt;</span>
+<span class="t-com">&lt;!-- No class. Done. --&gt;</span></code></pre>
+          </div>
+        </div>
+      </article>
+      <article class="sheet" style="--i:2">
+        <header class="sheet__bar">
+          <span class="sheet__num">03</span>
+          <h3>Catálogo <span>· @luz-ds/catalog</span></h3>
+          <a class="btn btn--ghost btn--sm" href="../es/docs/catalog.html">Abrir el catálogo</a>
+        </header>
+        <div class="sheet__body">
+          <p class="sheet__say" data-split>Un sitio entero, <em>una hoja de estilos cada vez.</em></p>
+          <div class="sheet__grid">
+            <p class="label label--ink">Necesita core<br>Sin bundle</p>
+            <ul><li>41 patrones, que enlazas uno a uno</li><li>Búsqueda, gráficas y navegación</li><li>Aterrizaje, blog, app y docs</li></ul>
+<pre class="sheet__code"><code><span class="t-tag">&lt;link</span> <span class="t-attr">rel</span>=<span class="t-str">"stylesheet"</span>
+  <span class="t-attr">href</span>=<span class="t-str">"…/catalog/components/hero.css"</span><span class="t-tag">&gt;</span></code></pre>
+          </div>
+        </div>
+      </article>
+    </div>
+    <div class="wrap">
+      <ul class="doors" aria-label="Ir directamente a" data-stagger>
+        <li><a href="../es/docs/color.html"><strong>Tokens</strong><span>Color, tipografía, espacio, movimiento</span></a></li>
+        <li><a href="../es/docs/components.html"><strong>Elementos HTML</strong><span>Lo que obtienes sin ninguna clase</span></a></li>
+        <li><a href="../es/docs/components.html"><strong>Componentes</strong><span>29 piezas de core</span></a></li>
+        <li><a href="../es/docs/catalog.html"><strong>Catálogo</strong><span>41 patrones, por tipo de sitio</span></a></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Playground -->
+  <section class="sec sec--white sec--line">
+    <div class="wrap">
+      <div class="sec__head">
+        <p class="label">Juega con ello</p>
+        <h2 data-split>Componentes de verdad. <em>Venga, tócalos.</em></h2>
+        <p>Nada de aquí es una imagen. Cada pieza de abajo es HTML nativo con estilo, y casi todas funcionan sin ningún script.</p>
+      </div>
+      <div class="bento">
+        <fieldset class="b b--modes">
+          <legend class="label label--ink">Modo de color</legend>
+          <h3>Un atributo lo cambia todo.</h3>
+          <div class="seg">
+            <label><input type="radio" name="bento-mode" value="light" checked> Claro</label>
+            <label><input type="radio" name="bento-mode" value="dark"> Oscuro</label>
+            <label><input type="radio" name="bento-mode" value="contrast"> Alto contraste</label>
+          </div>
+          <code class="b__code">&lt;html data-theme="<span class="b__mode">light</span>"&gt;</code>
+        </fieldset>
+
+        <div class="b b--acc">
+          <p class="label label--ink">Acordeón · details nativo</p>
+          <details open><summary>¿Necesito un paso de compilación?</summary><p>No. Dos etiquetas link y ya estás en marcha.</p></details>
+          <details><summary>¿Funciona sin JavaScript?</summary><p>Todos los componentes. Los scripts solo añaden comodidad.</p></details>
+          <details><summary>¿Puedo traer mi propia marca?</summary><p>Gira tres mandos, o escribe un tema a partir de la plantilla.</p></details>
+        </div>
+
+        <div class="b b--meter">
+          <p class="label label--ink">Medidor · nativo</p>
+          <h3>Almacenamiento usado</h3>
+          <div class="b__big"><output id="b-out" for="b-range">62%</output></div>
+          <meter id="b-meter" min="0" max="100" low="70" high="90" optimum="20" value="62">62%</meter>
+          <label class="b__range">Arrástrame <input id="b-range" type="range" min="0" max="100" value="62" data-meter="#b-meter" data-out="#b-out"></label>
+        </div>
+
+        <div class="b b--toast">
+          <p class="label label--ink">Aviso</p>
+          <h3>Di una cosa y espera.</h3>
+          <button class="x-btn" type="button" data-toast="Enlace copiado al portapapeles">Copiar el enlace</button>
+        </div>
+
+        <div class="b b--dialog">
+          <p class="label label--ink">Modal · diálogo nativo</p>
+          <h3>Escape simplemente funciona.</h3>
+          <button class="x-btn x-btn--2" type="button" data-open="#b-dialog">Abrir el diálogo</button>
+        </div>
+
+        <form class="b b--form" onsubmit="return false">
+          <p class="label label--ink">Formulario · validación nativa</p>
+          <label class="x-field">Correo de trabajo <span class="b__hint">Por ejemplo, nombre@ejemplo.com</span><input class="x-input" type="email" required></label>
+          <p class="b__error"><strong>Error:</strong> Escribe una dirección de correo con el formato correcto, como nombre@ejemplo.com.</p>
+          <p class="b__hint">Escribe algo que no sea un correo y sal del campo. El error espera a que lo hagas.</p>
+        </form>
+      </div>
+      <dialog class="b-dialog" id="b-dialog" aria-labelledby="b-dialog-h">
+        <form method="dialog">
+          <h3 id="b-dialog-h">¿Eliminar este borrador?</h3>
+          <p>Se va para siempre. El navegador se encarga del foco, del fondo y de la tecla Escape.</p>
+          <div class="x-row"><button class="x-btn x-btn--2" value="cancel" autofocus>Conservar el borrador</button><button class="x-btn x-btn--danger" value="delete">Eliminar el borrador</button></div>
+        </form>
+      </dialog>
+      <div class="toasts" role="status" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- Manifesto -->
+  <section class="sec sec--line">
+    <div class="wrap mani">
+      <p class="label">Por qué Luz</p>
+      <p class="mani__say" data-split>La mayoría de los sistemas de diseño te piden que aprendas <s>el sistema</s>. Luz te pide que recuerdes <em>HTML.</em></p>
+      <div class="trio" data-stagger>
+        <div>
+          <p class="label label--ink">01</p>
+          <h3>Ninguna clase necesaria</h3>
+          <p>Un botón es un <code>&lt;button&gt;</code>. Una tabla es un <code>&lt;table&gt;</code>. Escribe el elemento y llega terminado. Una clase solo añade lo que HTML no puede decir.</p>
+        </div>
+        <div>
+          <p class="label label--ink">02</p>
+          <h3>Ningún script necesario</h3>
+          <p>Los diálogos, los popovers y los acordeones son del propio navegador. JavaScript mejora la página. Nunca es la razón por la que la página funciona.</p>
+        </div>
+        <div>
+          <p class="label label--ink">03</p>
+          <h3>Ninguna compilación necesaria</h3>
+          <p>Dos etiquetas <code>&lt;link&gt;</code> y ya estás en marcha. Usa un bundler si te gusta alguno. Luz nunca lo pedirá.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="sec dark">
+    <div class="wrap">
+      <div class="sec__head sec__head--center">
+        <p class="label">Lo que obtienes</p>
+        <h2 data-split>Todo lo que una página necesita. <em>Nada que no necesite.</em></h2>
+      </div>
+      <div class="cards" data-stagger>
+        <article class="card">
+          <svg class="card__fig" viewBox="0 0 240 120" aria-hidden="true"><g stroke="currentColor" fill="none" vector-effect="non-scaling-stroke"><path d="M10 20h220M10 44h220M10 68h220M10 92h220"/></g><path class="ac" d="M10 92h220" fill="none"/><g font-family="ui-monospace,monospace" font-size="8" fill="currentColor" opacity=".6"><text x="10" y="15">luz.tokens</text><text x="10" y="39">luz.elements</text><text x="10" y="63">luz.components</text><text x="10" y="87">your css</text></g></svg>
+          <h3>Tu CSS siempre gana</h3>
+          <p>Capas de cascada con nombre y elementos base con especificidad cero. Sobrescribe lo que quieras con una regla normal, sin <code>!important</code>.</p>
+          <footer class="card__foot"><span>Capas de cascada</span><span class="card__num">01</span></footer>
+        </article>
+        <article class="card">
+          <svg class="card__fig" viewBox="0 0 240 120" aria-hidden="true"><g stroke="currentColor" fill="none" vector-effect="non-scaling-stroke"><rect x="10" y="10" width="40" height="100"/><rect x="58" y="10" width="40" height="100"/><rect x="106" y="10" width="40" height="100"/><rect x="154" y="10" width="40" height="100"/></g><rect class="ac" x="202" y="10" width="28" height="100" fill="none"/></svg>
+          <h3>Funciona sin JavaScript</h3>
+          <p>Cada componente se prueba dos veces, con scripts y sin ellos. La página que recibe tu lector en un mal día sigue funcionando.</p>
+          <footer class="card__foot"><span>Probado sin JS</span><span class="card__num">02</span></footer>
+        </article>
+        <article class="card">
+          <svg class="card__fig" viewBox="0 0 240 120" aria-hidden="true"><g stroke="currentColor" fill="none" vector-effect="non-scaling-stroke"><rect x="40" y="20" width="80" height="80"/><rect x="80" y="20" width="80" height="80"/></g><rect class="ac" x="120" y="20" width="80" height="80" fill="none"/></svg>
+          <h3>Tres modos, una fuente</h3>
+          <p>Claro, oscuro y alto contraste desde los mismos tokens semánticos, cada par medido antes de publicarse.</p>
+          <footer class="card__foot"><span>Modos de color</span><span class="card__num">03</span></footer>
+        </article>
+        <article class="card">
+          <svg class="card__fig" viewBox="0 0 240 120" aria-hidden="true"><g stroke="currentColor" fill="none" vector-effect="non-scaling-stroke"><rect x="10" y="12" width="20" height="20"/><rect x="38" y="12" width="20" height="20"/><rect x="66" y="12" width="20" height="20"/><rect x="94" y="12" width="20" height="20"/><rect x="122" y="12" width="20" height="20"/><rect x="150" y="12" width="20" height="20"/><rect x="178" y="12" width="20" height="20"/><rect x="206" y="12" width="20" height="20"/><rect x="10" y="40" width="20" height="20"/><rect x="38" y="40" width="20" height="20"/><rect x="66" y="40" width="20" height="20"/><rect x="94" y="40" width="20" height="20"/><rect x="122" y="40" width="20" height="20"/><rect x="150" y="40" width="20" height="20"/><rect x="178" y="40" width="20" height="20"/><rect x="206" y="40" width="20" height="20"/><rect x="10" y="68" width="20" height="20"/><rect x="38" y="68" width="20" height="20"/><rect x="66" y="68" width="20" height="20"/><rect x="94" y="68" width="20" height="20"/><rect x="122" y="68" width="20" height="20"/><rect x="150" y="68" width="20" height="20"/><rect x="178" y="68" width="20" height="20"/><rect x="206" y="68" width="20" height="20"/><rect x="10" y="96" width="20" height="20"/><rect x="38" y="96" width="20" height="20"/><rect x="66" y="96" width="20" height="20"/><rect x="94" y="96" width="20" height="20"/><rect x="122" y="96" width="20" height="20"/><rect x="150" y="96" width="20" height="20"/><rect x="178" y="96" width="20" height="20"/><rect x="206" y="96" width="20" height="20"/></g><rect class="ac" x="66" y="40" width="20" height="20" fill="none"/><rect class="ac" x="150" y="68" width="20" height="20" fill="none"/></svg>
+          <h3>Paga por lo que enlazas</h3>
+          <p>Una hoja de estilos por pieza. Una página con el hero y la búsqueda carga esas dos, y ni un byte más.</p>
+          <footer class="card__foot"><span>Un archivo cada una</span><span class="card__num">04</span></footer>
+        </article>
+        <article class="card">
+          <svg class="card__fig" viewBox="0 0 240 120" aria-hidden="true"><g stroke="currentColor" fill="none" vector-effect="non-scaling-stroke"><path d="M10 110h220M10 10v100"/><path d="M10 96 60 80 100 88 150 40 190 52 230 16" opacity=".35"/></g><path class="ac" d="M10 100 60 92 100 70 150 60 190 30 230 22" fill="none"/></svg>
+          <h3>Probado primero, siempre</h3>
+          <p>Cada cambio empieza como una prueba que falla. Si está en la caja, algo ya intentó romperlo.</p>
+          <footer class="card__foot"><span>Prueba primero</span><span class="card__num">05</span></footer>
+        </article>
+        <article class="card">
+          <svg class="card__fig" viewBox="0 0 240 120" aria-hidden="true"><g stroke="currentColor" fill="none" vector-effect="non-scaling-stroke"><path d="M20 30h200M20 60h200M20 90h200"/><rect x="66" y="24" width="12" height="12"/><rect x="150" y="54" width="12" height="12"/></g><rect class="ac" x="110" y="84" width="12" height="12" fill="none"/></svg>
+          <h3>Tuyo con tres mandos</h3>
+          <p>Base tipográfica, razón tipográfica, unidad de espacio. Gíralos y todo el sistema los sigue.</p>
+          <footer class="card__foot"><span>Tres mandos</span><span class="card__num">06</span></footer>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Kinds of site -->
+  <section class="sec sec--white sec--line">
+    <div class="wrap">
+      <div class="sec__head">
+        <p class="label">Tipos de sitio</p>
+        <h2 data-split>Un sistema. <em>Cuatro maneras de empezar.</em></h2>
+        <p>El catálogo conoce la forma del sitio que vas a hacer. Empieza por el patrón y luego hazlo inconfundiblemente tuyo.</p>
+      </div>
+      <div class="kinds" data-stagger>
+        <a class="kind" href="../es/docs/catalog.html">
+          <div class="kind__fig"><svg viewBox="0 0 240 300" aria-hidden="true">
+            <rect class="w-ink" x="20" y="22" width="26" height="5"/><rect class="w-line" x="150" y="22" width="18" height="5"/><rect class="w-line" x="176" y="22" width="18" height="5"/><rect class="w-line" x="202" y="22" width="18" height="5"/>
+            <rect class="w-ink" x="20" y="70" width="150" height="14"/><rect class="w-ink" x="20" y="92" width="110" height="14"/><rect class="w-line" x="20" y="124" width="130" height="5"/><rect class="w-line" x="20" y="135" width="100" height="5"/>
+            <rect class="w-blue" x="20" y="158" width="56" height="18"/>
+            <rect class="w-wash" x="132" y="196" width="20" height="104"/><rect class="w-wash" x="156" y="166" width="20" height="134"/><rect class="w-blue" x="180" y="140" width="20" height="160"/><rect class="w-wash" x="204" y="210" width="20" height="90"/>
+          </svg></div>
+          <h3>Página de aterrizaje</h3>
+          <p>Cabecera del sitio, hero, secciones, pie.</p>
+        </a>
+        <a class="kind" href="../es/docs/catalog.html">
+          <div class="kind__fig"><svg viewBox="0 0 240 300" aria-hidden="true">
+            <rect class="w-ink" x="70" y="26" width="100" height="12"/><rect class="w-line" x="20" y="52" width="200" height="1"/>
+            <rect class="w-wash" x="20" y="70" width="120" height="86"/><rect class="w-blue" x="64" y="100" width="32" height="40"/>
+            <rect class="w-ink" x="20" y="168" width="120" height="9"/><rect class="w-line" x="20" y="186" width="120" height="4"/><rect class="w-line" x="20" y="196" width="104" height="4"/><rect class="w-line" x="20" y="206" width="114" height="4"/>
+            <rect class="w-ink" x="156" y="70" width="64" height="7"/><rect class="w-line" x="156" y="86" width="64" height="4"/><rect class="w-line" x="156" y="96" width="50" height="4"/>
+            <rect class="w-ink" x="156" y="124" width="64" height="7"/><rect class="w-line" x="156" y="140" width="64" height="4"/><rect class="w-line" x="156" y="150" width="44" height="4"/>
+            <rect class="w-ink" x="156" y="178" width="64" height="7"/><rect class="w-line" x="156" y="194" width="64" height="4"/><rect class="w-line" x="156" y="204" width="56" height="4"/>
+            <rect class="w-line" x="20" y="232" width="200" height="1"/><rect class="w-line" x="20" y="248" width="60" height="4"/><rect class="w-line" x="90" y="248" width="60" height="4"/><rect class="w-line" x="160" y="248" width="60" height="4"/>
+          </svg></div>
+          <h3>Blog o periódico</h3>
+          <p>Cabecera editorial, artículo, índice de contenidos.</p>
+        </a>
+        <a class="kind" href="../es/docs/catalog.html">
+          <div class="kind__fig"><svg viewBox="0 0 240 300" aria-hidden="true">
+            <rect class="w-paper" x="0" y="0" width="56" height="300"/><rect class="w-ink" x="14" y="24" width="26" height="5"/><rect class="w-blue" x="14" y="56" width="28" height="5"/><rect class="w-line" x="14" y="72" width="24" height="5"/><rect class="w-line" x="14" y="88" width="28" height="5"/><rect class="w-line" x="14" y="104" width="20" height="5"/>
+            <rect class="w-ink" x="72" y="24" width="70" height="9"/>
+            <rect class="w-wash" x="72" y="50" width="44" height="40"/><rect class="w-wash" x="124" y="50" width="44" height="40"/><rect class="w-wash" x="176" y="50" width="44" height="40"/>
+            <rect class="w-ink" x="80" y="60" width="20" height="8"/><rect class="w-ink" x="132" y="60" width="16" height="8"/><rect class="w-ink" x="184" y="60" width="24" height="8"/>
+            <rect class="w-wash" x="72" y="160" width="22" height="40"/><rect class="w-wash" x="100" y="140" width="22" height="60"/><rect class="w-blue" x="128" y="118" width="22" height="82"/><rect class="w-wash" x="156" y="150" width="22" height="50"/><rect class="w-wash" x="184" y="130" width="22" height="70"/>
+            <rect class="w-line" x="72" y="200" width="148" height="1"/>
+            <rect class="w-line" x="72" y="222" width="148" height="4"/><rect class="w-line" x="72" y="238" width="148" height="4"/><rect class="w-line" x="72" y="254" width="148" height="4"/><rect class="w-line" x="72" y="270" width="100" height="4"/>
+          </svg></div>
+          <h3>Aplicación web</h3>
+          <p>Barra de aplicación, panel, gráficas, vistas de datos.</p>
+        </a>
+        <a class="kind" href="../es/docs/catalog.html">
+          <div class="kind__fig"><svg viewBox="0 0 240 300" aria-hidden="true">
+            <rect class="w-ink" x="16" y="20" width="24" height="5"/><rect class="w-line" x="0" y="40" width="240" height="1"/>
+            <rect class="w-line" x="16" y="60" width="38" height="4"/><rect class="w-blue" x="16" y="74" width="30" height="4"/><rect class="w-line" x="16" y="88" width="36" height="4"/><rect class="w-line" x="16" y="102" width="26" height="4"/><rect class="w-line" x="16" y="130" width="38" height="4"/><rect class="w-line" x="16" y="144" width="30" height="4"/><rect class="w-line" x="16" y="158" width="34" height="4"/>
+            <rect class="w-ink" x="74" y="60" width="90" height="12"/><rect class="w-line" x="74" y="84" width="110" height="4"/><rect class="w-line" x="74" y="94" width="96" height="4"/>
+            <rect class="w-ink" x="74" y="116" width="112" height="56"/><rect class="w-hi" x="84" y="128" width="50" height="4"/><rect class="w-paper" x="84" y="140" width="76" height="4"/><rect class="w-paper" x="84" y="152" width="40" height="4"/>
+            <rect class="w-line" x="74" y="188" width="112" height="4"/><rect class="w-line" x="74" y="198" width="100" height="4"/><rect class="w-line" x="74" y="208" width="108" height="4"/>
+            <rect class="w-wash" x="74" y="228" width="112" height="40"/><rect class="w-blue" x="80" y="240" width="12" height="12"/><rect class="w-ink" x="102" y="240" width="60" height="4"/><rect class="w-line" x="102" y="250" width="72" height="4"/>
+            <rect class="w-line" x="200" y="60" width="24" height="4"/><rect class="w-line" x="200" y="72" width="20" height="4"/><rect class="w-line" x="200" y="84" width="24" height="4"/>
+          </svg></div>
+          <h3>Documentación</h3>
+          <p>Estructura de docs, raíl de página, paginador.</p>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Accessibility -->
+  <section class="sec sec--line">
+    <div class="wrap">
+      <div class="sec__head">
+        <p class="label">Accesibilidad</p>
+        <h2 data-split>Accesible, y sincero <em>sobre sus fallos.</em></h2>
+        <p>WCAG 2.2 AA es la base de cada pieza. Donde Luz se queda corta, la declaración lo dice en público, con el criterio que incumple.</p>
+      </div>
+      <div class="honest" data-stagger>
+        <div>
+          <p class="label label--ink">Lo que se cumple</p>
+          <h3>Probado en cada componente</h3>
+          <ul>
+            <li>Solo con teclado, con un anillo de foco que siempre se ve.</li>
+            <li>Reorganización con un zoom del 400 %, hasta 320 píxeles.</li>
+            <li>Colores forzados y movimiento reducido.</li>
+            <li>Contraste medido en los tres modos, por el build.</li>
+          </ul>
+        </div>
+        <div>
+          <p class="label label--ink">Lo que aún no</p>
+          <h3>Conocido y por escrito</h3>
+          <ul>
+            <li>Un tema propio lo compruebas tú. La herramienta de contraste viene incluida.</li>
+            <li>Las pruebas con lectores de pantalla son a mano y se listan en cada versión.</li>
+            <li>Luz está en beta: un nombre aún puede cambiar antes de la 1.0.</li>
+          </ul>
+          <p class="honest__more"><a class="link" href="../es/docs/accessibility.html">Lee la declaración de accesibilidad</a></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Start in your terminal -->
+  <section class="sec dark" id="start">
+    <div class="wrap split split--start">
+      <div>
+        <p class="label">Empieza en tu terminal</p>
+        <h2 data-split>Un comando. <em>Pregunta antes de escribir.</em></h2>
+        <p>Primero mira tu proyecto, pregunta solo lo que no pudo saber, te enseña el plan y no escribe nada hasta que dices que sí. Después comprueba el resultado con <code>luz-check</code>.</p>
+        <div class="install install--dark">
+          <code id="create-line">npm create @luz-ds@0.4.1</code>
+          <button class="copy" type="button" data-copy="#create-line">Copiar</button>
+        </div>
+        <dl>
+          <div><dt>Detecta</dt><dd>Tu pila, tu gestor de paquetes y si Luz ya está ahí.</dd></div>
+          <div><dt>Planifica</dt><dd>Cada archivo que creará o cambiará, con el diff, antes de tocar ninguno.</dd></div>
+          <div><dt>Comprueba</dt><dd>Ejecuta <code>luz-check</code> al final y te dice lo que queda.</dd></div>
+        </dl>
+        <p class="ai-line"><strong>¿Trabajas con una IA?</strong> Dile que ejecute <code>npx @luz-ds/create@0.4.1 --json</code>. Recibe el plan en JSON y lo aplica con <code>--confirm</code> cuando estés de acuerdo. <a href="../es/docs/ai.html">Usa Luz con una IA</a></p>
+      </div>
+      <div>
+        <fieldset class="term-modes">
+          <legend class="sr-only">Mostrar la instalación</legend>
+          <label><input type="radio" name="term-mode" value="tty" checked> En una terminal</label>
+          <label><input type="radio" name="term-mode" value="a11y"> Modo accesible</label>
+          <label><input type="radio" name="term-mode" value="json"> Para un agente</label>
+        </fieldset>
+        <div class="term" data-type>
+          <div class="term__bar"><i></i><i></i><i></i><span>~/my-site</span></div>
+<pre class="term__pane term__pane--tty"><code><span class="dim">$</span> <span class="hi">npm create @luz-ds@0.4.1</span>
+
+  <span class="bl">▲ LUZ</span>  <span class="dim">create · 0.4.1</span>
+
+<span class="dim">◇</span>  Detected   <span class="hi">Astro · pnpm · a new site</span>
+<span class="dim">│</span>
+<span class="bl">◆</span>  How shall we start?
+<span class="dim">│</span>  <span class="bl">●</span> Quick: what is recommended for this project
+<span class="dim">│</span>  <span class="dim">○ Tailored: about eight questions</span>
+<span class="dim">│</span>  <span class="dim">○ Like last time</span>
+<span class="dim">└</span>
+<span class="dim">◇</span>  Plan
+<span class="dim">│</span>  Install  <span class="hi">@luz-ds/tokens @luz-ds/core @luz-ds/catalog</span>
+<span class="dim">│</span>  Create   src/styles/site.css     <span class="dim">your layer, after Luz</span>
+<span class="dim">│</span>  Create   src/pages/index.astro   <span class="dim">a landing to start from</span>
+<span class="dim">│</span>  Change   src/layouts/Base.astro  <span class="dim">+ 3 links in &lt;head&gt;</span>
+<span class="dim">│</span>  Add      AGENTS.md               <span class="dim">+ a short Luz section</span>
+<span class="dim">│</span>
+<span class="bl">◆</span>  Shall I do it?  <span class="bl">● Yes</span>  <span class="dim">○ Show the changes  ○ Cancel</span>
+<span class="dim">└</span>
+<span class="ok">✔</span>  Packages installed                       <span class="dim">1.9 s</span>
+<span class="ok">✔</span>  site.css, index.astro and Base.astro
+<span class="ok">✔</span>  AGENTS.md: Luz section added
+<span class="dim">◇</span>  luz-check src
+<span class="dim">│</span>  <span class="ok">✔ 0 errors</span>   <span class="wa">▲ 1 warning</span>
+<span class="dim">│</span>  <span class="wa">▲</span> src/pages/index.astro:14  .luz-btn with no variant
+<span class="dim">└</span>  Done. Next: <span class="hi">pnpm dev</span></code></pre>
+<pre class="term__pane term__pane--a11y"><code><span class="dim">$</span> <span class="hi">npm create @luz-ds@0.4.1 -- --accessible</span>
+
+Detected: Astro, pnpm, a new site.
+Question 1 of 2. How shall we start?
+  1. Quick: what is recommended for this project
+  2. Tailored: about eight questions
+  3. Like last time
+Type a number, then press Enter: <span class="hi">1</span>
+
+Plan:
+  Install @luz-ds/tokens, @luz-ds/core and @luz-ds/catalog.
+  Create src/styles/site.css and src/pages/index.astro.
+  Change src/layouts/Base.astro: 3 links in the head.
+  Add a short Luz section to AGENTS.md.
+Question 2 of 2. Shall I do it? Type y or n: <span class="hi">y</span>
+
+Installing. This takes a few seconds.
+Done: packages installed.
+Done: 3 files written, AGENTS.md updated.
+Check: 0 errors, 1 warning.
+Warning: src/pages/index.astro, line 14: .luz-btn with no variant.
+Finished. Next: pnpm dev</code></pre>
+<pre class="term__pane term__pane--json"><code><span class="dim">$</span> <span class="hi">npx @luz-ds/create@0.4.1 --json --stack astro --kind landing --brand vejer</span>
+{
+  <span class="bl">"detected"</span>: { <span class="bl">"stack"</span>: <span class="ok">"astro"</span>, <span class="bl">"packageManager"</span>: <span class="ok">"pnpm"</span>, <span class="bl">"project"</span>: <span class="ok">"new"</span> },
+  <span class="bl">"plan"</span>: [
+    { <span class="bl">"do"</span>: <span class="ok">"install"</span>, <span class="bl">"packages"</span>: [<span class="ok">"@luz-ds/tokens"</span>, <span class="ok">"@luz-ds/core"</span>, <span class="ok">"@luz-ds/catalog"</span>] },
+    { <span class="bl">"do"</span>: <span class="ok">"create"</span>, <span class="bl">"path"</span>: <span class="ok">"src/styles/site.css"</span> },
+    { <span class="bl">"do"</span>: <span class="ok">"create"</span>, <span class="bl">"path"</span>: <span class="ok">"src/pages/index.astro"</span> },
+    { <span class="bl">"do"</span>: <span class="ok">"change"</span>, <span class="bl">"path"</span>: <span class="ok">"src/layouts/Base.astro"</span> },
+    { <span class="bl">"do"</span>: <span class="ok">"append"</span>, <span class="bl">"path"</span>: <span class="ok">"AGENTS.md"</span>, <span class="bl">"section"</span>: <span class="ok">"LUZ"</span> }
+  ],
+  <span class="bl">"written"</span>: <span class="wa">false</span>,
+  <span class="bl">"apply"</span>: <span class="ok">"npx @luz-ds/create@0.4.1 --json … --confirm"</span>
+}
+<span class="dim"># Nothing is written without --confirm. Exit code 0.</span></code></pre>
+        </div>
+        <p class="term__note">Un boceto de <code>@luz-ds/create</code>, que es una propuesta y aún no está publicado.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Closing band -->
+  <section class="band">
+    <div class="band__art"><div class="cols cols--dark" aria-hidden="true"><div class="col" style="--h:28.6%;--i:0"><span>sm<br>14px</span></div><div class="col" style="--h:40.8%;--i:1"><span>lg<br>20px</span></div><div class="col" style="--h:63.3%;--i:2"><span>2xl<br>31px</span></div><div class="col" style="--h:100%;--i:3"><span>4xl<br>49px</span></div><div class="col" style="--h:79.6%;--i:4"><span>3xl<br>39px</span></div><div class="col" style="--h:51%;--i:5"><span>xl<br>25px</span></div><div class="col col--body" style="--h:32.7%;--i:6"><span>base<br>16px</span></div><div class="col" style="--h:30.6%;--i:7"><span>md<br>15px</span></div><div class="col" style="--h:24.5%;--i:8"><span>xs<br>12px</span></div></div></div>
+    <div class="wrap band__in">
+      <p class="label label--light">Código abierto · MIT</p>
+      <h2 data-split>Hágase <em>la luz.</em></h2>
+      <p>A dos etiquetas link de ahora, tu HTML parece terminado. Todo lo demás lo decides tú.</p>
+      <div class="hero__cta">
+        <a class="btn btn--light" href="../es/docs/get-started.html">Escribe tu primera página</a>
+        <a class="btn btn--line" href="https://github.com/nandovejer/luz">Dale una estrella en GitHub</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap foot__in">
+    <div>
+      <a class="brand" href="../es/index.html" aria-label="LUZ, inicio">
+        <svg viewBox="0 0 28 28" aria-hidden="true"><rect x="1.5" y="15.5" width="7" height="11" fill="none" stroke="currentColor"/><rect x="10.5" y="8.5" width="7" height="18" fill="none" stroke="currentColor"/><rect x="19.5" y="1.5" width="7" height="25" fill="#2f55ff"/></svg>
+        <span>Luz</span>
+      </a>
+      <p class="foot__say">Ligero, usable y sin dependencias. Un sistema de diseño en HTML, CSS y módulos ES sin más.</p>
+    </div>
+    <div>
+      <h2>Aprender</h2>
+      <ul>
+        <li><a href="../es/docs/get-started.html">Primeros pasos</a></li>
+        <li><a href="../es/docs/index.html">Documentación</a></li>
+        <li><a href="../es/docs/get-started.html">Hazlo tuyo</a></li>
+        <li><a href="../es/docs/ai.html">Usa Luz con una IA</a></li>
+      </ul>
+    </div>
+    <div>
+      <h2>Sistema</h2>
+      <ul>
+        <li><a href="../es/docs/color.html">Tokens</a></li>
+        <li><a href="../es/docs/components.html">Componentes</a></li>
+        <li><a href="../es/docs/catalog.html">Catálogo</a></li>
+        <li><a href="../es/docs/accessibility.html">Accesibilidad</a></li>
+      </ul>
+    </div>
+    <div>
+      <h2>Proyecto</h2>
+      <ul>
+        <li><a href="https://github.com/nandovejer/luz">GitHub</a></li>
+        <li><a href="https://www.npmjs.com/package/@luz-ds/core">npm</a></li>
+        <li><a href="https://github.com/nandovejer/luz/blob/main/CHANGELOG.md">Registro de cambios</a></li>
+        <li><a href="https://github.com/nandovejer/luz/blob/main/CONTRIBUTING.md">Cómo contribuir</a></li>
+        <li><a href="https://github.com/nandovejer/luz/blob/main/LICENSE">Licencia MIT</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="wrap foot__end">
+    <span>© 2026 LUZ. Licencia MIT.</span>
+    <span>Sin cookies. Sin rastreadores. Sin dependencias.</span>
+  </div>
+</footer>
+
+<dialog class="find" aria-label="Buscar en el sitio">
+  <form method="dialog">
+    <input type="search" placeholder="Buscar en la documentación" aria-label="Buscar en la documentación" autocomplete="off">
+    <button class="copy" type="submit">Esc</button>
+  </form>
+  <ul><li><a href="../es/docs/get-started.html"><span>Instalación</span><small>Primeros pasos</small></a></li><li><a href="../es/docs/get-started.html"><span>Hazlo tuyo</span><small>Primeros pasos</small></a></li><li><a href="../es/docs/get-started.html"><span>Migrar un proyecto</span><small>Primeros pasos</small></a></li><li><a href="../es/docs/ai.html"><span>Usa Luz con una IA</span><small>Trabajar con IA</small></a></li><li><a href="../es/docs/ai.html"><span>Todas las opciones</span><small>Trabajar con IA</small></a></li><li><a href="../es/docs/ai.html"><span>¿Sin terminal?</span><small>Trabajar con IA</small></a></li><li><a href="../es/docs/color.html"><span>Color</span><small>Tokens</small></a></li><li><a href="../es/docs/color.html"><span>Modos de color</span><small>Tokens</small></a></li><li><a href="../es/docs/color.html"><span>Tipografía</span><small>Tokens</small></a></li><li><a href="../es/docs/color.html"><span>Espaciado</span><small>Tokens</small></a></li><li><a href="../es/docs/color.html"><span>Movimiento</span><small>Tokens</small></a></li><li><a href="../es/docs/components.html"><span>Elementos de la A a la Z</span><small>Elementos HTML</small></a></li><li><a href="../es/docs/components.html"><span>Formularios</span><small>Elementos HTML</small></a></li><li><a href="../es/docs/components.html"><span>Texto</span><small>Elementos HTML</small></a></li><li><a href="../es/docs/components.html"><span>Todos los componentes</span><small>Componentes</small></a></li><li><a href="../es/docs/button.html"><span>Botón</span><small>Componentes</small></a></li><li><a href="../es/docs/button.html"><span>Tarjeta</span><small>Componentes</small></a></li><li><a href="../es/docs/button.html"><span>Campos de formulario</span><small>Componentes</small></a></li><li><a href="../es/docs/button.html"><span>Modal</span><small>Componentes</small></a></li><li><a href="../es/docs/button.html"><span>Tabla</span><small>Componentes</small></a></li><li><a href="../es/docs/button.html"><span>Pestañas</span><small>Componentes</small></a></li><li><a href="../es/docs/catalog.html"><span>Todos los patrones</span><small>Catálogo</small></a></li><li><a href="../es/docs/catalog.html"><span>Tipos de sitio</span><small>Catálogo</small></a></li><li><a href="../es/docs/catalog.html"><span>Hero</span><small>Catálogo</small></a></li><li><a href="../es/docs/catalog.html"><span>Buscar</span><small>Catálogo</small></a></li><li><a href="../es/docs/catalog.html"><span>Gráficas</span><small>Catálogo</small></a></li><li><a href="../es/docs/accessibility.html"><span>Declaración</span><small>Accesibilidad</small></a></li><li><a href="../es/docs/accessibility.html"><span>Estado por componente</span><small>Accesibilidad</small></a></li><li><a href="../es/docs/get-started.html"><span>Capas</span><small>Cómo está hecho</small></a></li><li><a href="../es/docs/get-started.html"><span>Principios</span><small>Cómo está hecho</small></a></li><li><a href="../es/docs/get-started.html"><span>Registro de cambios</span><small>Novedades</small></a></li><li><a href="../es/docs/get-started.html"><span>Hoja de ruta</span><small>Novedades</small></a></li><li><a href="../es/docs/get-started.html"><span>Contribuir</span><small>Novedades</small></a></li><li><a href="../es/index.html"><span>Inicio</span><small>Sitio</small></a></li><li><a href="../es/docs/index.html"><span>Documentación</span><small>Sitio</small></a></li></ul>
+  <p class="find__none" hidden>Ninguna página coincide. Revisa la ortografía, prueba con una palabra más corta o explora <a href="../es/docs/components.html">los componentes</a> y <a href="../es/docs/color.html">los tokens</a>.</p>
+</dialog>
+
+</body>
+</html>

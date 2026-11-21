@@ -14,7 +14,7 @@ for (const button of document.querySelectorAll("[data-copy]")) {
       return;
     }
     const label = button.textContent;
-    button.textContent = "Copied";
+    button.textContent = document.documentElement.lang === "es" ? "Copiado" : "Copied";
     button.dataset.done = "";
     setTimeout(() => {
       button.textContent = label;
@@ -34,7 +34,7 @@ for (const button of document.querySelectorAll("[data-copy-md]")) {
       return;
     }
     const label = button.textContent;
-    button.textContent = "Copied";
+    button.textContent = document.documentElement.lang === "es" ? "Copiado" : "Copied";
     setTimeout(() => (button.textContent = label), 1600);
   });
 }

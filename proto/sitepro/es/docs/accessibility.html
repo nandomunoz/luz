@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Declaración de accesibilidad · LUZ</title>
+<meta name="description" content="La declaración de accesibilidad de LUZ.">
+<meta name="robots" content="noindex">
+<link rel="alternate" type="text/markdown" href="accessibility.md">
+<link rel="icon" href="../../assets/mark.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../../assets/site.css">
+<link rel="stylesheet" href="../../assets/docs.css">
+<link rel="stylesheet" href="../../assets/motion.css">
+<link rel="stylesheet" href="../../assets/look.css">
+<script defer src="../../assets/site.js"></script>
+<script defer src="../../assets/motion.js"></script>
+</head>
+<body class="is-docs">
+<a class="skip" href="#main">Saltar al contenido</a>
+<header class="head">
+  <div class="wrap head__in">
+    <a class="brand" href="../../es/index.html" aria-label="LUZ, inicio">
+      <svg viewBox="0 0 28 28" aria-hidden="true"><rect x="1.5" y="15.5" width="7" height="11" fill="none" stroke="currentColor"/><rect x="10.5" y="8.5" width="7" height="18" fill="none" stroke="currentColor"/><rect x="19.5" y="1.5" width="7" height="25" fill="#2f55ff"/></svg>
+      <span>Luz</span>
+      <small>0.4.1 beta</small>
+    </a>
+    <nav aria-label="Principal">
+      <ul class="nav">
+        <li><a href="../../es/docs/index.html">Docs</a></li>
+        <li><a href="../../es/docs/components.html">Componentes</a></li>
+        <li><a href="../../es/docs/catalog.html">Catálogo</a></li>
+        <li><a href="../../es/docs/color.html">Tokens</a></li>
+        <li><a href="../../es/docs/accessibility.html" aria-current="page">Accesibilidad</a></li>
+      </ul>
+    </nav>
+    <div class="head__act">
+      <nav class="lang" aria-label="Idioma"><a href="../../docs/accessibility.html" lang="en" hreflang="en">EN</a><a href="../../es/docs/accessibility.html" lang="es" hreflang="es" aria-current="true">ES</a></nav>
+      <button class="kbd-btn" type="button" data-find-open>Buscar <kbd>Ctrl K</kbd></button>
+      <a class="btn btn--sm" href="../../es/docs/get-started.html#install">Instala</a>
+    </div>
+    <details class="menu">
+      <summary aria-label="Menú"><span></span></summary>
+      <div class="menu__panel">
+        <nav class="lang" aria-label="Idioma"><a href="../../docs/accessibility.html" lang="en" hreflang="en">EN</a><a href="../../es/docs/accessibility.html" lang="es" hreflang="es" aria-current="true">ES</a></nav>
+        <ul>
+          <li><a href="../../es/docs/index.html">Docs</a></li>
+          <li><a href="../../es/docs/components.html">Componentes</a></li>
+          <li><a href="../../es/docs/catalog.html">Catálogo</a></li>
+          <li><a href="../../es/docs/color.html">Tokens</a></li>
+          <li><a href="../../es/docs/accessibility.html">Accesibilidad</a></li>
+          <li><a href="../../es/docs/get-started.html">Primeros pasos</a></li>
+        </ul>
+      </div>
+    </details>
+  </div>
+</header>
+
+<div class="docs wrap">
+  <details class="docs__menu">
+    <summary>Explorar la documentación</summary>
+    <nav class="side" aria-label="Documentación">
+<details><summary><span>Primeros pasos</span></summary><ul><li><a href="../../es/docs/get-started.html">Instalación</a></li><li><a href="../../es/docs/get-started.html">Hazlo tuyo</a></li><li><a href="../../es/docs/get-started.html">Migrar un proyecto</a></li></ul></details>
+<details><summary><span>Trabajar con IA</span></summary><ul><li><a href="../../es/docs/ai.html">Usa Luz con una IA</a></li><li><a href="../../es/docs/ai.html">Todas las opciones</a></li><li><a href="../../es/docs/ai.html">¿Sin terminal?</a></li></ul></details>
+<details><summary><span>Tokens<code>@luz-ds/tokens</code></span></summary><ul><li><a href="../../es/docs/color.html">Color</a></li><li><a href="../../es/docs/color.html">Modos de color</a></li><li><a href="../../es/docs/color.html">Tipografía</a></li><li><a href="../../es/docs/color.html">Espaciado</a></li><li><a href="../../es/docs/color.html">Movimiento</a></li></ul></details>
+<details><summary><span>Elementos HTML<code>@luz-ds/core</code></span></summary><ul><li><a href="../../es/docs/components.html">Elementos de la A a la Z</a></li><li><a href="../../es/docs/components.html">Formularios</a></li><li><a href="../../es/docs/components.html">Texto</a></li></ul></details>
+<details><summary><span>Componentes<code>@luz-ds/core</code></span></summary><ul><li><a href="../../es/docs/components.html">Todos los componentes</a></li><li><a href="../../es/docs/button.html">Botón</a></li><li><a href="../../es/docs/button.html">Tarjeta</a></li><li><a href="../../es/docs/button.html">Campos de formulario</a></li><li><a href="../../es/docs/button.html">Modal</a></li><li><a href="../../es/docs/button.html">Tabla</a></li><li><a href="../../es/docs/button.html">Pestañas</a></li></ul></details>
+<details><summary><span>Catálogo<code>@luz-ds/catalog</code></span></summary><ul><li><a href="../../es/docs/catalog.html">Todos los patrones</a></li><li><a href="../../es/docs/catalog.html">Tipos de sitio</a></li><li><a href="../../es/docs/catalog.html">Hero</a></li><li><a href="../../es/docs/catalog.html">Buscar</a></li><li><a href="../../es/docs/catalog.html">Gráficas</a></li></ul></details>
+<details open><summary><span>Accesibilidad</span></summary><ul><li><a href="../../es/docs/accessibility.html" aria-current="page">Declaración</a></li><li><a href="../../es/docs/accessibility.html">Estado por componente</a></li></ul></details>
+<details><summary><span>Cómo está hecho</span></summary><ul><li><a href="../../es/docs/get-started.html">Capas</a></li><li><a href="../../es/docs/get-started.html">Principios</a></li></ul></details>
+<details><summary><span>Novedades</span></summary><ul><li><a href="../../es/docs/get-started.html">Registro de cambios</a></li><li><a href="../../es/docs/get-started.html">Hoja de ruta</a></li><li><a href="../../es/docs/get-started.html">Contribuir</a></li></ul></details>
+    </nav>
+  </details>
+  <aside class="docs__side">
+    <nav class="side" aria-label="Documentación">
+<details><summary><span>Primeros pasos</span></summary><ul><li><a href="../../es/docs/get-started.html">Instalación</a></li><li><a href="../../es/docs/get-started.html">Hazlo tuyo</a></li><li><a href="../../es/docs/get-started.html">Migrar un proyecto</a></li></ul></details>
+<details><summary><span>Trabajar con IA</span></summary><ul><li><a href="../../es/docs/ai.html">Usa Luz con una IA</a></li><li><a href="../../es/docs/ai.html">Todas las opciones</a></li><li><a href="../../es/docs/ai.html">¿Sin terminal?</a></li></ul></details>
+<details><summary><span>Tokens<code>@luz-ds/tokens</code></span></summary><ul><li><a href="../../es/docs/color.html">Color</a></li><li><a href="../../es/docs/color.html">Modos de color</a></li><li><a href="../../es/docs/color.html">Tipografía</a></li><li><a href="../../es/docs/color.html">Espaciado</a></li><li><a href="../../es/docs/color.html">Movimiento</a></li></ul></details>
+<details><summary><span>Elementos HTML<code>@luz-ds/core</code></span></summary><ul><li><a href="../../es/docs/components.html">Elementos de la A a la Z</a></li><li><a href="../../es/docs/components.html">Formularios</a></li><li><a href="../../es/docs/components.html">Texto</a></li></ul></details>
+<details><summary><span>Componentes<code>@luz-ds/core</code></span></summary><ul><li><a href="../../es/docs/components.html">Todos los componentes</a></li><li><a href="../../es/docs/button.html">Botón</a></li><li><a href="../../es/docs/button.html">Tarjeta</a></li><li><a href="../../es/docs/button.html">Campos de formulario</a></li><li><a href="../../es/docs/button.html">Modal</a></li><li><a href="../../es/docs/button.html">Tabla</a></li><li><a href="../../es/docs/button.html">Pestañas</a></li></ul></details>
+<details><summary><span>Catálogo<code>@luz-ds/catalog</code></span></summary><ul><li><a href="../../es/docs/catalog.html">Todos los patrones</a></li><li><a href="../../es/docs/catalog.html">Tipos de sitio</a></li><li><a href="../../es/docs/catalog.html">Hero</a></li><li><a href="../../es/docs/catalog.html">Buscar</a></li><li><a href="../../es/docs/catalog.html">Gráficas</a></li></ul></details>
+<details open><summary><span>Accesibilidad</span></summary><ul><li><a href="../../es/docs/accessibility.html" aria-current="page">Declaración</a></li><li><a href="../../es/docs/accessibility.html">Estado por componente</a></li></ul></details>
+<details><summary><span>Cómo está hecho</span></summary><ul><li><a href="../../es/docs/get-started.html">Capas</a></li><li><a href="../../es/docs/get-started.html">Principios</a></li></ul></details>
+<details><summary><span>Novedades</span></summary><ul><li><a href="../../es/docs/get-started.html">Registro de cambios</a></li><li><a href="../../es/docs/get-started.html">Hoja de ruta</a></li><li><a href="../../es/docs/get-started.html">Contribuir</a></li></ul></details>
+    </nav>
+  </aside>
+  <main class="docs__main" id="main">
+    <header class="doc-head">
+      <p class="label">Accesibilidad · Referencia</p>
+      <h1>Lo que prometemos y lo que no</h1>
+      <p class="doc-head__lead">Luz aspira al nivel AA de WCAG 2.2 en cada pieza que publica. Esta página dice cómo se comprueba, dónde se queda corta y cómo avisarnos cuando nos equivocamos.</p>
+<dl class="doc-facts"><div><dt>Estado</dt><dd>Revisada para 0.4.1 beta</dd></div></dl>
+      <p class="doc-acts"><a href="https://github.com/nandovejer/luz/edit/main/proto/sitepro/src/pages/docs/accessibility.html">Editar en GitHub</a><button type="button" data-copy-md>Copiar como Markdown</button></p>
+    </header>
+    <div class="prose">
+<dl class="score wide">
+  <div><dt>AA</dt><dd>WCAG 2.2 es la base, con EN 301 549 como referencia.</dd></div>
+  <div><dt>3</dt><dd>modos de color, cada uno con su contraste medido antes de cada versión.</dd></div>
+  <div><dt>2×</dt><dd>Cada componente se prueba con JavaScript activado y desactivado.</dd></div>
+</dl>
+
+<h2 id="promise">Lo que hace cada pieza</h2>
+<ul>
+  <li>Funciona solo con el teclado, con un anillo de foco que nunca se quita.</li>
+  <li>Se reorganiza con un zoom del 400 %, hasta un ancho de 320 píxeles.</li>
+  <li>Aguanta los colores forzados y el movimiento reducido.</li>
+  <li>Nunca usa el color como única señal de un estado.</li>
+  <li>Toma su nombre de la página: un <code>label</code>, texto visible y, solo en último caso, ARIA.</li>
+</ul>
+
+<h2 id="how">Cómo se prueba</h2>
+<div class="table-wrap wide">
+  <table>
+    <thead><tr><th>Comprobación</th><th>Cómo</th><th>Cuándo</th></tr></thead>
+    <tbody>
+      <tr><th>Reglas automáticas</th><td>axe, en cada componente y en cada página de este sitio</td><td>En cada pull request</td></tr>
+      <tr><th>Contraste</th><td>Cada par de colores que usa un componente, en los tres modos</td><td>En cada pull request</td></tr>
+      <tr><th>Teclado y sin JavaScript</th><td>Pruebas en navegador, en dos proyectos</td><td>En cada pull request</td></tr>
+      <tr><th>Lectores de pantalla</th><td>A mano. Solo se listan las combinaciones realmente usadas</td><td>Antes de cada versión</td></tr>
+    </tbody>
+  </table>
+</div>
+<div class="note">
+  <strong>Una prueba automática no es una persona.</strong>
+  <p>Una comprobación en verde encuentra un tercio de los problemas. El resto lo encuentran las personas, y tú.</p>
+</div>
+
+<h2 id="status">Estado por componente</h2>
+<p>Lo que se ha hecho en cada pieza, no lo que esperamos que sea cierto.</p>
+<div class="table-wrap wide">
+  <table>
+    <thead><tr><th>Componente</th><th>Automática</th><th>Teclado</th><th>Lector de pantalla</th></tr></thead>
+    <tbody>
+      <tr><th><a href="../../es/docs/button.html">Botón</a></th><td><span class="state state--ok">Probado</span></td><td><span class="state state--ok">Probado</span></td><td><span class="state state--ok">Probado</span></td></tr>
+      <tr><th><a href="../../es/docs/button.html">Campos de formulario</a></th><td><span class="state state--ok">Probado</span></td><td><span class="state state--ok">Probado</span></td><td><span class="state state--ok">Probado</span></td></tr>
+      <tr><th><a href="../../es/docs/button.html">Modal</a></th><td><span class="state state--ok">Probado</span></td><td><span class="state state--ok">Probado</span></td><td><span class="state state--part">En parte</span></td></tr>
+      <tr><th><a href="../../es/docs/button.html">Pestañas</a></th><td><span class="state state--ok">Probado</span></td><td><span class="state state--ok">Probado</span></td><td><span class="state state--part">En parte</span></td></tr>
+      <tr><th><a href="../../es/docs/button.html">Aviso</a></th><td><span class="state state--ok">Probado</span></td><td><span class="state state--part">En parte</span></td><td><span class="state state--no">Aún no</span></td></tr>
+    </tbody>
+  </table>
+</div>
+<p><small>Las filas de esta maqueta son ejemplos. En la página real, el build las escribe a partir de los registros de pruebas.</small></p>
+
+<h2 id="gaps">Dónde se queda corta</h2>
+<p>Un problema confirmado se publica aquí, con el criterio que incumple, hasta que se arregla.</p>
+<dl class="rows wide">
+  <div><dt>Temas propios</dt><dd>Luz garantiza el aspecto que publica. Un tema propio lo compruebas tú, con la herramienta de contraste que viene incluida.</dd></div>
+  <div><dt>Lectores de pantalla</dt><dd>No todos los componentes se han leído con todas las combinaciones. La tabla de arriba dice cuáles.</dd></div>
+  <div><dt>Beta</dt><dd>El marcado aún puede cambiar antes de la 1.0. Cada cambio está en el registro de cambios.</dd></div>
+</dl>
+
+<h2 id="report">Cuéntanoslo</h2>
+<p>Si algo no te funciona, es un error, y va primero. <a href="https://github.com/nandovejer/luz/issues">Abre una incidencia en GitHub</a> y cuenta qué intentabas hacer. No necesitas saber qué criterio falló.</p>
+
+    </div>
+<section class="related" aria-labelledby="related-h"><h2 class="label label--ink" id="related-h">Páginas relacionadas</h2><ul><li><a href="../../es/docs/color.html"><strong>Color</strong><span>El contraste de cada par de colores, medido por el build.</span></a></li><li><a href="../../es/docs/button.html"><strong>Botón</strong><span>Una página de componente, con su teclado y sus problemas conocidos.</span></a></li></ul></section>
+<nav class="pager" aria-label="Página anterior y siguiente"><a class="pager__a pager__a--prev" rel="prev" href="../../es/docs/catalog.html"><span class="label label--ink">Anterior</span><strong>Todos los patrones</strong><small>Catálogo</small></a><span></span></nav>
+  </main>
+  <aside class="docs__rail" aria-label="En esta página">
+    <p class="label label--ink">En esta página</p>
+<ul data-spy><li><a href="#promise">Lo que hace cada pieza</a></li><li><a href="#how">Cómo se prueba</a></li><li><a href="#status">Estado por componente</a></li><li><a href="#gaps">Dónde se queda corta</a></li><li><a href="#report">Cuéntanoslo</a></li></ul>
+  </aside>
+</div>
+
+<footer class="foot">
+  <div class="wrap foot__end">
+    <span>© 2026 LUZ 0.4.1 beta. Licencia MIT.</span>
+    <span><a href="https://github.com/nandovejer/luz">GitHub</a> · <a href="https://www.npmjs.com/package/@luz-ds/core">npm</a> · <a href="../../es/docs/accessibility.html">Accesibilidad</a></span>
+  </div>
+</footer>
+
+<dialog class="find" aria-label="Buscar en el sitio">
+  <form method="dialog">
+    <input type="search" placeholder="Buscar en la documentación" aria-label="Buscar en la documentación" autocomplete="off">
+    <button class="copy" type="submit">Esc</button>
+  </form>
+  <ul><li><a href="#promise"><span>Lo que hace cada pieza</span><small>En esta página</small></a></li><li><a href="#how"><span>Cómo se prueba</span><small>En esta página</small></a></li><li><a href="#status"><span>Estado por componente</span><small>En esta página</small></a></li><li><a href="#gaps"><span>Dónde se queda corta</span><small>En esta página</small></a></li><li><a href="#report"><span>Cuéntanoslo</span><small>En esta página</small></a></li><li><a href="../../es/docs/get-started.html"><span>Instalación</span><small>Primeros pasos</small></a></li><li><a href="../../es/docs/get-started.html"><span>Hazlo tuyo</span><small>Primeros pasos</small></a></li><li><a href="../../es/docs/get-started.html"><span>Migrar un proyecto</span><small>Primeros pasos</small></a></li><li><a href="../../es/docs/ai.html"><span>Usa Luz con una IA</span><small>Trabajar con IA</small></a></li><li><a href="../../es/docs/ai.html"><span>Todas las opciones</span><small>Trabajar con IA</small></a></li><li><a href="../../es/docs/ai.html"><span>¿Sin terminal?</span><small>Trabajar con IA</small></a></li><li><a href="../../es/docs/color.html"><span>Color</span><small>Tokens</small></a></li><li><a href="../../es/docs/color.html"><span>Modos de color</span><small>Tokens</small></a></li><li><a href="../../es/docs/color.html"><span>Tipografía</span><small>Tokens</small></a></li><li><a href="../../es/docs/color.html"><span>Espaciado</span><small>Tokens</small></a></li><li><a href="../../es/docs/color.html"><span>Movimiento</span><small>Tokens</small></a></li><li><a href="../../es/docs/components.html"><span>Elementos de la A a la Z</span><small>Elementos HTML</small></a></li><li><a href="../../es/docs/components.html"><span>Formularios</span><small>Elementos HTML</small></a></li><li><a href="../../es/docs/components.html"><span>Texto</span><small>Elementos HTML</small></a></li><li><a href="../../es/docs/components.html"><span>Todos los componentes</span><small>Componentes</small></a></li><li><a href="../../es/docs/button.html"><span>Botón</span><small>Componentes</small></a></li><li><a href="../../es/docs/button.html"><span>Tarjeta</span><small>Componentes</small></a></li><li><a href="../../es/docs/button.html"><span>Campos de formulario</span><small>Componentes</small></a></li><li><a href="../../es/docs/button.html"><span>Modal</span><small>Componentes</small></a></li><li><a href="../../es/docs/button.html"><span>Tabla</span><small>Componentes</small></a></li><li><a href="../../es/docs/button.html"><span>Pestañas</span><small>Componentes</small></a></li><li><a href="../../es/docs/catalog.html"><span>Todos los patrones</span><small>Catálogo</small></a></li><li><a href="../../es/docs/catalog.html"><span>Tipos de sitio</span><small>Catálogo</small></a></li><li><a href="../../es/docs/catalog.html"><span>Hero</span><small>Catálogo</small></a></li><li><a href="../../es/docs/catalog.html"><span>Buscar</span><small>Catálogo</small></a></li><li><a href="../../es/docs/catalog.html"><span>Gráficas</span><small>Catálogo</small></a></li><li><a href="../../es/docs/accessibility.html"><span>Declaración</span><small>Accesibilidad</small></a></li><li><a href="../../es/docs/accessibility.html"><span>Estado por componente</span><small>Accesibilidad</small></a></li><li><a href="../../es/docs/get-started.html"><span>Capas</span><small>Cómo está hecho</small></a></li><li><a href="../../es/docs/get-started.html"><span>Principios</span><small>Cómo está hecho</small></a></li><li><a href="../../es/docs/get-started.html"><span>Registro de cambios</span><small>Novedades</small></a></li><li><a href="../../es/docs/get-started.html"><span>Hoja de ruta</span><small>Novedades</small></a></li><li><a href="../../es/docs/get-started.html"><span>Contribuir</span><small>Novedades</small></a></li><li><a href="../../es/index.html"><span>Inicio</span><small>Sitio</small></a></li><li><a href="../../es/docs/index.html"><span>Documentación</span><small>Sitio</small></a></li></ul>
+  <p class="find__none" hidden>Ninguna página coincide. Revisa la ortografía, prueba con una palabra más corta o explora <a href="../../es/docs/components.html">los componentes</a> y <a href="../../es/docs/color.html">los tokens</a>.</p>
+</dialog>
+
+</body>
+</html>

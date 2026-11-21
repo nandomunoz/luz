@@ -36,7 +36,7 @@
       toast.textContent = button.dataset.toast;
       const close = document.createElement("button");
       close.type = "button";
-      close.textContent = "Dismiss";
+      close.textContent = document.documentElement.lang === "es" ? "Cerrar" : "Dismiss";
       close.addEventListener("click", () => {
         toast.classList.add("is-leaving");
         button.focus();

@@ -12,13 +12,37 @@
 import { mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
+import { collapse, translate } from "./i18n.mjs";
 
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const REPO = join(ROOT, "../..");
 const SRC = join(ROOT, "src");
 const GITHUB = "https://github.com/nandovejer/luz";
 
-const partial = (name) => readFileSync(join(SRC, "partials", `${name}.html`), "utf-8");
+/* ---- Languages ------------------------------------------------------------
+   English is the source. A language is src/i18n/<code>.json (see i18n.mjs):
+   its pages are the English ones with every unit of text swapped, and it is
+   written under <code>/ next to the English site. */
+const LANGS = ["en", "es"];
+let LANG = "en";
+let DICT = {};
+const missing = new Set();
+const tr = (html) => (LANG === "en" ? html : translate(html, DICT, (k) => missing.add(k)));
+/** One string the build itself writes (a label, a heading), in the language of the page. */
+const T = (s) => {
+  if (LANG === "en") return s;
+  const to = DICT[collapse(s)];
+  if (to === undefined) missing.add(collapse(s));
+  return to ?? s;
+};
+/** A link to a page of the site, in the language of the page. */
+const LINK = "{{lroot}}";
+
+// The page shell holds the skip link and the placeholders: it is not translated
+const partial = (name) => {
+  const text = readFileSync(join(SRC, "partials", `${name}.html`), "utf-8");
+  return name === "page" ? text : tr(text);
+};
 const json = (path) => JSON.parse(readFileSync(join(REPO, path), "utf-8"));
 
 /* ---- The figures of the copy, read from the repository ------------------- */
@@ -173,11 +197,11 @@ function sidebar(page) {
     const items = g.items
       .map((i) => {
         const current = i.own && i.href === page ? ' aria-current="page"' : "";
-        return `<li><a href="{{root}}${i.href}"${current}>${i.label}</a></li>`;
+        return `<li><a href="${LINK}${i.href}"${current}>${T(i.label)}</a></li>`;
       })
       .join("");
     const pkg = g.pkg ? `<code>${g.pkg}</code>` : "";
-    return `<details${here ? " open" : ""}><summary><span>${g.label}${pkg}</span></summary><ul>${items}</ul></details>`;
+    return `<details${here ? " open" : ""}><summary><span>${T(g.label)}${pkg}</span></summary><ul>${items}</ul></details>`;
   }).join("\n");
 }
 
@@ -200,44 +224,44 @@ function pager(page) {
   if (at < 0) return "";
   const link = (i, rel, word) =>
     i
-      ? `<a class="pager__a pager__a--${rel}" rel="${rel}" href="{{root}}${i.href}"><span class="label label--ink">${word}</span><strong>${i.label}</strong><small>${i.group}</small></a>`
+      ? `<a class="pager__a pager__a--${rel}" rel="${rel}" href="${LINK}${i.href}"><span class="label label--ink">${T(word)}</span><strong>${T(i.label)}</strong><small>${T(i.group)}</small></a>`
       : "<span></span>";
-  return `<nav class="pager" aria-label="Previous and next page">${link(OWN[at - 1], "prev", "Previous")}${link(OWN[at + 1], "next", "Next")}</nav>`;
+  return `<nav class="pager" aria-label="${T("Previous and next page")}">${link(OWN[at - 1], "prev", "Previous")}${link(OWN[at + 1], "next", "Next")}</nav>`;
 }
 
 function related(list = []) {
   if (!list.length) return "";
   const items = list
-    .map(([label, href, note]) => `<li><a href="{{root}}${href}"><strong>${label}</strong><span>${note}</span></a></li>`)
+    .map(([label, href, note]) => `<li><a href="${LINK}${href}"><strong>${T(label)}</strong><span>${T(note)}</span></a></li>`)
     .join("");
-  return `<section class="related" aria-labelledby="related-h"><h2 class="label label--ink" id="related-h">Related pages</h2><ul>${items}</ul></section>`;
+  return `<section class="related" aria-labelledby="related-h"><h2 class="label label--ink" id="related-h">${T("Related pages")}</h2><ul>${items}</ul></section>`;
 }
 
 /** The facts under the title: package, file, JavaScript, and the two actions. */
 function facts(meta, page) {
   const rows = [
-    meta.pkg && `<div><dt>Package</dt><dd><code>${meta.pkg}</code></dd></div>`,
-    meta.file && `<div><dt>File</dt><dd><code>${meta.file}</code></dd></div>`,
-    meta.js && `<div><dt>JavaScript</dt><dd>${meta.js}</dd></div>`,
-    meta.status && `<div><dt>Status</dt><dd>${meta.status}</dd></div>`,
+    meta.pkg && `<div><dt>${T("Package")}</dt><dd><code>${meta.pkg}</code></dd></div>`,
+    meta.file && `<div><dt>${T("File")}</dt><dd><code>${meta.file}</code></dd></div>`,
+    meta.js && `<div><dt>${T("JavaScript")}</dt><dd>${meta.js}</dd></div>`,
+    meta.status && `<div><dt>${T("Status")}</dt><dd>${meta.status}</dd></div>`,
   ]
     .filter(Boolean)
     .join("");
   const source = `${GITHUB}/edit/main/proto/sitepro/src/pages/${page}`;
   return `<dl class="doc-facts">${rows}</dl>
-      <p class="doc-acts"><a href="${source}">Edit on GitHub</a><button type="button" data-copy-md>Copy as Markdown</button></p>`;
+      <p class="doc-acts"><a href="${source}">${T("Edit on GitHub")}</a><button type="button" data-copy-md>${T("Copy as Markdown")}</button></p>`;
 }
 
 /** The search gives the sections of this page first, then the pages (guide, section 8). */
 function searchIndex(body, isDocs) {
   const here = isDocs
-    ? headings(body).map((h) => `<li><a href="#${h.id}"><span>${h.text}</span><small>On this page</small></a></li>`)
+    ? headings(body).map((h) => `<li><a href="#${h.id}"><span>${h.text}</span><small>${T("On this page")}</small></a></li>`)
     : [];
   const pages = [
     ...NAV.flatMap((g) => g.items.map((i) => ({ ...i, group: g.label }))),
     { label: "Home", href: "index.html", group: "Site" },
     { label: "Documentation", href: "docs/index.html", group: "Site" },
-  ].map((i) => `<li><a href="{{root}}${i.href}"><span>${i.label}</span><small>${i.group}</small></a></li>`);
+  ].map((i) => `<li><a href="${LINK}${i.href}"><span>${T(i.label)}</span><small>${T(i.group)}</small></a></li>`);
   return [...here, ...pages].join("");
 }
 
@@ -260,7 +284,7 @@ function scaleArt(variant = "") {
     const px = Math.round(step.rem * 16);
     const lost = variant === "lost" && name === "text-4xl";
     const cls = ["col", name === "text-base" ? "col--body" : "", lost ? "col--lost" : ""].filter(Boolean).join(" ");
-    const label = lost ? "404<br>not found" : `${name.replace("text-", "")}<br>${px}px`;
+    const label = lost ? T("404<br>not found") : `${name.replace("text-", "")}<br>${px}px`;
     return `<div class="${cls}" style="--h:${h}%;--i:${i}"><span>${label}</span></div>`;
   }).join("");
   return `<div class="cols${variant ? ` cols--${variant}` : ""}" aria-hidden="true">${cols}</div>`;
@@ -271,66 +295,90 @@ function inlineArt(text) {
 }
 
 let count = 0;
-for (const file of walk(join(SRC, "pages"))) {
-  const page = relative(join(SRC, "pages"), file).replaceAll("\\", "/");
-  const parsed = parse(file);
-  const meta = parsed.meta;
-  const body = inlineArt(parsed.body);
-  const root = "../".repeat(page.split("/").length - 1);
-  const isDocs = meta.layout === "docs";
-  const current = (id) => (meta.nav === id ? ' aria-current="page"' : "");
+for (LANG of LANGS) {
+  DICT = LANG === "en" ? {} : JSON.parse(readFileSync(join(SRC, "i18n", `${LANG}.json`), "utf-8"));
+  for (const file of walk(join(SRC, "pages"))) {
+    const page = relative(join(SRC, "pages"), file).replaceAll("\\", "/");
+    const parsed = parse(file);
+    const meta = { ...parsed.meta };
+    for (const k of ["title", "heading", "lead", "crumb", "status", "description", "js"]) if (meta[k]) meta[k] = T(meta[k]);
+    if (meta.related) meta.related = meta.related.map(([a, b, c]) => [a, b, c]);
+    const body = inlineArt(tr(parsed.body));
+    const outPage = LANG === "en" ? page : `${LANG}/${page}`;
+    const root = "../".repeat(outPage.split("/").length - 1);
+    const lroot = LANG === "en" ? root : `${root}${LANG}/`;
+    const isDocs = meta.layout === "docs";
+    const current = (id) => (meta.nav === id ? ' aria-current="page"' : "");
 
-  const main = isDocs
-    ? fill(partial("docs"), {
-        sidebar: sidebar(page),
-        rail: rail(body),
-        pager: pager(page),
-        related: related(meta.related),
-        crumb: meta.crumb ?? "",
-        title: meta.heading ?? meta.title,
-        lead: meta.lead ?? "",
-        facts: facts(meta, page),
-        body,
-      })
-    : body;
+    const main = isDocs
+      ? fill(partial("docs"), {
+          sidebar: sidebar(page),
+          rail: rail(body),
+          pager: pager(page),
+          related: related(parsed.meta.related),
+          crumb: meta.crumb ?? "",
+          title: meta.heading ?? meta.title,
+          lead: meta.lead ?? "",
+          facts: facts(parsed.meta.pkg || parsed.meta.file || parsed.meta.js || parsed.meta.status ? meta : meta, page),
+          body,
+        })
+      : body;
 
-  const html = fill(partial("page"), {
-    title: meta.title === "LUZ" ? "LUZ — a design system in plain HTML, CSS and ES modules" : `${meta.title} · LUZ`,
-    description: meta.description ?? "",
-    class: isDocs ? "is-docs" : `is-${meta.layout ?? "site"}`,
-    // Every docs page has a Markdown twin an agent can read (guide, section 6)
-    alternate: isDocs
-      ? `<link rel="alternate" type="text/markdown" href="${page.split("/").pop().replace(/\.html$/, ".md")}">`
-      : "",
-    header: partial("header"),
-    footer: isDocs ? partial("footer-docs") : partial("footer"),
-    search: partial("search"),
-    main,
-  });
+    const title = parsed.meta.title === "LUZ" ? T("LUZ — a design system in plain HTML, CSS and ES modules") : `${meta.title} · LUZ`;
+    const html = fill(partial("page"), {
+      title,
+      description: meta.description ?? "",
+      lang: LANG,
+      class: isDocs ? "is-docs" : `is-${meta.layout ?? "site"}`,
+      // Every docs page has a Markdown twin an agent can read (guide, section 6)
+      alternate: isDocs
+        ? `<link rel="alternate" type="text/markdown" href="${page.split("/").pop().replace(/\.html$/, ".md")}">`
+        : "",
+      header: partial("header"),
+      footer: isDocs ? partial("footer-docs") : partial("footer"),
+      search: partial("search"),
+      skip: T("Skip to the content"),
+      main,
+    });
 
-  const vars = {
-    root,
-    version: VERSION,
-    year: "2026",
-    github: GITHUB,
-    "n-core": String(N_CORE),
-    "n-catalog": String(N_CATALOG),
-    "n-total": String(N_CORE + N_CATALOG),
-    "kb-core": budget("core CSS"),
-    "kb-tokens": budget("tokens CSS"),
-    "kb-js": budget("core JS (entry, lazy chunks excluded)"),
-    "cur-docs": current("docs"),
-    "cur-components": current("components"),
-    "cur-catalog": current("catalog"),
-    "cur-tokens": current("tokens"),
-    "cur-a11y": current("a11y"),
-    "search-index": searchIndex(body, isDocs),
-  };
-  const out = join(ROOT, page);
-  mkdirSync(dirname(out), { recursive: true });
-  // Twice: the partials carry placeholders of their own
-  writeFileSync(out, fill(fill(html, vars), vars, true));
-  count++;
+    const langswitch = `<nav class="lang" aria-label="${T("Language")}">${LANGS.map((code) => {
+      const href = `${root}${code === "en" ? "" : `${code}/`}${page}`;
+      return `<a href="${href}" lang="${code}" hreflang="${code}"${code === LANG ? ' aria-current="true"' : ""}>${code.toUpperCase()}</a>`;
+    }).join("")}</nav>`;
+
+    const vars = {
+      root,
+      lroot,
+      lang: LANG,
+      langswitch,
+      version: VERSION,
+      year: "2026",
+      github: GITHUB,
+      "n-core": String(N_CORE),
+      "n-catalog": String(N_CATALOG),
+      "n-total": String(N_CORE + N_CATALOG),
+      "kb-core": budget("core CSS"),
+      "kb-tokens": budget("tokens CSS"),
+      "kb-js": budget("core JS (entry, lazy chunks excluded)"),
+      "cur-docs": current("docs"),
+      "cur-components": current("components"),
+      "cur-catalog": current("catalog"),
+      "cur-tokens": current("tokens"),
+      "cur-a11y": current("a11y"),
+      "search-index": searchIndex(body, isDocs),
+    };
+    const out = join(ROOT, outPage);
+    mkdirSync(dirname(out), { recursive: true });
+    // Links to a page of the site stay in the language of the page
+    const linked = html.replace(/\{\{root\}\}(docs\/|index\.html|404\.html)/g, "{{lroot}}$1");
+    // Twice: the partials carry placeholders of their own
+    writeFileSync(out, fill(fill(linked, vars), vars, true));
+    count++;
+  }
 }
 
 console.log(`pages: ${count}`);
+if (missing.size) {
+  console.log(`not translated (${missing.size}), left as written:`);
+  for (const k of missing) console.log("  ", k.length > 100 ? `${k.slice(0, 100)}…` : k);
+}

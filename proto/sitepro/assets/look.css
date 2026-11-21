@@ -1035,3 +1035,58 @@ h3 {
 .lost__art .col {
   height: calc(var(--h) * 0.62);
 }
+
+/* ---- The language switch ------------------------------------------------- */
+
+.lang {
+  display: flex;
+  border: 1px solid var(--line-2);
+  border-radius: 3px;
+  background: var(--white);
+}
+
+.lang a {
+  display: grid;
+  place-items: center;
+  min-width: 2.25rem;
+  min-height: 2.25rem;
+  padding-inline: 0.5rem;
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+  color: var(--ink-3);
+  text-decoration: none;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.lang a + a {
+  border-inline-start: 1px solid var(--line-2);
+}
+
+.lang a:hover {
+  color: var(--ink);
+}
+
+.lang a[aria-current] {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.menu__panel .lang {
+  align-self: flex-start;
+  width: fit-content;
+  margin-block-end: 1rem;
+}
+
+/* Longer words in another language never wrap these */
+.brand small,
+.kbd-btn,
+.kbd-btn kbd,
+.nav a,
+.btn {
+  white-space: nowrap;
+}
+
+.kbd-btn {
+  min-width: 0;
+}

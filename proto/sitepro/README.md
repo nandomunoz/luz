@@ -56,6 +56,22 @@ the weight ceilings from the repository, and it computes every contrast ratio
 - Components are grouped by what the reader wants to do, with an A to Z index,
   and only a piece on trial carries a label.
 
+## Languages
+
+English is the source and Spanish lives under `es/`. The header has an EN / ES
+switch that goes to the same page in the other language.
+
+- `src/i18n/es.json` maps each unit of English text (a paragraph, a heading, a
+  link, a button, with its inline tags and `{{placeholders}}`) to its Spanish.
+  `tools/i18n.mjs` finds the units, so there is no second copy of the markup.
+- A unit with no entry stays in English and the build lists it, so a new line
+  of copy shows up as untranslated instead of failing quietly. What is left
+  today is code, file names and package names, on purpose.
+- Code blocks, the two terminal sketches on the home and the contrast figures
+  are not translated.
+- To add a language: add its code to `LANGS` in `tools/build.mjs` and write
+  `src/i18n/<code>.json`. `node tools/i18n.mjs es` lists what is missing.
+
 ## Motion
 
 `assets/motion.css` and `assets/motion.js` follow
