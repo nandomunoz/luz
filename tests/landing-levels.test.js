@@ -201,8 +201,10 @@ describe("the pages of the three levels", () => {
       expect(css).toMatch(/@media \(min-width: 900px\) \{\s*\.landing-demo__window \{\s*grid-template-columns: minmax\(0, [\d.]+fr\) minmax\(0, 1fr\)/);
       const phone = [...css.matchAll(/@media \(max-width: 899px\) \{([\s\S]*?)\n\}/g)].map((m) => m[1]).join("\n");
       const rule = (selector) => new RegExp(`${selector.replace(/[.$]/g, "\\$&")}\\s*\\{([^}]*)\\}`).exec(phone)?.[1] ?? "";
-      expect(rule(".landing-tokens__hero")).toMatch(/border:\s*0/);
-      expect(rule(".landing-tokens__hero")).toMatch(/border-radius:\s*0/);
+      // the band itself has no border at any width, not only on a phone (owner, 2026-11-23)
+      const band = new RegExp("\\.landing-tokens__hero\\s*\\{([^}]*)\\}").exec(css)?.[1] ?? "";
+      expect(band).toMatch(/border:\s*0/);
+      expect(band).toMatch(/border-radius:\s*0/);
       const stage = rule(".landing-tokens__stage");
       expect(stage).toMatch(/border:\s*0/);
       expect(stage).toMatch(/box-shadow:\s*none/);
@@ -224,19 +226,41 @@ describe("the pages of the three levels", () => {
       expect(css).toMatch(/\.landing-demo__window\s*\{[^}]*border:[^}]*overflow:\s*hidden/);
       expect(css).toMatch(/\.landing-demo__window\s*\{[^}]*gap:\s*0/);
       expect(css).toMatch(/\.landing-demo__editor\s*\{[^}]*border:\s*0/);
+      // the page fills its pane: no margin around the product, which loses its own frame inside the window's
+      expect(css).toMatch(/\.landing-demo__viewport\s*\{[^}]*padding:\s*0/);
+      expect(css).toMatch(/\.landing-demo__window \.landing-demo__product\s*\{[^}]*border-radius:\s*0[^}]*box-shadow:\s*none/);
     });
 
     it.each(LANGS)("in %s: three steps, install, use and make it yours, each with code to copy", (code, prefix) => {
       const steps = sectionOf(rendered.get(`${prefix}tokens/`), "steps");
       expect(steps).toMatch(/<h2\b[^>]*>/);
-      const items = steps.match(/<li class="landing-tokens__step"/g) ?? [];
-      expect(items).toHaveLength(3);
+      const items = [...steps.matchAll(/<li class="landing-tokens__step landing-tokens__step--(\w+)"/g)].map((m) => m[1]);
+      expect(items).toEqual(["1", "2", "3", "result"]);
       for (const n of [1, 2, 3]) expect(steps).toContain(catalog(code)[`level.tokens.steps.${n}.title`]);
       const ids = [...steps.matchAll(/data-copy-from="([^"]+)"/g)].map((m) => m[1]);
       expect(ids.length).toBeGreaterThanOrEqual(3);
       for (const id of ids) expect(steps, id).toContain(`<code id="${id}">`);
       expect(steps).toContain("npm install @luz-ds/tokens");
       for (const body of codesOf(steps)) for (const m of body.matchAll(/--luz-[\w-]+/g)) expect(tokens, m[0]).toContain(m[0]);
+    });
+
+    it.each(LANGS)("in %s: the steps are a path joined by lines, 1 and 2 above, 3 under 2, and in the corner left what you get, in words", (code, prefix) => {
+      const steps = sectionOf(rendered.get(`${prefix}tokens/`), "steps");
+      const result = steps.slice(steps.indexOf('landing-tokens__step--result'));
+      expect(result).toContain(catalog(code)["level.tokens.steps.result.title"]);
+      const outcomes = [...(/<ul class="landing-tokens__outcomes">([\s\S]*?)<\/ul>/.exec(result)?.[1] ?? "").matchAll(/<li>([\s\S]*?)<\/li>/g)].map((m) => m[1]);
+      expect(outcomes).toEqual([1, 2, 3].map((n) => catalog(code)[`level.tokens.steps.result.${n}`]));
+      expect(result).not.toContain("landing-tokens__result");
+      // the path: two columns, 1 2 above and the result beside 3 below; a line joins each step to the next
+      expect(css).toMatch(/\.landing-tokens__step-list\s*\{[^}]*grid-template-areas:\s*"one two"\s*"result three"/);
+      for (const n of ["1", "2", "3"]) expect(css, n).toMatch(new RegExp(`\\.landing-tokens__step--${n}::after[^{]*\\{[^}]*content:\\s*""`));
+      // a line spans the gap between two boxes, from border to border, and goes into neither
+      expect(css).not.toMatch(/\.landing-tokens__step--\d::after[^{]*\{[^}]*calc\(100% - /);
+      // line and arrow are one piece, an SVG mask painted in the border's colour, so they cannot part
+      expect(css).toMatch(/\.landing-tokens__step--1::after[^{]*\{[^}]*background:\s*var\(--luz-divider\)[^}]*mask:[^}]*url\("data:image\/svg\+xml/);
+      expect(css).not.toMatch(/\.landing-tokens__step--[\w]+::before/);
+      // and a step does not move under the pointer, so the path stays joined
+      expect(css).not.toMatch(/\.landing-tokens__step:hover[^{]*\{[^}]*translate/);
     });
 
     it.each(LANGS)("in %s: four blocks, color, scales, motion and breakpoints, each a level of the home that links every group it holds to its docs", (code, prefix) => {
@@ -262,39 +286,39 @@ describe("the pages of the three levels", () => {
       expect(total).toBe(tokens.length);
     });
 
-    it.each(LANGS)("in %s: color shows one token in three modes, a matrix of semantic tokens by mode, over the palette in ramps on a grid of steps; scales and the rest read their tokens through --v", (code, prefix) => {
+    it.each(LANGS)("in %s: color is a mosaic in the framed panel: the semantic tokens in large tiles that follow the mode, and the primitives in deep, mid and pale tiles with their value; scales and the rest read their tokens through --v", (code, prefix) => {
       const html = rendered.get(`${prefix}tokens/`);
       const color = sectionOf(html, "t-color");
-      expect(color).not.toContain("landing-tokens__chain");
-      expect(color).not.toContain("landing-tokens__modes");
-      // the matrix: a table, the modes as its column heads, a semantic token per row, a cell per mode drawn in that mode
-      const matrix = /<table class="landing-tokens__matrix">([\s\S]*?)<\/table>/.exec(color)?.[1] ?? "";
-      expect(matrix).toContain(`<caption>${catalog(code)["level.tokens.color.modes"]}</caption>`);
-      const heads = [...matrix.matchAll(/<th scope="col"[^>]*>([^<]*)<\/th>/g)].map((m) => m[1]);
-      expect(heads.slice(-3)).toEqual(["light", "dark", "contrast"].map((key) => catalog(code)[`level.tokens.mode.${key}`]));
-      const rows = [...matrix.matchAll(/<tr><th scope="row"><code>(--luz-[\w-]+)<\/code><\/th>([\s\S]*?)<\/tr>/g)];
-      expect(rows.length).toBeGreaterThanOrEqual(4);
-      for (const [, name, cells] of rows) {
-        expect(tokens).toContain(name);
-        const themes = [...cells.matchAll(/<td data-theme="([a-z-]+)"><span class="landing-tokens__cell" style="--v:var\((--luz-[\w-]+)\)"><\/span><\/td>/g)];
-        expect(themes.map((m) => m[1]), name).toEqual(["light", "dark", "high-contrast"]);
-        for (const m of themes) expect(m[2]).toBe(name);
+      expect(color).not.toContain("landing-tokens__matrix");
+      expect(color).not.toContain("landing-tokens__palette");
+      // the semantic tiles: a name each, the colour read live (so it follows the mode), a semantic ink on it
+      const semantic = [...color.matchAll(/<li class="landing-tokens__tile" style="--v:var\((--luz-[\w-]+)\);--ink:var\((--luz-[\w-]+)\)"><code>(--luz-[\w-]+)<\/code><\/li>/g)];
+      expect(semantic.length).toBeGreaterThanOrEqual(5);
+      for (const [, bg, ink, name] of semantic) {
+        expect(name).toBe(bg);
+        expect(tokens).toContain(bg);
+        expect(tokens).toContain(ink);
+        expect(bg, `${bg} is semantic`).not.toMatch(/^--luz-(blue|gray|green|red|yellow|teal|purple)-\d+$/);
       }
-      // the palette: a head of steps, a row per family on that grid, a gap where a family has no step
-      const palette = /<div class="landing-tokens__palette"[^>]*>([\s\S]*?)<\/div>/.exec(color)?.[1] ?? "";
-      const steps = [...palette.matchAll(/<span class="landing-tokens__stepno">(\d+)<\/span>/g)].map((m) => Number(m[1]));
-      expect(steps).toEqual([10, 20, 30, 40, 50, 60, 70, 80, 90, 100]);
-      const families = Object.keys(JSON.parse(read("packages/tokens/tokens.json")).color);
-      for (const family of families) {
-        const row = new RegExp(`<span class="landing-tokens__family">${family}</span>((?:<span[^>]*></span>){10})`).exec(palette)?.[1];
-        expect(row, family).toBeTruthy();
-        const cells = [...row.matchAll(/<span([^>]*)><\/span>/g)].map((m) => m[1]);
-        steps.forEach((step, i) => {
-          if (tokens.includes(`--luz-${family}-${step}`)) expect(cells[i], `${family}-${step}`).toContain(`--v:var(--luz-${family}-${step})`);
-          else expect(cells[i], `${family}-${step}`).toContain("landing-tokens__gap");
-        });
+      // the primitive tiles: three steps of every family, deep to pale, each its name and its value, an ink that reads on it
+      const json = JSON.parse(read("packages/tokens/tokens.json")).color;
+      const swatches = [...color.matchAll(/<li class="landing-tokens__swatch" style="--v:var\(--luz-([a-z]+)-(\d+)\);--ink:var\(--luz-gray-(\d+)\)"><code>--luz-\1-\2<\/code><span>(#[0-9a-f]{6})<\/span><\/li>/g)];
+      expect(swatches.map((m) => m[1])).toEqual(Object.keys(json).flatMap((f) => [f, f, f]));
+      const lum = (hex) => {
+        const c = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255).map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4));
+        return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+      };
+      const ratio = (a, b) => (Math.max(lum(a), lum(b)) + 0.05) / (Math.min(lum(a), lum(b)) + 0.05);
+      for (const [, family, step, inkStep, hex] of swatches) {
+        expect(hex, `${family}-${step}`).toBe((json[family][step].value ?? json[family][step].$value).toLowerCase());
+        const ink = json.gray[inkStep].value ?? json.gray[inkStep].$value;
+        expect(ratio(hex, ink), `${family}-${step} on gray-${inkStep}`).toBeGreaterThanOrEqual(4.5);
       }
-      expect(color).toContain(catalog(code)["level.tokens.color.palette"].replace("{n:primitives}", String(tokens.filter((n) => families.some((f) => n.startsWith(`--luz-${f}-`))).length)));
+      // in the look of the site: the text as any level's, the mosaic inside the framed panel, its tiles touching
+      expect(css).not.toMatch(/\.landing-tokens__block--color \.landing-inside__copy\s*\{[^}]*background/);
+      expect(css).not.toMatch(/\.landing-tokens__block--color \.landing-tokens__panel\s*\{[^}]*display:\s*contents/);
+      expect(color).toMatch(/<div class="landing-panel landing-tokens__panel" dir="ltr"><div class="landing-tokens__mosaic">/);
+      expect(css).toMatch(/\.landing-tokens__mosaic\s*\{[^}]*gap:\s*0[^}]*overflow:\s*hidden/);
       const scales = sectionOf(html, "t-scales");
       for (const name of ["--luz-space-md", "--luz-text-2xl", "--luz-radius-md", "--luz-shadow-lg"]) expect(scales).toContain(`--v:var(${name})`);
       expect(sectionOf(html, "t-motion")).toContain("landing-tokens__curve");
@@ -321,6 +345,17 @@ describe("the pages of the three levels", () => {
         expect(block, id).toContain('<pre class="luz-code-block" data-lang="css"');
       }
       expect(html).not.toContain('id="t-more"');
+    });
+
+    it("scales are a level like the others, zigzagging with them: the four cards a 2 x 2 in a panel with no frame of its own, one column on a phone", () => {
+      const panel = new RegExp("\\.landing-tokens__block--scales \\.landing-tokens__panel\\s*\\{([^}]*)\\}").exec(css)?.[1] ?? "";
+      expect(panel).toMatch(/border:\s*0/);
+      expect(panel).toMatch(/padding:\s*0/);
+      // no more cards as the section's own grid items, nor the text in the middle
+      expect(css).not.toMatch(/\.landing-tokens__block--scales[^{]*\{[^}]*display:\s*contents/);
+      expect(css).not.toMatch(/\.landing-tokens__block--scales[^{]*\{[^}]*grid-template-areas/);
+      expect(css).toMatch(/\.landing-tokens__block--scales \.landing-tokens__scales\s*\{[^}]*grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/);
+      expect(css).toMatch(/@media \(max-width: 640px\) \{\s*\.landing-tokens__block--scales \.landing-tokens__scales\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1fr\)/);
     });
 
     it.each(LANGS)("in %s: the page ends with the next step: core, and the docs", (code, prefix) => {
