@@ -55,7 +55,7 @@
   "nav.on-page": "En esta página",
   "nav.get-started": "Primeros pasos",
   "hero.title": "Sistema de diseño para el <em>humano</em>, listo para la <em>IA</em>",
-  "hero.lead": "Tokens, CSS y un poco de JavaScript, sobre lo que el navegador ya hace: empieza un proyecto con <strong>LUZ</strong>, el sistema de diseño <span lang=\"en\"><strong>Light</strong>, <strong>Usable</strong> and <strong class=\"landing-nowrap\">Zero-dependency</strong></span>, o mígralo página a página. Cada componente funciona antes de que cargue JavaScript y cada cambio empieza con una prueba que falla.",
+  "hero.lead": "Tokens, CSS y un poco de JavaScript, sobre lo que el navegador ya hace. Empieza con <strong>LUZ</strong>, el sistema de diseño <span lang=\"en\"><strong>Light</strong>, <strong>Usable</strong> and <strong class=\"landing-nowrap\">Zero-dependency</strong></span>.",
   "hero.docs": "Leer la documentación, en inglés",
   "hero.start": "Primeros pasos",
   "hero.start-ai": "Empieza con IA",

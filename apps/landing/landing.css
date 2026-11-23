@@ -320,23 +320,16 @@
   }
 }
 
-/* A phone under about 760px tall: the sentence one step down and the pieces
-   of the hero closer, which is what lets the bar open inside the window */
+/* A phone under about 760px tall: the pieces of the hero closer, which is what
+   lets the bar open inside the window; the text keeps its size (the lead is
+   short enough) */
 @media (max-width: 640px) and (max-height: 760px) {
-  .landing-first .luz-hero__title {
-    font-size: var(--luz-text-xl);
-  }
-
   .landing-hero__brand {
     margin-block-end: var(--luz-space-2xs);
   }
 
   .landing-first .luz-hero__lead {
     margin-block: var(--luz-space-xs);
-    /* the lead names what LUZ stands for, a few lines longer than it was: one
-       step down and a closer foot keep the buttons above the round mode button
-       (Spanish, the longest, ends 5px above it at 320 x 568) */
-    font-size: var(--luz-text-sm);
   }
 
   .landing-first .luz-hero .o-actions {

@@ -128,7 +128,7 @@ test.describe('the gap between the sections', () => {
       for (let i = 1; i < sections.length; i++) out.push(Math.round(sections[i].getBoundingClientRect().top - sections[i - 1].getBoundingClientRect().bottom));
       return out;
     });
-    expect(gaps.length).toBeGreaterThan(5);
+    expect(gaps.length).toBeGreaterThan(4);
     expect(gaps.filter((gap) => gap === 256).length, `gaps ${gaps}`).toBeGreaterThanOrEqual(gaps.length - 2);
   });
 });

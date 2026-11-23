@@ -62,7 +62,7 @@
   "nav.get-started": "Get started",
 
   "hero.title": "Design system for <em>humans</em>, ready for <em>AI</em>.",
-  "hero.lead": "Tokens, CSS and a little vanilla JavaScript, built on what the browser already does: start a project with <strong>LUZ</strong>, the <strong>Light</strong>, <strong>Usable</strong> and <strong class=\"landing-nowrap\">Zero-dependency</strong> design system, or migrate it page by page. Every component works before JavaScript loads, and every change starts with a failing test.",
+  "hero.lead": "Tokens, CSS and a little vanilla JavaScript, built on what the browser already does. Start with <strong>LUZ</strong>, the <strong>Light</strong>, <strong>Usable</strong> and <strong class=\"landing-nowrap\">Zero-dependency</strong> design system.",
   "hero.docs": "Read the docs",
   "hero.start": "Get started",
   "hero.start-ai": "Get started with AI",

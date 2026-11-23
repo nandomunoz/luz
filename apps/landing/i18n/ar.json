@@ -55,7 +55,7 @@
   "nav.on-page": "في هذه الصفحة",
   "nav.get-started": "البدء",
   "hero.title": "نظام تصميم <em>للإنسان</em>، جاهز <em>للذكاء الاصطناعي</em>.",
-  "hero.lead": "رموز التصميم وCSS وقليل من JavaScript الخالصة، مبنية على ما يفعله المتصفح أصلًا: ابدأ مشروعًا باستخدام <strong>LUZ</strong>، نظام التصميم ⁦<span lang=\"en\"><strong>Light</strong>, <strong>Usable</strong> and <strong class=\"landing-nowrap\">Zero-dependency</strong></span>⁩، أو انقل مشروعك صفحةً صفحة. كل مكوّن يعمل قبل تحميل JavaScript، وكل تغيير يبدأ باختبار فاشل.",
+  "hero.lead": "رموز التصميم وCSS وقليل من JavaScript الخالصة، مبنية على ما يفعله المتصفح أصلًا. ابدأ باستخدام <strong>LUZ</strong>، نظام التصميم ⁦<span lang=\"en\"><strong>Light</strong>, <strong>Usable</strong> and <strong class=\"landing-nowrap\">Zero-dependency</strong></span>⁩.",
   "hero.docs": "اقرأ التوثيق، باللغة الإنجليزية",
   "hero.start": "ابدأ الآن",
   "hero.start-ai": "ابدأ بالذكاء الاصطناعي",
