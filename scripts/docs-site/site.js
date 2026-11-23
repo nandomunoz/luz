@@ -1797,6 +1797,8 @@ function levelLists(site, locale, used) {
  * A token named here that luz-tokens.css does not define fails the build.
  */
 const DEMO_FAMILIES = ["blue", "teal", "green", "purple", "red"];
+/** The device each breakpoint is drawn as, a small wireframe as wide as the breakpoint. */
+const DEVICES = { sm: "phone", md: "tablet", lg: "laptop", xl: "laptop", xxl: "desktop", xxxl: "desktop" };
 
 function tokenSections({ say, tokens, groups, counts, families, read }) {
   const known = new Set(tokens);
@@ -1855,7 +1857,11 @@ function tokenSections({ say, tokens, groups, counts, families, read }) {
       const widest = Math.max(...mq.map(px));
       return `<div class="landing-tokens__scales">${[
         card("motion", row("curves", ["standard", "enter", "exit", "spring"].map((step) => `<li><span class="landing-tokens__plot">${curve(`--luz-easing-${step}`)}<span class="landing-tokens__dot" style="--ease:var(${need(`--luz-easing-${step}`)})" aria-hidden="true"><span></span></span></span>${label(step)}</li>`)), "transition: opacity\n  var(--luz-duration-base)\n  var(--luz-easing-standard);"),
-        card("breakpoints", row("ruler", mq.map((n) => `<li><span class="landing-tokens__bar landing-tokens__bar--share" style="--share:${(px(n) / widest).toFixed(3)}"></span>${label(`${n.slice("--luz-mq-".length)} ${values.get(n)}`)}</li>`)), "/* a media query reads no property: */\n@media (min-width: 768px) { … }"),
+        card("breakpoints", row("devices", mq.map((n) => {
+          const step = n.slice("--luz-mq-".length);
+          if (!DEVICES[step]) throw new Error(`the page of the tokens has no device for ${n}: add it to DEVICES in scripts/docs-site/site.js`);
+          return `<li><span class="landing-tokens__device landing-tokens__device--${DEVICES[step]}" style="--share:${(px(n) / widest).toFixed(3)}"></span>${label(`${step} ${values.get(n)}`)}</li>`;
+        })), "/* a media query reads no property: */\n@media (min-width: 768px) { … }"),
       ].join("")}</div>`;
     },
   };

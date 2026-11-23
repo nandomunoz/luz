@@ -3280,22 +3280,86 @@ home-light:defined ~ .landing-light__nojs {
   stroke: var(--luz-divider);
 }
 
-.landing-tokens__specimen--ruler {
+/* Breakpoints: a small wireframe of a device for each, as wide as its
+   breakpoint against the widest; a header line and two lines of text inside */
+.landing-tokens__specimen--devices {
   display: grid;
-  justify-content: stretch;
-  gap: var(--luz-space-2xs);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: end;
+  gap: var(--luz-space-md) var(--luz-space-sm);
 }
 
-.landing-tokens__specimen--ruler > li {
-  grid-template-columns: minmax(0, 1fr) 6.5rem;
-  justify-items: stretch;
-  align-items: center;
+.landing-tokens__specimen--devices > li {
+  justify-items: center;
+  inline-size: 100%;
 }
 
-.landing-tokens__bar--share {
-  justify-self: start;
+.landing-tokens__device {
+  position: relative;
+  display: block;
   inline-size: calc(var(--share) * 100%);
-  block-size: 0.4rem;
+  border: 1.5px solid var(--luz-text-secondary);
+  border-radius: var(--luz-radius-sm);
+  background-color: var(--luz-surface);
+  background-image:
+    linear-gradient(var(--luz-brand-primary), var(--luz-brand-primary)),
+    linear-gradient(var(--luz-divider), var(--luz-divider)),
+    linear-gradient(var(--luz-divider), var(--luz-divider));
+  background-position:
+    20% 18%,
+    20% 45%,
+    20% 62%;
+  background-repeat: no-repeat;
+  background-size:
+    35% 2px,
+    60% 2px,
+    45% 2px;
+}
+
+.landing-tokens__device--phone {
+  aspect-ratio: 9 / 17;
+  border-radius: var(--luz-radius-md);
+}
+
+.landing-tokens__device--tablet {
+  aspect-ratio: 3 / 4;
+  border-radius: var(--luz-radius-md);
+}
+
+/* A laptop: the screen over a base a little wider */
+.landing-tokens__device--laptop {
+  aspect-ratio: 16 / 10;
+  margin-block-end: 4px;
+  border-end-start-radius: 0;
+  border-end-end-radius: 0;
+}
+
+.landing-tokens__device--laptop::after {
+  content: "";
+  position: absolute;
+  inset-inline: -12%;
+  inset-block-start: calc(100% + 1.5px);
+  block-size: 3px;
+  border-radius: 0 0 var(--luz-radius-sm) var(--luz-radius-sm);
+  background: var(--luz-text-secondary);
+}
+
+/* A monitor: the screen on a stand */
+.landing-tokens__device--desktop {
+  aspect-ratio: 16 / 9;
+  margin-block-end: 7px;
+}
+
+.landing-tokens__device--desktop::after {
+  content: "";
+  position: absolute;
+  inset-inline-start: 50%;
+  inset-block-start: calc(100% + 1.5px);
+  inline-size: 30%;
+  block-size: 6px;
+  border-block-end: 2px solid var(--luz-text-secondary);
+  background: linear-gradient(var(--luz-text-secondary), var(--luz-text-secondary)) center / 2px 100% no-repeat;
+  translate: -50% 0;
 }
 
 /* The next step: a band that closes the page */
@@ -3472,9 +3536,8 @@ home-light:defined ~ .landing-light__nojs {
       animation-range: entry 20% cover 35%;
     }
 
-    .landing-tokens__specimen--ruler .landing-tokens__bar {
-      transform-origin: left;
-      animation: landing-grow-x linear both;
+    .landing-tokens__device {
+      animation: landing-device-in linear both;
       animation-timeline: view();
       animation-range: entry 20% cover 35%;
     }
@@ -3507,9 +3570,10 @@ home-light:defined ~ .landing-light__nojs {
   }
 }
 
-@keyframes landing-grow-x {
+@keyframes landing-device-in {
   from {
-    scale: 0 1;
+    opacity: 0;
+    scale: 0.8;
   }
 }
 
