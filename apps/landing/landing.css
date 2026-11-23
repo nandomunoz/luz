@@ -2582,10 +2582,11 @@ home-light:defined ~ .landing-light__nojs {
   }
 }
 
-/* On a phone the frames go: the band keeps its tint with no border, and the
-   demo sits on it with no border, no shadow and no side padding, so its
+/* While the demo is one column (a phone, a tablet: below the 900px where it
+   turns to two) the frames go: the band keeps its tint with no border, and
+   the demo sits on it with no border, no shadow and no side padding, so its
    content has the whole width */
-@media (max-width: 640px) {
+@media (max-width: 899px) {
   .landing-tokens__hero {
     border: 0;
     border-radius: 0;
