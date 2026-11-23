@@ -23,8 +23,6 @@ const repo = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (file) => readFileSync(join(repo, file), "utf-8");
 const HOME = "apps/landing/index.html";
 const NAMES = ["tokens", "core", "catalog"];
-/** The level of the home each page is the page of, and the list the home shows for it. */
-const LEVEL = { tokens: { key: "l1", list: "in1-list" }, core: { key: "l2", list: "in2-list" }, catalog: { key: "l3", list: "in3-list" } };
 const LANGS = [["en", "/"], ["es", "/es/"], ["ar", "/ar/"]];
 
 const site = scanSite(join(repo, "apps/docs"), repo);
@@ -37,12 +35,6 @@ const rendered = new Map([...built.rendered].map(([route, page]) => [route, quot
 const { problems } = built;
 const catalog = (code) => JSON.parse(read(`apps/landing/i18n/${code}.json`));
 const hrefsOf = (html, pattern) => [...html.matchAll(pattern)].map((m) => m[1]);
-/** The tag lists of a pane of the home: the blocks a reader sees under "List". */
-const listsOf = (html, id) => {
-  const start = html.indexOf(`id="${id}"`);
-  const end = html.indexOf("</section>", start);
-  return html.slice(start, end).match(/<div class="landing-names"[\s\S]*?<\/ul>\s*<\/div>/g) ?? [];
-};
 
 describe("the pages of the three levels", () => {
   it("are routes of the site in every language, with no broken link and no catalog key left over", () => {
@@ -69,14 +61,6 @@ describe("the pages of the three levels", () => {
     // the footer's list of languages too
     const footer = html.slice(html.indexOf('class="page-nav__row"'));
     expect(hrefsOf(footer, /<li><a href="([^"]*)" hreflang/g).slice(0, 3)).toEqual(["/", "/es/", "/ar/"].map((p) => `${p}${name}/`));
-  });
-
-  it.each(["core", "catalog"].flatMap((name) => LANGS.map(([code, prefix]) => [name, code, prefix])))("%s in %s: lists every element the home lists for the level, link for link", (name, code, prefix) => {
-    const page = rendered.get(`${prefix}${name}/`);
-    const wanted = listsOf(rendered.get(prefix), LEVEL[name].list);
-    expect(wanted.length).toBeGreaterThan(0);
-    const all = page.slice(page.indexOf('id="all"'));
-    for (const list of wanted) expect(all, `${prefix}${name}/ has the list`).toContain(list);
   });
 
   it.each(NAMES.flatMap((name) => LANGS.map(([code, prefix]) => [name, code, prefix])))("%s in %s: its links to the home are the language's, and the page links to the docs of its level", (name, code, prefix) => {
@@ -448,7 +432,7 @@ describe("the page of core: the HTML you write comes styled, a class adds a comp
     const BLOCKS = [["actions", ["actions"]], ["forms", ["forms"]], ["content", ["content", "navigation"]], ["feedback", ["feedback", "media"]], ["layout", ["helpers", "objects"]]];
     BLOCKS.forEach(([id, covered], i) => {
       const block = sectionOf(html, `c-${id}`);
-      expect(block, id).toMatch(new RegExp(`^<section class="landing-inside${i % 2 ? " landing-inside--flip" : ""} landing-block landing-block--${id}"`));
+      expect(block, id).toMatch(new RegExp(`^<section class="landing-inside${i % 2 ? " landing-inside--flip" : ""} landing-block landing-block--${id} landing-block--wide"`));
       expect(block.match(/<h2\b/g), id).toHaveLength(1);
       const links = [...block.matchAll(/<a class="landing-block__link" href="([^"]+)"[^>]*>[^<]+<span class="landing-names__n">(\d+)<\/span>/g)];
       // the docs of a language are its own (/es/docs/…) once it has them
@@ -523,7 +507,7 @@ describe("the page of core: the HTML you write comes styled, a class adds a comp
 
   it.each(LANGS)("in %s: shows every class of core's components in its blocks, every variant, size, state and part, but for the few that cannot be shown in a card", (code, prefix) => {
     const html = core(prefix);
-    const blocks = html.slice(html.indexOf('<div class="landing-level__blocks">'), html.indexOf("landing-level__fold"));
+    const blocks = html.slice(html.indexOf('<div class="landing-level__blocks">'), html.indexOf('<section class="landing-level__next"'));
     const used = new Set([...blocks.matchAll(/class="([^"]+)"/g)].flatMap((m) => m[1].split(/\s+/)));
     // what a card cannot show: the text a player shows only without JavaScript and the status of a MIDI file, the
     // colour mode's button fixed to the corner of the window and its live region (hidden by design), and the buttons
@@ -549,7 +533,7 @@ describe("the page of core: the HTML you write comes styled, a class adds a comp
     expect(css).toMatch(/\.landing-block__panel:has\(> \.landing-cards\)\s*\{[^}]*border:\s*0/);
   });
 
-  it.each(LANGS)("in %s: three steps (install, write HTML, add a class) and what you get, then the next step to the catalog, and the whole list folded at the end", (code, prefix) => {
+  it.each(LANGS)("in %s: three steps (install, write HTML, add a class) and what you get, then the next step to the catalog, and no list of names: every component is live in the blocks", (code, prefix) => {
     const html = core(prefix);
     const steps = sectionOf(html, "steps");
     expect(steps.match(/class="landing-path__step landing-path__step--(1|2|3|result)"/g)).toHaveLength(4);
@@ -558,9 +542,8 @@ describe("the page of core: the HTML you write comes styled, a class adds a comp
     const next = sectionOf(html, "next");
     expect(next).toContain(`href="${prefix}catalog/"`);
     expect(next).toMatch(/href="(\/(es|ar))?\/docs\/components\/"/);
-    const all = sectionOf(html, "all");
-    expect(all).toMatch(/<details class="landing-level__fold">\s*<summary id="all-title">[^<]+<\/summary>/);
-    expect(all).toContain("landing-names");
+    expect(html).not.toContain('id="all"');
+    expect(html).not.toContain("landing-level__fold");
   });
 });
 
@@ -613,29 +596,62 @@ describe("the page of the catalog: a stylesheet per piece, linked only when used
     }
   });
 
-  it.each(LANGS)("in %s: four blocks, structure, content, charts and site-wide, in the sides of the home, each a card per piece (a wireframe and the stylesheet that draws it) linking the docs' groups they cover with their counts", (code, prefix) => {
+  // a block holds sections of its own (an announcement, the cookie banner): it ends where the next block or the next step starts
+  const blockOf = (html, id) => {
+    const start = html.search(new RegExp(`<section\\b[^>]*\\sid="${id}"`));
+    if (start < 0) return "";
+    const ends = [html.indexOf('<section class="landing-inside', start + 1), html.indexOf('<section class="landing-level__next"', start)].filter((n) => n > 0);
+    return html.slice(start, Math.min(...ends));
+  };
+
+  it.each(LANGS)("in %s: four blocks, structure, content, charts and site-wide, in the sides of the home with the panel on the wider side, each every piece of the docs' groups it covers, live, linking those groups with their counts", (code, prefix) => {
     const html = catalogPage(prefix);
     const groups = new Map();
     for (const page of site.pages.filter((p) => p.meta.area === "catalog" && p.meta.group)) groups.set(page.meta.group, (groups.get(page.meta.group) ?? 0) + 1);
     const BLOCKS = [["structure", ["navigation", "page-structure"]], ["content", ["content"]], ["charts", ["charts"]], ["sitewide", ["site-wide", "documentation"]]];
+    // every group of the catalog's docs but the reference of the classes is a block's
+    expect([...groups.keys()].filter((g) => g !== "reference").sort()).toEqual(BLOCKS.flatMap(([, covered]) => covered).sort());
     BLOCKS.forEach(([id, covered], i) => {
-      const block = sectionOf(html, `k-${id}`);
-      expect(block, id).toMatch(new RegExp(`^<section class="landing-inside${i % 2 ? " landing-inside--flip" : ""} landing-block landing-block--${id}"`));
+      const block = blockOf(html, `k-${id}`);
+      expect(block, id).toMatch(new RegExp(`^<section class="landing-inside${i % 2 ? " landing-inside--flip" : ""} landing-block landing-block--${id} landing-block--wide"`));
       const links = [...block.matchAll(/<a class="landing-block__link" href="([^"]+)"[^>]*>[^<]+<span class="landing-names__n">(\d+)<\/span>/g)];
       expect(links.map((m) => m[1].replace(/^\/(es|ar)\//, "/")), id).toEqual(covered.map((g) => `/docs/catalog/#group-${g}`));
       expect(links.map((m) => Number(m[2])), id).toEqual(covered.map((g) => groups.get(g)));
-      const cards = [...block.matchAll(/<div class="landing-card landing-card--([a-z-]+)"><p class="landing-card__title"><code>([a-z-]+)<\/code><\/p>([\s\S]*?)<\/pre><\/div>/g)];
-      expect(cards.length, id).toBe(4);
-      for (const [, name, title, body] of cards) {
-        expect(title).toBe(name);
-        expect(sheets, `${name} is a stylesheet of the catalog`).toContain(name);
-        expect(body).toContain('class="landing-wf"');
-        expect(body).toContain(`components/${name}.min.css`);
+      // each piece is there, live: its class or its CSS-only tag; page transition has no look of its own, so a card shows it
+      const pieces = site.pages.filter((p) => p.meta.area === "catalog" && covered.includes(p.meta.group)).map((p) => p.route.split("/").filter(Boolean).at(-1));
+      expect(pieces.length, id).toBe(covered.reduce((n, g) => n + groups.get(g), 0));
+      for (const name of pieces) {
+        if (name === "page-transition") expect(block).toContain('class="landing-card landing-card--page-transition"');
+        else expect(block, `${id} shows ${name}`).toMatch(new RegExp(`class="(?:[^"]* )?luz-${name}(?=__|[\\s"-])|<luz-${name}[\\s>]`));
       }
+      // what is live is inert, so the keyboard stays out of it, and no panel is forced left to right
+      const live = block.match(/<div class="landing-core__live[^"]*"[^>]*>/g) ?? [];
+      expect(live.length, id).toBeGreaterThan(0);
+      for (const tag of live) expect(tag, id).toMatch(/\sinert>$/);
+      expect(block).toMatch(/<div class="landing-panel landing-block__panel">/);
     });
   });
 
-  it.each(LANGS)("in %s: three steps (install, link the pieces you use, add the script once) and what you get, then the next step to the kinds of site, and the whole list folded at the end", (code, prefix) => {
+  it.each(LANGS)("in %s: no piece in the blocks wakes a script (catalog.js would load it and a cookie banner would really ask), and none links away", (code, prefix) => {
+    const html = catalogPage(prefix);
+    const blocks = html.slice(html.indexOf('<div class="landing-level__blocks">'), html.indexOf('<section class="landing-level__next"'));
+    for (const tag of ["luz-search", "luz-cookie-consent", "luz-theme-time", "luz-timeline", "luz-embed", "luz-chart"]) expect(blocks, tag).not.toMatch(new RegExp(`<${tag}[\\s>]`));
+    expect(blocks).not.toMatch(/data-luz-spy|data-luz-consent\b/);
+    // only the links of the words to the docs' groups go somewhere
+    expect(blocks.replace(/<pre\b[\s\S]*?<\/pre>/g, "").replace(/<ul class="landing-block__groups">[\s\S]*?<\/ul>/g, "")).not.toMatch(/<a\b[^>]*\shref=/);
+  });
+
+  it("links every stylesheet of the catalog, once and before the landing's, on its page only", () => {
+    for (const [, prefix] of LANGS) {
+      const head = catalogPage(prefix).split("</head>")[0];
+      const linked = [...head.matchAll(/<link rel="stylesheet" href="\/packages\/catalog\/dist\/components\/([a-z-]+)\.css">/g)].map((m) => m[1]);
+      expect([...linked].sort()).toEqual([...sheets].sort());
+      expect(head.lastIndexOf("/packages/catalog/dist/components/")).toBeLessThan(head.indexOf("/apps/landing/landing.css"));
+      for (const page of [prefix, `${prefix}core/`, `${prefix}tokens/`]) expect(rendered.get(page).split("</head>")[0]).not.toContain("/components/docs-layout.css");
+    }
+  });
+
+  it.each(LANGS)("in %s: three steps (install, link the pieces you use, add the script once) and what you get, then the next step to the kinds of site, and no list of names: every piece is live in the blocks", (code, prefix) => {
     const html = catalogPage(prefix);
     const steps = sectionOf(html, "steps");
     expect(steps.match(/class="landing-path__step landing-path__step--(1|2|3|result)"/g)).toHaveLength(4);
@@ -643,9 +659,8 @@ describe("the page of the catalog: a stylesheet per piece, linked only when used
     expect(steps).toContain("components/search.min.css");
     expect(steps).toContain("catalog.min.js");
     expect(sectionOf(html, "next")).toMatch(/href="(\/(es|ar))?\/docs\/kinds\/"/);
-    const all = sectionOf(html, "all");
-    expect(all).toMatch(/<details class="landing-level__fold">\s*<summary id="all-title">[^<]+<\/summary>/);
-    expect(all).toContain("landing-names");
+    expect(html).not.toContain('id="all"');
+    expect(html).not.toContain("landing-level__fold");
   });
 
   it("draws a wireframe as a grid its generator places, and a kind of site large", () => {
