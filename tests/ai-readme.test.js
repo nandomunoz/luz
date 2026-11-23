@@ -471,6 +471,15 @@ describe("node scripts/ai-readme.js", () => {
     for (const path of changed) expect(path).toMatch(/^packages\/[^/]+\/README\.md$/);
   });
 
+  it("leaves a private package alone: nothing is published, so no block tells an agent how to load it", () => {
+    put("packages/ai/package.json", JSON.stringify({ name: "@luz-ds/ai", version: "0.0.0", private: true }));
+    put("packages/ai/README.md", README("ai"));
+    expect(run("--write").status).toBe(0);
+    expect(readFileSync(join(dir, "packages/ai/README.md"), "utf-8")).toBe(README("ai"));
+    run("--write");
+    expect(run("--check").status).toBe(0);
+  });
+
   it("--write keeps the rest of the README, and a second --write changes nothing", () => {
     run("--write");
     const once = snapshot();
@@ -628,7 +637,7 @@ describe("the release flow runs ai-readme in the version step, without lifecycle
 /* ---- The real READMEs ---------------------------------------------------- */
 
 describe("the READMEs of the packages", () => {
-  const packages = readdirSync(join(repo, "packages")).filter((p) => existsSync(join(repo, "packages", p, "package.json")) && existsSync(join(repo, "packages", p, "README.md")));
+  const packages = readdirSync(join(repo, "packages")).filter((p) => existsSync(join(repo, "packages", p, "package.json")) && existsSync(join(repo, "packages", p, "README.md")) && !JSON.parse(read(`packages/${p}/package.json`)).private);
 
   it("there are packages with a README to check", () => {
     expect(packages).toEqual(expect.arrayContaining(["tokens", "core", "catalog"]));
@@ -636,7 +645,7 @@ describe("the READMEs of the packages", () => {
 
   it("there is no README of landing, cms, app or docs: they are not packages any more (F5b), their patterns are in catalog's", () => {
     expect(packages.filter((name) => ["landing", "cms", "app", "docs"].includes(name))).toEqual([]);
-    expect(readdirSync(join(repo, "packages")).sort()).toEqual(["catalog", "check", "core", "tokens"]);
+    expect(readdirSync(join(repo, "packages")).sort()).toEqual(["ai", "catalog", "check", "core", "tokens"]);
   });
 
   it.each(["tokens", "core", "catalog"])("%s has one block, between the markers, right before '## License'", (name) => {

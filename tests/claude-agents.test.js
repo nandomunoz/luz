@@ -199,3 +199,30 @@ describe("hooks name agents that exist", () => {
     });
   }
 });
+
+/**
+ * A strict YAML parser (PyYAML, a validator of the open Agent Skills
+ * specification, another assistant's loader) rejects a plain scalar that holds
+ * `: ` or ` #`; Claude Code reads it anyway. So a value with either is quoted.
+ */
+describe("frontmatter is strict YAML", () => {
+  const skills = readdirSync(resolve(root, ".claude/skills")).map((d) => resolve(root, ".claude/skills", d, "SKILL.md"));
+  const all = [...files.map((f) => resolve(agentsDir, f)), ...skills];
+
+  it("covers the agents and the skills", () => {
+    expect(all.length).toBeGreaterThan(files.length);
+  });
+
+  for (const file of all) {
+    it(`${file.replace(`${root}/`, "")} quotes a value that holds ': ' or ' #'`, () => {
+      const block = readFileSync(file, "utf-8").match(/^---\n([\s\S]*?)\n---/)?.[1] ?? "";
+      for (const line of block.split("\n")) {
+        const m = line.match(/^([A-Za-z_-]+):\s*(.*)$/);
+        if (!m) continue;
+        const value = m[2].trim();
+        if (/^["']/.test(value)) continue;
+        expect(value, `${m[1]} is a plain scalar with ': ' or ' #'`).not.toMatch(/: | #/);
+      }
+    });
+  }
+});
