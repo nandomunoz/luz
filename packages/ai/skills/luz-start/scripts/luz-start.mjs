@@ -180,19 +180,20 @@ function scalar(raw, line, problems) {
   }
   if (/^[>|]/.test(v)) problems.push({ rule: "yaml/block-scalar", line, message: "a block scalar (| or >) is outside the subset: write the value on one line, in quotes" });
   else if (/^[[{]/.test(v)) problems.push({ rule: "yaml/flow", line, message: "a flow value ([…] or {…}) is outside the subset: write a plain or quoted string" });
+  else if (v.startsWith("#")) problems.push({ rule: "yaml/plain-scalar", line, message: 'a plain value that starts with "#" is a comment: put it in quotes' });
   else if (/^[&*!%@`]/.test(v)) problems.push({ rule: "yaml/plain-scalar", line, message: `a plain value cannot start with "${v[0]}": put it in quotes` });
   else if (/: | #/.test(v) || v.endsWith(":")) problems.push({ rule: "yaml/plain-scalar", line, message: "a plain value with ': ' or ' #' is rejected by a strict YAML parser: put it in quotes" });
   return v;
 }
 
 /** The fields of a front matter: { key: string | { key: string } }, with the line of each. */
-function parseFront(front, problems) {
+function parseFront(front, problems, first = 2) {
   const data = {};
   const lines = {};
   let map = null;
   let last = null;
   front.forEach((text, i) => {
-    const line = i + 2;
+    const line = i + first;
     if (!text.trim() || text.trim().startsWith("#")) return;
     const indented = /^\s+/.test(text);
     // A list of strings, one level: `tools:` and then `  - read_file` lines
@@ -319,6 +320,29 @@ function checkToml(file) {
   return problems;
 }
 
+/** `agents/openai.yaml` of a skill, which Codex reads and every other assistant ignores. */
+function checkOpenai(file) {
+  const problems = [];
+  const add = (rule, message, line) => problems.push({ rule, message, sub: "agents/openai.yaml", ...(line ? { line } : {}) });
+  const text = readFileSync(file, "utf-8");
+  const lines = text.split(/\r?\n/);
+  const hidden = lines.findIndex((l) => HIDDEN.test(l));
+  if (hidden !== -1) add("chars/hidden", "a hidden, zero-width or bidi control character", hidden + 1);
+  const own = [];
+  const { data, lines: at } = parseFront(lines, own, 1);
+  problems.push(...own.map((p) => ({ ...p, sub: "agents/openai.yaml" })));
+  for (const key of Object.keys(data)) {
+    if (!FIELDS.openai.top.includes(key)) add("field/unknown", `${key} is not a key of agents/openai.yaml (${FIELDS.openai.top.join(", ")}); Codex ignores it without a word`, at[key]);
+    else if (key !== "dependencies" && (typeof data[key] !== "object" || Array.isArray(data[key]))) add("field/type", `${key} is a map of keys`, at[key]);
+    else if (FIELDS.openai[key]) {
+      for (const inner of Object.keys(data[key])) if (!FIELDS.openai[key].includes(inner)) add("field/unknown", `${key}.${inner} is not a key of ${key} (${FIELDS.openai[key].join(", ")})`, at[key]);
+    }
+  }
+  const flag = data.policy?.allow_implicit_invocation;
+  if (flag !== undefined && flag !== "true" && flag !== "false") add("field/type", "allow_implicit_invocation is true or false", at.policy);
+  return problems;
+}
+
 function checkFile(file, kind, target) {
   if (kind === "codex") return checkToml(file);
   const problems = [];
@@ -379,6 +403,8 @@ function checkFile(file, kind, target) {
         if (inner.length) add("reference/chain", `${ref} points on to ${inner[0][0]}, which SKILL.md does not name: name every reference from SKILL.md, one level deep`, line);
       }
     }
+    const openai = join(base, "agents/openai.yaml");
+    if (existsSync(openai)) problems.push(...checkOpenai(openai));
   }
   return problems;
 }
@@ -417,7 +443,7 @@ function runCheck(paths, base, forced) {
       const target = forced ?? (file.split(sep).includes(".claude") ? "claude" : "portable");
       const shown = relative(base, file) || file;
       checked.push(shown);
-      for (const p of checkFile(file, kind, target)) problems.push({ file: shown, ...p });
+      for (const { sub, ...p } of checkFile(file, kind, target)) problems.push({ file: sub ? join(dirname(shown), sub) : shown, ...p });
     }
   }
   return { checked, problems };
@@ -462,6 +488,17 @@ function runDoctor(dir) {
   if (existsSync(agentsMd)) {
     const size = statSync(agentsMd).size;
     if (size > LIMITS.agentsMdBytes) warnings.push(`AGENTS.md is ${size} bytes; Codex reads at most ${LIMITS.agentsMdBytes} by default, so the end of it may not be read`);
+  }
+  // A skill is written as a copy in two places: the copies must stay the same
+  const tree = (root) => new Map(readdirSync(root, { recursive: true, withFileTypes: true }).filter((e) => e.isFile()).map((e) => [relative(root, join(e.parentPath, e.name)), readFileSync(join(e.parentPath, e.name), "utf-8")]));
+  const [first, second] = SKILL_PLACES.map((p) => join(dir, p));
+  if (existsSync(first) && existsSync(second) && !isLink(first) && !isLink(second)) {
+    for (const entry of readdirSync(first, { withFileTypes: true }).filter((e) => e.isDirectory() && existsSync(join(second, e.name)) && !isLink(join(second, e.name)))) {
+      const a = tree(join(first, entry.name));
+      const b = tree(join(second, entry.name));
+      const differ = [...new Set([...a.keys(), ...b.keys()])].filter((k) => a.get(k) !== b.get(k));
+      if (differ.length) warnings.push(`${entry.name} is not the same in ${SKILL_PLACES[0]} and ${SKILL_PLACES[1]} (${differ.slice(0, 3).join(", ")}${differ.length > 3 ? ", …" : ""}): run skill add ${entry.name} --force`);
+    }
   }
   const { checked, problems: found } = runCheck([], dir);
   problems.push(...found);
@@ -532,7 +569,13 @@ const SKILL_PLACES = [".agents/skills", ".claude/skills"];
 const ADAPT = /^\[ADAPT:\s*(.*)\]$/;
 
 const agentNames = () => readdirSync(join(ASSETS, "agents")).filter((f) => f.endsWith(".md")).map((f) => f.slice(0, -3)).sort();
-const skillNames = () => readdirSync(join(ASSETS, "skills"), { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name).sort();
+// This skill adds itself too: its folder is the name of its parent, and its evals stay behind
+const SELF = basename(join(HERE, ".."));
+const skillNames = () => [...readdirSync(join(ASSETS, "skills"), { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name), SELF].sort();
+const skillRoot = (name) => (name === SELF ? join(HERE, "..") : join(ASSETS, "skills", name));
+// What the skill carries when it adds itself: these, and no file or folder that starts with a dot. Nothing else in its
+// folder (evals, a stray .env, node_modules) goes into a person's project
+const CARRIES = ["SKILL.md", "agents", "assets", "references", "scripts"];
 
 /**
  * The fields of an agent left to fill: a bullet of its text whose value is `[ADAPT: hint]`. A bullet under a
@@ -657,7 +700,7 @@ function listAgents() {
 
 function listSkills() {
   return skillNames().map((name) => {
-    const { data } = parseFront(split(readFileSync(join(ASSETS, "skills", name, "SKILL.md"), "utf-8")).front, []);
+    const { data } = parseFront(split(readFileSync(join(skillRoot(name), "SKILL.md"), "utf-8")).front, []);
     return { name, description: data.description };
   });
 }
@@ -690,8 +733,13 @@ function runAgentAdd(values, name) {
 function runSkillAdd(values, name) {
   if (!name) return { error: `a skill is missing. Example: luz-start skill add ${skillNames()[0]} --dir . --dry-run (skills: ${skillNames().join(", ")})` };
   if (!skillNames().includes(name)) return { error: `"${name}" is not a skill (${skillNames().join(", ")})` };
-  const root = join(ASSETS, "skills", name);
-  const rels = readdirSync(root, { recursive: true, withFileTypes: true }).filter((e) => e.isFile()).map((e) => relative(root, join(e.parentPath, e.name)).split(sep).join("/")).sort();
+  const root = skillRoot(name);
+  const rels = readdirSync(root, { recursive: true, withFileTypes: true })
+    .filter((e) => e.isFile())
+    .map((e) => relative(root, join(e.parentPath, e.name)).split(sep).join("/"))
+    .filter((rel) => !rel.split("/").some((part) => part.startsWith(".")))
+    .filter((rel) => name !== SELF || CARRIES.includes(rel.split("/")[0]))
+    .sort();
   const files = SKILL_PLACES.flatMap((place) => rels.map((rel) => ({ path: `${place}/${name}/${rel}`, content: readFileSync(join(root, rel), "utf-8") })));
   const written = writeFiles(values.dir ?? ".", files, { dryRun: Boolean(values["dry-run"]), force: values.force });
   if (written.error) return written;

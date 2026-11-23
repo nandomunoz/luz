@@ -38,11 +38,12 @@ export function loadCases(root = repo) {
 }
 
 /** Grades the folder of a run: { case, passed, checks: [{ id, ok, detail }] }. */
-export function grade(id, folder, { root = repo } = {}) {
+export function grade(id, folder, { root = repo, ignore = [] } = {}) {
   const c = loadCases(root).find((x) => x.id === id);
   if (!c) throw new Error(`${id} is not a case (${loadCases(root).map((x) => x.id).join(", ")})`);
   const dir = resolve(folder);
-  const files = existsSync(dir) ? walk(dir) : [];
+  // `ignore`: paths of the run's own setup (the skill installed for the run), which are not what the model wrote
+  const files = (existsSync(dir) ? walk(dir) : []).filter((f) => !ignore.some((prefix) => f.startsWith(prefix)));
   const fixture = Object.keys(c.fixture ?? {});
   const targetFiles = files.filter((f) => f.startsWith(`${c.target}/`));
   const pages = targetFiles.filter((f) => /\.(html|astro)$/.test(f));

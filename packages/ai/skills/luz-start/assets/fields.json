@@ -1,5 +1,5 @@
 {
-  "$comment": "The closed lists of front matter fields, per kind of file and per target. Claude Code ignores a misspelled field without a word, so the check reads these. The portable six are the open Agent Skills specification; the rest are Claude Code's own (dashes in a skill, camelCase in a subagent). A target is added here, with a test, when its list has been read at the source. The Gemini CLI list is read at geminicli.com/docs/core/subagents (2026-11-23); the Codex one at learn.chatgpt.com/docs/agent-configuration/subagents, which does not claim its list is complete.",
+  "$comment": "The closed lists of front matter fields, per kind of file and per target. Claude Code ignores a misspelled field without a word, so the check reads these. The portable six are the open Agent Skills specification; the rest are Claude Code's own (dashes in a skill, camelCase in a subagent). A target is added here, with a test, when its list has been read at the source. The Gemini CLI list is read at geminicli.com/docs/core/subagents (2026-11-23); the Codex one at learn.chatgpt.com/docs/agent-configuration/subagents, which does not claim its list is complete. agents/openai.yaml is read at learn.chatgpt.com/docs/build-skills (2026-11-23): interface, policy and dependencies; dependencies.tools is a list of maps, outside the subset this check reads, so a file that uses it is reported as nested.",
   "skill": {
     "portable": [
       "name",
@@ -82,5 +82,23 @@
     "name": 64,
     "bodyLines": 500,
     "agentsMdBytes": 32768
+  },
+  "openai": {
+    "top": [
+      "interface",
+      "policy",
+      "dependencies"
+    ],
+    "interface": [
+      "display_name",
+      "short_description",
+      "icon_small",
+      "icon_large",
+      "brand_color",
+      "default_prompt"
+    ],
+    "policy": [
+      "allow_implicit_invocation"
+    ]
   }
 }
