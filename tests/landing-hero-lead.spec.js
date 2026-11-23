@@ -85,6 +85,20 @@ test.describe('the hero on a phone', () => {
   }
 });
 
+test.describe('the hero title and lead, and the title and lead of a section', () => {
+  for (const [route] of ROUTES) {
+    for (const [width, height] of [[320, 568], [375, 667], [1280, 800]]) {
+      test(`${route} at ${width} x ${height}: the titles are the same size, and so are the leads`, async ({ page }) => {
+        await page.setViewportSize({ width, height });
+        await page.goto(route);
+        const size = (selector) => page.locator(selector).first().evaluate((el) => getComputedStyle(el).fontSize);
+        expect(await size('.luz-hero__title'), 'title').toBe(await size('.landing-inside__title'));
+        expect(await size('.luz-hero__lead'), 'lead').toBe(await size('.landing-inside__lead'));
+      });
+    }
+  }
+});
+
 test.describe('without JavaScript', () => {
   test.use({ javaScriptEnabled: false });
 
