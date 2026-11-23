@@ -2,15 +2,18 @@
 /**
  * luz-start: the one executable of the luz-start skill.
  *
- * It reads and reports; it never writes a file, never asks a question, never reaches the network and runs no
- * program. It finds its own data from its own path, so it works from any folder.
+ * It reads and reports, and `site new` is the one command that writes: only the files it names, under the folder
+ * it is given, and never one that exists unless --force says so. It never asks a question, never reaches the
+ * network and runs no program. It finds its own data from its own path, so it works from any folder.
  *
  *   luz-start doctor [--dir <folder>] [--json]
  *   luz-start check [path...] [--target portable|claude] [--json]
+ *   luz-start facts [--json]
+ *   luz-start site new --name <name> --kind <kind> --stack <stack> --target <folder> [--lang <code>] [--dry-run] [--force] [--json]
  *
  * Exit codes: 0 nothing blocks, 1 a problem blocks, 2 the command was used wrongly.
  */
-import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { basename, dirname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
@@ -25,15 +28,19 @@ const RANGES = [[0x00, 0x08], [0x0b, 0x0c], [0x0e, 0x1f], [0x7f, 0x7f], [0x200b,
 const HIDDEN = { test: (text) => [...text].some((ch) => RANGES.some(([a, b]) => ch.codePointAt(0) >= a && ch.codePointAt(0) <= b)) };
 const NAME = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 const MAX_LINES = 40;
+// The stacks a starter page is written for: the page is plain HTML, and Astro takes it as a page
+const GENERATED = ["vanilla", "astro"];
 
-const HELP = `luz-start: checks the skills and subagents of a project, and the project itself. It reads, it never writes.
+const HELP = `luz-start: starts a site with LUZ and checks the skills and subagents of a project. Only "site new" writes.
 
 Usage:
   luz-start <command> [options]
 
 Commands:
-  doctor   the project, the assistants it has and whether their skills and agents pass check
-  check    the front matter and the body of skills (SKILL.md) and subagents (.md)
+  site new  write the starter page of a kind of site and a stack (--dry-run shows it first)
+  facts     the versions, the kinds of site and the stacks of this release
+  doctor    the project, the assistants it has and whether their skills and agents pass check
+  check     the front matter and the body of skills (SKILL.md) and subagents (.md)
 
 Options:
   --json        one JSON object on stdout
@@ -46,7 +53,36 @@ Exit codes:
   2  the command was used wrongly
 
 Example:
-  luz-start doctor --json
+  luz-start site new --name "Acme" --kind landing --stack vanilla --target ./acme --dry-run
+`;
+
+const HELP_SITE = `luz-start site new: writes the starter page of a kind of site.
+
+Usage:
+  luz-start site new --name <name> --kind <kind> --stack <stack> --target <folder> [--lang <code>] [--dry-run] [--force] [--json]
+
+  --name     the name of the site: the title of the page
+  --kind     ${FACTS.kinds.join(", ")}
+  --stack    ${FACTS.stacks.map((s) => s.id).join(", ")} (a page is written for ${GENERATED.join(" and ")}; for the others, write vanilla and move the markup)
+  --target   the folder to write in; it is created if it does not exist
+  --lang     the language of the page, "en" by default
+  --dry-run  print the files, write nothing
+  --force    overwrite a file that exists; without it nothing is overwritten
+
+It never asks: a missing flag is an error that says which one and gives an example (exit 2). The page has
+"…" where its content goes, and the report counts them.
+
+Example:
+  luz-start site new --name "Acme" --kind landing --stack vanilla --target ./acme --dry-run
+`;
+
+const HELP_FACTS = `luz-start facts: the versions of the LUZ packages, the kinds of site and the stacks of this release.
+
+Usage:
+  luz-start facts [--json]
+
+Example:
+  luz-start facts --json
 `;
 
 const HELP_DOCTOR = `luz-start doctor: the project, its assistants, and a check of what it finds.
@@ -302,10 +338,75 @@ function runDoctor(dir) {
   return { ok: problems.length === 0, node, luz, assistants, facts: FACTS.versions, warnings, checked, problems };
 }
 
+// ---- facts and site new ---------------------------------------------------------------------------------------
+
+function runFacts(json) {
+  if (json) return `${JSON.stringify(FACTS, null, 2)}\n`;
+  const lines = ["facts:", ...Object.entries(FACTS.versions).map(([pkg, v]) => `  @luz-ds/${pkg} ${v}`), `  kinds: ${FACTS.kinds.join(", ")}`, `  stacks: ${FACTS.stacks.map((s) => s.id).join(", ")}`];
+  return `${lines.join("\n")}\n`;
+}
+
+/** A path the shell reads as one word: left as it is when it holds only plain characters, else in single quotes. */
+const shellQuote = (text) => (/^[\w@%+=:,./-]+$/.test(text) ? text : `'${text.replaceAll("'", "'\\''")}'`);
+
+const escapeHtml = (text) => text.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+
+/** The files `site new` writes, by path under the target, or an error for exit 2. */
+function planSite(values) {
+  const missing = [];
+  const need = (flag, hint) => {
+    if (!values[flag]) missing.push(`--${flag}${hint ? ` (${hint})` : ""}`);
+  };
+  need("name", "the name of the site");
+  need("kind", FACTS.kinds.join(", "));
+  need("stack", FACTS.stacks.map((s) => s.id).join(", "));
+  need("target", "the folder to write in");
+  if (missing.length) return { error: `missing ${missing.join(", ")}. Example: luz-start site new --name "Acme" --kind landing --stack vanilla --target ./acme --dry-run` };
+  const { name, kind, stack, lang = "en" } = values;
+  if (name.length > 80 || HIDDEN.test(name) || /[\r\n]/.test(name)) return { error: "--name is one line of 80 characters or less, with no control or hidden character" };
+  if (!FACTS.kinds.includes(kind)) return { error: `--kind "${kind}" is not one of ${FACTS.kinds.join(", ")}` };
+  if (!FACTS.stacks.some((s) => s.id === stack)) return { error: `--stack "${stack}" is not one of ${FACTS.stacks.map((s) => s.id).join(", ")}` };
+  if (!GENERATED.includes(stack)) return { error: `--stack ${stack}: a page is written for ${GENERATED.join(" and ")} only. Write the page with --stack vanilla, then move its markup and load LUZ as references/stacks.md says` };
+  if (!/^[a-z]{2,3}(-[A-Za-z0-9]+)*$/.test(lang)) return { error: `--lang "${lang}" is not a language code such as en, es or ar` };
+
+  const page = readFileSync(join(HERE, "../assets/templates", `${kind}.html.tpl`), "utf-8").replace("{{lang}}", () => lang).replace("{{title}}", () => escapeHtml(name));
+  const file = stack === "astro" ? { path: "src/pages/index.astro", content: `---\n---\n${page}` } : { path: "index.html", content: page };
+  const todo = (file.content.match(/…/g) ?? []).length;
+  const ext = stack === "astro" ? " --ext .astro" : "";
+  return { files: [file], todo, next: [`npx @luz-ds/check@${FACTS.versions.check} ${shellQuote(values.target)}${ext}`] };
+}
+
+function runSite(values) {
+  const plan = planSite(values);
+  if (plan.error) return { error: plan.error };
+  const target = resolve(values.target);
+  if (existsSync(target) && !statSync(target).isDirectory()) return { error: `${target} is a file, not a folder` };
+  const dryRun = Boolean(values["dry-run"]);
+  if (!dryRun) {
+    const exists = plan.files.map((f) => join(target, f.path)).filter(existsSync);
+    if (exists.length && !values.force) return { error: `${exists.join(", ")} exists: nothing was written. Use --force to overwrite it` };
+    for (const f of plan.files) {
+      mkdirSync(dirname(join(target, f.path)), { recursive: true });
+      writeFileSync(join(target, f.path), f.content);
+    }
+  }
+  const files = plan.files.map((f) => ({ path: join(values.target, f.path), bytes: Buffer.byteLength(f.content), ...(dryRun ? { content: f.content } : {}) }));
+  return { report: { ok: true, dryRun, files, todo: plan.todo, next: plan.next } };
+}
+
+function siteText({ dryRun, files, todo, next }) {
+  const bytes = files.reduce((n, f) => n + f.bytes, 0);
+  const out = [`site new: ${dryRun ? "would write" : "wrote"} ${files.length} file${files.length === 1 ? "" : "s"} (${bytes} bytes); ${todo} "…" to fill in`];
+  for (const f of files) out.push(dryRun ? `--- ${f.path}\n${f.content}` : `  ${f.path}`);
+  out.push(`next: ${next.join("; ")}`);
+  return `${out.join("\n")}\n`;
+}
+
 // ---- main -----------------------------------------------------------------------------------------------------
 
-function usage(message) {
-  process.stderr.write(`luz-start: ${message}\n\n${HELP}`);
+/** A wrong use: the message first, and the table of commands only when the command itself is wrong. */
+function usage(message, table = false) {
+  process.stderr.write(`luz-start: ${message}\n${table ? `\n${HELP}` : "\nRun luz-start <command> --help for its options.\n"}`);
   return 2;
 }
 
@@ -317,21 +418,41 @@ function show(text) {
 export function main(argv) {
   const [command, ...rest] = argv;
   if (command === "--help" || command === "-h") return show(HELP);
-  if (!command) return usage("a command is missing (doctor or check)");
-  if (!["doctor", "check"].includes(command)) return usage(`"${command}" is not a command (doctor, check)`);
+  if (!command) return usage("a command is missing (site new, facts, doctor or check)", true);
+  if (!["site", "facts", "doctor", "check"].includes(command)) return usage(`"${command}" is not a command (site new, facts, doctor, check)`, true);
   let args;
   try {
     args = parseArgs({
       args: rest,
       allowPositionals: true,
-      options: { json: { type: "boolean" }, "no-input": { type: "boolean" }, help: { type: "boolean", short: "h" }, dir: { type: "string" }, target: { type: "string" } },
+      options: {
+        json: { type: "boolean" },
+        "no-input": { type: "boolean" },
+        help: { type: "boolean", short: "h" },
+        dir: { type: "string" },
+        target: { type: "string" },
+        name: { type: "string" },
+        kind: { type: "string" },
+        stack: { type: "string" },
+        lang: { type: "string" },
+        "dry-run": { type: "boolean" },
+        force: { type: "boolean" },
+      },
     });
   } catch (error) {
     return usage(error.message);
   }
   const { values, positionals } = args;
-  if (values.help) return show(command === "doctor" ? HELP_DOCTOR : HELP_CHECK);
-  if (values.target && !["portable", "claude"].includes(values.target)) return usage(`--target is portable or claude, not "${values.target}"`);
+  if (values.help) return show({ site: HELP_SITE, facts: HELP_FACTS, doctor: HELP_DOCTOR, check: HELP_CHECK }[command]);
+  if (command === "site") {
+    if (positionals[0] !== "new" || positionals.length > 1) return usage('"site" takes one word: new');
+    const { error, report } = runSite(values);
+    if (error) return usage(error);
+    process.stdout.write(values.json ? `${JSON.stringify(report, null, 2)}\n` : siteText(report));
+    return 0;
+  }
+  if (command === "facts") return show(runFacts(values.json));
+  if (command === "check" && values.target && !["portable", "claude"].includes(values.target)) return usage(`--target is portable or claude, not "${values.target}"`);
   if (command === "doctor" && positionals.length) return usage("doctor takes no path: use --dir <folder>");
 
   const base = resolve(values.dir ?? ".");

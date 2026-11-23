@@ -5,6 +5,10 @@
   "description": "LUZ Design System — the luz-start skill and the agents and skills of luz-ai: not published yet (plan luz-ai-skill, phase 5)",
   "license": "MIT",
   "type": "module",
+  "files": [
+    "skills",
+    "!skills/*/evals"
+  ],
   "engines": {
     "node": ">=20"
   },
