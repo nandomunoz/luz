@@ -1782,8 +1782,8 @@ function levelLists(site, locale, used) {
  * does not yet know what a token is: what it is and how to use it, at a glance
  * (owner, 2026-11-23). The generator writes, from the packages and never typed:
  *
- *  - {{tokendemo}}, the hero's demo: a radio per brand family that repaints a
- *    small product card through one token, by CSS alone (landing.css,
+ *  - {{tokendemo}}, the hero's demo: a radio per brand family that repaints
+ *    the hero and a small product through one token, by CSS alone (landing.css,
  *    `.landing-demo:has(input[value=…]:checked)`), with the line that changes;
  *    {{tokenbrands}} is the style of its panel, a property per family
  *    (`--demo-<family>`), so landing.css reads no primitive;
@@ -1878,22 +1878,28 @@ function tokenSections({ say, tokens, groups, counts, families, read }) {
       `</section>`,
     ].join("\n"),
   );
+  // The preview: a small product drawn with --demo-brand, then the controls: the radios and the one line they change
   const demo = [
+    `<div class="landing-demo__product">`,
+    `<span class="landing-demo__bar" aria-hidden="true"><span class="landing-demo__logo"></span><span class="landing-demo__nav"></span><span class="landing-demo__nav"></span><span class="landing-demo__avatar"></span></span>`,
+    `<p class="landing-demo__badge">${t("level.tokens.demo.badge")}</p>`,
+    `<p class="landing-demo__heading">${t("level.tokens.demo.heading")}</p>`,
+    `<p class="landing-demo__text">${t("level.tokens.demo.text")}</p>`,
+    `<span class="landing-demo__row" aria-hidden="true"><span class="landing-demo__button">${t("level.tokens.demo.button")}</span><span class="landing-demo__link">${t("level.tokens.demo.link")}</span></span>`,
+    `<span class="landing-demo__meter" aria-hidden="true"><span></span></span>`,
+    `</div>`,
+    `<div class="landing-demo__controls">`,
+    `<p class="landing-demo__title">${t("level.tokens.demo.title")}</p>`,
     `<fieldset class="landing-demo__picker">`,
     `<legend>${t("level.tokens.demo.legend")}</legend>`,
     `<div class="landing-demo__options">`,
     DEMO_FAMILIES.map((family, i) => `<label class="landing-demo__option"><input type="radio" name="brand" value="${family}"${i ? "" : " checked"}><span class="landing-demo__swatch" ${v(`--luz-${family}-60`)} aria-hidden="true"></span><span dir="ltr">${family}</span></label>`).join(""),
     `</div>`,
     `</fieldset>`,
-    `<div class="landing-demo__product">`,
-    `<p class="landing-demo__badge">${t("level.tokens.demo.badge")}</p>`,
-    `<p class="landing-demo__heading">${t("level.tokens.demo.heading")}</p>`,
-    `<p class="landing-demo__text">${t("level.tokens.demo.text")}</p>`,
-    `<span class="landing-demo__button" aria-hidden="true">${t("level.tokens.demo.button")}</span>`,
-    `</div>`,
     `<p class="landing-demo__caption">${t("level.tokens.demo.code")}</p>`,
     // plain code, not a highlighted block: the highlighter rewrites a block's markup, and each line is shown by CSS
     `<p class="landing-demo__code" dir="ltr">${DEMO_FAMILIES.map((family) => `<code class="landing-demo__line" data-family="${family}">--luz-brand-fill: var(${need(`--luz-${family}-60`)});</code>`).join("")}</p>`,
+    `</div>`,
   ].join("\n");
   const modes = new Set([...read("packages/tokens/src/semantic.css").matchAll(/\[data-theme="([a-z-]+)"\]\s*[,{]/g)].map((m) => m[1]));
   return {

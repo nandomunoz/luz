@@ -2473,117 +2473,228 @@ home-light:defined ~ .landing-light__nojs {
    brand, three steps, three blocks, and the next step. A specimen reads its
    token through --v, so it follows the colour mode */
 
-/* The hero: the definition, before and after, and what a reader gains */
+/* The hero is the page's own, not a level of the home: centred on a band
+   tinted by the brand the reader picks, so the hero itself is the demo. The
+   checked radio sets --demo-brand (one of the --demo-<family> the generator
+   writes on the section, so this file reads no primitive); the band, the
+   marked word, the primary button and the product read it, and the one line
+   of code that says it shows */
+.landing-tokens__hero {
+  --demo-brand: var(--demo-blue);
+
+  display: grid;
+  justify-items: center;
+  gap: var(--luz-space-2xl);
+  padding: var(--luz-space-3xl) min(var(--luz-space-2xl), 5%) var(--luz-space-2xl);
+  border: 1px solid color-mix(in oklab, var(--demo-brand) 22%, transparent);
+  border-radius: var(--luz-radius-md);
+  background:
+    radial-gradient(120% 80% at 50% 0%, color-mix(in oklab, var(--demo-brand) 16%, var(--luz-surface-page)), var(--luz-surface-page) 70%);
+  text-align: center;
+}
+
+.landing-tokens__head {
+  display: grid;
+  justify-items: center;
+  gap: var(--luz-space-md);
+  max-inline-size: 46rem;
+}
+
+.landing-tokens__title {
+  margin: 0;
+  font-family: var(--luz-font-heading);
+  font-size: clamp(var(--luz-text-4xl), 8vw, calc(var(--luz-text-4xl) * 1.6));
+  font-weight: 400;
+  line-height: 1.05;
+  text-wrap: balance;
+}
+
+.landing-tokens__hero .landing-mark {
+  border-inline-end-color: var(--demo-brand);
+  background: color-mix(in oklab, var(--demo-brand) 18%, transparent);
+  color: var(--luz-text-primary);
+}
+
 .landing-tokens__what {
   margin: 0;
-  max-inline-size: 60ch;
-  font-size: var(--luz-text-lg);
+  max-inline-size: 48ch;
+  font-size: var(--luz-text-xl);
+  line-height: 1.4;
   color: var(--luz-text-secondary);
+  text-wrap: balance;
 }
 
-.landing-tokens__what code {
-  font-size: 0.85em;
-  color: var(--luz-text-primary);
+.landing-tokens__head .o-actions {
+  justify-self: stretch;
+  justify-content: center;
+  margin-block-start: var(--luz-space-xs);
 }
 
-.landing-tokens__compare {
+.landing-tokens__hero .luz-btn--primary {
+  border-color: var(--demo-brand);
+  background: var(--demo-brand);
+  color: var(--luz-text-on-fill);
+}
+
+/* The stage: the product, and beside it the controls */
+.landing-tokens__stage {
   display: grid;
-  gap: var(--luz-space-2xs);
-  margin: 0;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--luz-space-xl);
+  inline-size: 100%;
+  max-inline-size: 60rem;
+  padding: min(var(--luz-space-xl), 5%);
+  border: 1px solid color-mix(in oklab, var(--luz-text-primary) 12%, transparent);
+  border-radius: var(--luz-radius-md);
+  background: var(--luz-surface-page);
+  box-shadow: 0 1.5rem 3rem -1.5rem color-mix(in oklab, var(--luz-text-primary) 25%, transparent);
+  text-align: start;
 }
 
-.landing-tokens__before,
-.landing-tokens__after {
-  display: grid;
-  grid-template-columns: 8.5rem minmax(0, 1fr);
-  align-items: baseline;
-  gap: var(--luz-space-sm);
-  margin: 0;
-  padding: var(--luz-space-xs) var(--luz-space-sm);
-  border-radius: var(--luz-radius-sm);
-  font-family: var(--luz-font-sans);
-  font-size: var(--luz-text-sm);
-  color: var(--luz-text-secondary);
-}
+/* On a narrow screen the radios come first, so the product that changes is
+   under the finger that picks */
+@media (max-width: 899px) {
+  .landing-demo__controls {
+    order: -1;
+  }
 
-.landing-tokens__before code,
-.landing-tokens__after code {
-  overflow-wrap: anywhere;
-  padding: 0;
-  background: none;
-  font-size: var(--luz-text-sm);
-}
-
-.landing-tokens__before code {
-  color: var(--luz-text-secondary);
-  text-decoration: line-through;
-  text-decoration-color: color-mix(in oklab, var(--luz-color-danger) 60%, transparent);
-}
-
-.landing-tokens__after {
-  background: color-mix(in oklab, var(--luz-brand-primary) 10%, transparent);
-}
-
-.landing-tokens__after code {
-  color: var(--luz-text-primary);
-  font-weight: 600;
-}
-
-@media (max-width: 480px) {
-  .landing-tokens__before,
-  .landing-tokens__after {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 0;
+  .landing-tokens__what {
+    font-size: var(--luz-text-lg);
   }
 }
 
-.landing-level__stats {
+@media (min-width: 900px) {
+  .landing-tokens__stage {
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    align-items: center;
+  }
+}
+
+.landing-demo__product {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 7rem), 1fr));
-  gap: var(--luz-space-md);
-  margin: var(--luz-space-xs) 0 0;
-  padding-block: var(--luz-space-md);
-  border-block: 1px solid var(--luz-divider);
+  justify-items: start;
+  gap: var(--luz-space-sm);
+  padding: var(--luz-space-lg);
+  border: 1px solid var(--luz-divider);
+  border-block-start: 4px solid var(--demo-brand);
+  border-radius: var(--luz-radius-md);
+  background: var(--luz-surface);
 }
 
-.landing-level__stats > div {
-  display: flex;
-  flex-direction: column-reverse;
-  gap: var(--luz-space-3xs);
-}
-
-.landing-level__stats dt {
-  font-family: var(--luz-font-sans);
-  font-size: var(--luz-text-sm);
-  color: var(--luz-text-secondary);
-}
-
-.landing-level__stats dd {
+.landing-demo__product > p {
   margin: 0;
-  text-align: start;
+}
+
+.landing-demo__bar {
+  display: flex;
+  align-items: center;
+  gap: var(--luz-space-sm);
+  inline-size: 100%;
+  padding-block-end: var(--luz-space-sm);
+  border-block-end: 1px solid var(--luz-divider);
+}
+
+.landing-demo__logo {
+  inline-size: 1.25rem;
+  block-size: 1.25rem;
+  border-radius: var(--luz-radius-sm);
+  background: var(--demo-brand);
+}
+
+.landing-demo__nav {
+  inline-size: 2.5rem;
+  block-size: 0.4rem;
+  border-radius: var(--luz-radius-full);
+  background: var(--luz-divider);
+}
+
+.landing-demo__avatar {
+  inline-size: 1.25rem;
+  block-size: 1.25rem;
+  margin-inline-start: auto;
+  border-radius: var(--luz-radius-full);
+  background: color-mix(in oklab, var(--demo-brand) 30%, var(--luz-surface));
+}
+
+.landing-demo__badge {
+  margin-block-start: var(--luz-space-xs);
+  padding: var(--luz-space-3xs) var(--luz-space-xs);
+  border-radius: var(--luz-radius-full);
+  background: var(--demo-brand);
+  font-family: var(--luz-font-sans);
+  font-size: var(--luz-text-xs);
+  font-weight: 600;
+  color: var(--luz-text-on-fill);
+}
+
+.landing-demo__heading {
   font-family: var(--luz-font-heading);
   font-size: var(--luz-text-2xl);
   line-height: 1.1;
   color: var(--luz-text-primary);
 }
 
-/* The demo: the brand by CSS alone. The panel carries the primitive of each
-   family as --demo-<family> (written by the generator, so this file reads no
-   primitive), the checked radio picks one as --demo-brand, the card reads it,
-   and the one line of code that says it shows */
-.landing-demo {
-  --demo-brand: var(--demo-blue);
+.landing-demo__text {
+  color: var(--luz-text-secondary);
+}
 
+.landing-demo__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
   gap: var(--luz-space-md);
-  padding: var(--luz-space-lg);
+}
+
+.landing-demo__button {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 2.5rem;
+  padding-inline: var(--luz-space-lg);
+  border-radius: var(--luz-radius-md);
+  background: var(--demo-brand);
+  font-family: var(--luz-font-sans);
+  font-weight: 600;
+  color: var(--luz-text-on-fill);
+}
+
+/* The link keeps the ink of the text (a brand colour as text would fail in
+   one of the modes); the brand is its underline */
+.landing-demo__link {
+  font-family: var(--luz-font-sans);
+  font-weight: 600;
+  color: var(--luz-text-primary);
+  text-decoration: underline 2px var(--demo-brand);
+  text-underline-offset: 0.25em;
+}
+
+.landing-demo__meter {
+  inline-size: 100%;
+  block-size: 0.4rem;
+  margin-block-start: var(--luz-space-xs);
+  border-radius: var(--luz-radius-full);
+  background: var(--luz-chart-track);
+}
+
+.landing-demo__meter > span {
+  display: block;
+  inline-size: 64%;
+  block-size: 100%;
+  border-radius: inherit;
+  background: var(--demo-brand);
+}
+
+.landing-demo__controls {
+  display: grid;
+  gap: var(--luz-space-md);
+  min-inline-size: 0;
 }
 
 .landing-demo__title {
   margin: 0;
-  font-family: var(--luz-font-sans);
-  font-size: var(--luz-text-sm);
-  font-weight: 600;
-  color: var(--luz-text-secondary);
+  font-family: var(--luz-font-heading);
+  font-size: var(--luz-text-xl);
+  line-height: 1.2;
+  color: var(--luz-text-primary);
 }
 
 .landing-demo__picker {
@@ -2607,7 +2718,7 @@ home-light:defined ~ .landing-light__nojs {
   font-weight: 600;
   letter-spacing: normal;
   text-transform: none;
-  color: var(--luz-text-primary);
+  color: var(--luz-text-secondary);
 }
 
 .landing-demo__option {
@@ -2655,64 +2766,18 @@ home-light:defined ~ .landing-light__nojs {
   background: var(--v);
 }
 
-.landing-demo__product {
-  display: grid;
-  justify-items: start;
-  gap: var(--luz-space-sm);
-  padding: var(--luz-space-lg);
-  border: 1px solid var(--luz-divider);
-  border-block-start: 4px solid var(--demo-brand);
-  border-radius: var(--luz-radius-md);
-  background: var(--luz-surface);
-}
-
-.landing-demo__product > p {
-  margin: 0;
-}
-
-.landing-demo__badge {
-  padding: var(--luz-space-3xs) var(--luz-space-xs);
-  border-radius: var(--luz-radius-full);
-  background: var(--demo-brand);
-  font-family: var(--luz-font-sans);
-  font-size: var(--luz-text-xs);
-  font-weight: 600;
-  color: var(--luz-text-on-fill);
-}
-
-.landing-demo__heading {
-  font-family: var(--luz-font-heading);
-  font-size: var(--luz-text-2xl);
-  line-height: 1.1;
-  color: var(--luz-text-primary);
-}
-
-.landing-demo__text {
-  color: var(--luz-text-secondary);
-}
-
-.landing-demo__button {
-  display: inline-flex;
-  align-items: center;
-  min-block-size: 2.5rem;
-  padding-inline: var(--luz-space-lg);
-  border-radius: var(--luz-radius-md);
-  background: var(--demo-brand);
-  font-family: var(--luz-font-sans);
-  font-weight: 600;
-  color: var(--luz-text-on-fill);
-}
-
 .landing-demo__caption {
   margin: 0;
   font-family: var(--luz-font-sans);
   font-size: var(--luz-text-sm);
+  font-weight: 600;
   color: var(--luz-text-secondary);
 }
 
 .landing-demo__code {
   margin: 0;
   padding: var(--luz-space-sm) var(--luz-space-md);
+  border-inline-start: 3px solid var(--demo-brand);
   border-radius: var(--luz-radius-sm);
   background: var(--luz-surface-strong);
 }
@@ -2728,12 +2793,16 @@ home-light:defined ~ .landing-light__nojs {
 }
 
 @media (prefers-reduced-motion: no-preference) {
+  .landing-tokens__hero,
+  .landing-tokens__hero .landing-mark,
+  .landing-tokens__hero .luz-btn--primary,
   .landing-demo__product,
-  .landing-demo__badge,
-  .landing-demo__button {
+  .landing-demo__product *,
+  .landing-demo__code {
     transition:
-      background-color var(--luz-duration-base) var(--luz-easing-standard),
-      border-color var(--luz-duration-base) var(--luz-easing-standard);
+      background-color var(--luz-duration-slow) var(--luz-easing-standard),
+      border-color var(--luz-duration-slow) var(--luz-easing-standard),
+      text-decoration-color var(--luz-duration-slow) var(--luz-easing-standard);
   }
 }
 
@@ -2775,6 +2844,39 @@ home-light:defined ~ .landing-light__nojs {
 
 .landing-demo:has(input[value="red"]:checked) .landing-demo__line[data-family="red"] {
   display: block;
+}
+
+
+/* The numbers, a quiet row at the foot of the band */
+.landing-tokens__hero .landing-level__stats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--luz-space-md) var(--luz-space-2xl);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.landing-level__stats > div {
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  gap: var(--luz-space-3xs);
+}
+
+.landing-level__stats dt {
+  font-family: var(--luz-font-sans);
+  font-size: var(--luz-text-sm);
+  color: var(--luz-text-secondary);
+}
+
+.landing-level__stats dd {
+  margin: 0;
+  font-family: var(--luz-font-heading);
+  font-size: var(--luz-text-2xl);
+  line-height: 1.1;
+  color: var(--luz-text-primary);
 }
 
 /* The three steps, side by side from the width of a laptop */
