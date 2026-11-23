@@ -81,13 +81,14 @@ import { localize } from "./docs-i18n.js";
 import { DEBUG_FILE, DEBUG_ROUTE, hasDebugPage, renderDebug } from "./debug.js";
 import { PACKAGES } from "../luz-packages.js";
 import { promptFiles } from "./prompts.js";
+import { MOVED, renderRedirect } from "./redirect.js";
 import { AI_ROUTES, exampleAssets, exampleDocuments, manifestAssets, renderLlmsFull, renderLlmsTxt, renderPageMarkdown } from "./ai.js";
 import { SITE_URL } from "./i18n.js";
 
 const LANDING = { route: "/", file: "apps/landing/index.html" };
 
-/** The pages of the levels (tokens, core, components): each is the home's template with the <main> of apps/landing/levels/<name>.html. */
-const LEVELS = ["tokens", "core", "components"];
+/** The pages of the levels (tokens, core, catalog): each is the home's template with the <main> of apps/landing/levels/<name>.html. */
+const LEVELS = ["tokens", "core", "catalog"];
 
 /** Where the virtual pages of the docs languages are (never on disk): apps/docs/_virtual/<code>/<path>.html. */
 const VIRTUAL_DOCS = "apps/docs/_virtual";
@@ -173,6 +174,15 @@ export function docsSite({ repoRoot, relative: relativeUrls, outRoot, pagesBase 
     })),
   ];
 
+  /** The pages that moved, in every language: each answers with a redirect to its new address (redirect.js). */
+  const moved = () =>
+    MOVED.flatMap(({ from, to }) =>
+      (scan().i18n ? scan().i18n.locales : [undefined]).map((locale) => {
+        const route = `${locale?.route ?? "/"}${from}`;
+        return { route, file: `apps/landing${route}index.html`, kind: "redirect", locale, target: `${locale?.route ?? "/"}${to}`, virtual: true };
+      }),
+    );
+
   /**
    * The pages of each docs language (/es/docs/…): one virtual document per
    * page, with the translation's source where there is one and the English
@@ -217,6 +227,7 @@ export function docsSite({ repoRoot, relative: relativeUrls, outRoot, pagesBase 
       ...current.pages.map((p) => ({ route: p.route, file: p.file, kind: "page" })),
       ...(current.notFound ? [{ route: NOT_FOUND_ROUTE, file: current.notFound.file, kind: "page" }] : []),
       ...docsDocuments(),
+      ...moved(),
       // /debug/: a virtual document of the real site, rendered from the scan (debug.js)
       ...(hasDebugPage(current) ? [{ route: DEBUG_ROUTE, file: DEBUG_FILE, kind: "debug", virtual: true }] : []),
     ];
@@ -248,6 +259,7 @@ export function docsSite({ repoRoot, relative: relativeUrls, outRoot, pagesBase 
   const virtualSource = (doc) => {
     if (doc.kind === "landing") return doc.level ? levelTemplate(landingSource(), levelSource(doc.level), doc.level, LANDING.file) : landingSource();
     if (doc.kind === "debug") return renderDebug({ site: scan() });
+    if (doc.kind === "redirect") return renderRedirect({ from: doc.route, to: doc.target, lang: doc.locale?.code ?? "en", dir: doc.locale?.dir ?? "ltr", siteUrl: relativeUrls ? siteUrl : "" });
     const language = scan().docsI18n?.byCode.get(doc.locale.code);
     const page = language && localize(scan(), language).byRoute.get(doc.route);
     if (!page) throw new Error(`${doc.file}: ${doc.route} is not a page of the docs in ${doc.locale.code}`);

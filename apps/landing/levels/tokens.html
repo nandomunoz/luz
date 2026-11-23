@@ -3,33 +3,33 @@
          token repainting the hero itself), how to use it (three steps), what there is (three blocks), and what
          comes next -->
     <div class="landing-level">
-      <section class="landing-tokens__hero landing-demo" id="hero" aria-labelledby="hero-title" style="{{tokenlooks}}">
-        <div class="landing-tokens__head">
+      <section class="landing-intro landing-demo" id="hero" aria-labelledby="hero-title" style="{{tokenlooks}}">
+        <div class="landing-intro__head">
           <p class="landing-inside__eyebrow"><svg aria-hidden="true"><use href="#i0"/></svg><span>{{t:inside.l1.eyebrow}}</span></p>
-          <h1 class="landing-tokens__title" id="hero-title">{{html:inside.l1.title}}</h1>
-          <p class="landing-tokens__what">{{t:level.tokens.what}}</p>
+          <h1 class="landing-intro__title" id="hero-title">{{html:inside.l1.title}}</h1>
+          <p class="landing-intro__what">{{t:level.tokens.what}}</p>
           <div class="o-actions">
             <a class="luz-btn luz-btn--primary" href="#steps">{{t:level.tokens.cta.steps}}</a>
             <a class="luz-btn luz-btn--outline" href="/docs/tokens/">{{t:level.tokens.docs}}</a>
           </div>
-          <ul class="landing-tokens__facts">
+          <ul class="landing-intro__facts">
             <li><strong>{{ntokens}}</strong> {{t:level.tokens.stat.tokens}}</li>
             <li><strong>{{nmodes}}</strong> {{t:level.tokens.stat.modes}}</li>
             <li><strong>{{weight1}}</strong> {{t:level.tokens.stat.weight}}</li>
             <li><strong>{{ndeps}}</strong> {{t:level.tokens.stat.deps}}</li>
           </ul>
         </div>
-        <div class="landing-tokens__stage">
+        <div class="landing-intro__stage">
           {{tokendemo}}
         </div>
       </section>
 
-      <section class="o-stack luz-section landing-tokens__steps" id="steps" aria-labelledby="steps-title">
+      <section class="o-stack luz-section landing-path" id="steps" aria-labelledby="steps-title">
         <h2 class="luz-section__title" id="steps-title">{{t:level.tokens.steps.title}}</h2>
-        <ol class="landing-tokens__step-list">
-          <li class="landing-tokens__step landing-tokens__step--1" id="install">
-            <p class="landing-tokens__step-title">{{t:level.tokens.steps.1.title}}</p>
-            <p class="landing-tokens__step-text">{{t:level.tokens.steps.1.text}}</p>
+        <ol class="landing-path__list">
+          <li class="landing-path__step landing-path__step--1" id="install">
+            <p class="landing-path__title">{{t:level.tokens.steps.1.title}}</p>
+            <p class="landing-path__text">{{t:level.tokens.steps.1.text}}</p>
         <div class="landing-install">
           <div class="landing-install__bar">
             <span class="landing-install__label">{{t:inside.install.npm}}</span>
@@ -45,9 +45,9 @@
           <pre class="luz-code-block" data-lang="html" dir="ltr" tabindex="0" role="region" aria-label="{{t:inside.install.cdn}}"><code id="in1-cdn">&lt;link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@luz-ds/tokens@{{version}}/dist/luz-tokens.min.css"></code></pre>
         </div>
           </li>
-          <li class="landing-tokens__step landing-tokens__step--2">
-            <p class="landing-tokens__step-title">{{t:level.tokens.steps.2.title}}</p>
-            <p class="landing-tokens__step-text">{{t:level.tokens.steps.2.text}}</p>
+          <li class="landing-path__step landing-path__step--2">
+            <p class="landing-path__title">{{t:level.tokens.steps.2.title}}</p>
+            <p class="landing-path__text">{{t:level.tokens.steps.2.text}}</p>
             <div class="landing-install">
               <div class="landing-install__bar">
                 <span class="landing-install__label">CSS</span>
@@ -61,9 +61,9 @@
 }</code></pre>
             </div>
           </li>
-          <li class="landing-tokens__step landing-tokens__step--3">
-            <p class="landing-tokens__step-title">{{t:level.tokens.steps.3.title}}</p>
-            <p class="landing-tokens__step-text">{{t:level.tokens.steps.3.text}}</p>
+          <li class="landing-path__step landing-path__step--3">
+            <p class="landing-path__title">{{t:level.tokens.steps.3.title}}</p>
+            <p class="landing-path__text">{{t:level.tokens.steps.3.text}}</p>
             <div class="landing-install">
               <div class="landing-install__bar">
                 <span class="landing-install__label">CSS</span>
@@ -75,9 +75,9 @@
 }</code></pre>
             </div>
           </li>
-          <li class="landing-tokens__step landing-tokens__step--result">
-            <p class="landing-tokens__step-title">{{t:level.tokens.steps.result.title}}</p>
-            <ul class="landing-tokens__outcomes">
+          <li class="landing-path__step landing-path__step--result">
+            <p class="landing-path__title">{{t:level.tokens.steps.result.title}}</p>
+            <ul class="landing-path__outcomes">
               <li>{{t:level.tokens.steps.result.1}}</li>
               <li>{{t:level.tokens.steps.result.2}}</li>
               <li>{{t:level.tokens.steps.result.3}}</li>
@@ -86,11 +86,11 @@
         </ol>
       </section>
 
-      <div class="landing-tokens">
+      <div class="landing-level__blocks">
         {{tokenblocks}}
       </div>
 
-      <section class="landing-tokens__next" id="next" aria-labelledby="next-title">
+      <section class="landing-level__next" id="next" aria-labelledby="next-title">
         <h2 class="luz-section__title" id="next-title">{{t:level.tokens.next.title}}</h2>
         <p class="landing-inside__lead">{{t:level.tokens.next.lead}}</p>
         <div class="o-actions">

@@ -2481,13 +2481,13 @@ home-light:defined ~ .landing-light__nojs {
    writes on the section, so this file reads no primitive); the band, the
    marked word, the primary button and the product read it, and the one line
    of code that says it shows */
-.landing-tokens__hero {
-  --demo-brand: var(--look-classic-brand);
-  --demo-font: var(--look-classic-font);
-  --demo-radius: var(--look-classic-radius);
-  --demo-shadow: var(--look-classic-shadow);
-  --demo-ease: var(--look-classic-ease);
-  --demo-duration: var(--look-classic-duration);
+.landing-intro {
+  --demo-brand: var(--look-classic-brand, var(--luz-brand-fill));
+  --demo-font: var(--look-classic-font, var(--luz-font-body));
+  --demo-radius: var(--look-classic-radius, var(--luz-radius-md));
+  --demo-shadow: var(--look-classic-shadow, var(--luz-shadow-sm));
+  --demo-ease: var(--look-classic-ease, var(--luz-easing-standard));
+  --demo-duration: var(--look-classic-duration, var(--luz-duration-base));
   --demo-line: 1px;
   --demo-edge: var(--luz-divider);
 
@@ -2502,14 +2502,14 @@ home-light:defined ~ .landing-light__nojs {
   text-align: center;
 }
 
-.landing-tokens__head {
+.landing-intro__head {
   display: grid;
   justify-items: center;
   gap: var(--luz-space-md);
   max-inline-size: 46rem;
 }
 
-.landing-tokens__title {
+.landing-intro__title {
   margin: 0;
   font-family: var(--luz-font-heading);
   font-size: clamp(var(--luz-text-4xl), 8vw, calc(var(--luz-text-4xl) * 1.6));
@@ -2518,13 +2518,13 @@ home-light:defined ~ .landing-light__nojs {
   text-wrap: balance;
 }
 
-.landing-tokens__hero .landing-mark {
+.landing-intro .landing-mark {
   border-inline-end-color: var(--demo-brand);
   background: color-mix(in oklab, var(--demo-brand) 18%, transparent);
   color: var(--luz-text-primary);
 }
 
-.landing-tokens__what {
+.landing-intro__what {
   margin: 0;
   max-inline-size: 48ch;
   font-size: var(--luz-text-xl);
@@ -2533,13 +2533,13 @@ home-light:defined ~ .landing-light__nojs {
   text-wrap: balance;
 }
 
-.landing-tokens__head .o-actions {
+.landing-intro__head .o-actions {
   justify-self: stretch;
   justify-content: center;
   margin-block-start: var(--luz-space-xs);
 }
 
-.landing-tokens__hero .luz-btn--primary {
+.landing-intro .luz-btn--primary {
   border-color: var(--demo-brand);
   border-radius: var(--demo-radius);
   background: var(--demo-brand);
@@ -2548,7 +2548,7 @@ home-light:defined ~ .landing-light__nojs {
 }
 
 /* The stage: the product, and beside it the controls */
-.landing-tokens__stage {
+.landing-intro__stage {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: var(--luz-space-xl);
@@ -2572,7 +2572,7 @@ home-light:defined ~ .landing-light__nojs {
     font-size: var(--luz-text-xs);
   }
 
-  .landing-tokens__what {
+  .landing-intro__what {
     font-size: var(--luz-text-lg);
   }
 }
@@ -2643,7 +2643,7 @@ home-light:defined ~ .landing-light__nojs {
    frames go too: the demo sits on the band with no border, no shadow and no side padding, so its
    content has the whole width */
 @media (max-width: 899px) {
-  .landing-tokens__stage {
+  .landing-intro__stage {
     padding-inline: 0;
     border: 0;
     border-radius: 0;
@@ -2921,9 +2921,9 @@ home-light:defined ~ .landing-light__nojs {
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .landing-tokens__hero,
-  .landing-tokens__hero .landing-mark,
-  .landing-tokens__hero .luz-btn--primary,
+  .landing-intro,
+  .landing-intro .landing-mark,
+  .landing-intro .luz-btn--primary,
   .landing-demo__product,
   .landing-demo__product *,
   .landing-demo__code {
@@ -3008,7 +3008,7 @@ home-light:defined ~ .landing-light__nojs {
 /* The numbers: one quiet line of reassurance under the buttons that wraps
    and stays centred at any width. Room between two facts, not a dot, which
    would start a line once it wraps; the bold number says where one begins */
-.landing-tokens__facts {
+.landing-intro__facts {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -3021,22 +3021,22 @@ home-light:defined ~ .landing-light__nojs {
   color: var(--luz-text-secondary);
 }
 
-.landing-tokens__facts > li {
+.landing-intro__facts > li {
   margin: 0;
   white-space: nowrap;
 }
 
-.landing-tokens__facts strong {
+.landing-intro__facts strong {
   font-weight: 600;
   color: var(--luz-text-primary);
 }
 
 /* The three steps, side by side from the width of a laptop */
-.landing-tokens__steps {
+.landing-path {
   padding-block: var(--luz-space-3xl) 0;
 }
 
-.landing-tokens__step-list {
+.landing-path__list {
   --path-gap: var(--luz-space-xl);
 
   display: grid;
@@ -3047,7 +3047,7 @@ home-light:defined ~ .landing-light__nojs {
   list-style: none;
 }
 
-.landing-tokens__step {
+.landing-path__step {
   position: relative;
   display: grid;
   grid-template-rows: auto auto 1fr;
@@ -3066,9 +3066,9 @@ home-light:defined ~ .landing-light__nojs {
    border is added) and the arrow where it arrives, an SVG mask painted in
    the colour of the boxes' border, so the two cannot part. Down, while the
    steps are one column */
-.landing-tokens__step--1::after,
-.landing-tokens__step--2::after,
-.landing-tokens__step--3::after {
+.landing-path__step--1::after,
+.landing-path__step--2::after,
+.landing-path__step--3::after {
   content: "";
   position: absolute;
   inset-block-start: calc(100% + 1px);
@@ -3085,44 +3085,44 @@ home-light:defined ~ .landing-light__nojs {
 /* Two columns: 1 and 2 above, 3 under 2, the result beside 3; 1 joins 2
    across, 2 joins 3 down, 3 joins the result back across */
 @media (min-width: 800px) {
-  .landing-tokens__step-list {
+  .landing-path__list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     grid-template-areas:
       "one two"
       "result three";
   }
 
-  .landing-tokens__step--1 {
+  .landing-path__step--1 {
     grid-area: one;
   }
 
-  .landing-tokens__step--2 {
+  .landing-path__step--2 {
     grid-area: two;
   }
 
-  .landing-tokens__step--3 {
+  .landing-path__step--3 {
     grid-area: three;
   }
 
-  .landing-tokens__step--result {
+  .landing-path__step--result {
     grid-area: result;
   }
 
-  .landing-tokens__step--1::after,
-  .landing-tokens__step--3::after {
+  .landing-path__step--1::after,
+  .landing-path__step--3::after {
     inset-block-start: calc(2.5rem - 5px);
     inline-size: var(--path-gap);
     block-size: 10px;
   }
 
-  .landing-tokens__step--1::after {
+  .landing-path__step--1::after {
     inset-inline-start: calc(100% + 1px);
     mask:
       url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M4 1.5l4 3.5-4 3.5' fill='none' stroke='%23000' stroke-width='1.2'/%3E%3C/svg%3E") right center / 10px 10px no-repeat,
       linear-gradient(#000, #000) left center / 100% 1px no-repeat;
   }
 
-  .landing-tokens__step--3::after {
+  .landing-path__step--3::after {
     inset-inline-start: auto;
     inset-inline-end: calc(100% + 1px);
     mask:
@@ -3131,19 +3131,19 @@ home-light:defined ~ .landing-light__nojs {
   }
 
   /* Right to left the path runs the other way: the arrows across turn round */
-  .landing-tokens__step--1:dir(rtl)::after,
-  .landing-tokens__step--3:dir(rtl)::after {
+  .landing-path__step--1:dir(rtl)::after,
+  .landing-path__step--3:dir(rtl)::after {
     scale: -1 1;
   }
 }
 
 /* What you get: the end of the path, in words, a tick before each */
-.landing-tokens__step--result {
+.landing-path__step--result {
   border-style: dashed;
   background: color-mix(in oklab, var(--luz-brand-primary) 5%, var(--luz-surface-page));
 }
 
-.landing-tokens__outcomes {
+.landing-path__outcomes {
   display: grid;
   gap: var(--luz-space-sm);
   margin: 0;
@@ -3151,7 +3151,7 @@ home-light:defined ~ .landing-light__nojs {
   list-style: none;
 }
 
-.landing-tokens__outcomes > li {
+.landing-path__outcomes > li {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
   gap: var(--luz-space-sm);
@@ -3159,14 +3159,14 @@ home-light:defined ~ .landing-light__nojs {
   color: var(--luz-text-primary);
 }
 
-.landing-tokens__outcomes > li::before {
+.landing-path__outcomes > li::before {
   content: "✓";
   font-family: var(--luz-font-sans);
   font-weight: 600;
   color: var(--luz-color-success);
 }
 
-.landing-tokens__step-title {
+.landing-path__title {
   margin: 0;
   font-family: var(--luz-font-heading);
   font-size: var(--luz-text-xl);
@@ -3174,26 +3174,26 @@ home-light:defined ~ .landing-light__nojs {
   color: var(--luz-text-primary);
 }
 
-.landing-tokens__step-text {
+.landing-path__text {
   margin: 0;
   color: var(--luz-text-secondary);
 }
 
-.landing-tokens__step .landing-install + .landing-install {
+.landing-path__step .landing-install + .landing-install {
   margin-block-start: var(--luz-space-sm);
 }
 
 /* The three blocks */
-.landing-tokens {
+.landing-level__blocks {
   display: grid;
   gap: var(--level-gap);
 }
 
-.landing-tokens__block {
+.landing-block {
   scroll-margin-block-start: var(--luz-space-2xl);
 }
 
-.landing-tokens__groups {
+.landing-block__groups {
   display: flex;
   flex-wrap: wrap;
   gap: var(--luz-space-xs);
@@ -3202,7 +3202,7 @@ home-light:defined ~ .landing-light__nojs {
   list-style: none;
 }
 
-.landing-tokens__group-link {
+.landing-block__link {
   display: inline-flex;
   align-items: center;
   gap: var(--luz-space-xs);
@@ -3217,32 +3217,32 @@ home-light:defined ~ .landing-light__nojs {
   text-decoration: none;
 }
 
-.landing-tokens__group-link:hover {
+.landing-block__link:hover {
   border-color: var(--luz-brand-primary);
   color: var(--luz-brand-primary);
 }
 
-.landing-tokens__group-link::after {
+.landing-block__link::after {
   content: "→";
   color: var(--luz-text-secondary);
 }
 
-.landing-tokens__group-link:dir(rtl)::after {
+.landing-block__link:dir(rtl)::after {
   content: "←";
 }
 
-.landing-tokens__group-link .landing-names__n {
+.landing-block__link .landing-names__n {
   font-family: var(--luz-font-mono);
   font-size: var(--luz-text-xs);
   color: var(--luz-text-secondary);
 }
 
-.landing-tokens__panel {
+.landing-block__panel {
   gap: var(--luz-space-lg);
   padding: min(var(--luz-space-lg), 5%);
 }
 
-.landing-tokens__label {
+.landing-spec__label {
   padding: 0;
   background: none;
   font-family: var(--luz-font-mono);
@@ -3251,177 +3251,95 @@ home-light:defined ~ .landing-light__nojs {
   color: var(--luz-text-primary);
 }
 
-/* Color: a level like the others, its panel a mosaic of tiles that touch,
-   each its name inside. The semantic tokens in large tiles, read live so
-   they follow the mode, each with the ink it is made to carry; beside them
-   the primitives, deep, mid and pale for every family, with their value
-   and a gray that reads on them (the generator measures it) */
-.landing-tokens__mosaic {
-  display: grid;
+/* Color: a level like the others, in the look of the scales: two cards, one
+   over the other. The semantic colours are chips read live, so they follow
+   the mode; the primitives a ramp per family, every step of it (the
+   generator passes each one through --v, so this file names no primitive) */
+.landing-block--color .landing-block__panel > .landing-cards {
   grid-template-columns: minmax(0, 1fr);
-  gap: 0;
-  border-radius: var(--luz-radius-sm);
-  overflow: hidden;
 }
 
+.landing-block--color .landing-spec--colors {
+  flex-wrap: wrap;
+  align-items: stretch;
+  justify-content: flex-start;
+  min-block-size: 0;
+}
 
-.landing-tokens__semantic,
-.landing-tokens__swatches {
+.landing-block--color .landing-spec--colors > li {
+  flex: 1 1 6rem;
+  justify-items: stretch;
+  text-align: center;
+}
+
+.landing-spec__box.landing-spec__box--color {
+  border: 1px solid var(--luz-divider);
+  border-radius: var(--luz-radius-sm);
+  background: var(--v);
+}
+
+.landing-tokens__ramps {
   display: grid;
+  gap: var(--luz-space-xs);
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.landing-tokens__tile,
-.landing-tokens__swatch {
+.landing-tokens__ramps > li {
   display: grid;
-  align-content: end;
-  gap: 2px;
-  min-inline-size: 0;
-  margin: 0;
-  padding: var(--luz-space-xs) var(--luz-space-sm);
-  background: var(--v);
-  color: var(--ink);
+  grid-template-columns: 4rem minmax(0, 1fr);
+  align-items: center;
+  gap: var(--luz-space-sm);
 }
 
-.landing-tokens__tile code,
-.landing-tokens__swatch code,
-.landing-tokens__swatch span {
-  padding: 0;
-  background: none;
-  font-family: var(--luz-font-mono);
+.landing-tokens__ramps .landing-spec__label {
   font-size: var(--luz-text-xs);
-  color: inherit;
-  overflow-wrap: anywhere;
+  color: var(--luz-text-secondary);
 }
 
-/* The semantic tiles: surface tall over its strong step and the divider;
-   beside them the ink, tall, over the danger fill */
-.landing-tokens__semantic {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  grid-template-rows: repeat(5, minmax(3.5rem, 1fr));
-}
-
-.landing-tokens__tile:nth-child(1) {
-  grid-area: 1 / 1 / 4 / 2;
-}
-
-.landing-tokens__tile:nth-child(2) {
-  grid-area: 4 / 1 / 5 / 2;
-}
-
-.landing-tokens__tile:nth-child(3) {
-  grid-area: 5 / 1 / 6 / 2;
-}
-
-.landing-tokens__tile:nth-child(4) {
-  grid-area: 1 / 2 / 5 / 3;
-}
-
-.landing-tokens__tile:nth-child(5) {
-  grid-area: 5 / 2 / 6 / 3;
-}
-
-/* The primitives: a row per family, deep to pale */
-.landing-tokens__swatches {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  grid-auto-rows: minmax(3.5rem, 1fr);
-}
-
-/* From a phone up the semantic tiles are a band of four columns over the
-   primitives: the surface and the ink tall, the strong surface over the
-   divider, the danger fill tall at the end */
-@media (min-width: 480px) {
-  .landing-tokens__semantic {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    grid-template-rows: repeat(2, minmax(4rem, auto));
-  }
-
-  .landing-tokens__tile:nth-child(1) {
-    grid-area: 1 / 1 / 3 / 2;
-  }
-
-  .landing-tokens__tile:nth-child(2) {
-    grid-area: 1 / 3 / 2 / 4;
-  }
-
-  .landing-tokens__tile:nth-child(3) {
-    grid-area: 2 / 3 / 3 / 4;
-  }
-
-  .landing-tokens__tile:nth-child(4) {
-    grid-area: 1 / 2 / 3 / 3;
-  }
-
-  .landing-tokens__tile:nth-child(5) {
-    grid-area: 1 / 4 / 3 / 5;
-  }
-}
-
-/* A primitive's name stays whole: on a narrow tile, smaller type and less
-   padding; a semantic tile is large, and its name may wrap at a hyphen */
-.landing-tokens__swatch code {
-  white-space: nowrap;
+.landing-tokens__ramp {
+  display: flex;
+  block-size: 1.25rem;
   overflow: hidden;
-  text-overflow: ellipsis;
+  border-radius: var(--luz-radius-sm);
 }
 
-@media (max-width: 640px) {
-  .landing-tokens__swatch {
-    padding-inline: var(--luz-space-xs);
-  }
-
-  .landing-tokens__swatch code,
-  .landing-tokens__swatch span {
-    font-size: calc(var(--luz-text-xs) * 0.75);
-  }
+.landing-tokens__ramp > span {
+  flex: 1;
+  background: var(--v);
 }
 
-@media (max-width: 360px) {
-  .landing-tokens__block--color .landing-tokens__panel {
-    padding: var(--luz-space-2xs);
-  }
-
-  .landing-tokens__swatch {
-    padding-inline: var(--luz-space-2xs);
-  }
-
-  .landing-tokens__swatch code,
-  .landing-tokens__swatch span {
-    font-size: calc(var(--luz-text-xs) * 0.66);
-  }
-}
-
-/* Scales: a level like the others, the text on one side (the sides swap from
-   one section to the next, so the page zigzags) and on the other the four
-   cards as a 2 x 2. The cards are the frames, so the panel holds them with
-   none of its own; on a phone one column */
-.landing-tokens__block--scales .landing-tokens__panel {
+/* A block whose panel holds cards (scales, color, and each block of core): the
+   text on one side (the sides swap from one block to the next, so the page
+   zigzags) and on the other the cards, a 2 x 2 or a row of two. The cards are
+   the frames, so the panel holds them with none of its own; on a phone one
+   column */
+.landing-block__panel:has(> .landing-cards) {
   padding: 0;
   border: 0;
   background: none;
   box-shadow: none;
 }
 
-.landing-tokens__block--scales .landing-tokens__scales {
+.landing-block__panel > .landing-cards {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 @media (max-width: 640px) {
-  .landing-tokens__block--scales .landing-tokens__scales {
+  .landing-block__panel > .landing-cards {
     grid-template-columns: minmax(0, 1fr);
   }
 }
 
 /* Scales and the rest: a card per group, its specimen over its one line */
-.landing-tokens__scales {
+.landing-cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
   gap: var(--luz-space-md);
 }
 
-.landing-tokens__scale {
+.landing-card {
   display: grid;
   grid-template-rows: auto 1fr auto;
   gap: var(--luz-space-sm);
@@ -3432,7 +3350,7 @@ home-light:defined ~ .landing-light__nojs {
   background: var(--luz-surface);
 }
 
-.landing-tokens__scale-title {
+.landing-card__title {
   margin: 0;
   font-family: var(--luz-font-sans);
   font-size: var(--luz-text-sm);
@@ -3440,7 +3358,7 @@ home-light:defined ~ .landing-light__nojs {
   color: var(--luz-text-primary);
 }
 
-.landing-tokens__scale .luz-code-block {
+.landing-card .luz-code-block {
   margin: 0;
   padding: var(--luz-space-xs) 0 0;
   border: 0;
@@ -3451,12 +3369,12 @@ home-light:defined ~ .landing-light__nojs {
 }
 
 /* The bar or the card says what the code is: no language label in the block */
-.landing-tokens__step .luz-code-block::before,
-.landing-tokens__scale .luz-code-block::before {
+.landing-path__step .luz-code-block::before,
+.landing-card .luz-code-block::before {
   display: none;
 }
 
-.landing-tokens__specimen {
+.landing-spec {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
@@ -3467,7 +3385,7 @@ home-light:defined ~ .landing-light__nojs {
   list-style: none;
 }
 
-.landing-tokens__specimen > li {
+.landing-spec > li {
   display: grid;
   justify-items: center;
   align-content: end;
@@ -3475,7 +3393,7 @@ home-light:defined ~ .landing-light__nojs {
   min-inline-size: 0;
 }
 
-.landing-tokens__specimen .landing-tokens__label {
+.landing-spec .landing-spec__label {
   font-size: var(--luz-text-xs);
   color: var(--luz-text-secondary);
 }
@@ -3486,7 +3404,7 @@ home-light:defined ~ .landing-light__nojs {
   background: var(--luz-brand-primary);
 }
 
-.landing-tokens__specimen--bars .landing-tokens__bar {
+.landing-spec--bars .landing-tokens__bar {
   inline-size: 0.6rem;
   block-size: var(--v);
 }
@@ -3498,24 +3416,24 @@ home-light:defined ~ .landing-light__nojs {
   color: var(--luz-text-primary);
 }
 
-.landing-tokens__specimen--boxes > li {
+.landing-spec--boxes > li {
   flex: 1;
   justify-items: stretch;
   text-align: center;
 }
 
-.landing-tokens__box {
+.landing-spec__box {
   block-size: 2.75rem;
   background: var(--luz-surface);
 }
 
-.landing-tokens__box--radius {
+.landing-spec__box--radius {
   border: 2px solid var(--luz-brand-primary);
   border-radius: var(--v);
   background: color-mix(in oklab, var(--luz-brand-primary) 10%, var(--luz-surface));
 }
 
-.landing-tokens__box--shadow {
+.landing-spec__box--shadow {
   border-radius: var(--luz-radius-md);
   box-shadow: var(--v);
 }
@@ -3567,14 +3485,14 @@ home-light:defined ~ .landing-light__nojs {
 
 /* Breakpoints: a small wireframe of a device for each, as wide as its
    breakpoint against the widest; a header line and two lines of text inside */
-.landing-tokens__specimen--devices {
+.landing-spec--devices {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 4.5rem), 1fr));
   align-items: end;
   gap: var(--luz-space-md) var(--luz-space-sm);
 }
 
-.landing-tokens__specimen--devices > li {
+.landing-spec--devices > li {
   justify-items: center;
   inline-size: 100%;
 }
@@ -3648,7 +3566,7 @@ home-light:defined ~ .landing-light__nojs {
 }
 
 /* The next step: a band that closes the page */
-.landing-tokens__next {
+.landing-level__next {
   display: grid;
   justify-items: center;
   gap: var(--luz-space-md);
@@ -3659,12 +3577,12 @@ home-light:defined ~ .landing-light__nojs {
   text-align: center;
 }
 
-.landing-tokens__next > h2,
-.landing-tokens__next .landing-inside__lead {
+.landing-level__next > h2,
+.landing-level__next .landing-inside__lead {
   margin: 0;
 }
 
-.landing-tokens__next .o-actions {
+.landing-level__next .o-actions {
   justify-self: stretch;
   justify-content: center;
 }
@@ -3676,33 +3594,33 @@ home-light:defined ~ .landing-light__nojs {
    view(), so elsewhere every section is simply there */
 @media (prefers-reduced-motion: no-preference) {
   /* The hero, one piece after another */
-  .landing-tokens__head > *,
-  .landing-tokens__stage {
+  .landing-intro__head > *,
+  .landing-intro__stage {
     animation: landing-rise var(--luz-duration-lazy) var(--luz-easing-enter) both;
   }
 
-  .landing-tokens__head > :nth-child(2) {
+  .landing-intro__head > :nth-child(2) {
     animation-delay: var(--luz-duration-fast);
   }
 
-  .landing-tokens__head > :nth-child(3) {
+  .landing-intro__head > :nth-child(3) {
     animation-delay: var(--luz-duration-base);
   }
 
-  .landing-tokens__head > :nth-child(4) {
+  .landing-intro__head > :nth-child(4) {
     animation-delay: var(--luz-duration-slow);
   }
 
-  .landing-tokens__stage {
+  .landing-intro__stage {
     animation-delay: var(--luz-duration-slower);
   }
 
-  .landing-tokens__head > :nth-child(5) {
+  .landing-intro__head > :nth-child(5) {
     animation-delay: var(--luz-duration-slower);
   }
 
   /* The marked word: its tint sweeps in from the start of the line */
-  .landing-tokens__hero .landing-mark {
+  .landing-intro .landing-mark {
     background-image: linear-gradient(color-mix(in oklab, var(--demo-brand) 18%, transparent), color-mix(in oklab, var(--demo-brand) 18%, transparent));
     background-color: transparent;
     background-position: left center;
@@ -3711,7 +3629,7 @@ home-light:defined ~ .landing-light__nojs {
     animation: landing-mark-sweep var(--luz-duration-lazy) var(--luz-easing-standard) var(--luz-duration-slower) both;
   }
 
-  .landing-tokens__hero .landing-mark:dir(rtl) {
+  .landing-intro .landing-mark:dir(rtl) {
     background-position: right center;
   }
 
@@ -3745,8 +3663,8 @@ home-light:defined ~ .landing-light__nojs {
 
 
   /* The cards lift under the pointer, and the arrow of a group points on */
-  .landing-tokens__step,
-  .landing-tokens__scale,
+  .landing-path__step,
+  .landing-card,
   .landing-demo__option,
   .landing-level .luz-btn {
     transition:
@@ -3757,11 +3675,11 @@ home-light:defined ~ .landing-light__nojs {
   }
 
   /* A step only deepens: it does not move, so the path stays joined */
-  .landing-tokens__step:hover {
+  .landing-path__step:hover {
     box-shadow: var(--luz-shadow-md);
   }
 
-  .landing-tokens__scale:hover {
+  .landing-card:hover {
     translate: 0 -3px;
     box-shadow: var(--luz-shadow-md);
   }
@@ -3770,15 +3688,15 @@ home-light:defined ~ .landing-light__nojs {
     translate: 0 -1px;
   }
 
-  .landing-tokens__group-link::after {
+  .landing-block__link::after {
     transition: translate var(--luz-duration-base) var(--luz-easing-standard);
   }
 
-  .landing-tokens__group-link:hover::after {
+  .landing-block__link:hover::after {
     translate: 3px 0;
   }
 
-  .landing-tokens__group-link:dir(rtl):hover::after {
+  .landing-block__link:dir(rtl):hover::after {
     translate: -3px 0;
   }
 
@@ -3789,11 +3707,11 @@ home-light:defined ~ .landing-light__nojs {
     display: block;
   }
 
-  .landing-tokens__block--motion:is(:hover, :focus-within) .landing-tokens__dot {
+  .landing-block--motion:is(:hover, :focus-within) .landing-tokens__dot {
     animation: landing-dot-x-loop calc(var(--luz-duration-lazy) * 2) linear infinite;
   }
 
-  .landing-tokens__block--motion:is(:hover, :focus-within) .landing-tokens__dot > span {
+  .landing-block--motion:is(:hover, :focus-within) .landing-tokens__dot > span {
     animation: landing-dot-y-loop calc(var(--luz-duration-lazy) * 2) var(--ease) infinite;
   }
 
@@ -3811,16 +3729,16 @@ home-light:defined ~ .landing-light__nojs {
       animation-range: entry 40% cover 60%;
     }
 
-    .landing-tokens__steps > *,
-    .landing-tokens__block > *,
-    .landing-tokens__block--scales .landing-tokens__scale,
-    .landing-tokens__next {
+    .landing-path > *,
+    .landing-block > *,
+    .landing-block .landing-card,
+    .landing-level__next {
       animation: landing-rise linear both;
       animation-timeline: view();
       animation-range: entry 0% entry 70%;
     }
 
-    .landing-tokens__specimen--bars .landing-tokens__bar {
+    .landing-spec--bars .landing-tokens__bar {
       transform-origin: bottom;
       animation: landing-grow-y linear both;
       animation-timeline: view();
@@ -3953,4 +3871,178 @@ home-light:defined ~ .landing-light__nojs {
     opacity: 0.3;
     translate: 0 0.75rem;
   }
+}
+
+/* The page of core (apps/landing/levels/core.html, coreSections() in
+   scripts/docs-site/site.js): the hero's demo is one page written three ways,
+   shown by the radio that is checked, and every block holds cards of real
+   components, which the keyboard does not enter (inert) */
+/* The three pages, and the three listings beside them, are laid over one
+   another and only the checked one is seen: the window keeps the height of the
+   tallest, so it does not jump from one to the next */
+.landing-views__product,
+.landing-views .landing-demo__code {
+  display: grid;
+  align-content: start;
+}
+
+.landing-views__page,
+.landing-views .landing-demo__look {
+  display: block;
+  grid-area: 1 / 1;
+  visibility: hidden;
+}
+
+.landing-views__page {
+  display: grid;
+  gap: var(--luz-space-sm);
+  justify-items: start;
+  align-content: start;
+  min-inline-size: 0;
+}
+
+.landing-views__page > * {
+  margin: 0;
+}
+
+.landing-views__page > .o-actions {
+  justify-self: stretch;
+}
+
+.landing-views__page :is(input, .luz-field) {
+  inline-size: min(100%, 22rem);
+}
+
+.landing-views:has(input[value="bare"]:checked) :is(.landing-views__page[data-view="bare"], .landing-demo__look[data-look="bare"]),
+.landing-views:has(input[value="classes"]:checked) :is(.landing-views__page[data-view="classes"], .landing-demo__look[data-look="classes"]),
+.landing-views:has(input[value="yours"]:checked) :is(.landing-views__page[data-view="yours"], .landing-demo__look[data-look="yours"]),
+.landing-views:has(input[value="landing"]:checked) :is(.landing-views__page[data-view="landing"], .landing-demo__look[data-look="landing"]),
+.landing-views:has(input[value="blog"]:checked) :is(.landing-views__page[data-view="blog"], .landing-demo__look[data-look="blog"]),
+.landing-views:has(input[value="app"]:checked) :is(.landing-views__page[data-view="app"], .landing-demo__look[data-look="app"]),
+.landing-views:has(input[value="docs"]:checked) :is(.landing-views__page[data-view="docs"], .landing-demo__look[data-look="docs"]) {
+  visibility: visible;
+}
+
+/* The reader's own rule: unlayered, so it beats core's layer with no !important */
+.landing-views__page[data-view="yours"] .luz-btn {
+  border-radius: var(--luz-radius-full);
+  text-transform: uppercase;
+}
+
+.landing-demo__note {
+  color: var(--luz-text-secondary);
+}
+
+.landing-core__live {
+  display: grid;
+  align-content: center;
+  min-inline-size: 0;
+  min-block-size: 5rem;
+}
+
+.landing-core__live > * {
+  margin: 0;
+}
+
+.landing-core__live .luz-card {
+  margin: 0;
+}
+
+.landing-wire {
+  display: block;
+  block-size: 1.25rem;
+  border: 1px solid color-mix(in oklab, var(--luz-brand-primary) 45%, transparent);
+  border-radius: var(--luz-radius-sm);
+  background: color-mix(in oklab, var(--luz-brand-primary) 18%, var(--luz-surface));
+}
+
+.landing-wire--icon {
+  flex: none;
+  inline-size: 2.5rem;
+  block-size: 2.5rem;
+}
+
+.o-row > .landing-wire {
+  flex: 1 1 3rem;
+}
+
+.landing-core__grid {
+  --luz-grid-min: 3rem;
+}
+
+.landing-core__grid > .landing-wire {
+  block-size: 2rem;
+}
+
+.o-media__body > .landing-wire {
+  block-size: 0.75rem;
+}
+
+/* The whole list of core, folded at the end of the page */
+.landing-level__fold > summary {
+  font-family: var(--luz-font-heading);
+  font-size: var(--luz-text-xl);
+  cursor: pointer;
+}
+
+.landing-level__fold > .landing-level__list {
+  margin-block-start: var(--luz-space-lg);
+}
+
+/* The page of the catalog (apps/landing/levels/catalog.html, catalogSections()
+   in scripts/docs-site/site.js): a wireframe is a grid of cells, each placed
+   by the generator; a piece is drawn small in its card, and a kind of site
+   large in the demo's window, each region named after the pattern it is */
+.landing-wf {
+  --gap: var(--luz-space-2xs);
+
+  display: grid;
+  grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+  grid-template-rows: repeat(var(--rows), minmax(0, 1fr));
+  gap: var(--gap);
+  inline-size: 100%;
+  block-size: calc(var(--rows) * 1.5rem);
+}
+
+.landing-wf__cell {
+  min-inline-size: 0;
+  border: 1px dashed color-mix(in oklab, var(--luz-brand-primary) 55%, transparent);
+  border-radius: var(--luz-radius-sm);
+  background: transparent;
+}
+
+.landing-wf__cell--fill {
+  border-style: solid;
+  background: color-mix(in oklab, var(--luz-brand-primary) 18%, var(--luz-surface));
+}
+
+.landing-wf--page {
+  block-size: calc(var(--rows) * 3.25rem);
+  inline-size: 100%;
+}
+
+.landing-wf__cell--named {
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: color-mix(in oklab, var(--luz-brand-primary) 8%, var(--luz-surface));
+}
+
+.landing-wf__cell--named > code {
+  padding: 0 var(--luz-space-2xs);
+  background: none;
+  font-family: var(--luz-font-mono);
+  font-size: var(--luz-text-xs);
+  color: var(--luz-text-primary);
+  white-space: nowrap;
+}
+
+.landing-views__page--site {
+  grid-template-columns: minmax(0, 1fr);
+  justify-self: stretch;
+  justify-items: stretch;
+}
+
+.landing-views__page--site > .landing-wf {
+  align-self: stretch;
 }

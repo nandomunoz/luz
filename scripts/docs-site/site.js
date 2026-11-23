@@ -40,10 +40,10 @@ import { existsSync, lstatSync, readFileSync, readdirSync, realpathSync, statSyn
 import { gzipSync } from "node:zlib";
 import { dirname, join, relative, resolve, sep } from "node:path";
 import { HtmlError, compactHtml, readHtml, tags } from "./html.js";
-import { fileKinds, fitsKindsOf, isKindFile } from "./kinds.js";
+import { FITS_KINDS, fileKinds, fitsKindsOf, isKindFile, kindPatterns } from "./kinds.js";
 import { fillAiMarkers } from "./ai.js";
 import { DEBUG_FILE, DEBUG_ROUTE, hasDebugPage, renderDebug } from "./debug.js";
-import { catalogComponents, catalogFilesIn, renderComponentLinks, renderSnippets, snippetData } from "./snippets.js";
+import { FILES, catalogComponents, catalogFilesIn, renderComponentLinks, renderSnippets, snippetData } from "./snippets.js";
 import { assertInlineHtml, loadLocales, localizeDocsLinks, lookup, markDocsLinks, renderAlternates, renderLangLinks, renderPageLinks, renderSwitcher, unusedKeys } from "./i18n.js";
 import { isDemo, loadDocsLocales, localizeLinks, localize } from "./docs-i18n.js";
 import { bundledEnglish, englishT, makeT } from "./strings.js";
@@ -114,9 +114,11 @@ const PLACEHOLDERS = new Set([
   "weight1", "weight2", "weight3",
   // What each level of the home brings, as a list of names read from the packages
   "list1", "list2", "list3", "tokendemo", "tokenlooks", "tokenblocks", "ntokens", "nmodes", "ndeps",
+  "coredemo", "coreblocks", "ncomponents", "nobjects", "ndepscore",
+  "catalogdemo", "catalogblocks", "ncatalog", "nchunks", "ndepscatalog",
 ]);
 /** Values inserted as HTML, not escaped. Only the generator produces them. */
-const RAW_VALUES = new Set(["content", "nav", "pagehead", "rail", "endnav", "pagefoot", "generated", "alternates", "langswitch", "langlinks", "endir", "notice", "contentattrs", "list1", "list2", "list3", "tokendemo", "tokenblocks"]);
+const RAW_VALUES = new Set(["content", "nav", "pagehead", "rail", "endnav", "pagefoot", "generated", "alternates", "langswitch", "langlinks", "endir", "notice", "contentattrs", "list1", "list2", "list3", "tokendemo", "tokenblocks", "coredemo", "coreblocks", "catalogdemo", "catalogblocks"]);
 
 /** Where the home page's languages live, from the repository root. */
 export const I18N_DIR = "apps/landing/i18n";
@@ -1712,6 +1714,17 @@ function levelLists(site, locale, used) {
     }
     return map;
   };
+  // How many pages of a docs area are in each of its groups (the `group:` of their front matter), and all of them as "*"
+  const docsGroups = (dir, all) => {
+    const count = new Map([["*", all]]);
+    for (const name of readdirSync(resolve(root, pages, dir)).filter((n) => n.endsWith(".html"))) {
+      const group = /^group:\s*([a-z-]+)/m.exec(read(`${pages}/${dir}/${name}`).split("-->")[0])?.[1];
+      if (group) count.set(group, (count.get(group) ?? 0) + 1);
+    }
+    return count;
+  };
+  // Every stylesheet of the catalog, those of the patterns of a kind of site too (`sheets()` leaves those out of the home's list)
+  const allCatalogSheets = readdirSync(resolve(root, "packages/catalog/src/components")).filter((n) => n.endsWith(".css") && n !== "index.css" && !n.startsWith("_")).map((n) => n.slice(0, -4));
   const coreHref = pageOf("components", "components");
   const siteHref = pageOf("catalog", "catalog");
   const layoutIds = ids("components/layout.html");
@@ -1766,6 +1779,8 @@ function levelLists(site, locale, used) {
   });
   return {
     ...tokenSections({ say, tokens, groups: GROUPS, counts, families: Object.keys(tokenJson.color), root, read }),
+    ...catalogSections({ say, root, groups: docsGroups("catalog", 0), sheets: allCatalogSheets, dependencies: Object.keys(JSON.parse(read("packages/catalog/package.json")).dependencies ?? {}).length, chunks: FILES.catalog.chunks.length }),
+    ...coreSections({ say, groups: docsGroups("components", sheets("packages/core/src/components").length), objects: objects.length, dependencies: Object.keys(JSON.parse(read("packages/core/package.json")).dependencies ?? {}).length }),
     list1: [
       `<div class="landing-names" style="--n:${GROUPS.length}">`,
       `  <h3 class="landing-names__title">${escapeHtml(say("inside.list.tokens"))} <span class="landing-names__n">${tokens.length}</span></h3>`,
@@ -1798,6 +1813,25 @@ function levelLists(site, locale, used) {
  * A token named here that luz-tokens.css does not define fails the build.
  */
 /**
+ * A block of a level's page, the way the home's sections are: the words (h2, lead, one link per group of the docs it
+ * covers with its count) on one side and a panel on the other, the sides swapping from one block to the next so the
+ * page zigzags. `anchor` is the prefix of its id (`t-color`), `links` are [{ href, label, count }] with `label`
+ * already escaped, and `panel` is the panel's inside.
+ */
+function levelBlock({ i, id, anchor, title, lead, links, panel }) {
+  return [
+    `<section class="landing-inside${i % 2 ? " landing-inside--flip" : ""} landing-block landing-block--${id}" id="${anchor}-${id}" aria-labelledby="${anchor}-${id}-title">`,
+    `  <div class="landing-inside__copy">`,
+    `    <h2 class="landing-inside__title" id="${anchor}-${id}-title">${title}</h2>`,
+    `    <p class="landing-inside__lead">${lead}</p>`,
+    `    <ul class="landing-block__groups">${links.map((l) => `<li><a class="landing-block__link" href="${l.href}">${l.label} <span class="landing-names__n">${l.count}</span></a></li>`).join("")}</ul>`,
+    `  </div>`,
+    `  <div class="landing-panel landing-block__panel" dir="ltr">${panel}</div>`,
+    `</section>`,
+  ].join("\n");
+}
+
+/**
  * The looks of the hero's demo: the same markup, a whole look and feel from the
  * tokens of every group. Any two differ in at least three of colour, type,
  * corners, depth and motion (tests/landing-levels.test.js).
@@ -1823,7 +1857,7 @@ function tokenSections({ say, tokens, groups, counts, families, read }) {
   };
   const t = (key) => escapeHtml(say(key));
   const v = (name) => `style="--v:var(${need(name)})"`;
-  const label = (text) => `<code class="landing-tokens__label">${escapeHtml(text)}</code>`;
+  const label = (text) => `<code class="landing-spec__label">${escapeHtml(text)}</code>`;
   const css = (text) => {
     for (const m of text.matchAll(/--luz-[\w-]+/g)) need(m[0]);
     // focusable, so a block that scrolls on a narrow screen scrolls from the keyboard too
@@ -1836,51 +1870,27 @@ function tokenSections({ say, tokens, groups, counts, families, read }) {
     const at = (x, y) => `${(x * 40).toFixed(1)},${(44 - y * 40).toFixed(1)}`;
     return `<svg class="landing-tokens__curve" viewBox="-2 -12 44 60" aria-hidden="true"><path class="landing-tokens__axis" d="M0,44 H40 M0,44 V4"/><path pathLength="1" d="M${at(0, 0)} C${at(x1, y1)} ${at(x2, y2)} ${at(1, 1)}"/></svg>`;
   };
-  const card = (name, specimen, code) => `<div class="landing-tokens__scale landing-tokens__scale--${name}"><p class="landing-tokens__scale-title">${t(`inside.list.${name}`)}</p>${specimen}${css(code)}</div>`;
-  const row = (cls, items) => `<ul class="landing-tokens__specimen landing-tokens__specimen--${cls}" aria-hidden="true">${items.join("")}</ul>`;
+  const card = (name, specimen, code) => `<div class="landing-card landing-card--${name}"><p class="landing-card__title">${t(`inside.list.${name}`)}</p>${specimen}${css(code)}</div>`;
+  const row = (cls, items) => `<ul class="landing-spec landing-spec--${cls}" aria-hidden="true">${items.join("")}</ul>`;
   const panels = {
-    // A mosaic: the semantic tokens in large tiles, read live so they follow the mode, each with the semantic ink
-    // it is made to carry; then the primitives, three steps of every family (deep, mid, pale), each with its value
-    // and the gray, of the two ends of the scale, that reads on it (4.5:1 at least, or the build fails)
+    // Two cards, as the scales have: the semantic colours as chips read live (so they follow the mode), over the one
+    // line that reads them; and the primitives, every family a ramp of all its steps, over the line that points a
+    // semantic token at one of them
     color: () => {
-      const SEMANTIC = [
-        ["--luz-surface", "--luz-text-primary"],
-        ["--luz-surface-strong", "--luz-text-primary"],
-        ["--luz-divider", "--luz-text-primary"],
-        ["--luz-text-primary", "--luz-surface"],
-        ["--luz-color-danger-fill", "--luz-text-on-fill"],
-      ];
+      const SEMANTIC = ["--luz-surface", "--luz-surface-strong", "--luz-divider", "--luz-text-primary", "--luz-brand-primary"];
       const json = JSON.parse(read("packages/tokens/tokens.json")).color;
-      const hexOf = (family, step) => String(json[family][step].value ?? json[family][step].$value).toLowerCase();
-      const lum = (hex) => {
-        const c = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255).map((x) => (x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4));
-        return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
-      };
-      const ratio = (x, y) => (Math.max(lum(x), lum(y)) + 0.05) / (Math.min(lum(x), lum(y)) + 0.05);
-      const grays = Object.keys(json.gray);
-      const ends = [grays[0], grays[grays.length - 1]];
-      const inkOf = (hex) => {
-        const best = ends.map((step) => [step, ratio(hex, hexOf("gray", step))]).sort((x, y) => y[1] - x[1])[0];
-        if (best[1] < 4.5) throw new Error(`the page of the tokens has no gray that reads on ${hex}: change the steps of its mosaic`);
-        return best[0];
-      };
-      const semantic = `<ul class="landing-tokens__semantic">${SEMANTIC.map(([bg, ink]) => `<li class="landing-tokens__tile" style="--v:var(${need(bg)});--ink:var(${need(ink)})"><code>${bg}</code></li>`).join("")}</ul>`;
-      const swatches = `<ul class="landing-tokens__swatches">${families
-        .flatMap((family) =>
-          [60, 40, 20].map((step) => {
-            const hex = hexOf(family, step);
-            return `<li class="landing-tokens__swatch" style="--v:var(${need(`--luz-${family}-${step}`)});--ink:var(--luz-gray-${inkOf(hex)})"><code>--luz-${family}-${step}</code><span>${hex}</span></li>`;
-          }),
-        )
+      const chips = row("colors", SEMANTIC.map((name) => `<li><span class="landing-spec__box landing-spec__box--color" ${v(name)}></span>${label(name.slice("--luz-".length))}</li>`));
+      const ramps = `<ul class="landing-tokens__ramps" aria-hidden="true">${families
+        .map((family) => `<li>${label(family)}<span class="landing-tokens__ramp">${Object.keys(json[family]).map((step) => `<span ${v(`--luz-${family}-${step}`)}></span>`).join("")}</span></li>`)
         .join("")}</ul>`;
-      return `<div class="landing-tokens__mosaic">${semantic}${swatches}</div>`;
+      return `<div class="landing-cards">${card("semantic", chips, "background: var(--luz-surface);\ncolor: var(--luz-text-primary);")}${card("primitives", ramps, "--luz-brand-primary: var(--luz-blue-60);")}</div>`;
     },
     scales: () =>
-      `<div class="landing-tokens__scales">${[
+      `<div class="landing-cards">${[
         card("spacing", row("bars", ["xs", "sm", "md", "lg", "xl", "2xl"].map((step) => `<li><span class="landing-tokens__bar" ${v(`--luz-space-${step}`)}></span>${label(step)}</li>`)), "gap: var(--luz-space-md);"),
         card("typography", row("type", ["sm", "base", "lg", "xl", "2xl"].map((step) => `<li><span class="landing-tokens__letter" ${v(`--luz-text-${step}`)}>Aa</span>${label(step)}</li>`)), "font-size: var(--luz-text-2xl);"),
-        card("radius", row("boxes", ["none", "sm", "md", "full"].map((step) => `<li><span class="landing-tokens__box landing-tokens__box--radius" ${v(`--luz-radius-${step}`)}></span>${label(step)}</li>`)), "border-radius: var(--luz-radius-md);"),
-        card("shadows", row("boxes", ["sm", "md", "lg"].map((step) => `<li><span class="landing-tokens__box landing-tokens__box--shadow" ${v(`--luz-shadow-${step}`)}></span>${label(step)}</li>`)), "box-shadow: var(--luz-shadow-lg);"),
+        card("radius", row("boxes", ["none", "sm", "md", "full"].map((step) => `<li><span class="landing-spec__box landing-spec__box--radius" ${v(`--luz-radius-${step}`)}></span>${label(step)}</li>`)), "border-radius: var(--luz-radius-md);"),
+        card("shadows", row("boxes", ["sm", "md", "lg"].map((step) => `<li><span class="landing-spec__box landing-spec__box--shadow" ${v(`--luz-shadow-${step}`)}></span>${label(step)}</li>`)), "box-shadow: var(--luz-shadow-lg);"),
       ].join("")}</div>`,
     // Motion and breakpoints, a section each: the specimen, then its code, with no card inside the panel
     motion: () =>
@@ -1905,16 +1915,15 @@ function tokenSections({ say, tokens, groups, counts, families, read }) {
   const lost = groups.map(([key]) => key.replace("inside.list.", "")).filter((id) => !BLOCKS.some(([, ids]) => ids.includes(id)));
   if (lost.length) throw new Error(`the page of the tokens has no block for ${lost.join(", ")}: add it to BLOCKS in tokenSections()`);
   const blocks = BLOCKS.map(([id, ids], i) =>
-    [
-      `<section class="landing-inside${i % 2 ? " landing-inside--flip" : ""} landing-tokens__block landing-tokens__block--${id}" id="t-${id}" aria-labelledby="t-${id}-title">`,
-      `  <div class="landing-inside__copy">`,
-      `    <h2 class="landing-inside__title" id="t-${id}-title">${t(`level.tokens.${id}.title`)}</h2>`,
-      `    <p class="landing-inside__lead">${t(`level.tokens.${id}.lead`)}</p>`,
-      `    <ul class="landing-tokens__groups">${ids.map((g) => `<li><a class="landing-tokens__group-link" href="${byId[g].href}">${t(byId[g].key)} <span class="landing-names__n">${byId[g].count}</span></a></li>`).join("")}</ul>`,
-      `  </div>`,
-      `  <div class="landing-panel landing-tokens__panel" dir="ltr">${panels[id]()}</div>`,
-      `</section>`,
-    ].join("\n"),
+    levelBlock({
+      i,
+      id,
+      anchor: "t",
+      title: t(`level.tokens.${id}.title`),
+      lead: t(`level.tokens.${id}.lead`),
+      links: ids.map((g) => ({ href: byId[g].href, label: t(byId[g].key), count: byId[g].count })),
+      panel: panels[id](),
+    }),
   );
   // Top down: the title and the looks, centred; then the product, drawn with the look's tokens, beside the
   // code in an editor that says them
@@ -1969,6 +1978,253 @@ function tokenSections({ say, tokens, groups, counts, families, read }) {
     ntokens: String(tokens.length),
     nmodes: String(modes.size),
     ndeps: String(Object.keys(JSON.parse(read("packages/tokens/package.json")).dependencies ?? {}).length),
+  };
+}
+
+/** A listing of HTML in the colours of the devtools: a tag, its attributes and their values, and a comment (the text is escaped first). */
+function paintHtml(text) {
+  return escapeHtml(text)
+    .replace(/(&lt;!--[\s\S]*?--&gt;|\/\*[\s\S]*?\*\/)/g, '<span class="landing-demo__note">$1</span>')
+    .replace(/&lt;(\/?)([a-z0-9]+)/g, '&lt;$1<span class="landing-demo__sel">$2</span>')
+    .replace(/ ([a-z-]+)=&quot;([^&]*?)&quot;/g, ' <span class="landing-demo__prop">$1</span>=<span class="landing-demo__val">&quot;$2&quot;</span>');
+}
+
+/** The views of the demo of core: the same page written three ways, each a step further. */
+const CORE_VIEWS = ["bare", "classes", "yours"];
+
+/**
+ * The page of core (apps/landing/levels/core.html): for a developer who does not yet know what core gives, that the
+ * HTML they already write comes styled, that a class adds a component and that their own CSS wins. The generator
+ * writes, from the packages and never typed:
+ *
+ *  - {{coredemo}}, the hero's demo: one page written three ways (CORE_VIEWS), a radio each, shown by CSS alone: HTML
+ *    with no class (the bare elements), the same page with the classes of its components, and with one rule of the
+ *    reader's own, which wins with no `!important` because core is in a cascade layer. The page is real core markup,
+ *    inert, so the keyboard stays out of it; the HTML beside it is the same markup, in the colours of the devtools;
+ *  - {{coreblocks}}, four blocks (forms, content, feedback and layout) in the order and the sides of the home, each
+ *    with cards of real components and the line of HTML that writes them, linking the docs' groups they cover with
+ *    their counts;
+ *  - {{ncomponents}}, {{nobjects}} and {{ndepscore}}, the hero's numbers.
+ */
+function coreSections({ say, groups, objects, dependencies }) {
+  const t = (key) => escapeHtml(say(key));
+  const html = (text) => `<pre class="luz-code-block" data-lang="html" dir="ltr" tabindex="0"><code>${escapeHtml(text)}</code></pre>`;
+  const card = (name, live, code) => `<div class="landing-card landing-card--${name}"><p class="landing-card__title">${t(`level.core.card.${name}`)}</p><div class="landing-core__live" inert>${live}</div>${html(code)}</div>`;
+  const wire = (n) => '<span class="landing-wire"></span>'.repeat(n);
+  const sample = {
+    actions: `<div class="o-actions"><button class="luz-btn luz-btn--primary" type="button">${t("level.core.sample.save")}</button><button class="luz-btn luz-btn--outline" type="button">${t("level.core.sample.cancel")}</button><button class="luz-btn luz-btn--ghost" type="button">${t("level.core.sample.skip")}</button></div>`,
+    fields: `<div class="luz-field"><label class="luz-field__label" for="core-email">${t("level.core.sample.email")}</label><input class="luz-input" id="core-email" type="email" value="you@example.com"><div class="luz-field__helper">${t("level.core.sample.hint")}</div></div>`,
+    content: `<div class="luz-card"><h3 class="luz-card__title">${t("level.core.sample.title")}</h3><p class="luz-card__body">${t("level.core.sample.body")}</p><span class="luz-tag luz-tag--blue luz-tag--dot">${t("level.core.sample.tag")}</span></div>`,
+    navigation: `<nav class="luz-tabs"><a class="luz-tab">${t("level.core.sample.tab1")}</a><a class="luz-tab">${t("level.core.sample.tab2")}</a><a class="luz-tab">${t("level.core.sample.tab3")}</a></nav>`,
+    alerts: `<div class="luz-alert luz-alert--success"><div><div class="luz-alert__title">${t("level.core.sample.alert.title")}</div><div class="luz-alert__body">${t("level.core.sample.alert.body")}</div></div></div>`,
+    status: `<progress class="luz-progress" value="67" max="100"></progress><meter class="luz-meter" value="40" min="0" max="100"></meter>`,
+    stack: `<div class="o-stack">${wire(3)}</div>`,
+    row: `<div class="o-row">${wire(4)}</div>`,
+    grid: `<div class="o-grid o-grid--auto landing-core__grid">${wire(6)}</div>`,
+    media: `<div class="o-media"><span class="landing-wire landing-wire--icon"></span><div class="o-media__body o-stack">${wire(2)}</div></div>`,
+  };
+  const lines = {
+    actions: '<button class="luz-btn luz-btn--primary">',
+    fields: '<div class="luz-field">\n  <label class="luz-field__label">\n  <input class="luz-input">',
+    content: '<div class="luz-card">\n  <h3 class="luz-card__title">',
+    navigation: '<nav class="luz-tabs">\n  <a class="luz-tab">',
+    alerts: '<div class="luz-alert luz-alert--success">',
+    status: '<progress class="luz-progress" value="67">',
+    stack: '<div class="o-stack">',
+    row: '<div class="o-row">',
+    grid: '<div class="o-grid o-grid--auto">',
+    media: '<div class="o-media">',
+  };
+  const BLOCKS = [
+    ["forms", ["actions", "fields"], [["actions"], ["forms"]]],
+    ["content", ["content", "navigation"], [["content"], ["navigation"]]],
+    ["feedback", ["alerts", "status"], [["feedback"], ["media"]]],
+    ["layout", ["stack", "row", "grid", "media"], [["helpers"]]],
+  ];
+  const linkOf = (id) => ({
+    href: id === "objects" ? "/docs/components/layout/" : `/docs/components/#group-${id}`,
+    label: t(id === "objects" ? "inside.list.objects" : `level.core.group.${id}`),
+    count: id === "objects" ? objects : groups.get(id) ?? 0,
+  });
+  const blocks = BLOCKS.map(([id, cards, covers], i) =>
+    levelBlock({
+      i,
+      id,
+      anchor: "c",
+      title: t(`level.core.${id}.title`),
+      lead: t(`level.core.${id}.lead`),
+      links: [...covers.flat(), ...(id === "layout" ? ["objects"] : [])].map(linkOf),
+      panel: `<div class="landing-cards">${cards.map((name) => card(name, sample[name], lines[name])).join("")}</div>`,
+    }),
+  );
+  // The page, once per view: the same words, the markup a step further each time
+  const word = (key) => t(`level.core.demo.${key}`);
+  const page = {
+    bare: [
+      `<h3>${word("heading")}</h3>`,
+      `<label>${word("label")} <input type="email" value="you@example.com"></label>`,
+      `<p><button type="submit">${word("submit")}</button> <button type="button">${word("cancel")}</button></p>`,
+    ],
+    classes: [
+      `<span class="luz-tag luz-tag--blue luz-tag--dot">${word("tag")}</span>`,
+      `<h3>${word("heading")}</h3>`,
+      `<div class="luz-field"><label class="luz-field__label" for="core-demo-email">${word("label")}</label><input class="luz-input" id="core-demo-email" type="email" value="you@example.com"></div>`,
+      `<div class="o-actions"><button class="luz-btn luz-btn--primary" type="submit">${word("submit")}</button><button class="luz-btn luz-btn--outline" type="button">${word("cancel")}</button></div>`,
+    ],
+  };
+  page.yours = page.classes.map((line) => line.replaceAll("core-demo-email", "core-demo-email-yours"));
+  const source = {
+    bare: `<h3>${word("heading")}</h3>\n<label>${word("label")}\n  <input type="email">\n</label>\n<p>\n  <button type="submit">${word("submit")}</button>\n  <button type="button">${word("cancel")}</button>\n</p>`,
+    classes: `<span class="luz-tag luz-tag--blue">${word("tag")}</span>\n<h3>${word("heading")}</h3>\n<div class="luz-field">\n  <label class="luz-field__label">${word("label")}</label>\n  <input class="luz-input" type="email">\n</div>\n<button class="luz-btn luz-btn--primary">${word("submit")}</button>\n<button class="luz-btn luz-btn--outline">${word("cancel")}</button>`,
+  };
+  source.yours = `${source.classes}\n\n/* ${say("level.core.demo.yours.note")} */\n.luz-btn {\n  border-radius: var(--luz-radius-full);\n  text-transform: uppercase;\n}`;
+  // The listing in the colours of the devtools, and the rule of the reader's own CSS the third view adds
+  const paint = (text) =>
+    paintHtml(text)
+      .replace(/^(\.luz-btn)/m, '<span class="landing-demo__sel">$1</span>')
+      .replace(/^ {2}(border-radius|text-transform)/gm, '  <span class="landing-demo__prop">$1</span>')
+      .replace(/(var\(--luz-radius-full\)|uppercase)/g, '<span class="landing-demo__val">$1</span>');
+  const demo = [
+    `<div class="landing-demo__top">`,
+    `<p class="landing-demo__title">${word("title")}</p>`,
+    `<fieldset class="landing-demo__picker">`,
+    `<legend>${word("legend")}</legend>`,
+    `<div class="landing-demo__options">`,
+    CORE_VIEWS.map((view, i) => `<label class="landing-demo__option"><input type="radio" name="view" value="${view}"${i ? "" : " checked"}><span>${t(`level.core.look.${view}`)}</span></label>`).join(""),
+    `</div>`,
+    `</fieldset>`,
+    `</div>`,
+    `<div class="landing-demo__window">`,
+    `<div class="landing-demo__chrome" aria-hidden="true"><span></span><span></span><span></span></div>`,
+    `<div class="landing-demo__viewport">`,
+    `<div class="landing-demo__product landing-views__product" inert>`,
+    CORE_VIEWS.map((view) => `<div class="landing-views__page" data-view="${view}">${page[view].join("")}</div>`).join(""),
+    `</div>`,
+    `</div>`,
+    `<div class="landing-demo__editor">`,
+    `<p class="landing-demo__caption"><span>${word("code")}</span></p>`,
+    `<pre class="landing-demo__code" dir="ltr" tabindex="0" aria-label="${word("code")}">${CORE_VIEWS.map((view) => `<code class="landing-demo__look" data-look="${view}">${paint(source[view])}</code>`).join("")}</pre>`,
+    `</div>`,
+    `</div>`,
+  ].join("\n");
+  return {
+    coredemo: demo,
+    coreblocks: blocks.join("\n"),
+    ncomponents: String(groups.get("*")),
+    nobjects: String(objects),
+    ndepscore: String(dependencies),
+  };
+}
+
+/** The kinds of site of the catalog's demo, each a wireframe of regions named after the patterns it uses: [row/column/row/column, name]. */
+const KIND_WIRES = {
+  landing: [["1/1/2/7", "site-header"], ["2/1/4/7", "hero"], ["4/1/5/3", "section"], ["4/3/5/5", "section"], ["4/5/5/7", "section"], ["5/1/6/7", "stat"], ["6/1/7/7", "site-footer"]],
+  blog: [["1/1/2/7", "site-header"], ["2/1/3/7", "masthead"], ["3/1/4/7", "page-header"], ["4/1/6/5", "post-list"], ["4/5/6/7", "toc"], ["6/1/7/7", "site-footer"]],
+  app: [["1/1/2/7", "app-bar"], ["2/1/7/2", "sidebar"], ["2/2/4/4", "bar-list"], ["2/4/4/7", "column-chart"], ["4/2/7/5", "heat-map"], ["4/5/7/7", "ring"]],
+  docs: [["1/1/7/2", "sidebar"], ["1/2/2/6", "doc-header"], ["2/2/4/6", "example"], ["4/2/6/6", "do-dont"], ["6/2/7/6", "page-footer"], ["1/6/7/7", "page-rail"]],
+};
+
+/** The pieces drawn in the blocks of the catalog page: a wireframe each, [rows, columns, [row/column/row/column, fill?]…]. */
+const PIECE_WIRES = {
+  navbar: [1, 6, [["1/1/2/2", 1], ["1/3/2/4"], ["1/4/2/5"], ["1/5/2/6"], ["1/6/2/7", 1]]],
+  sidebar: [4, 5, [["1/1/5/2", 1], ["1/2/2/6"], ["2/2/4/6"], ["4/2/5/5"]]],
+  "site-header": [1, 6, [["1/1/2/2", 1], ["1/3/2/5"], ["1/6/2/7", 1]]],
+  "site-footer": [3, 6, [["1/1/4/3"], ["1/3/4/5"], ["1/5/4/7"]]],
+  hero: [4, 6, [["1/1/2/5", 1], ["2/1/3/4"], ["3/1/4/2", 1], ["3/2/4/3"], ["1/5/4/7"]]],
+  faq: [4, 6, [["1/1/2/7"], ["2/1/3/7"], ["3/1/4/7"], ["4/1/5/7"]]],
+  stat: [2, 6, [["1/1/3/3", 1], ["1/3/3/5", 1], ["1/5/3/7", 1]]],
+  timeline: [4, 6, [["1/1/2/2", 1], ["1/2/2/6"], ["2/1/3/2", 1], ["2/2/3/6"], ["3/1/4/2", 1], ["3/2/4/5"], ["4/1/5/2", 1], ["4/2/5/6"]]],
+  "bar-list": [4, 6, [["1/1/2/6", 1], ["2/1/3/5", 1], ["3/1/4/3", 1], ["4/1/5/2", 1]]],
+  "column-chart": [4, 6, [["3/1/5/2", 1], ["2/2/5/3", 1], ["1/3/5/4", 1], ["3/4/5/5", 1], ["2/5/5/6", 1]]],
+  "heat-map": [3, 6, [["1/1/2/2"], ["1/2/2/3", 1], ["1/3/2/4"], ["1/4/2/5", 1], ["1/5/2/6"], ["2/1/3/2", 1], ["2/2/3/3"], ["2/3/3/4", 1], ["2/4/3/5"], ["2/5/3/6", 1], ["3/1/4/2"], ["3/2/4/3", 1], ["3/3/4/4", 1], ["3/4/4/5"], ["3/5/4/6", 1]]],
+  ring: [4, 4, [["1/1/5/3", 1], ["2/3/3/5"], ["3/3/4/5"]]],
+  search: [3, 6, [["1/1/2/7", 1], ["2/1/3/7"], ["3/1/4/6"]]],
+  "cookie-consent": [3, 6, [["1/1/3/7"], ["2/5/3/6", 1], ["2/6/3/7"]]],
+  "lang-switch": [1, 6, [["1/1/2/2", 1], ["1/2/2/3"], ["1/3/2/4"]]],
+  "docs-layout": [4, 6, [["1/1/5/2", 1], ["1/2/5/5"], ["1/5/5/7"]]],
+};
+
+/**
+ * The page of the catalog (apps/landing/levels/catalog.html): for a developer who does not yet know that the catalog
+ * is a stylesheet per piece, that a page links only what it uses and that the script of a piece loads when the piece
+ * is on the page. The generator writes, from the packages and never typed:
+ *
+ *  - {{catalogdemo}}, the hero's demo: a radio per kind of site (FITS_KINDS), each a wireframe of the regions it is
+ *    made of, named after the patterns of that kind (kinds.js, `fits-kinds`), with the `<link>` of each stylesheet
+ *    the kind needs beside it, in cascade order. A region that is not a pattern of its kind fails the build;
+ *  - {{catalogblocks}}, four blocks (structure, content, charts, site-wide) in the sides of the home, each a card per
+ *    piece (a wireframe and the stylesheet that draws it), linking the docs' groups they cover with their counts;
+ *  - {{ncatalog}}, {{nchunks}} and {{ndepscatalog}}, the hero's numbers.
+ */
+function catalogSections({ say, root, groups, sheets, dependencies, chunks }) {
+  const t = (key) => escapeHtml(say(key));
+  const wire = ([rows, cols, cells]) =>
+    `<span class="landing-wf" style="--rows:${rows};--cols:${cols}" aria-hidden="true">${cells.map(([area, fill]) => `<span class="landing-wf__cell${fill ? " landing-wf__cell--fill" : ""}" style="grid-area:${area}"></span>`).join("")}</span>`;
+  const link = (name) => `<link rel="stylesheet" href="…/components/${name}.min.css">`;
+  const card = (name) => {
+    const drawing = PIECE_WIRES[name];
+    if (!drawing) throw new Error(`the page of the catalog has no wireframe for ${name}: add it to PIECE_WIRES in scripts/docs-site/site.js`);
+    if (!sheets.includes(name)) throw new Error(`the page of the catalog draws ${name}, which is not a stylesheet of packages/catalog/src/components`);
+    return `<div class="landing-card landing-card--${name}"><p class="landing-card__title"><code>${name}</code></p><div class="landing-core__live">${wire(drawing)}</div><pre class="luz-code-block" data-lang="html" dir="ltr" tabindex="0"><code>${escapeHtml(link(name))}</code></pre></div>`;
+  };
+  const BLOCKS = [
+    ["structure", ["navbar", "sidebar", "site-header", "site-footer"], ["navigation", "page-structure"]],
+    ["content", ["hero", "faq", "stat", "timeline"], ["content"]],
+    ["charts", ["bar-list", "column-chart", "heat-map", "ring"], ["charts"]],
+    ["sitewide", ["search", "cookie-consent", "lang-switch", "docs-layout"], ["site-wide", "documentation"]],
+  ];
+  const blocks = BLOCKS.map(([id, cards, covers], i) =>
+    levelBlock({
+      i,
+      id,
+      anchor: "k",
+      title: t(`level.catalog.${id}.title`),
+      lead: t(`level.catalog.${id}.lead`),
+      links: covers.map((g) => ({ href: `/docs/catalog/#group-${g}`, label: t(`level.catalog.group.${g}`), count: groups.get(g) ?? 0 })),
+      panel: `<div class="landing-cards">${cards.map(card).join("")}</div>`,
+    }),
+  );
+  const word = (key) => t(`level.catalog.demo.${key}`);
+  const kinds = FITS_KINDS.map((kind) => {
+    const { files, pages } = kindPatterns(kind, root, null);
+    const regions = KIND_WIRES[kind];
+    for (const [, name] of regions) if (!pages.includes(name)) throw new Error(`the wireframe of ${kind} draws ${name}, which is not a pattern of that kind (${pages.join(", ")}): change KIND_WIRES in scripts/docs-site/site.js`);
+    const lines = [...files.map((file) => link(file.slice("components/".length, -".css".length))), '<script type="module" src="…/catalog.min.js"></script>'];
+    return {
+      kind,
+      page: `<span class="landing-wf landing-wf--page" style="--rows:6;--cols:6" aria-hidden="true">${regions.map(([area, name]) => `<span class="landing-wf__cell landing-wf__cell--named" style="grid-area:${area}"><code>${name}</code></span>`).join("")}</span>`,
+      listing: lines.join("\n"),
+    };
+  });
+  const demo = [
+    `<div class="landing-demo__top">`,
+    `<p class="landing-demo__title">${word("title")}</p>`,
+    `<fieldset class="landing-demo__picker">`,
+    `<legend>${word("legend")}</legend>`,
+    `<div class="landing-demo__options">`,
+    kinds.map(({ kind }, i) => `<label class="landing-demo__option"><input type="radio" name="view" value="${kind}"${i ? "" : " checked"}><span>${t(`level.catalog.kind.${kind}`)}</span></label>`).join(""),
+    `</div>`,
+    `</fieldset>`,
+    `</div>`,
+    `<div class="landing-demo__window">`,
+    `<div class="landing-demo__chrome" aria-hidden="true"><span></span><span></span><span></span></div>`,
+    `<div class="landing-demo__viewport">`,
+    `<div class="landing-demo__product landing-views__product" inert>`,
+    kinds.map(({ kind, page }) => `<div class="landing-views__page landing-views__page--site" data-view="${kind}">${page}</div>`).join(""),
+    `</div>`,
+    `</div>`,
+    `<div class="landing-demo__editor">`,
+    `<p class="landing-demo__caption"><span>${word("code")}</span></p>`,
+    `<pre class="landing-demo__code" dir="ltr" tabindex="0" aria-label="${word("code")}">${kinds.map(({ kind, listing }) => `<code class="landing-demo__look" data-look="${kind}">${paintHtml(listing)}</code>`).join("")}</pre>`,
+    `</div>`,
+    `</div>`,
+  ].join("\n");
+  return {
+    catalogdemo: demo,
+    catalogblocks: blocks.join("\n"),
+    ncatalog: String(sheets.length),
+    nchunks: String(chunks),
+    ndepscatalog: String(dependencies),
   };
 }
 
@@ -2103,7 +2359,7 @@ export function landingDocuments(site, file, html) {
 }
 
 /**
- * The template of a page of a level (tokens, core, components): the home's, with the
+ * The template of a page of a level (tokens, core, catalog): the home's, with the
  * inside of its <main> up to the icons replaced by `fragment`, the title and the
  * description by the level's own (`level.<name>.meta.*`), and the links to a section
  * of the home (`#inside`, `#faq`) by the same links on the language's home, because the
