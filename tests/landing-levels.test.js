@@ -441,11 +441,11 @@ describe("the page of core: the HTML you write comes styled, a class adds a comp
     expect(css).not.toMatch(/@layer/);
   });
 
-  it.each(LANGS)("in %s: four blocks, forms, content, feedback and layout, in the sides of the home (the page zigzags), each cards of real components and the line of HTML that writes them, linking the docs' groups they cover with their counts", (code, prefix) => {
+  it.each(LANGS)("in %s: five blocks, actions, forms, content, feedback and layout, in the sides of the home (the page zigzags), each cards of real components and the line of HTML that writes them, linking the docs' groups they cover with their counts", (code, prefix) => {
     const html = core(prefix);
     const groups = new Map();
     for (const page of site.pages.filter((p) => p.meta.area === "components" && p.meta.group)) groups.set(page.meta.group, (groups.get(page.meta.group) ?? 0) + 1);
-    const BLOCKS = [["forms", ["actions", "forms"]], ["content", ["content", "navigation"]], ["feedback", ["feedback", "media"]], ["layout", ["helpers", "objects"]]];
+    const BLOCKS = [["actions", ["actions"]], ["forms", ["forms"]], ["content", ["content", "navigation"]], ["feedback", ["feedback", "media"]], ["layout", ["helpers", "objects"]]];
     BLOCKS.forEach(([id, covered], i) => {
       const block = sectionOf(html, `c-${id}`);
       expect(block, id).toMatch(new RegExp(`^<section class="landing-inside${i % 2 ? " landing-inside--flip" : ""} landing-block landing-block--${id}"`));
@@ -454,9 +454,38 @@ describe("the page of core: the HTML you write comes styled, a class adds a comp
       // the docs of a language are its own (/es/docs/…) once it has them
       expect(links.map((m) => m[1].replace(/^\/(es|ar)\//, "/")), id).toEqual(covered.map((g) => (g === "objects" ? "/docs/components/layout/" : `/docs/components/#group-${g}`)));
       expect(links.map((m) => Number(m[2])), id).toEqual(covered.map((g) => (g === "objects" ? numbers.objects : groups.get(g))));
+      if (id === "forms") {
+        // not cards: one real form with every kind of control, inert so the keyboard stays out of it, and the markup of a field beside it
+        expect(block).toContain('<div class="landing-core__live" inert><form class="landing-form" action="#">');
+        for (const type of ["text", "email", "password", "date", "tel", "range", "radio", "checkbox"]) expect(block, type).toContain(`type="${type}"`);
+        for (const part of ["<select class=\"luz-select\"", "<textarea class=\"luz-input luz-input--textarea\"", 'role="switch"', "<output class=\"luz-output\"", "luz-check-group", "disabled", 'type="submit"']) expect(block, part).toContain(part);
+        expect(block.match(/<fieldset class="luz-fieldset">/g)).toHaveLength(2);
+        // a field in error says so, to the eye and to the machine
+        expect(block).toMatch(/luz-input luz-input--error" id="core-f-password" type="password" value="1234" aria-invalid="true"/);
+        expect(block).toContain("luz-field__error");
+        // every label names a control of the form
+        for (const [, target] of block.matchAll(/<label[^>]* for="([^"]+)"/g)) expect(block, target).toContain(`id="${target}"`);
+        expect(block).toMatch(/<pre class="luz-code-block" data-lang="html" dir="ltr" tabindex="0">/);
+        return;
+      }
+      if (id === "content") {
+        // not cards: one page of a project made of every piece of the two groups it covers, inert, the markup beside it
+        expect(block).toContain('<div class="landing-core__live" inert><div class="landing-page">');
+        const files = site.pages.filter((p) => p.meta.area === "components" && covered.includes(p.meta.group)).flatMap((p) => [...String(p.meta.files ?? "").matchAll(/components\/([a-z-]+)\.css/g)].map((m) => m[1]));
+        expect(files.length).toBe(groups.get("content") + groups.get("navigation"));
+        for (const name of files) expect(block, name).toMatch(new RegExp(`class="[^"]*\\bluz-${name}(?=__|[\\s"-])`));
+        expect(block).toMatch(/<pre class="luz-code-block" data-lang="html" dir="ltr" tabindex="0">/);
+        return;
+      }
+      if (id === "feedback") {
+        // every piece of the two groups it covers is in one of its cards
+        const files = site.pages.filter((p) => p.meta.area === "components" && covered.includes(p.meta.group)).flatMap((p) => [...String(p.meta.files ?? "").matchAll(/components\/([a-z-]+)\.css/g)].map((m) => m[1]));
+        expect(files.length).toBe(groups.get("feedback") + groups.get("media"));
+        for (const name of files) expect(block, name).toMatch(new RegExp(`class="[^"]*\\bluz-${name}(?=__|[\\s"-])`));
+      }
       // the panel holds cards, each its title, its component (inert: the keyboard stays out of it) and one line of code
       const cards = block.match(/<div class="landing-card landing-card--[a-z]+">[\s\S]*?<\/pre><\/div>/g) ?? [];
-      expect(cards.length, id).toBeGreaterThanOrEqual(2);
+      expect(cards.length, id).toBeGreaterThanOrEqual(id === "layout" ? 4 : 2);
       for (const card of cards) {
         expect(card).toMatch(/<p class="landing-card__title">[^<]+<\/p><div class="landing-core__live" inert>/);
         expect(card).toMatch(/<pre class="luz-code-block" data-lang="html" dir="ltr" tabindex="0">/);
