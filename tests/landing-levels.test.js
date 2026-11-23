@@ -117,16 +117,20 @@ describe("the pages of the three levels", () => {
     };
     const codesOf = (html) => [...html.matchAll(/<code\b[^>]*>([\s\S]*?)<\/code>/g)].map((m) => m[1]);
 
-    it.each(LANGS)("in %s: the hero says what a token is, before and after, and leads to the three steps", (code, prefix) => {
+    it.each(LANGS)("in %s: the hero is the page's own, not a level of the home: centred, one line that says what a token is, and the demo inside it", (code, prefix) => {
       const hero = sectionOf(rendered.get(`${prefix}tokens/`), "hero");
-      expect(hero).toContain('class="landing-tokens__what"');
-      expect(hero).toContain("<code>var(--luz-brand-primary)</code>");
-      const before = /class="landing-tokens__before"[\s\S]*?<code>([^<]*)<\/code>/.exec(hero)?.[1];
-      const after = /class="landing-tokens__after"[\s\S]*?<code>([^<]*)<\/code>/.exec(hero)?.[1];
-      expect(before).toMatch(/#[0-9a-f]{6}/);
-      expect(after).toContain("var(--luz-");
-      for (const key of ["before", "after"]) expect(hero).toContain(catalog(code)[`level.tokens.${key}`]);
+      expect(hero).toMatch(/^<section class="landing-tokens__hero landing-demo"/);
+      expect(hero).not.toMatch(/landing-inside\b/);
+      const what = /<p class="landing-tokens__what">([\s\S]*?)<\/p>/.exec(hero)?.[1] ?? "";
+      expect(what).toBe(catalog(code)["level.tokens.what"]);
+      // one line: a sentence a developer reads at once, with no example to decode
+      expect(what.replace(/<[^>]+>/g, "").length).toBeLessThanOrEqual(140);
+      expect(what).not.toContain("<code>");
+      expect(hero).not.toContain("landing-tokens__before");
+      expect(hero).not.toContain("landing-tokens__after");
       expect(hero).toMatch(/<a class="luz-btn luz-btn--primary" href="#steps">/);
+      // the h1 comes before the demo: what it is, then try it
+      expect(hero.indexOf("<h1")).toBeLessThan(hero.indexOf("<fieldset"));
     });
 
     it.each(LANGS)("in %s: the hero's numbers are what a reader gains: the tokens, the modes, the weight and no dependency", (code, prefix) => {
@@ -142,12 +146,13 @@ describe("the pages of the three levels", () => {
 
     it.each(LANGS)("in %s: the hero's demo changes the brand with one token, with no script: a radio per family, each drawn by landing.css", (code, prefix) => {
       const hero = sectionOf(rendered.get(`${prefix}tokens/`), "hero");
-      const demo = hero.slice(hero.indexOf('class="landing-panel landing-demo"'));
+      const demo = hero;
       expect(demo).toMatch(/<fieldset\b/);
       expect(demo).toContain(`<legend>${catalog(code)["level.tokens.demo.legend"]}</legend>`);
       const families = [...demo.matchAll(/<input type="radio" name="brand" value="([a-z]+)"/g)].map((m) => m[1]);
       expect(families.length).toBeGreaterThanOrEqual(4);
       expect(demo).toMatch(new RegExp(`<input type="radio" name="brand" value="${families[0]}" checked`));
+      expect(demo).toContain('class="landing-demo__product"');
       for (const family of families) {
         expect(tokens).toContain(`--luz-${family}-60`);
         expect(css, family).toContain(`.landing-demo:has(input[value="${family}"]:checked)`);
