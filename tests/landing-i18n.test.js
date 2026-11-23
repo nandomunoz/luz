@@ -469,6 +469,20 @@ describe("the new home page: catalogs and rendered pages (F5)", () => {
     }
   });
 
+  it("the tokens, core and catalog sections each have a button to the page that lists all their elements, in every language", () => {
+    const LISTS = { inside: "tokens", "inside-2": "components", "inside-3": "catalog" };
+    for (const doc of docs) {
+      const html = rendered.get(doc.route);
+      for (const [id, area] of Object.entries(LISTS)) {
+        const start = html.search(new RegExp(`<section\\b[^>]*\\sid="${id}"`));
+        const end = html.indexOf("<section", start + 1);
+        const section = html.slice(start, end);
+        const link = new RegExp(`<a\\b[^>]*class="luz-btn[^"]*"[^>]*href="[^"]*/docs/${area}/"|<a\\b[^>]*href="[^"]*/docs/${area}/"[^>]*class="luz-btn[^"]*"`).exec(section);
+        expect(link, `${doc.route} #${id} has a button to /docs/${area}/`).not.toBeNull();
+      }
+    }
+  });
+
   it("each language renders the seven sections in order and none other at the top level, one h1 and no template syntax left", () => {
     for (const doc of docs) {
       const html = rendered.get(doc.route);
