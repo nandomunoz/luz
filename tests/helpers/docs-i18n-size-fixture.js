@@ -161,6 +161,8 @@ export function makeSite({ languages = ["es", "ar"], probe = false } = {}) {
   mkdirSync(join(repoRoot, "apps/landing"), { recursive: true });
   cpSync(join(REAL_REPO, "apps/landing/i18n"), join(repoRoot, "apps/landing/i18n"), { recursive: true });
   cpSync(join(REAL_REPO, "apps/landing/index.html"), join(repoRoot, "apps/landing/index.html"));
+  // The pages of the levels are the home's template with these fragments
+  cpSync(join(REAL_REPO, "apps/landing/levels"), join(repoRoot, "apps/landing/levels"), { recursive: true });
   // The home's weights, checks and lists are written from the repository (budgets.json against packages/*/dist,
   // the tests, scripts/check-contrast.js): the build of the home reads them in the copy as it does in the real one
   cpSync(join(REAL_REPO, "budgets.json"), join(repoRoot, "budgets.json"));

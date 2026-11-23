@@ -7,9 +7,9 @@
  *     "Human-first, AI-ready"
  *     "Every change starts with a failing test"
  *
- *   Home page    apps/landing/i18n/{en,es,ar}.json carry the statement in `hero.lead` (the second
- *                half of the lead: "... and every change starts with a failing test"), translated
- *                in es and ar; the link to the docs section went with the home's redesign;
+ *   Home page    apps/landing/i18n/{en,es,ar}.json carry the lead in `hero.lead`: since 2026-11-23 two short
+ *                sentences (what LUZ is built on, and its name spelled out), at the owner's request, so the
+ *                home no longer says "every change starts with a failing test": README.md and PRINCIPLES.md do;
  *                apps/landing/index.html writes it as {{html:hero.lead}}; the old built.* keys are gone
  *   README.md, PRINCIPLES.md   both statements before the first `## ` heading
  *   Page         apps/docs/pages/get-started/how-luz-is-built.html: front matter
@@ -46,13 +46,12 @@ describe("the home page says it in three languages", () => {
   const catalog = (code) => JSON.parse(read(`apps/landing/i18n/${code}.json`));
   const textOfHtml = (html) => html.replace(/<[^>]*>/g, "").replace(/&amp;/g, "&").replace(/\s+/g, " ").trim();
 
-  it("English says it in the lead, in one sentence", () => {
+  it("English says what LUZ is built on in the lead, in two short sentences", () => {
     // README.md and PRINCIPLES.md keep STATEMENT and LINE
     const lead = catalog("en")["hero.lead"];
-    // It also says what to do with LUZ: start a project, or migrate one page by page; it spells the name out (four strong words)
+    // It says what LUZ is built on and spells the name out (four strong words)
     expect([...lead.matchAll(/<strong\b[^>]*>([^<]*)<\/strong>/g)].map((m) => m[1])).toEqual(["LUZ", "Light", "Usable", "Zero-dependency"]);
-    expect(textOfHtml(lead)).toBe("Tokens, CSS and a little vanilla JavaScript, built on what the browser already does: start a project with LUZ, the Light, Usable and Zero-dependency design system, or migrate it page by page. Every component works before JavaScript loads, and every change starts with a failing test.");
-    expect(textOfHtml(lead).toLowerCase()).toContain(LINE.toLowerCase());
+    expect(textOfHtml(lead)).toBe("Tokens, CSS and a little vanilla JavaScript, built on what the browser already does. Start with LUZ, the Light, Usable and Zero-dependency design system.");
   });
 
   it.each(["es", "ar"])("%s has the lead, translated: not the English text, and no English left but a name", (code) => {

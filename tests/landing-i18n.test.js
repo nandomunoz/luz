@@ -19,6 +19,7 @@ import { generatorStrings, giveHomeSources } from "./helpers/home-sources.js";
 import { findAll, parse, query, textOf } from "./helpers/html-dom.js";
 import { quoted } from "./helpers/quoted-attributes.js";
 import { warnIfOver } from "./helpers/warn-if-over.js";
+import { levelPagesOf } from "./helpers/level-pages.js";
 
 // The home is written without the quotes a value does not need: these tests read it with them restored
 const renderQuoted = (...args) => quoted(renderDocument(...args));
@@ -394,7 +395,7 @@ describe("the new home page: catalogs and rendered pages (F5)", () => {
   const site = scanSite(join(repo, "apps/docs"), repo);
   const template = readFileSync(join(repo, "apps/landing/index.html"), "utf-8");
   const docs = landingDocuments(site, "apps/landing/index.html", template);
-  const { rendered: written, problems } = buildSite(site, { extra: docs });
+  const { rendered: written, problems } = buildSite(site, { extra: [...docs, ...levelPagesOf(site, template)] });
   // What the build wrote (its size is what the ceiling weighs) and the same page with the quotes of its values restored
   const rendered = new Map([...written].map(([route, page]) => [route, quoted(page)]));
   const SECTIONS = ["hero", "light", "inside", "inside-2", "inside-3", "inside-4", "faq"];

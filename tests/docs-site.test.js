@@ -14,6 +14,7 @@ import { PROMPT_KINDS, promptRoute } from "../scripts/docs-site/prompts.js";
 import { classesOf, findAll, hasClass, isInside, isLive, parse, query, queryAllLive, textOf } from "./helpers/html-dom.js";
 import { PATTERN_AREAS } from "./helpers/package-areas.js";
 import { quoted } from "./helpers/quoted-attributes.js";
+import { levelPagesOf } from "./helpers/level-pages.js";
 import { readIndex, search } from "../packages/catalog/src/search.js";
 import {
   SEARCH_INDEX_ROUTE,
@@ -485,7 +486,12 @@ describe("the LUZ docs site", () => {
   const site = scanSite(join(repo, "apps/docs"), repo);
   const landing = landingDocuments(site, "apps/landing/index.html", readFileSync(join(repo, "apps/landing/index.html"), "utf-8"));
   const homes = landing.map((d) => d.route);
-  const { rendered, problems } = buildSite(site, { extra: landing });
+  // The pages of the levels (/tokens/, /core/, /components/) are built so every link and every key is checked, and left out of what
+  // the tests below walk: they are start pages like the home, not docs pages
+  const levels = levelPagesOf(site);
+  const levelRoutes = new Set(levels.map((d) => d.route));
+  const withoutLevels = (built) => ({ ...built, rendered: new Map([...built.rendered].filter(([route]) => !levelRoutes.has(route))) });
+  const { rendered, problems } = withoutLevels(buildSite(site, { extra: [...landing, ...levels] }));
   // /debug/ is a tool page of the real site (scripts/docs-site/debug.js), not a docs page: no site header, sidebar, h1 of .docs-title or pager.
   // The tests about the docs pages leave it out on purpose; its own tests (tests/debug-*.test.js) and the one below say what it has instead.
   const DEBUG = "/debug/";
@@ -613,7 +619,7 @@ describe("the LUZ docs site", () => {
     // F7: the navbar, the sidebar, the terminal and the timeline are pages of the Catalog area now; so are the bar list and the three charts since 2026-11-03, and the select became a control of Choice, one of the four pages of Form fields, since 2026-11-05 (the old form page became Inputs, Choice, Values and Field parts: 31 pages of components)
     const components = site.pages.filter((p) => p.meta.area === "components" && p.meta.group && p.meta.group !== "helpers");
     expect(components).toHaveLength(31);
-    const withLanguages = buildSite(site, { extra: landing, languages: true, unchecked: homes });
+    const withLanguages = withoutLevels(buildSite(site, { extra: [...landing, ...levels], languages: true, unchecked: homes }));
     // Every language of the home page is a start page; only Spanish has docs, so a link from the Arabic home goes to the English docs
     const homeCodes = homes.filter((h) => h !== "/").map((h) => h.replaceAll("/", ""));
     const codes = docsLanguages();

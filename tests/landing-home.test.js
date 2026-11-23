@@ -146,12 +146,17 @@ describe("apps/landing/index.html: the template of the home", () => {
     expect(at("/apps/landing/light/light.css")).toBeGreaterThan(-1);
   });
 
-  it("writes the sections of the home in order: the hero and the light first, then the levels, why, native, modes and the FAQ", () => {
+  it("writes the sections of the home in order: the hero and the light first, then the four levels and the FAQ", () => {
     const main = html.slice(html.indexOf("<main"), html.indexOf("</main>"));
     const ids = [...main.matchAll(/<section\b[^>]*\sid="([^"]+)"/g)].map((m) => m[1]);
-    expect(ids).toEqual(["hero", "light", "inside", "inside-2", "inside-3", "inside-4", "why", "native", "modes", "faq"]);
+    expect(ids).toEqual(["hero", "light", "inside", "inside-2", "inside-3", "inside-4", "faq"]);
     expect(main.match(/<h1\b/g)).toHaveLength(1);
-    expect(html, "no link to a section that went").not.toMatch(/href="#(?:fit|type|start)"/);
+    expect(html, "no link to a section that went").not.toMatch(/href="#(?:fit|type|start|why|native|modes)"/);
+  });
+
+  it("the why, native and modes sections went (owner, 2026-11-23): nothing is left of them", () => {
+    expect(html).not.toMatch(/<section\b[^>]*\sid="(?:why|native|modes|fit)"/);
+    expect(html).not.toMatch(/landing-(?:why|fit|modes)\b|\{\{(?:weights|checks|packages)\}\}|\{\{t:(?:why|native|modes|fit)\./);
   });
 
   it("the first screen holds the hero and the light, and the hero's first action goes to the levels", () => {
@@ -168,22 +173,6 @@ describe("apps/landing/index.html: the template of the home", () => {
     expect(first.slice(heroAt, lightAt)).toContain('href="#inside"');
   });
 
-  it("writes the two fit lists at the end of #why, each with its own h3 and its three items, no section of their own", () => {
-    const why = html.slice(html.search(/<section\b[^>]*\sid="why"/));
-    const body = why.slice(0, why.indexOf("</section>"));
-    const fit = body.slice(body.indexOf('class="landing-fit"'));
-    expect(fit.indexOf("{{t:fit.good}}")).toBeGreaterThan(-1);
-    expect(fit.indexOf("{{t:fit.bad}}")).toBeGreaterThan(fit.indexOf("{{t:fit.good}}"));
-    const lists = [...fit.matchAll(/<ul\b[\s\S]*?<\/ul>/g)].map((m) => m[0]);
-    expect(lists).toHaveLength(2);
-    for (const list of lists) expect(list.match(/<li>/g)).toHaveLength(3);
-    // The marks are drawn, not read: the text of the item says it, and the picture is hidden
-    for (const list of lists) for (const svg of list.match(/<svg\b[^>]*>/g)) expect(svg).toContain('aria-hidden="true"');
-    expect(fit.match(/<h3\b/g)).toHaveLength(2);
-    expect(body.indexOf('class="landing-why"'), "after the three words").toBeLessThan(body.indexOf('class="landing-fit"'));
-    expect(html).not.toMatch(/<section\b[^>]*\sid="fit"/);
-  });
-
   it("the type section went with its quote and its scale: nothing is left of it", () => {
     expect(html).not.toMatch(/<section\b[^>]*\sid="type"/);
     expect(html).not.toContain("type.scale");
@@ -195,25 +184,4 @@ describe("apps/landing/index.html: the template of the home", () => {
     expect(html).not.toMatch(/style="[^"]*(#[0-9a-fA-F]{3,8}|rgb\(|hsl\()/);
   });
 
-  it("the three boxes of #modes are scopes: data-theme on a div, one each, a picture hidden from the tree", () => {
-    const modes = html.slice(html.search(/<section\b[^>]*\sid="modes"/), html.indexOf("</main>"));
-    for (const mode of ["light", "dark", "high-contrast"]) {
-      expect(modes.match(new RegExp(`<div\\b[^>]*\\sdata-theme="${mode}"`, "g")) ?? [], mode).toHaveLength(1);
-    }
-    const pictures = modes.match(/<div class="landing-cut__picture"[^>]*>/g);
-    expect(pictures).toHaveLength(3);
-    for (const picture of pictures) expect(picture).toMatch(/\binert\b[^>]*aria-hidden="true"/);
-  });
-
-  it("each box has a button for its mode, hidden until the script runs: it needs JavaScript, so it is not there without", () => {
-    const modes = html.slice(html.search(/<section\b[^>]*\sid="modes"/), html.indexOf("</main>"));
-    const buttons = [...modes.matchAll(/<button\b[^>]*>/g)].map((m) => m[0]);
-    expect(buttons.map((tag) => tag.match(/data-apply-mode="([^"]+)"/)?.[1])).toEqual(["light", "dark", "high-contrast"]);
-    for (const tag of buttons) {
-      expect(tag).toContain('type="button"');
-      expect(tag).toContain('aria-pressed="false"');
-      expect(tag).toMatch(/\shidden\b/);
-      expect(tag).toContain("data-needs-js");
-    }
-  });
 });

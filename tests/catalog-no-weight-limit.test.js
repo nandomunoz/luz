@@ -97,30 +97,12 @@ describe("the docs page How LUZ is built promises a ceiling for tokens and core,
   });
 });
 
-describe("the home no longer says every package has a size ceiling: tokens and core do, catalog does not", () => {
-  const text = (code) => JSON.parse(read(`apps/landing/i18n/${code}.json`))["why.light.text"];
-  /** The sentences of a value, split after . or the Arabic full stop that ends a sentence. */
-  const sentences = (value) => value.split(/(?<=[.\u06D4])\s+/);
+describe("the home does not say every package has a size ceiling: tokens and core do, catalog does not", () => {
+  // The paragraph that said it went with the home's "Three words" section (owner, 2026-11-23); nothing may say it again
+  const CLAIM = { en: /each package has a size ceiling/, es: /cada paquete tiene un techo/, ar: /لكل حزمة[^.\u06D4]*سقف/ };
 
-  it("in English", () => {
-    const value = text("en");
-    expect(value).not.toMatch(/each package has a size ceiling/);
-    expect(value).toMatch(/\btokens and core\b/i);
-    expect(sentences(value).find((sentence) => /ceiling/.test(sentence)), "the sentence with the ceiling").toMatch(/tokens and core/i);
-    expect(sentences(value).filter((sentence) => /catalog/i.test(sentence) && /ceiling|limit/i.test(sentence)), "a sentence about catalog that promises a ceiling").toEqual([]);
-  });
-
-  it("in Spanish", () => {
-    const value = text("es");
-    expect(value).not.toMatch(/cada paquete tiene un techo/);
-    expect(sentences(value).find((sentence) => /techo/.test(sentence)), "the sentence with the ceiling").toMatch(/tokens y core/i);
-    expect(sentences(value).filter((sentence) => /catalog/i.test(sentence) && /techo|límite/i.test(sentence)), "a sentence about catalog that promises a ceiling").toEqual([]);
-  });
-
-  it("in Arabic", () => {
-    const value = text("ar");
-    expect(value).not.toContain("لكل حزمة");
-    expect(sentences(value).find((sentence) => sentence.includes("سقف")), "the sentence with the ceiling").toMatch(/tokens/);
-    expect(sentences(value).filter((sentence) => /catalog/i.test(sentence) && sentence.includes("سقف")), "a sentence about catalog that promises a ceiling").toEqual([]);
+  it.each(["en", "es", "ar"])("%s: no value of the catalog promises a ceiling for every package", (code) => {
+    const catalog = JSON.parse(read(`apps/landing/i18n/${code}.json`));
+    for (const [key, value] of Object.entries(catalog)) expect(value, `${code} ${key}`).not.toMatch(CLAIM[code]);
   });
 });

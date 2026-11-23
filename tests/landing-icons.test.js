@@ -48,7 +48,7 @@ describe("the icons of the home page follow the one family of the Icons page", (
 
   it("draws an inline icon of the page as shapes straight in its svg, with no group that carries the stroke", () => {
     const inline = findAll(tree, (n) => n.name === "svg" && (n.attrs.get("class") ?? "").split(/\s+/).includes("ic") && !find(n, (c) => c.name === "use"));
-    expect(inline.length, "the inline icons of the levels, the kinds and the eyebrows").toBeGreaterThan(8);
+    expect(inline.length, "the inline icons of the kinds and the eyebrows").toBeGreaterThan(4);
     const grouped = inline.filter((svg) => queryAll(svg, "g").length > 0);
     expect(grouped).toHaveLength(0);
     for (const svg of inline) expect(svg.attrs.get("viewbox")).toBe("0 0 24 24");

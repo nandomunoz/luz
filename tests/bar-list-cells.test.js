@@ -184,22 +184,6 @@ describe("the page of the bar list has a second example, In cells", () => {
   });
 });
 
-describe("the second example is the home's pattern", () => {
-  it("has the elements and the classes of the home's chart of weights, row by row and in the caption", () => {
-    const home = parse(buildReal().rendered.get("/"), "/");
-    const chart = findAll(home, (n) => n.name === "figure" && classesOf(n).includes("luz-bar-list--cells"))[0];
-    expect(chart, "the home has a chart in cells").toBeTruthy();
-    const docs = query(parse(cellsPart(english()), ROUTE), "figure");
-    expect(classesOf(docs)).toEqual(classesOf(chart));
-    const homeRow = query(chart, "li.luz-bar-list__row");
-    const docsRow = query(docs, "li.luz-bar-list__row");
-    expect(shapeOf(docsRow)).toEqual(shapeOf(homeRow));
-    expect(shapeOf(query(docs, "figcaption"))).toEqual(shapeOf(query(chart, "figcaption")));
-    expect(shapeOf(query(docs, "ul"))[0]).toEqual(shapeOf(query(chart, "ul"))[0]);
-    expect(new Set(shapeOf(docs))).toEqual(new Set(shapeOf(chart)));
-  });
-});
-
 describe("the Spanish page", () => {
   it("has the h3 example-cells, En celdas, after the first example and before the known issues", () => {
     const es = read(ES_FILE);

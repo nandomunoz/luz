@@ -188,7 +188,7 @@ describe("the sheet is linked as a catalog sheet by the debug page and by the ex
 
 /* ---- The home ---------------------------------------------------------------------------------------------------------- */
 
-describe("the home page uses the bar list, and keeps no bar chart of its own", () => {
+describe("the home page keeps no bar chart of its own", () => {
   const OWN = /landing-bar|landing-chart/;
 
   it("has no class of the old charts in its stylesheet, its template or the generator", () => {
@@ -198,31 +198,6 @@ describe("the home page uses the bar list, and keeps no bar chart of its own", (
     for (const file of readdirSync(join(root, "apps/landing/i18n")).filter((f) => f.endsWith(".json"))) expect(read(`apps/landing/i18n/${file}`), file).not.toMatch(OWN);
   });
 
-  it("links the sheet of catalog in its template, after luz.css, and no sheet of core's but luz.css", () => {
-    const links = [...read("apps/landing/index.html").matchAll(/<link rel="stylesheet" href="([^"]+)"/g)].map((m) => m[1]);
-    const at = links.indexOf("/packages/catalog/dist/components/bar-list.css");
-    expect(at, "a link to catalog's bar-list.css").toBeGreaterThan(links.indexOf("/packages/core/dist/luz.css"));
-    expect(links).not.toContain("/packages/core/dist/components/bar-list.css");
-    expect(links.filter((href) => href.startsWith("/packages/core/"))).toEqual(["/packages/core/dist/luz.css"]);
-  });
-
-  it.each(["/", "/es/", "/ar/"])("%s: the three charts are figures of the bar list in cells, each row a name, a figure and a hidden meter, and no old class is left", (route) => {
-    const html = buildReal().rendered.get(route);
-    expect(html).not.toMatch(OWN);
-    expect(sheets(html), route).toContain("/packages/catalog/dist/components/bar-list.css");
-    expect(html.match(/<figure class="?luz-bar-list luz-bar-list--cells"?>/g), "three charts").toHaveLength(3);
-    expect(html.match(/<ul class="?luz-bar-list__rows"? aria-label=/g), "each list keeps its name").toHaveLength(3);
-    const rows = html.match(/<li class="?luz-bar-list__row\b/g).length;
-    expect(html.match(/<span class="?luz-bar-list__name"?>/g)).toHaveLength(rows);
-    expect(html.match(/<span class="?luz-bar-list__figure"?>/g)).toHaveLength(rows);
-    const meters = html.match(/<meter\b[^>]*>/g);
-    expect(meters).toHaveLength(rows);
-    for (const meter of meters) {
-      expect(meter, "the meter is the bar's, with no class of core's meter").toMatch(/class="?luz-bar-list__meter"?/);
-      expect(meter).not.toMatch(/luz-meter/);
-      expect(meter, "a picture of a figure that is text").toMatch(/aria-hidden="?true"?/);
-    }
-  });
 });
 
 /* ---- DESIGN.md --------------------------------------------------------------------------------------------------------- */

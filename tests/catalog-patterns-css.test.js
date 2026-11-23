@@ -536,7 +536,8 @@ describe("the home page and the docs footer are built on the landing patterns an
     expect(home).toMatch(/<body class="[^"]*\bo-page\b/);
     expect(home).toMatch(/<main[^>]*class="[^"]*\bluz-main\b/);
     expect(home).toMatch(/<section class="[^"]*\bluz-hero\b[^"]*\bo-grid\b[^"]*\bo-grid--split\b|<section class="[^"]*\bo-grid\b[^"]*\bo-grid--split\b[^"]*\bluz-hero\b/);
-    expect(home).toMatch(/\bluz-section\b/);
+    // the sections of the home are its levels; `.luz-section` is the pages of the levels' (apps/landing/levels)
+    expect(home).toMatch(/<section class="[^"]*\blanding-inside\b/);
     expect(home).toMatch(/<footer[^>]*class="[^"]*\bluz-site-footer\b|<footer[^>]*>\s*<div class="[^"]*\bluz-site-footer\b/);
     expect(home).toMatch(/\bo-actions\b/);
   });
