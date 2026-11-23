@@ -2582,6 +2582,24 @@ home-light:defined ~ .landing-light__nojs {
   }
 }
 
+/* On a phone the frames go: the band keeps its tint with no border, and the
+   demo sits on it with no border, no shadow and no side padding, so its
+   content has the whole width */
+@media (max-width: 640px) {
+  .landing-tokens__hero {
+    border: 0;
+    border-radius: 0;
+  }
+
+  .landing-tokens__stage {
+    padding-inline: 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+  }
+}
+
 /* The title and the looks, centred over the two columns */
 .landing-demo__top {
   grid-column: 1 / -1;
