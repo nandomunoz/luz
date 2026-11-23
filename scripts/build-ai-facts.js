@@ -10,6 +10,7 @@
  *                                  {{title}} for the script to fill
  *   references/kinds/<kind>.md     what to ask for that kind of site: the preset of the prompt, without its skeleton
  *   references/stacks.md           where each stack loads LUZ and which extensions the check reads
+ *   references/agents.md           the agents and skills of luz-ai that the skill can add, from their own front matter
  *
  * A starter is a text for the person's own site, not a page of this repository, so it is `.html.tpl`: nothing here loads it,
  * and the CDN addresses in it are the ones the prompts print (RL-12 reads the `.html` pages of packages/ and apps/).
@@ -18,7 +19,7 @@
  *
  * Usage: node scripts/build-ai-facts.js (from the repo root) writes the files.
  */
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { PUBLISHED } from "./luz-packages.js";
@@ -27,6 +28,7 @@ import { assemblePrompt } from "./docs-site/prompts.js";
 
 const repo = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const SKILL = "packages/ai/skills/luz-start";
+export { BY_NEED };
 export const FACTS_FILE = `${SKILL}/assets/facts.json`;
 
 const readJson = (root, file) => JSON.parse(readFileSync(join(root, file), "utf-8"));
@@ -83,6 +85,53 @@ function stacksReference(root) {
   return ["# Where each stack loads LUZ", "", ...rows, ""].join("\n");
 }
 
+/** name, description and tools of an agent or a skill, from its front matter (a value in quotes is JSON). */
+function frontOf(text) {
+  const block = text.match(/^---\n([\s\S]*?)\n---/)?.[1] ?? "";
+  const field = (key) => {
+    const v = block.match(new RegExp(`^${key}:[ ]*(.*)$`, "m"))?.[1]?.trim() ?? "";
+    return v.startsWith('"') ? JSON.parse(v) : v;
+  };
+  return { name: field("name"), description: field("description"), tools: field("tools") };
+}
+
+// What the person says matters to them, and the agent for it: the choice the skill offers. The names are checked
+// against the agents the package has (tests/ai-start.test.js), so an agent renamed or removed fails there.
+const BY_NEED = [
+  ["Found by search engines and by AI assistants", "luz-seo-geo-specialist"],
+  ["Usable by everyone, with a keyboard, a screen reader or a small screen", "luz-accessibility-auditor"],
+  ["Fast on a phone", "luz-core-web-vitals-optimizer"],
+  ["The site has an AI feature (a chatbot, an assistant, AI search); a site with none does not need it", "luz-ai-auditor"],
+];
+
+function agentsReference(root) {
+  const dir = join(root, SKILL, "assets");
+  const agents = readdirSync(join(dir, "agents")).filter((f) => f.endsWith(".md")).sort().map((f) => frontOf(readFileSync(join(dir, "agents", f), "utf-8")));
+  const skills = readdirSync(join(dir, "skills"), { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => frontOf(readFileSync(join(dir, "skills", e.name, "SKILL.md"), "utf-8")));
+  return [
+    "# The agents and skills of luz-ai",
+    "",
+    "Offer the ones that fit what the person says matters to them, the recommended first. Never offer one they do not need. `agent list` gives the fields of each agent.",
+    "",
+    "## By what matters to the person",
+    "",
+    ...BY_NEED.map(([need, name]) => `- ${need}: \`${name}\`.`),
+    "",
+    "## Agents",
+    "",
+    "Each is a base template with fields left to fill. `agent add <name> --for <assistants>` writes it for Claude Code, Gemini CLI or Codex. A field left out stays `[ADAPT: …]`, and the agent stops and asks until it is filled.",
+    "",
+    ...agents.map((a) => `- \`${a.name}\` (tools: ${a.tools}): ${a.description}`),
+    "",
+    "## Skills",
+    "",
+    "`skill add <name>` writes the skill folder in `.agents/skills` and in `.claude/skills`.",
+    "",
+    ...skills.map((s) => `- \`${s.name}\`: ${s.description}`),
+    "",
+  ].join("\n");
+}
+
 /** Every generated file of the skill, by path under the repository. */
 export function buildAiFiles({ root = repo } = {}) {
   const facts = buildAiFacts({ root });
@@ -93,6 +142,7 @@ export function buildAiFiles({ root = repo } = {}) {
     files[`${SKILL}/references/kinds/${kind}.md`] = kindReference(kind, prompt);
   }
   files[`${SKILL}/references/stacks.md`] = stacksReference(root);
+  files[`${SKILL}/references/agents.md`] = agentsReference(root);
   return files;
 }
 

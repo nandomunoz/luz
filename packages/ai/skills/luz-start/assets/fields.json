@@ -1,7 +1,14 @@
 {
-  "$comment": "The closed lists of front matter fields, per kind of file and per target. Claude Code ignores a misspelled field without a word, so the check reads these. The portable six are the open Agent Skills specification; the rest are Claude Code's own (dashes in a skill, camelCase in a subagent). A target is added here, with a test, when its list has been read at the source.",
+  "$comment": "The closed lists of front matter fields, per kind of file and per target. Claude Code ignores a misspelled field without a word, so the check reads these. The portable six are the open Agent Skills specification; the rest are Claude Code's own (dashes in a skill, camelCase in a subagent). A target is added here, with a test, when its list has been read at the source. The Gemini CLI list is read at geminicli.com/docs/core/subagents (2026-11-23); the Codex one at learn.chatgpt.com/docs/agent-configuration/subagents, which does not claim its list is complete.",
   "skill": {
-    "portable": ["name", "description", "license", "compatibility", "metadata", "allowed-tools"],
+    "portable": [
+      "name",
+      "description",
+      "license",
+      "compatibility",
+      "metadata",
+      "allowed-tools"
+    ],
     "claude": [
       "name",
       "description",
@@ -43,7 +50,37 @@
       "isolation",
       "color",
       "initialPrompt"
+    ],
+    "gemini": [
+      "name",
+      "description",
+      "kind",
+      "tools",
+      "mcpServers",
+      "model",
+      "temperature",
+      "max_turns",
+      "timeout_mins"
+    ],
+    "codex": [
+      "name",
+      "description",
+      "developer_instructions",
+      "model",
+      "model_reasoning_effort",
+      "model_reasoning_summary",
+      "model_verbosity"
+    ],
+    "codexTables": [
+      "features",
+      "skills"
     ]
   },
-  "limits": { "description": 1024, "compatibility": 500, "name": 64, "bodyLines": 500, "agentsMdBytes": 32768 }
+  "limits": {
+    "description": 1024,
+    "compatibility": 500,
+    "name": 64,
+    "bodyLines": 500,
+    "agentsMdBytes": 32768
+  }
 }

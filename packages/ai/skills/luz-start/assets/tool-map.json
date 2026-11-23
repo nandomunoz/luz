@@ -1,0 +1,16 @@
+{
+  "$comment": "Claude Code tool names to the names Gemini CLI uses in the tools list of a subagent. Read at geminicli.com/docs/core/subagents (2026-11-23), which names read_file and grep_search and does not name a tool to list files, edit or run commands: a null is a tool with no verified name. A tool that only reads and has no name is left out (the agent has fewer tools, never more); a tool in `acting` with no name makes the agent not writable for Gemini CLI. Add a name here once it is read at its source, with a test.",
+  "gemini": {
+    "Read": "read_file",
+    "Grep": "grep_search",
+    "Glob": null,
+    "Edit": null,
+    "Write": null,
+    "Bash": null
+  },
+  "acting": [
+    "Edit",
+    "Write",
+    "Bash"
+  ]
+}

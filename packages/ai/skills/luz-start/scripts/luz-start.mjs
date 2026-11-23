@@ -13,7 +13,7 @@
  *
  * Exit codes: 0 nothing blocks, 1 a problem blocks, 2 the command was used wrongly.
  */
-import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { existsSync, lstatSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { basename, dirname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
@@ -38,6 +38,8 @@ Usage:
 
 Commands:
   site new  write the starter page of a kind of site and a stack (--dry-run shows it first)
+  agent     list the agents of luz-ai, or add one to a project for Claude Code, Gemini CLI or Codex
+  skill     list the skills of luz-ai, or add one to a project (.agents/skills and .claude/skills)
   facts     the versions, the kinds of site and the stacks of this release
   doctor    the project, the assistants it has and whether their skills and agents pass check
   check     the front matter and the body of skills (SKILL.md) and subagents (.md)
@@ -74,6 +76,39 @@ It never asks: a missing flag is an error that says which one and gives an examp
 
 Example:
   luz-start site new --name "Acme" --kind landing --stack vanilla --target ./acme --dry-run
+`;
+
+const HELP_AGENT = `luz-start agent: the agents of luz-ai, written for the assistant the project uses.
+
+Usage:
+  luz-start agent list [--json]
+  luz-start agent add <name> --for <assistants> [--dir <folder>] [--set "Field=value"]... [--dry-run] [--force] [--json]
+
+  --for      claude, gemini, codex, comma separated: one file of the same instructions for each
+  --dir      the project folder, "." by default
+  --set      a value for a field of the agent ([ADAPT: …] in its text); repeat it for each field. A field left
+             out stays [ADAPT], and the agent stops and asks until it is filled
+  --dry-run  print what would be written, write nothing
+  --force    overwrite a file that exists; without it nothing is overwritten
+
+A field value is one plain line of 300 characters or less. Gemini CLI has no verified name for every tool, so an
+agent that needs one it lacks is not written for gemini; Codex cannot limit tools in the agent's file.
+
+Example:
+  luz-start agent add luz-accessibility-auditor --for claude,codex --set "Target conformance level=WCAG 2.2 AA" --dry-run
+`;
+
+const HELP_SKILL = `luz-start skill: the skills of luz-ai.
+
+Usage:
+  luz-start skill list [--json]
+  luz-start skill add <name> [--dir <folder>] [--dry-run] [--force] [--json]
+
+It writes the skill folder in .agents/skills and in .claude/skills of the project, the same files in both.
+Nothing is overwritten without --force.
+
+Example:
+  luz-start skill add luz-readme --dir . --dry-run
 `;
 
 const HELP_FACTS = `luz-start facts: the versions of the LUZ packages, the kinds of site and the stacks of this release.
@@ -155,10 +190,21 @@ function parseFront(front, problems) {
   const data = {};
   const lines = {};
   let map = null;
+  let last = null;
   front.forEach((text, i) => {
     const line = i + 2;
     if (!text.trim() || text.trim().startsWith("#")) return;
     const indented = /^\s+/.test(text);
+    // A list of strings, one level: `tools:` and then `  - read_file` lines
+    const item = indented ? text.match(/^\s+-\s+(.+)$/) : null;
+    if (item) {
+      if (last && Array.isArray(data[last])) data[last].push(scalar(item[1], line, problems));
+      else if (last && map && Object.keys(map).length === 0) {
+        data[last] = [scalar(item[1], line, problems)];
+        map = null;
+      } else problems.push({ rule: "yaml/nested", line, message: "a list item with no key above it" });
+      return;
+    }
     const m = text.trim().match(/^([A-Za-z_][A-Za-z0-9_-]*):(?:\s+(.*))?$/);
     if (!m) {
       problems.push({ rule: "yaml/syntax", line, message: `not a "key: value" line: ${text.trim().slice(0, 60)}` });
@@ -176,8 +222,10 @@ function parseFront(front, problems) {
     if (rest.trim() === "") {
       map = {};
       data[key] = map;
+      last = key;
     } else {
       map = null;
+      last = null;
       data[key] = scalar(rest, line, problems);
     }
   });
@@ -198,7 +246,81 @@ function referencesIn(lines) {
     .filter(([target]) => target && !/^[a-z][a-z0-9+.-]*:/i.test(target) && !target.startsWith("/"));
 }
 
+/** The keys of a Codex agent file, a small subset of TOML: strings, booleans, numbers, [tables] and multi-line literal strings. */
+function parseToml(text, problems) {
+  const TRIPLE = "'".repeat(3);
+  const data = {};
+  const lines = text.split(/\r?\n/);
+  let table = "";
+  for (let i = 0; i < lines.length; i++) {
+    const t = lines[i].trim();
+    if (!t || t.startsWith("#")) continue;
+    const header = t.match(/^\[([A-Za-z0-9_.-]+)\]$/);
+    if (header) {
+      table = header[1];
+      data[table] = data[table] ?? { table: true, line: i + 1 };
+      continue;
+    }
+    const m = t.match(/^([A-Za-z0-9_.-]+)\s*=\s*(.*)$/);
+    if (!m) {
+      problems.push({ rule: "toml/syntax", line: i + 1, message: `not a "key = value" line or a [table]: ${t.slice(0, 60)}` });
+      continue;
+    }
+    const [, key, raw] = m;
+    const full = table ? `${table}.${key}` : key;
+    let value;
+    if (raw.startsWith(TRIPLE)) {
+      const start = i;
+      let body = raw.slice(3);
+      while (!body.includes(TRIPLE) && i + 1 < lines.length) body += `\n${lines[++i]}`;
+      if (!body.includes(TRIPLE)) {
+        problems.push({ rule: "toml/syntax", line: start + 1, message: "a multi-line literal string that is never closed" });
+        break;
+      }
+      value = body.slice(0, body.indexOf(TRIPLE)).replace(/^\n/, "");
+      const after = body.slice(body.indexOf(TRIPLE) + 3).trim();
+      if (after && !after.startsWith("#")) problems.push({ rule: "toml/syntax", line: i + 1, message: "text after the closing of a multi-line literal string" });
+    } else if (raw.startsWith('"')) {
+      try {
+        value = JSON.parse(raw);
+      } catch {
+        problems.push({ rule: "toml/syntax", line: i + 1, message: `${key} is a string that is not valid: escape quotes and backslashes inside it` });
+        continue;
+      }
+    } else if (/^(true|false|-?\d+(\.\d+)?)$/.test(raw)) value = raw;
+    else {
+      problems.push({ rule: "toml/syntax", line: i + 1, message: `${key} has a value this check does not read: a quoted string, a number, true or false` });
+      continue;
+    }
+    data[full] = { value, line: i + 1, table };
+  }
+  return data;
+}
+
+function checkToml(file) {
+  const problems = [];
+  const add = (rule, message, line) => problems.push({ rule, message, ...(line ? { line } : {}) });
+  const text = readFileSync(file, "utf-8");
+  const hidden = text.split(/\r?\n/).findIndex((l) => HIDDEN.test(l));
+  if (hidden !== -1) add("chars/hidden", "a hidden, zero-width or bidi control character: text a reader does not see but a model reads", hidden + 1);
+  const data = parseToml(text, problems);
+  for (const [key, entry] of Object.entries(data)) {
+    if (entry.table) {
+      if (!FIELDS.agent.codexTables.includes(key.split(".")[0])) add("field/unknown", `[${key}] is not a table of a Codex agent file (${FIELDS.agent.codexTables.join(", ")})`, entry.line);
+    } else if (!key.includes(".") && !FIELDS.agent.codex.includes(key)) {
+      add("field/unknown", `${key} is not a key of a Codex agent file (${FIELDS.agent.codex.join(", ")}); its source does not claim the list complete, so add a key here once it is read there`, entry.line);
+    }
+  }
+  for (const key of ["name", "description", "developer_instructions"]) {
+    if (typeof data[key]?.value !== "string" || !data[key].value.trim()) add(`${key === "developer_instructions" ? "instructions" : key}/missing`, `${key} is required and must be a string`, data[key]?.line);
+  }
+  const name = data.name?.value;
+  if (typeof name === "string" && !/^[a-z0-9_-]+$/.test(name)) add("name/pattern", `name "${name}" must be lowercase letters, digits, hyphens and underscores`, data.name.line);
+  return problems;
+}
+
 function checkFile(file, kind, target) {
+  if (kind === "codex") return checkToml(file);
   const problems = [];
   const add = (rule, message, line) => problems.push({ rule, message, ...(line ? { line } : {}) });
   const text = readFileSync(file, "utf-8");
@@ -215,17 +337,22 @@ function checkFile(file, kind, target) {
   const { data, lines: at } = parseFront(parts.front, own);
   problems.push(...own);
 
-  const allowed = kind === "skill" ? FIELDS.skill[target] : FIELDS.agent.claude;
+  const agentTarget = file.split(sep).includes(".gemini") ? "gemini" : "claude";
+  const allowed = kind === "skill" ? FIELDS.skill[target] : FIELDS.agent[agentTarget];
+  const who = kind === "skill" ? `a ${target} skill` : agentTarget === "gemini" ? "a Gemini CLI subagent" : "a Claude Code subagent";
   for (const key of Object.keys(data)) {
-    if (!allowed.includes(key)) add("field/unknown", `${key} is not a field of ${kind === "skill" ? `a ${target} skill` : "a Claude Code subagent"} (${allowed.join(", ")}); the assistant ignores it without a word`, at[key]);
+    if (!allowed.includes(key)) add("field/unknown", `${key} is not a field of ${who} (${allowed.join(", ")}); the assistant ignores it without a word`, at[key]);
   }
+  if (agentTarget === "gemini" && kind === "agent" && "tools" in data && !Array.isArray(data.tools)) add("field/type", "tools is a list in a Gemini CLI subagent: one `- name` line for each tool", at.tools);
 
   const name = data.name;
   const stem = kind === "skill" ? basename(dirname(file)) : basename(file, ".md");
   if (typeof name !== "string" || !name) add("name/missing", "name is required", at.name);
   else {
-    if (!NAME.test(name) || name.length > LIMITS.name) add("name/pattern", `name "${name}" must be 1 to ${LIMITS.name} characters: lowercase letters, digits and single hyphens`, at.name);
-    if (name !== stem) add(kind === "skill" ? "name/folder" : "name/file", `name "${name}" must be the ${kind === "skill" ? "folder" : "file"} name "${stem}"`, at.name);
+    const pattern = agentTarget === "gemini" && kind === "agent" ? /^[a-z0-9_-]+$/ : NAME;
+    if (!pattern.test(name) || name.length > LIMITS.name) add("name/pattern", `name "${name}" must be 1 to ${LIMITS.name} characters: lowercase letters, digits and single hyphens`, at.name);
+    // Gemini CLI does not say its name is the file's, so a name of the person's own there is theirs
+    if (name !== stem && !(kind === "agent" && agentTarget === "gemini")) add(kind === "skill" ? "name/folder" : "name/file", `name "${name}" must be the ${kind === "skill" ? "folder" : "file"} name "${stem}"`, at.name);
     if (kind === "skill" && /claude|anthropic/.test(name)) add("name/reserved", `name "${name}" contains claude or anthropic, which the platform reserves`, at.name);
   }
 
@@ -239,6 +366,7 @@ function checkFile(file, kind, target) {
     const body = parts.body.at(-1) === "" ? parts.body.slice(0, -1) : parts.body;
     if (body.length > LIMITS.bodyLines) add("body/long", `the body is ${body.length} lines; the limit is ${LIMITS.bodyLines}: move detail to a file of references/`, parts.bodyStart);
     const base = dirname(file);
+    const named = new Set(referencesIn(body).map(([ref]) => resolve(base, ref)));
     for (const [ref, i] of referencesIn(body)) {
       const path = resolve(base, ref);
       const line = parts.bodyStart + i;
@@ -246,8 +374,9 @@ function checkFile(file, kind, target) {
       else if (!existsSync(path)) add("reference/missing", `${ref} does not exist`, line);
       else if (statSync(path).isFile() && path.endsWith(".md")) {
         // One level deep: a reference does not send the model on to another reference
-        const inner = referencesIn(readFileSync(path, "utf-8").split(/\r?\n/)).filter(([r]) => r.endsWith(".md") && existsSync(resolve(dirname(path), r)));
-        if (inner.length) add("reference/chain", `${ref} points on to ${inner[0][0]}: every reference is named from SKILL.md, one level deep`, line);
+        // A link to a file SKILL.md names too hides nothing: the model can reach it from SKILL.md
+        const inner = referencesIn(readFileSync(path, "utf-8").split(/\r?\n/)).filter(([r]) => r.endsWith(".md") && existsSync(resolve(dirname(path), r)) && !named.has(resolve(dirname(path), r)));
+        if (inner.length) add("reference/chain", `${ref} points on to ${inner[0][0]}, which SKILL.md does not name: name every reference from SKILL.md, one level deep`, line);
       }
     }
   }
@@ -256,7 +385,7 @@ function checkFile(file, kind, target) {
 
 /** What a path means: [{ file, kind }]. */
 function discover(path) {
-  if (statSync(path).isFile()) return [{ file: path, kind: basename(path) === "SKILL.md" ? "skill" : "agent" }];
+  if (statSync(path).isFile()) return [{ file: path, kind: basename(path) === "SKILL.md" ? "skill" : path.endsWith(".toml") ? "codex" : "agent" }];
   if (existsSync(join(path, "SKILL.md"))) return [{ file: join(path, "SKILL.md"), kind: "skill" }];
   const found = [];
   const walk = (dir, depth) => {
@@ -266,13 +395,14 @@ function discover(path) {
         if (existsSync(join(full, "SKILL.md"))) found.push({ file: join(full, "SKILL.md"), kind: "skill" });
         else walk(full, depth + 1);
       } else if (entry.isFile() && entry.name.endsWith(".md") && basename(dir) === "agents") found.push({ file: full, kind: "agent" });
+      else if (entry.isFile() && entry.name.endsWith(".toml") && basename(dir) === "agents") found.push({ file: full, kind: "codex" });
     }
   };
   walk(path, 0);
   return found;
 }
 
-const DEFAULT_PLACES = [".agents/skills", ".claude/skills", ".claude/agents", ".gemini/agents"];
+const DEFAULT_PLACES = [".agents/skills", ".claude/skills", ".claude/agents", ".gemini/agents", ".codex/agents"];
 
 /** `paths` are absolute; with none, the usual places under `base`. */
 function runCheck(paths, base, forced) {
@@ -379,19 +509,10 @@ function planSite(values) {
 function runSite(values) {
   const plan = planSite(values);
   if (plan.error) return { error: plan.error };
-  const target = resolve(values.target);
-  if (existsSync(target) && !statSync(target).isDirectory()) return { error: `${target} is a file, not a folder` };
   const dryRun = Boolean(values["dry-run"]);
-  if (!dryRun) {
-    const exists = plan.files.map((f) => join(target, f.path)).filter(existsSync);
-    if (exists.length && !values.force) return { error: `${exists.join(", ")} exists: nothing was written. Use --force to overwrite it` };
-    for (const f of plan.files) {
-      mkdirSync(dirname(join(target, f.path)), { recursive: true });
-      writeFileSync(join(target, f.path), f.content);
-    }
-  }
-  const files = plan.files.map((f) => ({ path: join(values.target, f.path), bytes: Buffer.byteLength(f.content), ...(dryRun ? { content: f.content } : {}) }));
-  return { report: { ok: true, dryRun, files, todo: plan.todo, next: plan.next } };
+  const written = writeFiles(values.target, plan.files, { dryRun, force: values.force });
+  if (written.error) return written;
+  return { report: { ok: true, dryRun, files: written.files, todo: plan.todo, next: plan.next } };
 }
 
 function siteText({ dryRun, files, todo, next }) {
@@ -399,6 +520,204 @@ function siteText({ dryRun, files, todo, next }) {
   const out = [`site new: ${dryRun ? "would write" : "wrote"} ${files.length} file${files.length === 1 ? "" : "s"} (${bytes} bytes); ${todo} "…" to fill in`];
   for (const f of files) out.push(dryRun ? `--- ${f.path}\n${f.content}` : `  ${f.path}`);
   out.push(`next: ${next.join("; ")}`);
+  return `${out.join("\n")}\n`;
+}
+
+// ---- agents and skills: what the package installs --------------------------------------------------------------
+
+const ASSETS = join(HERE, "../assets");
+const TOOL_MAP = JSON.parse(readFileSync(join(ASSETS, "tool-map.json"), "utf-8"));
+const AGENT_TARGETS = ["claude", "gemini", "codex"];
+const SKILL_PLACES = [".agents/skills", ".claude/skills"];
+const ADAPT = /^\[ADAPT:\s*(.*)\]$/;
+
+const agentNames = () => readdirSync(join(ASSETS, "agents")).filter((f) => f.endsWith(".md")).map((f) => f.slice(0, -3)).sort();
+const skillNames = () => readdirSync(join(ASSETS, "skills"), { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name).sort();
+
+/**
+ * The fields of an agent left to fill: a bullet of its text whose value is `[ADAPT: hint]`. A bullet under a
+ * parent bullet with no value (`- Commands:`) is `Parent/Label`.
+ */
+export function adaptFields(body) {
+  const fields = [];
+  let parent = null;
+  body.split("\n").forEach((text, index) => {
+    const m = text.match(/^(\s*)- ([^:\n]+):\s*(.*)$/);
+    if (!m) return;
+    const [, indent, label, value] = m;
+    if (!indent) parent = value === "" ? label : null;
+    const key = indent && parent ? `${parent}/${label}` : label;
+    const hint = value.match(ADAPT);
+    if (hint) fields.push({ key, hint: hint[1], index });
+  });
+  return fields;
+}
+
+function loadAgent(name) {
+  const parts = split(readFileSync(join(ASSETS, "agents", `${name}.md`), "utf-8"));
+  const { data } = parseFront(parts.front, []);
+  const body = parts.body.join("\n").trim();
+  return { name, description: data.description, tools: String(data.tools ?? "").split(",").map((s) => s.trim()).filter(Boolean), body };
+}
+
+/** The body with the values the person gave in place of their `[ADAPT: …]`; the rest is the package's, byte for byte. */
+function fillAgent(agent, sets) {
+  const fields = adaptFields(agent.body);
+  const unknown = Object.keys(sets).filter((key) => !fields.some((f) => f.key === key));
+  if (unknown.length) return { error: `${agent.name} has no field ${unknown.map((k) => `"${k}"`).join(", ")}; its fields are ${fields.map((f) => `"${f.key}"`).join(", ")}` };
+  const lines = agent.body.split("\n");
+  const filled = [];
+  for (const f of fields) {
+    if (!(f.key in sets)) continue;
+    lines[f.index] = lines[f.index].replace(/\[ADAPT:.*\]\s*$/, () => sets[f.key]);
+    filled.push(f.key);
+  }
+  return { body: lines.join("\n"), filled, unfilled: fields.map((f) => f.key).filter((k) => !filled.includes(k)) };
+}
+
+const front = (name, description, extra) => ["---", `name: ${name}`, `description: ${JSON.stringify(description)}`, ...extra, "---", ""].join("\n");
+
+/** One agent for one assistant: the same instructions, the front matter or keys that assistant reads. */
+function wrapAgent(agent, body, target) {
+  const acting = agent.tools.filter((t) => TOOL_MAP.acting.includes(t));
+  if (target === "claude") return { path: `.claude/agents/${agent.name}.md`, content: `${front(agent.name, agent.description, [`tools: ${agent.tools.join(", ")}`])}\n${body}\n`, notes: [] };
+  if (target === "gemini") {
+    const tools = [];
+    const dropped = [];
+    for (const tool of agent.tools) {
+      if (!(tool in TOOL_MAP.gemini)) return { error: `${agent.name}: the tool ${tool} has no entry in tool-map.json, so it cannot be written for gemini` };
+      if (TOOL_MAP.gemini[tool]) tools.push(TOOL_MAP.gemini[tool]);
+      else if (acting.includes(tool)) return { error: `${agent.name} cannot be written for gemini yet: it needs ${acting.join(" and ")}, and there is no verified Gemini CLI name for ${tool}. Use --for claude or codex` };
+      else dropped.push(tool);
+    }
+    const extra = ["tools:", ...tools.map((t) => `  - ${t}`)];
+    return { path: `.gemini/agents/${agent.name}.md`, content: `${front(agent.name, agent.description, extra)}\n${body}\n`, notes: dropped.length ? [`${agent.name} for gemini: ${dropped.join(", ")} left out, since Gemini CLI has no verified name for it; the agent can read and search, not list`] : [] };
+  }
+  const triple = "'".repeat(3);
+  if (body.includes(triple)) return { error: `${agent.name} holds ${triple}, which a Codex multi-line literal string cannot` };
+  const notes = acting.length ? [] : [`${agent.name} for codex: the agent's file cannot limit its tools or make it read-only, so only its instructions say it does not edit; set the sandbox of the session`];
+  return { path: `.codex/agents/${agent.name}.toml`, content: `name = ${JSON.stringify(agent.name)}\ndescription = ${JSON.stringify(agent.description)}\ndeveloper_instructions = ${triple}\n${body}\n${triple}\n`, notes };
+}
+
+/** `Label=value` from --set: the label as the agent writes it, the value one plain line. */
+function parseSets(list = []) {
+  const sets = Object.create(null);
+  for (const item of list) {
+    const at = item.indexOf("=");
+    const key = at === -1 ? "" : item.slice(0, at).trim();
+    const value = at === -1 ? "" : item.slice(at + 1).trim();
+    if (!key || !value) return { error: `--set takes Label=value, not "${item.slice(0, 40)}"` };
+    if (value.length > 300 || /[\r\n]/.test(value) || HIDDEN.test(value) || value.includes("[ADAPT")) return { error: `the value of "${key}" is one plain line of 300 characters or less, with no control or hidden character and no [ADAPT` };
+    sets[key] = value;
+  }
+  return { sets };
+}
+
+const isLink = (path) => {
+  try {
+    return lstatSync(path).isSymbolicLink();
+  } catch {
+    return false;
+  }
+};
+
+/** Writes `files` ({ path, content }, relative to `dir`), or only reports them. It never overwrites without `force`. */
+function writeFiles(dir, files, { dryRun, force }) {
+  const target = resolve(dir);
+  if (existsSync(target) && !statSync(target).isDirectory()) return { error: `${target} is a file, not a folder` };
+  for (const f of files) {
+    const full = resolve(target, f.path);
+    if (!full.startsWith(target + sep)) return { error: `${f.path} is outside ${target}` };
+  }
+  // A symbolic link in the way (a cloned repository may have one at .claude) could send a write out of the folder
+  for (const f of files) {
+    let at = target;
+    for (const part of ["", ...f.path.split("/")]) {
+      at = join(at, part);
+      if (isLink(at)) return { error: `${relative(target, at) || at} is a symbolic link: nothing was written` };
+    }
+  }
+  if (!dryRun) {
+    const exists = files.map((f) => join(target, f.path)).filter(existsSync);
+    if (exists.length && !force) return { error: `${exists.join(", ")} exists: nothing was written. Use --force to overwrite it` };
+    for (const f of files) {
+      mkdirSync(dirname(join(target, f.path)), { recursive: true });
+      writeFileSync(join(target, f.path), f.content, { flag: force ? "w" : "wx" });
+    }
+  }
+  return { files: files.map((f) => ({ path: join(dir, f.path), bytes: Buffer.byteLength(f.content), ...(dryRun ? { content: f.content } : {}) })) };
+}
+
+function listAgents() {
+  return agentNames().map((name) => {
+    const agent = loadAgent(name);
+    return { name, description: agent.description, tools: agent.tools, fields: adaptFields(agent.body).map((f) => f.key), for: AGENT_TARGETS.filter((t) => !wrapAgent(agent, agent.body, t).error) };
+  });
+}
+
+function listSkills() {
+  return skillNames().map((name) => {
+    const { data } = parseFront(split(readFileSync(join(ASSETS, "skills", name, "SKILL.md"), "utf-8")).front, []);
+    return { name, description: data.description };
+  });
+}
+
+function runAgentAdd(values, name) {
+  if (!name) return { error: `an agent is missing. Example: luz-start agent add ${agentNames()[0]} --for claude --dir . --dry-run (agents: ${agentNames().join(", ")})` };
+  if (!agentNames().includes(name)) return { error: `"${name}" is not an agent (${agentNames().join(", ")})` };
+  if (!values.for) return { error: `--for is missing (${AGENT_TARGETS.join(", ")}, comma separated). Example: luz-start agent add ${name} --for claude,codex --dir . --dry-run` };
+  const targets = [...new Set(values.for.split(",").map((s) => s.trim()))];
+  const bad = targets.find((t) => !AGENT_TARGETS.includes(t));
+  if (bad) return { error: `--for "${bad}" is not one of ${AGENT_TARGETS.join(", ")}` };
+  const { sets, error } = parseSets(values.set);
+  if (error) return { error };
+  const agent = loadAgent(name);
+  const filled = fillAgent(agent, sets);
+  if (filled.error) return { error: filled.error };
+  const files = [];
+  const notes = [];
+  for (const target of targets) {
+    const wrapped = wrapAgent(agent, filled.body, target);
+    if (wrapped.error) return { error: wrapped.error };
+    files.push({ path: wrapped.path, content: wrapped.content });
+    notes.push(...wrapped.notes);
+  }
+  const written = writeFiles(values.dir ?? ".", files, { dryRun: Boolean(values["dry-run"]), force: values.force });
+  if (written.error) return written;
+  return { report: { ok: true, dryRun: Boolean(values["dry-run"]), files: written.files, filled: filled.filled.map((key) => ({ field: key, value: sets[key] })), unfilled: filled.unfilled, notes } };
+}
+
+function runSkillAdd(values, name) {
+  if (!name) return { error: `a skill is missing. Example: luz-start skill add ${skillNames()[0]} --dir . --dry-run (skills: ${skillNames().join(", ")})` };
+  if (!skillNames().includes(name)) return { error: `"${name}" is not a skill (${skillNames().join(", ")})` };
+  const root = join(ASSETS, "skills", name);
+  const rels = readdirSync(root, { recursive: true, withFileTypes: true }).filter((e) => e.isFile()).map((e) => relative(root, join(e.parentPath, e.name)).split(sep).join("/")).sort();
+  const files = SKILL_PLACES.flatMap((place) => rels.map((rel) => ({ path: `${place}/${name}/${rel}`, content: readFileSync(join(root, rel), "utf-8") })));
+  const written = writeFiles(values.dir ?? ".", files, { dryRun: Boolean(values["dry-run"]), force: values.force });
+  if (written.error) return written;
+  return { report: { ok: true, dryRun: Boolean(values["dry-run"]), files: written.files, places: SKILL_PLACES } };
+}
+
+function agentText({ dryRun, files, filled, unfilled, notes }) {
+  const bytes = files.reduce((n, f) => n + f.bytes, 0);
+  const total = filled.length + unfilled.length;
+  const out = [`agent add: ${dryRun ? "would write" : "wrote"} ${files.length} file${files.length === 1 ? "" : "s"} (${bytes} bytes); ${filled.length} of ${total} fields filled, ${unfilled.length} still [ADAPT]`];
+  out.push(...files.map((f) => `  ${f.path}`));
+  if (filled.length) out.push("filled:", ...filled.map((f) => `  - ${f.field}: ${f.value}`));
+  if (unfilled.length) out.push("still [ADAPT], so the agent stops and asks until they are filled:", ...unfilled.map((k) => `  - ${k}`));
+  out.push(...notes.map((n) => `note: ${n}`));
+  return `${out.join("\n")}\n`;
+}
+
+function skillText({ dryRun, files }) {
+  const bytes = files.reduce((n, f) => n + f.bytes, 0);
+  const rows = files.map((f) => `  ${f.path}`);
+  return `${[`skill add: ${dryRun ? "would write" : "wrote"} ${files.length} files (${bytes} bytes)`, ...rows.slice(0, MAX_LINES), ...(rows.length > MAX_LINES ? [`  … and ${rows.length - MAX_LINES} more (use --json)`] : [])].join("\n")}\n`;
+}
+
+function listText(kind, items) {
+  const out = [`${kind}s:`];
+  for (const i of items) out.push(`  ${i.name}: ${i.description}`, ...(i.fields ? [`    fields: ${i.fields.join(", ") || "none"}`, `    for: ${i.for.join(", ")}`] : []));
   return `${out.join("\n")}\n`;
 }
 
@@ -418,8 +737,8 @@ function show(text) {
 export function main(argv) {
   const [command, ...rest] = argv;
   if (command === "--help" || command === "-h") return show(HELP);
-  if (!command) return usage("a command is missing (site new, facts, doctor or check)", true);
-  if (!["site", "facts", "doctor", "check"].includes(command)) return usage(`"${command}" is not a command (site new, facts, doctor, check)`, true);
+  if (!command) return usage("a command is missing (site new, agent, skill, facts, doctor or check)", true);
+  if (!["site", "agent", "skill", "facts", "doctor", "check"].includes(command)) return usage(`"${command}" is not a command (site new, agent, skill, facts, doctor, check)`, true);
   let args;
   try {
     args = parseArgs({
@@ -437,18 +756,36 @@ export function main(argv) {
         lang: { type: "string" },
         "dry-run": { type: "boolean" },
         force: { type: "boolean" },
+        for: { type: "string" },
+        set: { type: "string", multiple: true },
       },
     });
   } catch (error) {
     return usage(error.message);
   }
   const { values, positionals } = args;
-  if (values.help) return show({ site: HELP_SITE, facts: HELP_FACTS, doctor: HELP_DOCTOR, check: HELP_CHECK }[command]);
+  if (values.help) return show({ site: HELP_SITE, agent: HELP_AGENT, skill: HELP_SKILL, facts: HELP_FACTS, doctor: HELP_DOCTOR, check: HELP_CHECK }[command]);
   if (command === "site") {
     if (positionals[0] !== "new" || positionals.length > 1) return usage('"site" takes one word: new');
     const { error, report } = runSite(values);
     if (error) return usage(error);
     process.stdout.write(values.json ? `${JSON.stringify(report, null, 2)}\n` : siteText(report));
+    return 0;
+  }
+  if (command === "agent" || command === "skill") {
+    const [verb, name, ...extra] = positionals;
+    if (!["list", "add"].includes(verb) || extra.length || (verb === "list" && name)) return usage(`"${command}" takes list, or add and a name`);
+    const json = (data) => process.stdout.write(`${JSON.stringify(data, null, 2)}\n`);
+    if (verb === "list") {
+      const items = command === "agent" ? listAgents() : listSkills();
+      if (values.json) json(items);
+      else process.stdout.write(listText(command, items));
+      return 0;
+    }
+    const { error, report } = command === "agent" ? runAgentAdd(values, name) : runSkillAdd(values, name);
+    if (error) return usage(error);
+    if (values.json) json(report);
+    else process.stdout.write(command === "agent" ? agentText(report) : skillText(report));
     return 0;
   }
   if (command === "facts") return show(runFacts(values.json));
