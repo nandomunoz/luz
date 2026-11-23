@@ -1820,7 +1820,7 @@ function tokenSections({ say, tokens, groups, counts, families, read }) {
     const at = (x, y) => `${(x * 40).toFixed(1)},${(44 - y * 40).toFixed(1)}`;
     return `<svg class="landing-tokens__curve" viewBox="-2 -12 44 60" aria-hidden="true"><path class="landing-tokens__axis" d="M0,44 H40 M0,44 V4"/><path pathLength="1" d="M${at(0, 0)} C${at(x1, y1)} ${at(x2, y2)} ${at(1, 1)}"/></svg>`;
   };
-  const card = (name, specimen, code) => `<div class="landing-tokens__scale"><p class="landing-tokens__scale-title">${t(`inside.list.${name}`)}</p>${specimen}${css(code)}</div>`;
+  const card = (name, specimen, code) => `<div class="landing-tokens__scale landing-tokens__scale--${name}"><p class="landing-tokens__scale-title">${t(`inside.list.${name}`)}</p>${specimen}${css(code)}</div>`;
   const row = (cls, items) => `<ul class="landing-tokens__specimen landing-tokens__specimen--${cls}" aria-hidden="true">${items.join("")}</ul>`;
   const ui = (attrs = "") =>
     `<span class="landing-tokens__ui"${attrs}><span class="landing-tokens__ui-title">Aa</span><span class="landing-tokens__ui-line"></span><span class="landing-tokens__ui-line landing-tokens__ui-line--short"></span><span class="landing-tokens__ui-button"></span></span>`;
@@ -1854,7 +1854,7 @@ function tokenSections({ say, tokens, groups, counts, families, read }) {
       const px = (n) => parseFloat(values.get(n)) || 0;
       const widest = Math.max(...mq.map(px));
       return `<div class="landing-tokens__scales">${[
-        card("motion", row("curves", ["standard", "enter", "exit", "spring"].map((step) => `<li>${curve(`--luz-easing-${step}`)}${label(step)}</li>`)), "transition: opacity\n  var(--luz-duration-base)\n  var(--luz-easing-standard);"),
+        card("motion", row("curves", ["standard", "enter", "exit", "spring"].map((step) => `<li><span class="landing-tokens__plot">${curve(`--luz-easing-${step}`)}<span class="landing-tokens__dot" style="--ease:var(${need(`--luz-easing-${step}`)})" aria-hidden="true"><span></span></span></span>${label(step)}</li>`)), "transition: opacity\n  var(--luz-duration-base)\n  var(--luz-easing-standard);"),
         card("breakpoints", row("ruler", mq.map((n) => `<li><span class="landing-tokens__bar landing-tokens__bar--share" style="--share:${(px(n) / widest).toFixed(3)}"></span>${label(`${n.slice("--luz-mq-".length)} ${values.get(n)}`)}</li>`)), "/* a media query reads no property: */\n@media (min-width: 768px) { … }"),
       ].join("")}</div>`;
     },
