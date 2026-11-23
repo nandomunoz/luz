@@ -6,11 +6,11 @@
  */
 import { afterAll, describe, it, expect } from "vitest";
 import { spawnSync } from "node:child_process";
-import { mkdtempSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync, existsSync } from "node:fs";
+import { mkdtempSync, mkdirSync, readdirSync, readFileSync, rmSync, symlinkSync, writeFileSync, existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { buildAiFacts, buildAiFiles } from "../scripts/build-ai-facts.js";
+import { BY_NEED, buildAiFacts, buildAiFiles } from "../scripts/build-ai-facts.js";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const skill = join(root, "packages/ai/skills/luz-start");
@@ -60,7 +60,7 @@ describe("the data beside the script", () => {
 
   it("has every generated file (the facts, a starter page and a reference per kind, the stacks) as the prompts build it", () => {
     const files = buildAiFiles({ root });
-    expect(Object.keys(files).length).toBe(10);
+    expect(Object.keys(files).length).toBe(11);
     for (const [file, text] of Object.entries(files)) expect(read(join(root, file)), `${file} is out of step: run node scripts/build-ai-facts.js`).toBe(text);
   });
 
@@ -476,7 +476,7 @@ describe("the skill", () => {
 
   it("names only commands the script has", () => {
     const help = run(["--help"]).out;
-    for (const m of body.matchAll(/`(site new|facts|check|doctor)\b/g)) expect(help, m[1]).toContain(m[1]);
+    for (const m of body.matchAll(/`(site new|agent|skill|facts|check|doctor)\b/g)) expect(help, m[1]).toContain(m[1]);
   });
 
   it("has no hidden or bidi character in any file", () => {
@@ -484,5 +484,231 @@ describe("the skill", () => {
       const bad = [...read(file)].filter((ch) => /[\u200B-\u200F\u202A-\u202E\u2060-\u206F\uFEFF]/.test(ch) || (ch.codePointAt(0) >= 0xe0000 && ch.codePointAt(0) <= 0xe007f));
       expect(bad, file).toEqual([]);
     }
+  });
+});
+
+describe("the agents and skills of luz-ai", () => {
+  const assets = join(skill, "assets");
+  const AGENTS = ["luz-accessibility-auditor", "luz-ai-auditor", "luz-core-web-vitals-optimizer", "luz-seo-geo-specialist"];
+  const SKILLS = ["luz-create-landing", "luz-create-video", "luz-readme"];
+  const list = (kind) => JSON.parse(run([kind, "list", "--json"]).out);
+  const bodyOf = (text) => text.replace(/^---\n[\s\S]*?\n---\n+/, "").trim();
+  const add = (d, name, flags = []) => run(["agent", "add", name, "--dir", d, "--json", ...flags]);
+
+  it("are the four agents and three skills of the repository luz-ai, kept here and passing the check", () => {
+    expect(list("agent").map((a) => a.name)).toEqual(AGENTS);
+    expect(list("skill").map((s) => s.name)).toEqual(SKILLS);
+    const r = run(["check", "--json", join(assets, "agents"), join(assets, "skills")]);
+    expect(JSON.parse(r.out).problems).toEqual([]);
+    expect(JSON.parse(r.out).checked.length).toBe(7);
+  });
+
+  it("have every agent a startup rule that stops while a field is left, and every field a hint", () => {
+    for (const a of AGENTS) {
+      const text = read(join(assets, "agents", `${a}.md`));
+      expect(text, a).toMatch(/Startup rule/);
+      expect(text, a).toMatch(/\[ADAPT: \.\.\.\]/);
+      expect(text, a).toMatch(/stop and tell the user which fields are missing/);
+    }
+    for (const a of list("agent")) expect(a.fields.length, a.name).toBeGreaterThan(5);
+  });
+
+  it("have a way in the catalogue for what the person says matters, and every name in it exists", () => {
+    const catalogue = read(join(skill, "references/agents.md"));
+    for (const [, name] of BY_NEED) expect(AGENTS, name).toContain(name);
+    for (const name of [...AGENTS, ...SKILLS]) expect(catalogue, name).toContain(`\`${name}\``);
+  });
+
+  it("writes one agent for each assistant: the same instructions, the front matter or keys that assistant reads, each passing check", () => {
+    const d = dir();
+    const r = add(d, "luz-accessibility-auditor", ["--for", "claude,gemini,codex"]);
+    expect(r.code, r.err).toBe(0);
+    const source = bodyOf(read(join(assets, "agents/luz-accessibility-auditor.md")));
+    const claude = read(join(d, ".claude/agents/luz-accessibility-auditor.md"));
+    const gemini = read(join(d, ".gemini/agents/luz-accessibility-auditor.md"));
+    const codex = read(join(d, ".codex/agents/luz-accessibility-auditor.toml"));
+    expect(bodyOf(claude)).toBe(source);
+    expect(bodyOf(gemini)).toBe(source);
+    expect(claude).toMatch(/^tools: Read, Grep, Glob$/m);
+    expect(gemini).toMatch(/^tools:\n {2}- read_file\n {2}- grep_search\n---/m);
+    expect(codex).toMatch(/^name = "luz-accessibility-auditor"$/m);
+    expect(codex).toContain(`developer_instructions = ${"'".repeat(3)}\n${source}\n${"'".repeat(3)}\n`);
+    const c = run(["check", "--json"], d);
+    expect(JSON.parse(c.out).problems).toEqual([]);
+    expect(JSON.parse(c.out).checked.length).toBe(3);
+  });
+
+  it("writes every agent for the assistants that can have it, and says which cannot", () => {
+    const d = dir();
+    const rows = list("agent");
+    for (const a of rows) expect(add(d, a.name, ["--for", a.for.join(",")]).code, a.name).toBe(0);
+    expect(rows.find((a) => a.name === "luz-core-web-vitals-optimizer").for).toEqual(["claude", "codex"]);
+    expect(rows.find((a) => a.name === "luz-seo-geo-specialist").for).toEqual(["claude", "gemini", "codex"]);
+    expect(JSON.parse(run(["check", "--json"], d).out).problems).toEqual([]);
+  });
+
+  it("refuses an agent for Gemini CLI when it needs a tool Gemini CLI has no verified name for, and writes nothing", () => {
+    const d = dir();
+    const r = add(d, "luz-core-web-vitals-optimizer", ["--for", "claude,gemini"]);
+    expect(r.code).toBe(2);
+    expect(r.err).toMatch(/Edit/);
+    expect(readdirSync(d)).toEqual([]);
+  });
+
+  it("fills the fields it is given, one plain line each, and leaves the rest [ADAPT], the stop rule untouched", () => {
+    const d = dir();
+    const r = add(d, "luz-accessibility-auditor", ["--for", "claude", "--set", "Target conformance level=WCAG 2.2 AA", "--set", "Site languages=English and Arabic"]);
+    const out = JSON.parse(r.out);
+    expect(out.filled.map((f) => f.field)).toEqual(["Target conformance level", "Site languages"]);
+    expect(out.unfilled).toHaveLength(5);
+    const text = read(join(d, ".claude/agents/luz-accessibility-auditor.md"));
+    expect(text).toContain("- Target conformance level: WCAG 2.2 AA\n");
+    expect(text).toContain("- Site languages: English and Arabic\n");
+    expect((text.match(/\[ADAPT: [^\n]*\]\n/g) ?? []).length).toBe(5);
+    // Only the filled lines differ from the package's text
+    const was = bodyOf(read(join(assets, "agents/luz-accessibility-auditor.md"))).split("\n");
+    const now = bodyOf(text).split("\n");
+    expect(now.length).toBe(was.length);
+    expect(now.filter((l, i) => l !== was[i])).toEqual(["- Target conformance level: WCAG 2.2 AA", "- Site languages: English and Arabic"]);
+    expect(text).toMatch(/If it still contains\n?\s*`\[ADAPT: \.\.\.\]`|`\[ADAPT: \.\.\.\]` placeholders, stop/);
+  });
+
+  it("fills a field under a parent by Parent/Label", () => {
+    const d = dir();
+    const r = add(d, "luz-core-web-vitals-optimizer", ["--for", "claude", "--set", "Commands/Build=npm run build"]);
+    expect(JSON.parse(r.out).filled).toEqual([{ field: "Commands/Build", value: "npm run build" }]);
+    expect(read(join(d, ".claude/agents/luz-core-web-vitals-optimizer.md"))).toContain("  - Build: npm run build\n");
+  });
+
+  it("refuses a field that is not the agent's, and a value that is not one plain line", () => {
+    const bad = (extra) => add(dir(), "luz-accessibility-auditor", ["--for", "claude", ...extra]);
+    expect(bad(["--set", "Nothing=x"]).code).toBe(2);
+    expect(bad(["--set", "Audit scope"]).code).toBe(2);
+    expect(bad(["--set", "Audit scope=one\ntwo"]).code).toBe(2);
+    expect(bad(["--set", "Audit scope=a\u202Eb"]).code).toBe(2);
+    expect(bad(["--set", "Audit scope=[ADAPT: more]"]).code).toBe(2);
+    expect(bad(["--set", `Audit scope=${"x".repeat(301)}`]).code).toBe(2);
+    expect(bad(["--set", `Audit scope=${"x".repeat(300)}`]).code).toBe(0);
+  });
+
+  it("asks for what is missing, says which, and never overwrites without --force", () => {
+    expect(run(["agent", "add"]).code).toBe(2);
+    expect(run(["agent", "add", "luz-nothing", "--for", "claude"]).code).toBe(2);
+    const noFor = run(["agent", "add", "luz-ai-auditor"]);
+    expect(noFor.code).toBe(2);
+    expect(noFor.err).toContain("--for");
+    expect(add(dir(), "luz-ai-auditor", ["--for", "cursor"]).code).toBe(2);
+    const d = dir({ ".claude/agents/luz-ai-auditor.md": "mine\n" });
+    expect(add(d, "luz-ai-auditor", ["--for", "claude"]).code).toBe(2);
+    expect(read(join(d, ".claude/agents/luz-ai-auditor.md"))).toBe("mine\n");
+    expect(add(d, "luz-ai-auditor", ["--for", "claude", "--force"]).code).toBe(0);
+  });
+
+  it("writes nothing with --dry-run and prints the files, the fields filled and the fields left", () => {
+    const d = dir();
+    const r = run(["agent", "add", "luz-ai-auditor", "--for", "claude,codex", "--dir", d, "--set", "Audit scope=src", "--dry-run"]);
+    expect(r.code).toBe(0);
+    expect(readdirSync(d)).toEqual([]);
+    expect(r.out.split("\n")[0]).toMatch(/would write 2 files .* 1 of 10 fields filled, 9 still \[ADAPT\]/);
+    expect(r.out).toContain("Audit scope: src");
+    expect(r.out).toContain("the agent stops and asks");
+    expect(r.out).toMatch(/note: .*codex/);
+    expect(r.out.length).toBeLessThan(3000);
+    const json = JSON.parse(run(["agent", "add", "luz-ai-auditor", "--for", "claude", "--dir", d, "--dry-run", "--json"]).out);
+    expect(json.files[0].content).toContain("[ADAPT:");
+  });
+
+  it("adds a skill as the same folder in .agents/skills and .claude/skills, and never overwrites without --force", () => {
+    const d = dir();
+    const r = run(["skill", "add", "luz-readme", "--dir", d, "--json"]);
+    expect(r.code, r.err).toBe(0);
+    const rel = (base) => readdirSync(join(d, base, "luz-readme"), { recursive: true }).sort();
+    expect(rel(".agents/skills")).toEqual(rel(".claude/skills"));
+    expect(rel(".agents/skills")).toEqual(expect.arrayContaining(["SKILL.md", "references", "references/anatomy.md"]));
+    for (const f of rel(".agents/skills").filter((x) => x.endsWith(".md"))) expect(read(join(d, ".agents/skills/luz-readme", f))).toBe(read(join(d, ".claude/skills/luz-readme", f)));
+    expect(JSON.parse(run(["check", "--json"], d).out).problems).toEqual([]);
+    expect(run(["skill", "add", "luz-readme", "--dir", d]).code).toBe(2);
+    expect(run(["skill", "add", "luz-readme", "--dir", d, "--force"]).code).toBe(0);
+    expect(run(["skill", "add", "luz-nothing", "--dir", d]).code).toBe(2);
+    expect(run(["skill", "add"]).code).toBe(2);
+  });
+
+  it("never writes through a symbolic link, which a cloned repository may have at .claude", () => {
+    const outside = dir();
+    const d = dir();
+    symlinkSync(outside, join(d, ".claude"));
+    const r = add(d, "luz-ai-auditor", ["--for", "claude"]);
+    expect(r.code).toBe(2);
+    expect(r.err).toMatch(/symbolic link/);
+    expect(readdirSync(outside)).toEqual([]);
+    const dangling = dir();
+    mkdirSync(join(dangling, ".claude/agents"), { recursive: true });
+    symlinkSync(join(outside, "nothing.md"), join(dangling, ".claude/agents/luz-ai-auditor.md"));
+    expect(add(dangling, "luz-ai-auditor", ["--for", "claude", "--force"]).code).toBe(2);
+    expect(readdirSync(outside)).toEqual([]);
+  });
+
+  it("does not read a field called __proto__ or constructor as one", () => {
+    expect(add(dir(), "luz-ai-auditor", ["--for", "claude", "--set", "__proto__=x"]).code).toBe(2);
+    expect(add(dir(), "luz-ai-auditor", ["--for", "claude", "--set", "constructor=x"]).code).toBe(2);
+  });
+
+  it("takes only list or add after the noun", () => {
+    expect(run(["agent"]).code).toBe(2);
+    expect(run(["agent", "remove", "x"]).code).toBe(2);
+    expect(run(["skill", "list", "extra"]).code).toBe(2);
+  });
+});
+
+describe("check: the formats of Gemini CLI and Codex", () => {
+  const gemini = (front, name = "demo") => dir({ [`.gemini/agents/${name}.md`]: `---\n${front}\n---\n\nBody.\n` });
+  const codex = (text, name = "demo") => dir({ [`.codex/agents/${name}.toml`]: text });
+  const TRIPLE = "'".repeat(3);
+  const GOOD_TOML = `name = "demo"\ndescription = "Does a thing."\ndeveloper_instructions = ${TRIPLE}\nLine one.\nLine two.\n${TRIPLE}\n`;
+
+  it("reads a list of tools in a Gemini CLI agent, and fails a string or a field that is not Gemini's", () => {
+    expect(run(["check", "--json", gemini("name: demo\ndescription: x\ntools:\n  - read_file\n  - grep_search\nmax_turns: 5")]).code).toBe(0);
+    expect(rules(run(["check", "--json", gemini("name: demo\ndescription: x\ntools: read_file")]))).toContain("field/type");
+    expect(rules(run(["check", "--json", gemini("name: demo\ndescription: x\nmax-turns: 5")]))).toContain("field/unknown");
+    expect(rules(run(["check", "--json", gemini("name: demo\ndescription: x\ntools:\n  - a\n  - b: c")]))).toContain("yaml/plain-scalar");
+  });
+
+  it("takes a name of its own in a Gemini CLI agent, since Gemini CLI does not say it is the file's", () => {
+    expect(run(["check", "--json", gemini("name: other_name\ndescription: x")]).code).toBe(0);
+    expect(rules(run(["check", "--json", gemini("name: Bad Name\ndescription: x")]))).toContain("name/pattern");
+  });
+
+  it("reads a Codex agent file and needs name, description and developer_instructions", () => {
+    expect(run(["check", "--json", codex(GOOD_TOML)]).code).toBe(0);
+    expect(rules(run(["check", "--json", codex(GOOD_TOML.replace(/description = .*\n/, ""))]))).toContain("description/missing");
+    expect(rules(run(["check", "--json", codex(`name = "demo"\ndescription = "x"\n`)]))).toContain("instructions/missing");
+  });
+
+  it("fails a Codex key that is not one of its keys, a table that is not one, and a string that is not closed", () => {
+    expect(rules(run(["check", "--json", codex(`${GOOD_TOML}sandbox_mode = "read-only"\n`)]))).toContain("field/unknown");
+    expect(rules(run(["check", "--json", codex(`${GOOD_TOML}[mystery]\nx = 1\n`)]))).toContain("field/unknown");
+    expect(run(["check", "--json", codex(`${GOOD_TOML}[features]\nshell_tool = false\n`)]).code).toBe(0);
+    expect(rules(run(["check", "--json", codex(`name = "demo"\ndescription = "x"\ndeveloper_instructions = ${TRIPLE}\nnever closed\n`)]))).toContain("toml/syntax");
+    expect(rules(run(["check", "--json", codex(`name = demo\n${GOOD_TOML}`)]))).toContain("toml/syntax");
+  });
+
+  it("fails text after the closing of a multi-line literal string", () => {
+    const closed = (tail) => GOOD_TOML.slice(0, GOOD_TOML.lastIndexOf(TRIPLE)) + TRIPLE + tail + "\n";
+    expect(rules(run(["check", "--json", codex(closed(" extra"))]))).toContain("toml/syntax");
+    expect(run(["check", "--json", codex(closed(" # a comment"))]).code).toBe(0);
+  });
+
+  it("fails a hidden character in a Codex file", () => {
+    expect(rules(run(["check", "--json", codex(GOOD_TOML.replace("Line one.", "Line \u202E one."))]))).toContain("chars/hidden");
+  });
+
+  it("lets a reference point to another that SKILL.md names, and fails one that it does not", () => {
+    const base = ".agents/skills/demo";
+    const ok = dir({ [`${base}/SKILL.md`]: `${GOOD}\nRead [a](references/a.md) and [b](references/b.md).\n`, [`${base}/references/a.md`]: "See [b](b.md).\n", [`${base}/references/b.md`]: "b\n" });
+    expect(run(["check", "--json", ok]).code).toBe(0);
+  });
+
+  it("looks in .codex/agents when no path is given", () => {
+    expect(JSON.parse(run(["check", "--json"], codex(GOOD_TOML)).out).checked).toEqual([".codex/agents/demo.toml"]);
   });
 });
