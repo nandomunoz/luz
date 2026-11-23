@@ -56,7 +56,7 @@ const tokensPage = () => {
   if (!built) {
     const site = scanSite(join(repo, "apps/docs"), repo);
     const home = read("apps/landing/index.html");
-    const levels = ["tokens", "core", "catalog"].map((name) => ({ name, file: `apps/landing/levels/${name}.html`, html: read(`apps/landing/levels/${name}.html`) }));
+    const levels = ["tokens", "core", "catalog", "ai"].map((name) => ({ name, file: `apps/landing/levels/${name}.html`, html: read(`apps/landing/levels/${name}.html`) }));
     built = buildSite(site, { extra: [...landingDocuments(site, "apps/landing/index.html", home), ...levelDocuments(site, { file: "apps/landing/index.html", html: home }, levels)] });
   }
   return quoted(built.rendered.get("/tokens/"));

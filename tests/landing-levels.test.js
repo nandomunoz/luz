@@ -27,7 +27,7 @@ const LANGS = [["en", "/"], ["es", "/es/"], ["ar", "/ar/"]];
 
 const site = scanSite(join(repo, "apps/docs"), repo);
 const home = read(HOME);
-const levels = NAMES.map((name) => ({ name, file: `apps/landing/levels/${name}.html`, html: read(`apps/landing/levels/${name}.html`) }));
+const levels = [...NAMES, "ai"].map((name) => ({ name, file: `apps/landing/levels/${name}.html`, html: read(`apps/landing/levels/${name}.html`) }));
 const extra = [...landingDocuments(site, HOME, home), ...levelDocuments(site, { file: HOME, html: home }, levels)];
 const built = buildSite(site, { extra });
 /** What the build wrote, with the quotes of its attributes restored to read it. */
