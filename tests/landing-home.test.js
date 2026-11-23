@@ -132,7 +132,7 @@ describe("apps/landing/index.html: the template of the home", () => {
     const at = (needle) => html.indexOf(needle);
     expect(at("/packages/landing/"), "the package landing is gone").toBe(-1);
     // Every class of the landing patterns (F8 names: hero, section, stat, glow, main, site-header, site-footer) the template and the partials it includes use is in a file the page links, and the file comes first
-    const partials = ["header", "site-links", "prompt-dialog", "sky-filter", "footer"].map((name) => read(`apps/site/_partials/${name}.html`)).join("\n");
+    const partials = ["header", "site-links", "sky-filter", "footer"].map((name) => read(`apps/site/_partials/${name}.html`)).join("\n");
     const used = new Set([...(html + partials).matchAll(/\bluz-(?:hero|section|stat|glow|main|site-header|site-footer)(?:__|--)?[a-z0-9_-]*/g)].map((m) => m[0]));
     const classes = JSON.parse(read("packages/catalog/dist/classes.json")).classes;
     const files = new Set([...used].map((name) => classes.find((c) => c.name === name)?.files[0]).filter(Boolean));

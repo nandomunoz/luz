@@ -65,8 +65,6 @@ const LEVELS = [
     list: ['inside.list.catalog'],
   },
 ];
-/** The fourth: a prompt for each kind of site, in the order of the cards (the ids of the prompts and of the pages /docs/kinds/<id>/). */
-const KINDS = ['landing', 'blog', 'app', 'docs'];
 
 /* ---- Helpers ----------------------------------------------------------- */
 
@@ -593,7 +591,7 @@ test.describe('Landing page', () => {
       });
     }
 
-    test('#inside-4: level 4 has an eyebrow, a title, a lead and three points, none of them a weight: a prompt adds nothing to the page', async ({ page }) => {
+    test('#inside-4: level 4 has an eyebrow, a title, a lead and three points, none of them a weight: a skill adds nothing to the page', async ({ page }) => {
       await open(page);
 
       const section = page.locator('section#inside-4');
@@ -714,40 +712,27 @@ test.describe('Landing page', () => {
     });
 
     for (const [route, lang] of ROUTES) {
-      test(`${route}: level 4 is a list of four kinds of site, each with the opener of its prompt and a link to its recipes, and the general prompt under them (${lang})`, async ({ page }) => {
+      test(`${route}: level 4 is the terminal of the LUZ skill to come, with no prompt and no card of a kind of site, and the words say it is not published yet (${lang})`, async ({ page }) => {
         const words = catalog(lang);
         await open(page, route);
 
-        const kinds = page.locator('#inside-4 ul.landing-inside__kinds');
-        await expect(kinds).toHaveAccessibleName(words['inside.l4.panel']);
-        await expect(kinds.locator('> li.landing-kind')).toHaveCount(4);
-        for (const [index, key] of KINDS.entries()) {
-          const kind = kinds.locator('> li').nth(index);
-          await expect(kind).toHaveClass(new RegExp(`landing-kind--${key}\\b`));
-          await expect(kind.locator('h3')).toHaveText(words[`inside.kind.${key}.title`]);
-          await expect(kind.locator('.landing-kind__name p')).toHaveText(words[`inside.kind.${key}.text`]);
-          // No install tabs, no terminal: the card opens a prompt and points at the recipes
-          await expect(kind.locator('.luz-terminal, .luz-tabs, pre')).toHaveCount(0);
-          // The opener is a link to the text of the prompt, a button once the script has run; named by its words and the card's title
-          const opener = kind.locator('a[data-prompt-open], button[data-prompt-title]');
-          await expect(opener).toHaveCount(1);
-          await expect(opener).toHaveAccessibleName(`${words['inside.kind.open']} ${words[`inside.kind.${key}.title`]}`);
-          // The recipes: the page of the kind in the docs of its language; Arabic has none yet, so it says it is English
-          const recipes = kind.getByRole('link', { name: `${words['inside.kind.recipes']} ${words[`inside.kind.${key}.title`]}`, exact: true });
-          await expect(recipes).toHaveAttribute('href', `${lang === 'es' ? '/es' : ''}/docs/kinds/${key}/`);
-          if (lang === 'ar') await expect(recipes).toHaveAttribute('hreflang', 'en');
-          else await expect(recipes).not.toHaveAttribute('hreflang', /./);
-        }
-        const scratch = page.locator('#inside-4').getByRole('button', { name: words['inside.start.open'], exact: true });
-        await expect(scratch).toHaveCount(1);
-        await expect(page.locator('#inside-4')).toContainText(words['inside.start.text']);
+        const cli = page.locator('#inside-4 figure.landing-cli');
+        await expect(cli).toHaveAccessibleName(words['inside.l4.panel']);
+        await expect(cli).toContainText('npx @luz-ds/ai');
+        await expect(page.locator('#inside-4 .landing-kind, #inside-4 [data-prompt-open], #inside-4 a[href^="/prompts/"]')).toHaveCount(0);
+        await expect(page.locator('#inside-4 .landing-cli__note')).toContainText(words['inside.l4.soon']);
+        // The way to the prompts until the skill is out: the kinds of site in the docs of the language; Arabic has none yet, so it says it is English
+        const meanwhile = page.locator('#inside-4').getByRole('link', { name: words['inside.l4.meanwhile'], exact: true });
+        await expect(meanwhile).toHaveAttribute('href', `${lang === 'es' ? '/es' : ''}/docs/kinds/`);
+        if (lang === 'ar') await expect(meanwhile).toHaveAttribute('hreflang', 'en');
+        else await expect(meanwhile).not.toHaveAttribute('hreflang', /./);
       });
     }
 
-    test('the headings go h2 for a level, h3 for a kind of site, with no level skipped', async ({ page }) => {
+    test('level 4 has one heading, its h2: the terminal is a figure, not a list of headed cards', async ({ page }) => {
       await open(page);
 
-      expect(await page.locator('#inside-4 h2, #inside-4 h3').evaluateAll((all) => all.map((h) => h.tagName))).toEqual(['H2', 'H3', 'H3', 'H3', 'H3']);
+      expect(await page.locator('#inside-4 :is(h2, h3, h4)').evaluateAll((all) => all.map((h) => h.tagName))).toEqual(['H2']);
     });
 
     test('from 1024px the text and the panel sit side by side, and every other section is flipped; below, they stack', async ({ page }) => {
@@ -763,7 +748,7 @@ test.describe('Landing page', () => {
       expect(await sides('inside', '.landing-panel')).toEqual({ copyFirst: true, sameRow: true });
       expect(await sides('inside-2', '.landing-panel')).toEqual({ copyFirst: false, sameRow: true });
       expect(await sides('inside-3', '.landing-panel')).toEqual({ copyFirst: true, sameRow: true });
-      expect(await sides('inside-4', '.landing-inside__kinds')).toEqual({ copyFirst: false, sameRow: true });
+      expect(await sides('inside-4', '.landing-cli')).toEqual({ copyFirst: false, sameRow: true });
 
       await page.setViewportSize({ width: 600, height: 900 });
       for (const id of ['inside', 'inside-2']) {
@@ -980,9 +965,11 @@ test.describe('Landing page', () => {
       for (const { n } of LEVELS) {
         for (const pane of ['install', 'list', 'code']) await expect(page.locator(`#in${n}-${pane}`), `level ${n} ${pane}`).toBeVisible();
       }
-      // Level 4 has no install panes: its five prompts are links to their text, and the recipes of each kind a link too
-      for (const id of [...KINDS, 'start']) await expect(page.locator(`#inside-4 a[href="/prompts/${id}.txt"]`), id).toBeVisible();
-      for (const id of KINDS) await expect(page.locator(`#inside-4 a[href="/docs/kinds/${id}/"]`), id).toBeVisible();
+      // Level 4 has no install panes: its terminal shows the whole conversation, still, and the way to the prompts is a link
+      const lines = page.locator('#inside-4 .landing-cli__line');
+      expect(await lines.count()).toBeGreaterThanOrEqual(12);
+      await expect(page.locator('#inside-4 .landing-cli__line:visible')).toHaveCount(await lines.count());
+      await expect(page.locator('#inside-4 a[href="/docs/kinds/"]')).toBeVisible();
     });
 
     test('the controls that need a script are not shown: the Copy buttons', async ({ page }) => {

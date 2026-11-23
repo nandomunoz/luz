@@ -6,7 +6,7 @@
  *   - every character of the .txt is on screen, in order, in the code font, on a ground that is not the dialog's:
  *     one row (.site-prompt__line) per line, an h3 for each "#" / "##" line, the marks (#, -, backticks, ```) kept;
  *   - the line numbers are generated content with an empty alternative: not in the text, not in a selection,
- *     not in the accessibility tree; their gutter is on the left (also in Arabic) and a wrapped line goes on
+ *     not in the accessibility tree; their gutter is on the left and a wrapped line goes on
  *     under its own text;
  *   - while Copy is locked the text cannot be selected (a drag, a triple click, a range copy nothing); once it is
  *     on, the text is selectable and the selection holds the text and no numbers;
@@ -35,11 +35,11 @@ const MIN_TEXT = 4.5;
 
 const catalog = (code) => JSON.parse(readFileSync(new URL(`../apps/landing/i18n/${code}.json`, import.meta.url), 'utf-8'));
 
-/** Where the start prompt opens in each language: the docs page, or the home when the docs have no such language. */
+/** Where the start prompt opens in each language: its docs page. Arabic has no docs and the home has no prompt
+ * since the terminal of its fourth level (tests/home-cli.spec.js), so no page opens the dialog in Arabic. */
 const LANGS = {
   en: { route: '/docs/get-started/ai/', opener: 'Open the prompt' },
   es: { route: '/es/docs/get-started/ai/', opener: 'Abrir el prompt' },
-  ar: { route: '/ar/', home: true },
 };
 
 /** A prompt for the tests that need a known text; it fits the dialog, so Copy is on from the start. */
@@ -89,17 +89,14 @@ const scrollToEnd = (region) => region.evaluate((el) => { el.scrollTop = el.scro
 /**
  * Open the start prompt in a language from the keyboard and wait until its headings are laid out.
  * @param {import('@playwright/test').Page} page
- * @param {'en' | 'es' | 'ar'} lang
+ * @param {'en' | 'es'} lang
  */
 async function openStart(page, lang) {
-  const words = catalog(lang);
-  const { route, opener, home } = LANGS[lang];
+  const { route, opener } = LANGS[lang];
   // The globe of the home is not what these tests look at
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto(route);
-  const button = home
-    ? page.locator('section#inside-4').getByRole('button', { name: words['inside.start.open'], exact: true })
-    : page.locator('section:has(> #start-site)').getByRole('button', { name: opener, exact: true });
+  const button = page.locator('section:has(> #start-site)').getByRole('button', { name: opener, exact: true });
   await expect(button).toBeVisible();
   await button.focus();
   await page.keyboard.press('Enter');
@@ -209,11 +206,11 @@ test.describe('line numbers', () => {
     }
   });
 
-  for (const lang of ['en', 'ar']) {
+  for (const lang of ['en', 'es']) {
     test(`${lang}: the gutter is on the left, and a wrapped line goes on under its text, not under the number`, async ({ page, request }) => {
       await page.setViewportSize({ width: 800, height: 900 });
       const text = await (await request.get(TXT)).text();
-      const dialog = await openStart(page, /** @type {'en' | 'ar'} */ (lang));
+      const dialog = await openStart(page, /** @type {'en' | 'es'} */ (lang));
     await needRows(dialog);
       const m = await regionOf(dialog).evaluate((region, digits) => {
         const lines = [...region.querySelectorAll('.site-prompt__line')];
@@ -334,10 +331,10 @@ test.describe('addresses', () => {
     for (const address of NOT_LINKED) expect(shown, address).toContain(address);
   });
 
-  for (const lang of ['en', 'es', 'ar']) {
+  for (const lang of ['en', 'es']) {
     test(`${lang}: a link is named by its text and then the hint, and has the language of the page unless it is English`, async ({ page }) => {
       await serve(page, ADDRESSES);
-      const dialog = await openStart(page, /** @type {'en' | 'es' | 'ar'} */ (lang));
+      const dialog = await openStart(page, /** @type {'en' | 'es'} */ (lang));
       const links = regionOf(dialog).locator('a');
       await expect(links).toHaveCount(2);
       const m = await links.evaluateAll((all) =>
@@ -354,7 +351,7 @@ test.describe('addresses', () => {
     });
 
     test(`${lang}: the link to the raw text opens in a new tab and is named by its text and then the hint`, async ({ page }) => {
-      const dialog = await openStart(page, /** @type {'en' | 'es' | 'ar'} */ (lang));
+      const dialog = await openStart(page, /** @type {'en' | 'es'} */ (lang));
       const file = dialog.getByRole('link', { name: `${fileText(lang)} ${hint(lang)}`, exact: true });
       await expect(file).toHaveCount(1);
       await expect(file).toHaveAttribute('href', new RegExp(`${TXT.replace('.', '\\.')}$`));
