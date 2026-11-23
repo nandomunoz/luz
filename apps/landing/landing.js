@@ -21,9 +21,8 @@ import "/packages/catalog/dist/search.js";
 // page is scanned, so its chunk is imported here
 import { initThemeTimeBar } from "/packages/catalog/dist/theme-time-bar.js";
 import { initSiteHeader } from "/apps/site/header.js";
-// The prompts of the fourth level: each link to a prompt's text becomes the
-// button that opens it in a dialog
-import { initPromptDialogs } from "/apps/site/prompt-dialog.js";
+// The terminal of the fourth level: its lines appear one by one, once
+import { initCli } from "/apps/landing/cli.js";
 // <home-light>, the visitor's sky under the hero: defines the element, which
 // loads its one visual
 import "/apps/landing/light/light.js";
@@ -208,7 +207,7 @@ initDayBand();
 initSiteHeader();
 initCopy();
 initModes();
-initPromptDialogs();
+initCli();
 // The panels of "What's inside": install, code and result
 for (const panel of document.querySelectorAll(".landing-panel")) {
   initTabs(panel);

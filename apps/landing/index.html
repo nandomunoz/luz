@@ -24,7 +24,6 @@
   <link rel="stylesheet" href="/apps/site/header.css">
   <link rel="stylesheet" href="/apps/site/theme-light.css">
   <link rel="stylesheet" href="/apps/site/sky.css">
-  <link rel="stylesheet" href="/apps/site/prompt-dialog.css">
   <!-- Before the first paint: the visitor's color mode (core) and the moment of the day (catalog), EX-009 -->
   <script src="/packages/core/dist/theme-boot.min.js"></script>
   <script src="/packages/catalog/dist/theme-time-boot.min.js" data-moments="dawn@05:00=dark morning@07:30=light afternoon@12:00=light* sunset@17:30=light dusk@20:30=dark night@22:30=dark*"></script>
@@ -287,11 +286,16 @@ a {
         </div>
       </div>
       </section>
-    <!-- The fourth level: a prompt per kind of site, a card each with the
-         button that opens it (a link to its text without JavaScript,
-         apps/site/prompt-dialog.js) and the way to its recipes; under the
-         four, the general prompt. Each button and link is named by its words
-         and the card's title, so five "Open the prompt" are told apart -->
+    <!-- The fourth level: a fake terminal that plays the conversation of the
+         LUZ skill to come (@luz-ds/ai, not published yet): it asks what you
+         want to make, the kind of site and the stack, suggests the agents and
+         skills that matter, fills their [ADAPT] fields and builds with LUZ.
+         The whole transcript is in the markup and shows whole without
+         JavaScript. With it, apps/landing/cli.js shows the first line and the
+         visitor brings the next one with Enter (its button) or a tap inside
+         the terminal; the screen is a polite live region, so each new line
+         is read out. Left to right in every language, as a terminal is; each
+         translated phrase is a <bdi> -->
     <section class="landing-inside landing-inside--flip" id="inside-4" aria-labelledby="inside-4-title">
         <div class="landing-inside__copy">
           <p class="landing-inside__eyebrow"><svg aria-hidden="true"><use href="#i0"/></svg><span>{{t:inside.l4.eyebrow}}</span></p>
@@ -302,42 +306,27 @@ a {
             <li><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h9m4 0h3M4 17h3m4 0h9M15 5v4M9 15v4"/></svg><span><strong>{{t:inside.l4.p2.name}}</strong> {{t:inside.l4.p2.text}}</span></li>
             <li><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="m8.5 12 2.5 2.5 4.5-5"/></svg><span><strong>{{t:inside.l4.p3.name}}</strong> {{t:inside.l4.p3.text}}</span></li>
           </ul>
+          <p class="landing-cli__note"><span class="luz-badge luz-badge--primary">{{t:inside.l4.soon}}</span> <a href="/docs/kinds/">{{t:inside.l4.meanwhile}}</a></p>
         </div>
-      <ul class="landing-inside__kinds" aria-label="{{t:inside.l4.panel}}">
-          <li class="landing-kind landing-kind--landing">
-            <div class="landing-kind__head"><svg class="landing-kind__icon ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 8h18M8 12.5h8M10 16h4"/></svg><hgroup class="landing-kind__name"><h3 id="in4-landing">{{t:inside.kind.landing.title}}</h3><p>{{t:inside.kind.landing.text}}</p></hgroup></div>
-            <div class="o-actions landing-kind__actions">
-              <a class="luz-btn luz-btn--primary site-prompt-open" id="in4-landing-prompt" href="/prompts/landing.txt" data-prompt-open data-prompt-title="{{t:inside.kind.landing.prompt}}" aria-labelledby="in4-landing-prompt in4-landing">{{t:inside.kind.open}}</a>
-              <a class="landing-kind__docs" id="in4-landing-recipes" href="/docs/kinds/landing/" aria-labelledby="in4-landing-recipes in4-landing">{{t:inside.kind.recipes}}<svg class="ic" aria-hidden="true"><use href="#i7"/></svg></a>
-            </div>
-          </li>
-          <li class="landing-kind landing-kind--blog">
-            <div class="landing-kind__head"><svg class="landing-kind__icon ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M13 4H5.5A1.5 1.5 0 0 0 4 5.5v13A1.5 1.5 0 0 0 5.5 20h13a1.5 1.5 0 0 0 1.5-1.5V11M8 9h3M8 13h5M8 16.5h7"/><path d="m17.5 3.5 3 3-6 6h-3v-3l6-6Z"/></svg><hgroup class="landing-kind__name"><h3 id="in4-blog">{{t:inside.kind.blog.title}}</h3><p>{{t:inside.kind.blog.text}}</p></hgroup></div>
-            <div class="o-actions landing-kind__actions">
-              <a class="luz-btn luz-btn--primary site-prompt-open" id="in4-blog-prompt" href="/prompts/blog.txt" data-prompt-open data-prompt-title="{{t:inside.kind.blog.prompt}}" aria-labelledby="in4-blog-prompt in4-blog">{{t:inside.kind.open}}</a>
-              <a class="landing-kind__docs" id="in4-blog-recipes" href="/docs/kinds/blog/" aria-labelledby="in4-blog-recipes in4-blog">{{t:inside.kind.recipes}}<svg class="ic" aria-hidden="true"><use href="#i7"/></svg></a>
-            </div>
-          </li>
-          <li class="landing-kind landing-kind--app">
-            <div class="landing-kind__head"><svg class="landing-kind__icon ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="14" rx="1.5"/><path d="M3.5 9h17M9 9v10"/></svg><hgroup class="landing-kind__name"><h3 id="in4-app">{{t:inside.kind.app.title}}</h3><p>{{t:inside.kind.app.text}}</p></hgroup></div>
-            <div class="o-actions landing-kind__actions">
-              <a class="luz-btn luz-btn--primary site-prompt-open" id="in4-app-prompt" href="/prompts/app.txt" data-prompt-open data-prompt-title="{{t:inside.kind.app.prompt}}" aria-labelledby="in4-app-prompt in4-app">{{t:inside.kind.open}}</a>
-              <a class="landing-kind__docs" id="in4-app-recipes" href="/docs/kinds/app/" aria-labelledby="in4-app-recipes in4-app">{{t:inside.kind.recipes}}<svg class="ic" aria-hidden="true"><use href="#i7"/></svg></a>
-            </div>
-          </li>
-          <li class="landing-kind landing-kind--docs">
-            <div class="landing-kind__head"><svg class="landing-kind__icon ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6.5C10.5 5 8 4.5 4 4.5v13c4 0 6.5.5 8 2 1.5-1.5 4-2 8-2v-13c-4 0-6.5.5-8 2Zm0 0v13"/></svg><hgroup class="landing-kind__name"><h3 id="in4-docs">{{t:inside.kind.docs.title}}</h3><p>{{t:inside.kind.docs.text}}</p></hgroup></div>
-            <div class="o-actions landing-kind__actions">
-              <a class="luz-btn luz-btn--primary site-prompt-open" id="in4-docs-prompt" href="/prompts/docs.txt" data-prompt-open data-prompt-title="{{t:inside.kind.docs.prompt}}" aria-labelledby="in4-docs-prompt in4-docs">{{t:inside.kind.open}}</a>
-              <a class="landing-kind__docs" id="in4-docs-recipes" href="/docs/kinds/docs/" aria-labelledby="in4-docs-recipes in4-docs">{{t:inside.kind.recipes}}<svg class="ic" aria-hidden="true"><use href="#i7"/></svg></a>
-            </div>
-          </li>
-        </ul>
-      <div class="landing-scratch">
-        <p class="landing-scratch__text">{{t:inside.start.text}}</p>
-        <a class="luz-btn luz-btn--outline site-prompt-open" href="/prompts/start.txt" data-prompt-open data-prompt-title="{{t:inside.start.prompt}}">{{t:inside.start.open}}</a>
-      </div>
-      <!-- luz:include prompt-dialog -->
+      <figure class="landing-cli" dir="ltr" aria-label="{{t:inside.l4.panel}}" data-landing-cli>
+        <div class="landing-cli__bar" aria-hidden="true"><span class="landing-cli__dots"><span></span><span></span><span></span></span><code class="landing-cli__title">~/my-app</code></div>
+        <div class="landing-cli__screen" aria-live="polite">
+          <p class="landing-cli__line landing-cli__line--cmd"><span class="landing-cli__mark" aria-hidden="true">$</span> <code>npx @luz-ds/ai</code></p>
+          <p class="landing-cli__line"><span class="landing-cli__mark" aria-hidden="true">&gt;</span> <bdi>{{t:inside.cli.ask}}</bdi></p>
+          <p class="landing-cli__line landing-cli__line--you"><bdi class="landing-cli__you">{{t:inside.cli.answer}}</bdi></p>
+          <p class="landing-cli__line"><span class="landing-cli__mark" aria-hidden="true">&gt;</span> <bdi>{{t:inside.cli.kind}}</bdi> <span class="landing-cli__why">(<code>luz-create-landing</code>)</span></p>
+          <p class="landing-cli__line"><span class="landing-cli__mark" aria-hidden="true">&gt;</span> <bdi>{{t:inside.cli.stack}}</bdi> <span class="landing-cli__pick">[HTML + Vite]</span> <span class="landing-cli__why">Astro · Next.js · WordPress</span></p>
+          <p class="landing-cli__line"><span class="landing-cli__mark" aria-hidden="true">&gt;</span> <bdi>{{t:inside.cli.agents}}</bdi></p>
+          <p class="landing-cli__line landing-cli__line--item"><span class="landing-cli__box">[x]</span> <code>luz-seo-geo-specialist</code> <bdi class="landing-cli__why">{{t:inside.cli.seo}}</bdi></p>
+          <p class="landing-cli__line landing-cli__line--item"><span class="landing-cli__box">[x]</span> <code>luz-accessibility-auditor</code> <bdi class="landing-cli__why">{{t:inside.cli.a11y}}</bdi></p>
+          <p class="landing-cli__line landing-cli__line--item"><span class="landing-cli__box">[x]</span> <code>luz-core-web-vitals-optimizer</code> <bdi class="landing-cli__why">{{t:inside.cli.speed}}</bdi></p>
+          <p class="landing-cli__line landing-cli__line--item landing-cli__line--off"><span class="landing-cli__box">[ ]</span> <code>luz-ai-auditor</code> <bdi class="landing-cli__why">{{t:inside.cli.noai}}</bdi></p>
+          <p class="landing-cli__line"><span class="landing-cli__mark" aria-hidden="true">&gt;</span> <bdi>{{t:inside.cli.skills}}</bdi> <code>luz-create-landing</code> · <code>luz-readme</code></p>
+          <p class="landing-cli__line"><span class="landing-cli__mark" aria-hidden="true">&gt;</span> <bdi>{{t:inside.cli.adapt}}</bdi></p>
+          <p class="landing-cli__line landing-cli__line--end"><span class="landing-cli__done"><bdi>{{t:inside.cli.done}}</bdi></span> <bdi>{{t:inside.cli.build}}</bdi> <code>@luz-ds/core</code> + <code>catalog</code>: <code>hero</code>, <code>section</code>, <code>site-footer</code><span class="landing-cli__caret" aria-hidden="true"></span></p>
+        </div>
+        <button class="luz-btn luz-btn--ghost luz-btn--sm landing-cli__next" type="button" hidden><kbd>Enter</kbd> <span data-cli-next>{{t:inside.l4.next}}</span><span data-cli-replay hidden>{{t:inside.l4.replay}}</span></button>
+      </figure>
       </section>
 
 
@@ -486,7 +475,7 @@ a {
           <h2 class="luz-site-footer__col-title" id="footer-resources">{{t:footer.resources}}</h2>
           <ul aria-labelledby="footer-resources">
             <li><a href="https://www.npmjs.com/org/luz-ds">{{t:footer.npm}}</a></li>
-            <li><a href="#inside-4">{{t:footer.prompts}}</a></li>
+            <li><a href="#inside-4">{{t:footer.ai}}</a></li>
             <li><a href="/llms.txt" lang="en" dir="ltr">llms.txt</a></li>
             <li><a href="https://github.com/nandovejer/luz/blob/main/CHANGELOG.md">{{t:footer.changelog}}</a></li>
             <li><a href="/docs/get-started/how-luz-is-built/">{{t:footer.built}}</a></li>

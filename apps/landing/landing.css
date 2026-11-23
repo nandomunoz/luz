@@ -650,150 +650,6 @@ home-light:defined ~ .landing-light__nojs {
   color: var(--luz-text-primary);
 }
 
-/* The four kinds of site, in the place the other levels give their panel: a
-   card each, two by two, with its icon, its name and what it gets you; at its
-   foot the button that opens its prompt and the way to its recipes */
-.landing-inside__kinds {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--luz-space-md);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-/* The actions start where the title does: past the icon (its size, its
-   padding) and the gap after it */
-.landing-kind {
-  --landing-kind-icon: 1.5rem;
-  --landing-kind-indent: calc(var(--landing-kind-icon) + var(--luz-space-xs) * 2 + var(--luz-space-sm));
-
-  display: grid;
-  grid-template-rows: 1fr auto;
-  gap: var(--luz-space-md);
-  min-inline-size: 0;
-  padding: var(--luz-space-lg);
-  border: 1px solid color-mix(in oklab, var(--luz-text-primary) 14%, transparent);
-  border-radius: var(--luz-radius-md);
-  background: color-mix(in oklab, var(--luz-surface-page) 60%, transparent);
-  box-shadow: 0 1rem 2rem -1.5rem color-mix(in oklab, var(--luz-text-primary) 25%, transparent);
-  transition: border-color var(--luz-duration-base) ease;
-}
-
-.landing-kind:hover,
-.landing-kind:focus-within {
-  border-color: color-mix(in oklab, var(--luz-brand-primary) 60%, transparent);
-}
-
-.landing-kind__head {
-  display: flex;
-  align-items: start;
-  gap: var(--luz-space-sm);
-}
-
-.landing-kind__icon {
-  flex: none;
-  inline-size: var(--landing-kind-icon);
-  block-size: var(--landing-kind-icon);
-  padding: var(--luz-space-xs);
-  border-radius: var(--luz-radius-md);
-  background: color-mix(in oklab, var(--luz-brand-primary) 12%, transparent);
-  color: var(--luz-brand-primary);
-  box-sizing: content-box;
-}
-
-.landing-kind__name {
-  display: grid;
-  gap: var(--luz-space-3xs);
-  margin: 0;
-}
-
-/* The kind of site: the card's title */
-.landing-kind__name h3 {
-  margin: 0;
-  font-family: var(--luz-font-heading);
-  font-size: var(--luz-text-xl);
-  font-weight: 400;
-  line-height: 1.2;
-  color: var(--luz-text-primary);
-}
-
-/* The card under the pointer or the keyboard turns its title to the page's
-   action colour, with its node */
-.landing-kind__name h3 {
-  transition: color var(--luz-duration-base) ease;
-}
-
-.landing-kind:is(:hover, :focus-within) .landing-kind__name h3 {
-  color: var(--luz-brand-primary);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .landing-kind__name h3 {
-    transition: none;
-  }
-}
-
-/* What the kind brings, in a sentence, under the title */
-.landing-kind__name p {
-  margin: 0;
-  font-size: var(--luz-text-md);
-  line-height: 1.45;
-  color: var(--luz-text-secondary);
-}
-
-/* The prompt first, the way to the recipes after it, quieter: on one line
-   when they fit, the second under the first when they do not. They line up
-   under the kind's name */
-.landing-kind__actions {
-  align-self: end;
-  column-gap: var(--luz-space-sm);
-  margin-inline-start: var(--landing-kind-indent);
-}
-
-/* A link, not a second button: the prompt is the card's one action. In the
-   sans of the button beside it, as tall as the button on one line with it,
-   underlined as every link (core's a) */
-.landing-kind__docs {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--luz-space-xs);
-  /* A target of its own when it wraps under the button (WCAG 2.5.8) */
-  min-block-size: var(--luz-control-sm);
-  font-family: var(--luz-font-sans);
-  font-size: var(--luz-text-md);
-}
-
-.landing-kind__docs svg {
-  inline-size: 1em;
-  block-size: 1em;
-  transition: translate var(--luz-duration-base) ease;
-}
-
-.landing-kind__docs:hover svg {
-  translate: 0.2em 0;
-}
-
-[dir="rtl"] .landing-kind__docs svg {
-  scale: -1 1;
-}
-
-[dir="rtl"] .landing-kind__docs:hover svg {
-  translate: -0.2em 0;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .landing-kind__docs svg {
-    transition: none;
-  }
-}
-
-@media (forced-colors: active) {
-  .landing-kind {
-    border-color: CanvasText;
-  }
-}
-
 /* The panel: an editor beside the page, in the page's own mode (its surface,
    its code colours), lifted by a hairline and a soft shadow */
 /* No gap: the closed tabs are still boxes (until-found), and a gap after each
@@ -1640,282 +1496,6 @@ home-light:defined ~ .landing-light__nojs {
   }
 }
 
-/* On a phone the cards go one under the other: two buttons need the width */
-@media (max-width: 640px) {
-  .landing-inside__kinds {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-
-/* The last level: the words on top, in one column, and the four kinds under
-   them hanging from the words like the nodes of a tree: a spine down from
-   the words, a branch across to each card ending in the card's icon, in a
-   circle. Two by two from a tablet up, the spine in the gap between the
-   columns; one under the other on a phone, the spine down the start edge
-   and the icons on it, like a timeline */
-#inside-4 {
-  /* The lines in the grey of a card at rest */
-  --landing-node-line: color-mix(in oklab, var(--luz-text-primary) 14%, transparent);
-}
-
-#inside-4 .landing-inside__kinds {
-  --landing-node: var(--luz-space-2xl);
-  --landing-node-icon: 1.25rem;
-  --landing-node-size: calc(var(--landing-node-icon) + var(--luz-space-xs) * 2 + 2px);
-  --landing-node-row-gap: var(--luz-space-xl);
-
-  position: relative;
-  grid-auto-rows: 1fr;
-  row-gap: var(--landing-node-row-gap);
-  padding-block-start: var(--landing-node);
-}
-
-/* The spine, to the middle of the last card (the rows are equal), and over
-   it the path lit, in the page's action colour, down to the card under the
-   pointer or the keyboard */
-#inside-4 .landing-inside__kinds::after,
-#inside-4 .landing-inside__kinds::before {
-  content: "";
-  position: absolute;
-  inset-block: 0 calc(var(--landing-node-row) / 2);
-  inset-inline-start: var(--landing-node-x);
-  border-inline-start: 1px solid var(--landing-node-line);
-}
-
-#inside-4 .landing-inside__kinds::before {
-  border-color: var(--luz-brand-primary);
-  opacity: 0;
-  transition: opacity var(--luz-duration-base) ease;
-}
-
-#inside-4 .landing-inside__kinds:has(.landing-kind:is(:hover, :focus-within))::before {
-  opacity: 1;
-}
-
-#inside-4 .landing-kind {
-  --landing-kind-icon: var(--landing-node-icon);
-  --landing-kind-indent: 0px;
-
-  position: relative;
-}
-
-/* The branch, from the spine across to the card, at its middle */
-#inside-4 .landing-kind::before {
-  content: "";
-  position: absolute;
-  inset-block-start: 50%;
-  inline-size: var(--landing-node-branch);
-  border-block-start: 1px solid var(--landing-node-line);
-}
-
-/* The node: the card's own icon, in a circle where the branch meets the
-   card; the title and what follows start at the card's edge */
-#inside-4 .landing-kind__icon {
-  position: absolute;
-  z-index: 1;
-  inset-block-start: calc(50% - var(--landing-node-size) / 2);
-  border: 1px solid var(--landing-node-line);
-  border-radius: var(--luz-radius-full);
-  background: color-mix(in oklab, var(--luz-brand-primary) 10%, var(--luz-surface-page));
-}
-
-/* The card under the pointer or the keyboard lights its node and its
-   branch: the circle fills with the page's action colour */
-#inside-4 .landing-kind__icon,
-#inside-4 .landing-kind::before {
-  transition:
-    background-color var(--luz-duration-base) ease,
-    border-color var(--luz-duration-base) ease,
-    color var(--luz-duration-base) ease;
-}
-
-#inside-4 .landing-kind:is(:hover, :focus-within) .landing-kind__icon {
-  border-color: var(--luz-brand-fill);
-  background: var(--luz-brand-fill);
-  color: var(--luz-text-on-fill);
-}
-
-#inside-4 .landing-kind:is(:hover, :focus-within)::before {
-  border-color: var(--luz-brand-primary);
-}
-
-/* A phone: one column, the spine down the start edge through the circles,
-   each card a short branch away from its own */
-@media (max-width: 640px) {
-  #inside-4 .landing-inside__kinds {
-    --landing-node-x: calc(var(--landing-node-size) / 2);
-    --landing-node-branch: var(--luz-space-sm);
-    --landing-node-row: calc((100% - var(--landing-node) - var(--landing-node-row-gap) * 3) / 4);
-
-    padding-inline-start: calc(var(--landing-node-size) + var(--landing-node-branch));
-  }
-
-  #inside-4 .landing-kind::before {
-    inset-inline-end: 100%;
-  }
-
-  #inside-4 .landing-kind__icon {
-    inset-inline-start: calc(-1 * (var(--landing-node-size) + var(--landing-node-branch)));
-  }
-
-  /* The path lit stops at the card's own row */
-  #inside-4 .landing-inside__kinds:has(.landing-kind:nth-child(1):is(:hover, :focus-within))::before {
-    inset-block-end: calc(100% - var(--landing-node) - var(--landing-node-row) / 2);
-  }
-
-  #inside-4 .landing-inside__kinds:has(.landing-kind:nth-child(2):is(:hover, :focus-within))::before {
-    inset-block-end: calc(100% - var(--landing-node) - var(--landing-node-row) * 1.5 - var(--landing-node-row-gap));
-  }
-
-  #inside-4 .landing-inside__kinds:has(.landing-kind:nth-child(3):is(:hover, :focus-within))::before {
-    inset-block-end: calc(100% - var(--landing-node) - var(--landing-node-row) * 2.5 - var(--landing-node-row-gap) * 2);
-  }
-}
-
-/* A tablet and up: the words centred over two columns, the spine in the
-   gap between them, the circles astride the cards' inner edges */
-@media (min-width: 641px) {
-  #inside-4 {
-    grid-template-columns: minmax(0, 1fr);
-    row-gap: 0;
-  }
-
-  #inside-4 .landing-inside__copy {
-    order: 0;
-    justify-items: center;
-    text-align: center;
-    margin-bottom: var(--luz-space-xl);
-  }
-
-  #inside-4 .landing-inside__points {
-    text-align: start;
-  }
-
-  /* The level's rows have no gap from a tablet up: the general prompt keeps
-     the distance the words keep from the cards */
-  #inside-4 .landing-scratch {
-    margin-block-start: var(--luz-space-xl);
-  }
-
-  #inside-4 .landing-inside__kinds {
-    --landing-node-gap: var(--luz-space-3xl);
-    --landing-node-x: 50%;
-    --landing-node-branch: calc(var(--landing-node-gap) / 2);
-    --landing-node-row: calc((100% - var(--landing-node) - var(--landing-node-row-gap)) / 2);
-
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    column-gap: var(--landing-node-gap);
-  }
-
-  #inside-4 .landing-kind:nth-child(odd)::before {
-    inset-inline-start: 100%;
-  }
-
-  #inside-4 .landing-kind:nth-child(even)::before {
-    inset-inline-end: 100%;
-  }
-
-  #inside-4 .landing-kind:nth-child(odd) .landing-kind__icon {
-    inset-inline-start: calc(100% - var(--landing-node-size) / 2);
-  }
-
-  #inside-4 .landing-kind:nth-child(even) .landing-kind__icon {
-    inset-inline-start: calc(var(--landing-node-size) / -2);
-  }
-
-  /* The path lit stops at the first row for its two cards */
-  #inside-4 .landing-inside__kinds:has(.landing-kind:nth-child(-n + 2):is(:hover, :focus-within))::before {
-    inset-block-end: calc(100% - var(--landing-node) - var(--landing-node-row) / 2);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  #inside-4 .landing-inside__kinds::before,
-  #inside-4 .landing-kind__icon,
-  #inside-4 .landing-kind::before {
-    transition: none;
-  }
-}
-
-@media (forced-colors: active) {
-  #inside-4 {
-    --landing-node-line: CanvasText;
-  }
-
-  #inside-4 .landing-inside__kinds::before {
-    border-color: Highlight;
-  }
-
-  #inside-4 .landing-kind:is(:hover, :focus-within) .landing-kind__icon {
-    border-color: Highlight;
-    background: Highlight;
-    color: HighlightText;
-  }
-
-  #inside-4 .landing-kind__icon {
-    border-color: CanvasText;
-  }
-}
-
-/* 400 % text at 320 px (WCAG 1.4.4, 1.4.10): the sizes of the timeline, the
-   cards and their icons are in rem, so as the text grows they take the whole
-   width and the buttons are pushed out of the window. Measured in the
-   level's own em, not in px, the query holds when the text is large for the
-   width, whatever the window: the spine, the branches and the circles go,
-   the icon sits in the card as it does in a card of any level, the card's
-   padding is a share of its width and the icon and the name wrap. A phone at
-   the usual size has more than 16em and keeps the timeline. */
-@container inside (max-inline-size: 16em) {
-  #inside-4 .landing-inside__kinds {
-    padding-inline-start: 0;
-  }
-
-  #inside-4 .landing-inside__kinds::after,
-  #inside-4 .landing-inside__kinds::before,
-  #inside-4 .landing-kind::before {
-    display: none;
-  }
-
-  #inside-4 .landing-kind__icon {
-    position: static;
-    border: 0;
-    border-radius: var(--luz-radius-md);
-    background: color-mix(in oklab, var(--luz-brand-primary) 12%, transparent);
-  }
-
-  .landing-kind {
-    padding: min(var(--luz-space-lg), 7%);
-  }
-
-  .landing-kind__head {
-    flex-wrap: wrap;
-  }
-
-  /* The title a step down: a letter of the largest size, with the marked
-     word's padding, is wider than the line */
-  .landing-inside__title {
-    font-size: var(--luz-text-3xl);
-  }
-}
-
-/* Under the four kinds, the general prompt: a line that says who it is for
-   and its button, centred under the tree; one under the other when the line
-   is long for the width */
-.landing-scratch {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: var(--luz-space-sm) var(--luz-space-md);
-  text-align: center;
-}
-
-.landing-scratch__text {
-  margin: 0;
-  font-size: var(--luz-text-lg);
-  text-wrap: balance;
-  color: var(--luz-text-secondary);
-}
 
 @keyframes landing-typed-details {
   0%,
@@ -5284,5 +4864,218 @@ home-light:defined ~ .landing-light__nojs {
 @container (min-width: 24rem) {
   .landing-cat-sitewide__docs .luz-do-dont {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* --------------------------------------------------------------------------
+   The fourth level: a terminal that plays the conversation of the LUZ skill
+   to come. A window in the page's own mode, as the panels of the other
+   levels: a title bar with its three dots and the folder, then the lines in
+   mono. Left to right in every language; a line too long for the width wraps
+   under itself, past its mark, so nothing scrolls sideways at 320 px
+   -------------------------------------------------------------------------- */
+.landing-cli {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-inline-size: 0;
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid color-mix(in oklab, var(--luz-text-primary) 14%, transparent);
+  border-radius: var(--luz-radius-md);
+  background: var(--luz-surface-page);
+  color: var(--luz-text-primary);
+  box-shadow: 0 1.5rem 3rem -1.5rem color-mix(in oklab, var(--luz-text-primary) 25%, transparent);
+}
+
+.landing-cli__bar {
+  display: flex;
+  align-items: center;
+  gap: var(--luz-space-sm);
+  padding: var(--luz-space-xs) var(--luz-space-sm);
+  border-block-end: 1px solid color-mix(in oklab, var(--luz-text-primary) 12%, transparent);
+  background: color-mix(in oklab, var(--luz-text-primary) 5%, var(--luz-surface-page));
+}
+
+.landing-cli__dots {
+  display: flex;
+  gap: var(--luz-space-2xs);
+}
+
+.landing-cli__dots > span {
+  inline-size: 0.625rem;
+  block-size: 0.625rem;
+  border-radius: var(--luz-radius-full);
+  background: color-mix(in oklab, var(--luz-text-primary) 22%, transparent);
+}
+
+.landing-cli__title {
+  font-family: var(--luz-font-mono);
+  font-size: var(--luz-text-xs);
+  color: var(--luz-text-secondary);
+}
+
+.landing-cli__screen {
+  display: grid;
+  gap: var(--luz-space-3xs);
+  /* A share of the width caps it at 400 % text; at any usual size the token is the smaller */
+  padding: min(var(--luz-space-md), 5%);
+  font-family: var(--luz-font-mono);
+  font-size: var(--luz-text-sm);
+  line-height: 1.55;
+}
+
+.landing-cli__line {
+  margin: 0;
+  padding-inline-start: 2ch;
+  text-indent: -2ch;
+  overflow-wrap: anywhere;
+}
+
+.landing-cli__line code {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+}
+
+.landing-cli__mark,
+.landing-cli__why,
+.landing-cli__line--off {
+  color: var(--luz-text-secondary);
+}
+
+/* The visitor's answer, and the stack picked: in the page's action colour */
+.landing-cli__you,
+.landing-cli__pick {
+  color: var(--luz-brand-primary);
+}
+
+.landing-cli__line--you {
+  padding-inline-start: 4ch;
+}
+
+/* The agents and skills it suggests, under the question */
+.landing-cli__line--item {
+  padding-inline-start: 6ch;
+}
+
+.landing-cli__line--item code {
+  font-weight: 600;
+}
+
+.landing-cli__line--off code {
+  font-weight: 400;
+}
+
+.landing-cli__done {
+  font-weight: 600;
+  color: var(--luz-color-success);
+}
+
+.landing-cli__caret {
+  display: inline-block;
+  inline-size: 0.6em;
+  block-size: 1.1em;
+  margin-inline-start: 0.25ch;
+  vertical-align: text-bottom;
+  background: currentColor;
+}
+
+/* The button that brings the next line, with the key that presses it */
+.landing-cli__next {
+  justify-self: end;
+  gap: var(--luz-space-xs);
+  margin: 0 var(--luz-space-sm) var(--luz-space-sm);
+}
+
+.landing-cli__next kbd {
+  padding: 0 var(--luz-space-2xs);
+  border: 1px solid color-mix(in oklab, var(--luz-text-primary) 25%, transparent);
+  border-radius: var(--luz-radius-sm);
+  font-family: var(--luz-font-mono);
+  font-size: var(--luz-text-xs);
+}
+
+/* Under the words: the skill is not published yet, and the way to the
+   prompts that do its job until it is */
+.landing-cli__note {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--luz-space-xs) var(--luz-space-sm);
+  margin: 0;
+}
+
+/* Step by step (cli.js): the terminal answers a click like a field, and the
+   line that has just come in fades in, the caret blinking a few times after
+   it, only when motion is welcome (under five seconds, WCAG 2.2.2) */
+.landing-cli[data-cli="step"] .landing-cli__screen {
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .landing-cli__line.is-new {
+    animation: luz-fade-in var(--luz-duration-slow) var(--luz-easing-enter) both;
+  }
+
+  .landing-cli__line.is-new .landing-cli__caret {
+    animation: landing-cli-caret var(--luz-duration-lazy) steps(1, end) var(--luz-duration-slow) 4;
+  }
+}
+
+@keyframes landing-cli-caret {
+  50% {
+    opacity: 0;
+  }
+}
+
+@media (forced-colors: active) {
+  .landing-cli {
+    border-color: CanvasText;
+  }
+
+  .landing-cli__caret {
+    background: CanvasText;
+  }
+}
+
+/* Arabic has no letters in the mono stack: its phrases in the terminal and
+   the badge under the words take the page's sans, the code stays mono */
+.landing-cli bdi:lang(ar),
+.landing-cli__note .luz-badge:lang(ar) {
+  font-family: var(--luz-font-sans);
+}
+
+/* 400 % text at 320 px (WCAG 1.4.4, 1.4.10): measured in the level's own em,
+   as the other levels do, the terminal gives up what is drawn in rem and ch
+   (the bar's padding, the indents of the lines, the button on one line), so
+   every word wraps inside it and nothing is cut by its frame */
+@container inside (max-inline-size: 16em) {
+  .landing-cli__bar {
+    padding: 4%;
+  }
+
+  .landing-cli__title {
+    display: none;
+  }
+
+  .landing-cli__screen {
+    padding: 4%;
+  }
+
+  .landing-cli__line,
+  .landing-cli__line--you,
+  .landing-cli__line--item {
+    padding-inline-start: 0;
+    text-indent: 0;
+  }
+
+  .landing-cli__next {
+    justify-self: stretch;
+    margin: 0 4% 4%;
+    white-space: normal;
+    block-size: auto;
+    flex-wrap: wrap;
   }
 }
