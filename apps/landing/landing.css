@@ -2468,10 +2468,75 @@ home-light:defined ~ .landing-light__nojs {
   row-gap: 0;
 }
 
-/* The page of the tokens: the hero's numbers, the primitive colours as a
-   mosaic over the install, the links to each group, then a section of the
-   home's kind per group whose panel draws every token of it (tokenSections()
-   in scripts/docs-site/site.js). A specimen reads its token through --v */
+/* The page of the tokens (apps/landing/levels/tokens.html, tokenSections() in
+   scripts/docs-site/site.js): what a token is, a demo of one token changing a
+   brand, three steps, three blocks, and the next step. A specimen reads its
+   token through --v, so it follows the colour mode */
+
+/* The hero: the definition, before and after, and what a reader gains */
+.landing-tokens__what {
+  margin: 0;
+  max-inline-size: 60ch;
+  font-size: var(--luz-text-lg);
+  color: var(--luz-text-secondary);
+}
+
+.landing-tokens__what code {
+  font-size: 0.85em;
+  color: var(--luz-text-primary);
+}
+
+.landing-tokens__compare {
+  display: grid;
+  gap: var(--luz-space-2xs);
+  margin: 0;
+}
+
+.landing-tokens__before,
+.landing-tokens__after {
+  display: grid;
+  grid-template-columns: 8.5rem minmax(0, 1fr);
+  align-items: baseline;
+  gap: var(--luz-space-sm);
+  margin: 0;
+  padding: var(--luz-space-xs) var(--luz-space-sm);
+  border-radius: var(--luz-radius-sm);
+  font-family: var(--luz-font-sans);
+  font-size: var(--luz-text-sm);
+  color: var(--luz-text-secondary);
+}
+
+.landing-tokens__before code,
+.landing-tokens__after code {
+  overflow-wrap: anywhere;
+  padding: 0;
+  background: none;
+  font-size: var(--luz-text-sm);
+}
+
+.landing-tokens__before code {
+  color: var(--luz-text-secondary);
+  text-decoration: line-through;
+  text-decoration-color: color-mix(in oklab, var(--luz-color-danger) 60%, transparent);
+}
+
+.landing-tokens__after {
+  background: color-mix(in oklab, var(--luz-brand-primary) 10%, transparent);
+}
+
+.landing-tokens__after code {
+  color: var(--luz-text-primary);
+  font-weight: 600;
+}
+
+@media (max-width: 480px) {
+  .landing-tokens__before,
+  .landing-tokens__after {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+}
+
 .landing-level__stats {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 7rem), 1fr));
@@ -2502,72 +2567,280 @@ home-light:defined ~ .landing-light__nojs {
   color: var(--luz-text-primary);
 }
 
-/* The same card in the three modes: the tokens change, the CSS does not */
-.landing-level__modes {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--luz-space-sm);
-  margin-block-end: var(--luz-space-md);
+/* The demo: the brand by CSS alone. The panel carries the primitive of each
+   family as --demo-<family> (written by the generator, so this file reads no
+   primitive), the checked radio picks one as --demo-brand, the card reads it,
+   and the one line of code that says it shows */
+.landing-demo {
+  --demo-brand: var(--demo-blue);
+
+  gap: var(--luz-space-md);
+  padding: var(--luz-space-lg);
 }
 
-.landing-level__mode {
-  display: grid;
-  gap: var(--luz-space-xs);
+.landing-demo__title {
   margin: 0;
+  font-family: var(--luz-font-sans);
+  font-size: var(--luz-text-sm);
+  font-weight: 600;
+  color: var(--luz-text-secondary);
 }
 
-.landing-level__mode-ui {
-  display: grid;
+.landing-demo__picker {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
+.landing-demo__options {
+  display: flex;
+  flex-wrap: wrap;
   gap: var(--luz-space-xs);
-  padding: var(--luz-space-md);
+}
+
+.landing-demo__picker legend {
+  margin-block-end: var(--luz-space-xs);
+  padding: 0;
+  font-family: var(--luz-font-sans);
+  font-size: var(--luz-text-sm);
+  font-weight: 600;
+  letter-spacing: normal;
+  text-transform: none;
+  color: var(--luz-text-primary);
+}
+
+.landing-demo__option {
+  position: relative;
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--luz-space-xs);
+  block-size: 2.75rem;
+  padding-inline: var(--luz-space-sm) var(--luz-space-md);
   border: 1px solid var(--luz-divider);
+  border-radius: var(--luz-radius-full);
+  background: var(--luz-surface);
+  font-family: var(--luz-font-mono);
+  font-size: var(--luz-text-sm);
+  color: var(--luz-text-primary);
+  cursor: pointer;
+}
+
+/* The native radio stays, out of sight, for the keyboard and the reader */
+.landing-demo__option input {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.landing-demo__option:has(input:checked) {
+  border-color: var(--luz-text-primary);
+  box-shadow: inset 0 0 0 1px var(--luz-text-primary);
+}
+
+.landing-demo__option:has(input:focus-visible) {
+  outline: 2px solid var(--luz-focus-ring);
+  outline-offset: 2px;
+}
+
+.landing-demo__swatch {
+  inline-size: 1.25rem;
+  block-size: 1.25rem;
+  border-radius: var(--luz-radius-full);
+  background: var(--v);
+}
+
+.landing-demo__product {
+  display: grid;
+  justify-items: start;
+  gap: var(--luz-space-sm);
+  padding: var(--luz-space-lg);
+  border: 1px solid var(--luz-divider);
+  border-block-start: 4px solid var(--demo-brand);
   border-radius: var(--luz-radius-md);
   background: var(--luz-surface);
 }
 
-.landing-level__mode-title {
+.landing-demo__product > p {
+  margin: 0;
+}
+
+.landing-demo__badge {
+  padding: var(--luz-space-3xs) var(--luz-space-xs);
+  border-radius: var(--luz-radius-full);
+  background: var(--demo-brand);
+  font-family: var(--luz-font-sans);
+  font-size: var(--luz-text-xs);
+  font-weight: 600;
+  color: var(--luz-text-on-fill);
+}
+
+.landing-demo__heading {
   font-family: var(--luz-font-heading);
   font-size: var(--luz-text-2xl);
-  line-height: 1;
+  line-height: 1.1;
   color: var(--luz-text-primary);
 }
 
-.landing-level__mode-line {
-  block-size: 0.4rem;
-  border-radius: var(--luz-radius-full);
-  background: var(--luz-text-secondary);
-}
-
-.landing-level__mode-line--short {
-  inline-size: 60%;
-}
-
-.landing-level__mode-button {
-  inline-size: 60%;
-  block-size: 1.5rem;
-  margin-block-start: var(--luz-space-xs);
-  border-radius: var(--luz-radius-md);
-  background: var(--luz-brand-fill);
-}
-
-.landing-level__mode figcaption {
-  font-style: normal;
-  font-family: var(--luz-font-sans);
-  font-size: var(--luz-text-sm);
-  text-align: center;
+.landing-demo__text {
   color: var(--luz-text-secondary);
 }
 
-.landing-level__jumps {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--luz-space-xs);
+.landing-demo__button {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 2.5rem;
+  padding-inline: var(--luz-space-lg);
+  border-radius: var(--luz-radius-md);
+  background: var(--demo-brand);
+  font-family: var(--luz-font-sans);
+  font-weight: 600;
+  color: var(--luz-text-on-fill);
+}
+
+.landing-demo__caption {
+  margin: 0;
+  font-family: var(--luz-font-sans);
+  font-size: var(--luz-text-sm);
+  color: var(--luz-text-secondary);
+}
+
+.landing-demo__code {
+  margin: 0;
+  padding: var(--luz-space-sm) var(--luz-space-md);
+  border-radius: var(--luz-radius-sm);
+  background: var(--luz-surface-strong);
+}
+
+.landing-demo__line {
+  display: none;
+  padding: 0;
+  background: none;
+  font-family: var(--luz-font-mono);
+  font-size: var(--luz-text-sm);
+  color: var(--luz-text-primary);
+  overflow-wrap: anywhere;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .landing-demo__product,
+  .landing-demo__badge,
+  .landing-demo__button {
+    transition:
+      background-color var(--luz-duration-base) var(--luz-easing-standard),
+      border-color var(--luz-duration-base) var(--luz-easing-standard);
+  }
+}
+
+.landing-demo:has(input[value="blue"]:checked) {
+  --demo-brand: var(--demo-blue);
+}
+
+.landing-demo:has(input[value="blue"]:checked) .landing-demo__line[data-family="blue"] {
+  display: block;
+}
+
+.landing-demo:has(input[value="teal"]:checked) {
+  --demo-brand: var(--demo-teal);
+}
+
+.landing-demo:has(input[value="teal"]:checked) .landing-demo__line[data-family="teal"] {
+  display: block;
+}
+
+.landing-demo:has(input[value="green"]:checked) {
+  --demo-brand: var(--demo-green);
+}
+
+.landing-demo:has(input[value="green"]:checked) .landing-demo__line[data-family="green"] {
+  display: block;
+}
+
+.landing-demo:has(input[value="purple"]:checked) {
+  --demo-brand: var(--demo-purple);
+}
+
+.landing-demo:has(input[value="purple"]:checked) .landing-demo__line[data-family="purple"] {
+  display: block;
+}
+
+.landing-demo:has(input[value="red"]:checked) {
+  --demo-brand: var(--demo-red);
+}
+
+.landing-demo:has(input[value="red"]:checked) .landing-demo__line[data-family="red"] {
+  display: block;
+}
+
+/* The three steps, side by side from the width of a laptop */
+.landing-tokens__steps {
+  padding-block: var(--luz-space-3xl) 0;
+}
+
+.landing-tokens__step-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr));
+  gap: var(--luz-space-lg);
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.landing-level__jump {
+.landing-tokens__step {
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+  align-content: start;
+  gap: var(--luz-space-sm);
+  min-inline-size: 0;
+  padding: var(--luz-space-lg);
+  border: 1px solid var(--luz-divider);
+  border-radius: var(--luz-radius-md);
+  background: var(--luz-surface);
+}
+
+.landing-tokens__step-title {
+  margin: 0;
+  font-family: var(--luz-font-heading);
+  font-size: var(--luz-text-xl);
+  line-height: 1.2;
+  color: var(--luz-text-primary);
+}
+
+.landing-tokens__step-text {
+  margin: 0;
+  color: var(--luz-text-secondary);
+}
+
+.landing-tokens__step .landing-install + .landing-install {
+  margin-block-start: var(--luz-space-sm);
+}
+
+/* The three blocks */
+.landing-tokens {
+  display: grid;
+  gap: var(--luz-space-4xl);
+  padding-block: var(--luz-space-4xl);
+}
+
+.landing-tokens__block {
+  scroll-margin-block-start: var(--luz-space-2xl);
+}
+
+.landing-tokens__groups {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--luz-space-xs);
+  margin: var(--luz-space-xs) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.landing-tokens__group-link {
   display: inline-flex;
   align-items: center;
   gap: var(--luz-space-xs);
@@ -2576,74 +2849,113 @@ home-light:defined ~ .landing-light__nojs {
   border: 1px solid var(--luz-divider);
   border-radius: var(--luz-radius-full);
   background: var(--luz-surface);
-  color: var(--luz-text-primary);
   font-family: var(--luz-font-sans);
   font-size: var(--luz-text-sm);
+  color: var(--luz-text-primary);
   text-decoration: none;
 }
 
-.landing-level__jump:hover {
+.landing-tokens__group-link:hover {
   border-color: var(--luz-brand-primary);
   color: var(--luz-brand-primary);
 }
 
-.landing-level__jump .landing-names__n {
+.landing-tokens__group-link::after {
+  content: "→";
+  color: var(--luz-text-secondary);
+}
+
+.landing-tokens__group-link:dir(rtl)::after {
+  content: "←";
+}
+
+.landing-tokens__group-link .landing-names__n {
   font-family: var(--luz-font-mono);
   font-size: var(--luz-text-xs);
   color: var(--luz-text-secondary);
 }
 
-.landing-tokens {
-  display: grid;
-  gap: var(--luz-space-4xl);
-  padding-block: var(--luz-space-2xl) var(--luz-space-4xl);
-}
-
-.landing-tokens__group {
-  scroll-margin-block-start: var(--luz-space-2xl);
-}
-
-.landing-tokens__group .landing-inside__eyebrow {
-  align-items: baseline;
-}
-
-.landing-tokens__count {
-  font-family: var(--luz-font-mono);
-  font-variant-numeric: tabular-nums;
-}
-
-/* The panel: the specimen over the CSS that uses it */
 .landing-tokens__panel {
   gap: var(--luz-space-lg);
-}
-
-.landing-tokens__specimen {
-  display: grid;
-  gap: var(--luz-space-sm);
-  margin: 0;
-  padding: var(--luz-space-md) var(--luz-space-sm);
-  list-style: none;
+  padding: min(var(--luz-space-lg), 5%);
 }
 
 .landing-tokens__label {
   padding: 0;
   background: none;
   font-family: var(--luz-font-mono);
-  font-size: var(--luz-text-xs);
+  font-size: var(--luz-text-sm);
+  white-space: nowrap;
+  color: var(--luz-text-primary);
+}
+
+/* Color: the chain from the palette to a component */
+.landing-tokens__chain {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--luz-space-md);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.landing-tokens__chain > li {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: var(--luz-space-xs);
+  min-inline-size: 0;
+  text-align: center;
+}
+
+.landing-tokens__chain > li + li::before {
+  content: "→";
+  position: absolute;
+  inset-block-start: 0.9rem;
+  inset-inline-start: calc(var(--luz-space-md) / -2);
+  translate: -50% 0;
   color: var(--luz-text-secondary);
 }
 
-/* Primitives: a ramp per family */
-.landing-tokens__specimen--ramps {
-  grid-template-columns: auto minmax(0, 1fr);
+.landing-tokens__chain .landing-tokens__label {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  font-size: var(--luz-text-xs);
+}
+
+.landing-tokens__chip {
+  inline-size: 2.5rem;
+  block-size: 2.5rem;
+  border-radius: var(--luz-radius-md);
+  background: var(--v);
+}
+
+.landing-tokens__chain-button {
+  display: inline-flex;
   align-items: center;
-  gap: 4px var(--luz-space-sm);
+  min-block-size: 2.5rem;
+  padding-inline: var(--luz-space-md);
+  border-radius: var(--luz-radius-md);
+  background: var(--luz-brand-fill);
+  font-family: var(--luz-font-sans);
+  font-size: var(--luz-text-sm);
+  font-weight: 600;
+  color: var(--luz-text-on-fill);
+  max-inline-size: 100%;
+  text-align: center;
 }
 
-.landing-tokens__family {
-  font-family: var(--luz-font-mono);
-  font-size: var(--luz-text-xs);
-  color: var(--luz-text-secondary);
+.landing-tokens__chain-kind {
+  font-family: var(--luz-font-sans);
+  font-size: var(--luz-text-sm);
+  font-weight: 600;
+  color: var(--luz-text-primary);
+}
+
+.landing-tokens__ramps {
+  display: grid;
+  gap: 3px;
 }
 
 .landing-tokens__ramp {
@@ -2653,90 +2965,122 @@ home-light:defined ~ .landing-light__nojs {
 }
 
 .landing-tokens__ramp > span {
-  block-size: 1.75rem;
+  block-size: 1.25rem;
   border-radius: var(--luz-radius-sm);
   background: var(--v);
-  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--luz-text-primary) 10%, transparent);
 }
 
-/* Semantic: a card drawn with them, and the key */
-.landing-tokens__specimen--card {
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 9.5rem), 1fr));
-  gap: var(--luz-space-sm) var(--luz-space-md);
+/* The same card in the three modes, each framed so a light one on a dark
+   page does not glare; the caption sits outside the mode */
+.landing-tokens__modes {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--luz-space-sm);
+}
+
+.landing-tokens__mode {
+  display: grid;
+  gap: var(--luz-space-xs);
+  margin: 0;
 }
 
 .landing-tokens__ui {
-  grid-column: 1 / -1;
   display: grid;
-  gap: var(--luz-space-sm);
-  margin-block-end: var(--luz-space-xs);
-  padding: var(--luz-space-lg);
-  border: 1px solid var(--line);
+  gap: var(--luz-space-xs);
+  padding: var(--luz-space-md);
+  border: 1px solid var(--luz-divider);
   border-radius: var(--luz-radius-md);
-  background: var(--bg);
+  background: var(--luz-surface);
+  box-shadow: 0 0 0 1px color-mix(in oklab, currentcolor 12%, transparent);
 }
 
 .landing-tokens__ui-title {
   font-family: var(--luz-font-heading);
-  font-size: var(--luz-text-2xl);
+  font-size: var(--luz-text-xl);
   line-height: 1;
-  color: var(--v);
+  color: var(--luz-text-primary);
 }
 
-.landing-tokens__ui-text {
-  block-size: 0.5rem;
+.landing-tokens__ui-line {
+  block-size: 0.35rem;
   border-radius: var(--luz-radius-full);
-  background: var(--v);
-  opacity: 0.45;
+  background: var(--luz-text-secondary);
 }
 
-.landing-tokens__ui-text--short {
+.landing-tokens__ui-line--short {
   inline-size: 60%;
 }
 
-.landing-tokens__ui-row {
-  display: flex;
-  align-items: center;
-  gap: var(--luz-space-sm);
-  margin-block-start: var(--luz-space-xs);
-}
-
 .landing-tokens__ui-button {
-  inline-size: 6rem;
-  block-size: 2rem;
-  border-radius: var(--luz-radius-md);
-  background: var(--v);
+  inline-size: 60%;
+  block-size: 1.25rem;
+  margin-block-start: var(--luz-space-3xs);
+  border-radius: var(--luz-radius-sm);
+  background: var(--luz-brand-fill);
 }
 
-.landing-tokens__ui-dot,
-.landing-tokens__dot {
-  flex: none;
-  inline-size: 1rem;
-  block-size: 1rem;
-  border-radius: var(--luz-radius-full);
-  background: var(--v);
-  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--luz-text-primary) 15%, transparent);
+.landing-tokens__mode figcaption {
+  font-family: var(--luz-font-sans);
+  font-size: var(--luz-text-sm);
+  font-style: normal;
+  text-align: center;
+  color: var(--luz-text-secondary);
 }
 
-.landing-tokens__key {
-  display: flex;
-  align-items: center;
-  gap: var(--luz-space-xs);
+/* Scales and the rest: a card per group, its specimen over its one line */
+.landing-tokens__scales {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  gap: var(--luz-space-md);
+}
+
+.landing-tokens__scale {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: var(--luz-space-sm);
   min-inline-size: 0;
+  padding: var(--luz-space-md);
+  border: 1px solid var(--luz-divider);
+  border-radius: var(--luz-radius-md);
+  background: var(--luz-surface);
 }
 
-/* Space: bars of each step */
-.landing-tokens__specimen--bars {
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(0, 1fr);
-  align-items: end;
-  justify-items: center;
+.landing-tokens__scale-title {
+  margin: 0;
+  font-family: var(--luz-font-sans);
+  font-size: var(--luz-text-sm);
+  font-weight: 600;
+  color: var(--luz-text-primary);
 }
 
-.landing-tokens__specimen--bars > li,
-.landing-tokens__specimen--type > li,
-.landing-tokens__specimen--boxes > li,
-.landing-tokens__specimen--curves > li {
+.landing-tokens__scale .luz-code-block {
+  margin: 0;
+  padding: var(--luz-space-xs) 0 0;
+  border: 0;
+  background: none;
+  font-size: var(--luz-text-xs);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* The bar or the card says what the code is: no language label in the block */
+.landing-tokens__step .luz-code-block::before,
+.landing-tokens__scale .luz-code-block::before {
+  display: none;
+}
+
+.landing-tokens__specimen {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--luz-space-xs);
+  min-block-size: 5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.landing-tokens__specimen > li {
   display: grid;
   justify-items: center;
   align-content: end;
@@ -2744,9 +3088,9 @@ home-light:defined ~ .landing-light__nojs {
   min-inline-size: 0;
 }
 
-.landing-tokens__specimen--bars .landing-tokens__bar {
-  inline-size: 0.75rem;
-  block-size: var(--v);
+.landing-tokens__specimen .landing-tokens__label {
+  font-size: var(--luz-text-xs);
+  color: var(--luz-text-secondary);
 }
 
 .landing-tokens__bar {
@@ -2755,13 +3099,9 @@ home-light:defined ~ .landing-light__nojs {
   background: var(--luz-brand-primary);
 }
 
-/* Type: the scale, on one baseline */
-.landing-tokens__specimen--type {
-  grid-auto-flow: column;
-  grid-auto-columns: auto;
-  justify-content: space-between;
-  align-items: end;
-  overflow: hidden;
+.landing-tokens__specimen--bars .landing-tokens__bar {
+  inline-size: 0.6rem;
+  block-size: var(--v);
 }
 
 .landing-tokens__letter {
@@ -2771,19 +3111,14 @@ home-light:defined ~ .landing-light__nojs {
   color: var(--luz-text-primary);
 }
 
-/* Radii and shadows: a box each */
-.landing-tokens__specimen--boxes {
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 5rem), 1fr));
-  gap: var(--luz-space-lg);
-}
-
 .landing-tokens__specimen--boxes > li {
+  flex: 1;
   justify-items: stretch;
   text-align: center;
 }
 
 .landing-tokens__box {
-  block-size: 4rem;
+  block-size: 2.75rem;
   background: var(--luz-surface);
 }
 
@@ -2798,14 +3133,9 @@ home-light:defined ~ .landing-light__nojs {
   box-shadow: var(--v);
 }
 
-/* Motion: the curves */
-.landing-tokens__specimen--curves {
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 4.5rem), 1fr));
-}
-
 .landing-tokens__curve {
-  inline-size: 3.5rem;
-  block-size: 4.5rem;
+  inline-size: 2.5rem;
+  block-size: 3.25rem;
   overflow: visible;
 }
 
@@ -2820,15 +3150,42 @@ home-light:defined ~ .landing-light__nojs {
   stroke: var(--luz-divider);
 }
 
-/* Breakpoints: a ruler, each width against the widest */
-.landing-tokens__specimen--ruler > li {
+.landing-tokens__specimen--ruler {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 7rem;
+  justify-content: stretch;
+  gap: var(--luz-space-2xs);
+}
+
+.landing-tokens__specimen--ruler > li {
+  grid-template-columns: minmax(0, 1fr) 6.5rem;
+  justify-items: stretch;
   align-items: center;
-  gap: var(--luz-space-sm);
 }
 
 .landing-tokens__bar--share {
+  justify-self: start;
   inline-size: calc(var(--share) * 100%);
-  block-size: 0.5rem;
+  block-size: 0.4rem;
+}
+
+/* The next step: a band that closes the page */
+.landing-tokens__next {
+  display: grid;
+  justify-items: center;
+  gap: var(--luz-space-md);
+  margin-block-end: var(--luz-space-3xl);
+  padding: var(--luz-space-2xl) var(--luz-space-lg);
+  border-radius: var(--luz-radius-md);
+  background: color-mix(in oklab, var(--luz-brand-primary) 8%, var(--luz-surface-page));
+  text-align: center;
+}
+
+.landing-tokens__next > h2,
+.landing-tokens__next .landing-inside__lead {
+  margin: 0;
+}
+
+.landing-tokens__next .o-actions {
+  justify-self: stretch;
+  justify-content: center;
 }

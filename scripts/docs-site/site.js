@@ -113,10 +113,10 @@ const PLACEHOLDERS = new Set([
   // The weight of each of the home's levels of adoption (budgets.json against dist)
   "weight1", "weight2", "weight3",
   // What each level of the home brings, as a list of names read from the packages
-  "list1", "list2", "list3", "tokennav", "tokensections", "ntokens", "ngroups", "nmodes",
+  "list1", "list2", "list3", "tokendemo", "tokenbrands", "tokenblocks", "ntokens", "nmodes", "ndeps",
 ]);
 /** Values inserted as HTML, not escaped. Only the generator produces them. */
-const RAW_VALUES = new Set(["content", "nav", "pagehead", "rail", "endnav", "pagefoot", "generated", "alternates", "langswitch", "langlinks", "endir", "notice", "contentattrs", "list1", "list2", "list3", "tokennav", "tokensections"]);
+const RAW_VALUES = new Set(["content", "nav", "pagehead", "rail", "endnav", "pagefoot", "generated", "alternates", "langswitch", "langlinks", "endir", "notice", "contentattrs", "list1", "list2", "list3", "tokendemo", "tokenblocks"]);
 
 /** Where the home page's languages live, from the repository root. */
 export const I18N_DIR = "apps/landing/i18n";
@@ -1778,28 +1778,25 @@ function levelLists(site, locale, used) {
 }
 
 /**
- * The page of the tokens (apps/landing/levels/tokens.html): read at a glance,
- * a reader who scrolls learns what each group is and how to use it, never the
- * whole list (owner, 2026-11-23). {{tokensections}} is a section of the home's
- * kind for each group of levelLists(): how many tokens it has, its name, its
- * lead from the catalog (`level.tokens.<id>.lead`), a link to its docs, and a
- * panel with a small specimen drawn from a few of its tokens (read through
- * `--v`, so it follows the colour mode) over the CSS that uses them
- * (SNIPPETS, English like all code). {{tokennav}} links to the sections,
- * and {{ntokens}}, {{ngroups}}, {{nmodes}} (the [data-theme] blocks of
- * semantic.css) are the hero's numbers. A token named here that luz-tokens.css
- * no longer defines fails the build.
+ * The page of the tokens (apps/landing/levels/tokens.html), for a developer who
+ * does not yet know what a token is: what it is and how to use it, at a glance
+ * (owner, 2026-11-23). The generator writes, from the packages and never typed:
+ *
+ *  - {{tokendemo}}, the hero's demo: a radio per brand family that repaints a
+ *    small product card through one token, by CSS alone (landing.css,
+ *    `.landing-demo:has(input[value=…]:checked)`), with the line that changes;
+ *    {{tokenbrands}} is the style of its panel, a property per family
+ *    (`--demo-<family>`), so landing.css reads no primitive;
+ *  - {{tokenblocks}}, three sections of the home's kind, colour, scales and the
+ *    rest, each linking the groups of levelLists() it holds to their docs with
+ *    their counts, over a panel that draws a few tokens (read through `--v`, so
+ *    they follow the colour mode) and the CSS that uses them;
+ *  - {{ntokens}}, {{nmodes}} (the [data-theme] blocks of semantic.css) and
+ *    {{ndeps}} (the dependencies of @luz-ds/tokens), the hero's numbers.
+ *
+ * A token named here that luz-tokens.css does not define fails the build.
  */
-const TOKEN_SNIPPETS = {
-  primitives: "/* In your theme, never in a component */\n:root {\n  --luz-brand-primary: var(--luz-blue-60);\n}",
-  semantic: ".card {\n  background: var(--luz-surface);\n  color: var(--luz-text-primary);\n  border: 1px solid var(--luz-divider);\n}",
-  spacing: ".card {\n  padding: var(--luz-space-lg);\n  gap: var(--luz-space-sm);\n}",
-  typography: "h1 {\n  font-family: var(--luz-font-heading);\n  font-size: var(--luz-text-4xl);\n}",
-  radius: ".card {\n  border-radius: var(--luz-radius-md);\n}",
-  shadows: ".popover {\n  box-shadow: var(--luz-shadow-lg);\n}",
-  motion: ".panel {\n  transition: opacity\n    var(--luz-duration-base)\n    var(--luz-easing-standard);\n}",
-  breakpoints: "/* --luz-mq-md: a media query cannot\n   read a property, so write its value */\n@media (min-width: 768px) { … }",
-};
+const DEMO_FAMILIES = ["blue", "teal", "green", "purple", "red"];
 
 function tokenSections({ say, tokens, groups, counts, families, read }) {
   const known = new Set(tokens);
@@ -1809,65 +1806,103 @@ function tokenSections({ say, tokens, groups, counts, families, read }) {
     if (!known.has(name)) throw new Error(`the page of the tokens names ${name}, which luz-tokens.css does not define: change tokenSections() in scripts/docs-site/site.js`);
     return name;
   };
+  const t = (key) => escapeHtml(say(key));
   const v = (name) => `style="--v:var(${need(name)})"`;
-  const short = (name, prefix) => name.slice(prefix.length);
   const label = (text) => `<code class="landing-tokens__label">${escapeHtml(text)}</code>`;
-  const idOf = (key) => key.replace("inside.list.", "");
+  const css = (text) => {
+    for (const m of text.matchAll(/--luz-[\w-]+/g)) need(m[0]);
+    return `<pre class="luz-code-block" data-lang="css" dir="ltr"><code>${escapeHtml(text)}</code></pre>`;
+  };
+  const byId = Object.fromEntries(groups.map(([key, href, test], i) => [key.replace("inside.list.", ""), { key, href, test, count: counts[i] }]));
   const curve = (name) => {
     const m = /cubic-bezier\(([^)]+)\)/.exec(values.get(need(name)));
     const [x1, y1, x2, y2] = m ? m[1].split(",").map(Number) : [0, 0, 1, 1];
     const at = (x, y) => `${(x * 40).toFixed(1)},${(44 - y * 40).toFixed(1)}`;
     return `<svg class="landing-tokens__curve" viewBox="-2 -12 44 60" aria-hidden="true"><path class="landing-tokens__axis" d="M0,44 H40 M0,44 V4"/><path d="M${at(0, 0)} C${at(x1, y1)} ${at(x2, y2)} ${at(1, 1)}"/></svg>`;
   };
-  const figure = (cls, items) => `<ul class="landing-tokens__specimen landing-tokens__specimen--${cls}" aria-hidden="true">${items.join("")}</ul>`;
-  const specimens = {
-    primitives: (names) =>
-      `<div class="landing-tokens__specimen landing-tokens__specimen--ramps" aria-hidden="true">${families
-        .map((family) => `<span class="landing-tokens__family">${family}</span><span class="landing-tokens__ramp">${names.filter((n) => n.startsWith(`--luz-${family}-`)).map((n) => `<span ${v(n)}></span>`).join("")}</span>`)
-        .join("")}</div>`,
-    // a card drawn with the semantic colours, so they are seen doing their job
-    semantic: () =>
-      `<div class="landing-tokens__specimen landing-tokens__specimen--card" aria-hidden="true"><span class="landing-tokens__ui" style="--bg:var(${need("--luz-surface")});--line:var(${need("--luz-divider")})"><span class="landing-tokens__ui-title" ${v("--luz-text-primary")}>Aa</span><span class="landing-tokens__ui-text" ${v("--luz-text-secondary")}></span><span class="landing-tokens__ui-text landing-tokens__ui-text--short" ${v("--luz-text-secondary")}></span><span class="landing-tokens__ui-row"><span class="landing-tokens__ui-button" ${v("--luz-brand-fill")}></span><span class="landing-tokens__ui-dot" ${v("--luz-color-success")}></span><span class="landing-tokens__ui-dot" ${v("--luz-color-danger")}></span></span></span>${[
-        "--luz-surface", "--luz-text-primary", "--luz-divider", "--luz-brand-fill", "--luz-color-success", "--luz-color-danger",
-      ].map((n) => `<span class="landing-tokens__key"><span class="landing-tokens__dot" ${v(n)}></span>${label(short(n, "--luz-"))}</span>`).join("")}</div>`,
-    spacing: () => figure("bars", ["2xs", "xs", "sm", "md", "lg", "xl", "2xl", "3xl", "4xl"].map((step) => `<li><span class="landing-tokens__bar" ${v(`--luz-space-${step}`)}></span>${label(step)}</li>`)),
-    typography: () => figure("type", ["sm", "base", "lg", "xl", "2xl", "3xl", "4xl"].map((step) => `<li><span class="landing-tokens__letter" ${v(`--luz-text-${step}`)}>Aa</span>${label(step)}</li>`)),
-    radius: (names) => figure("boxes", names.map((n) => `<li><span class="landing-tokens__box landing-tokens__box--radius" ${v(n)}></span>${label(short(n, "--luz-radius-"))}</li>`)),
-    shadows: () => figure("boxes", ["sm", "md", "lg"].map((step) => `<li><span class="landing-tokens__box landing-tokens__box--shadow" ${v(`--luz-shadow-${step}`)}></span>${label(step)}</li>`)),
-    motion: () => figure("curves", ["standard", "enter", "exit", "spring"].map((step) => `<li>${curve(`--luz-easing-${step}`)}${label(step)}</li>`)),
-    breakpoints: (names) => {
+  const card = (name, specimen, code) => `<div class="landing-tokens__scale"><p class="landing-tokens__scale-title">${t(`inside.list.${name}`)}</p>${specimen}${css(code)}</div>`;
+  const row = (cls, items) => `<ul class="landing-tokens__specimen landing-tokens__specimen--${cls}" aria-hidden="true">${items.join("")}</ul>`;
+  const ui = (attrs = "") =>
+    `<span class="landing-tokens__ui"${attrs}><span class="landing-tokens__ui-title">Aa</span><span class="landing-tokens__ui-line"></span><span class="landing-tokens__ui-line landing-tokens__ui-line--short"></span><span class="landing-tokens__ui-button"></span></span>`;
+  const panels = {
+    color: () => {
+      const primitive = "--luz-blue-60";
+      const ramps = `<div class="landing-tokens__ramps" aria-hidden="true">${families
+        .map((family) => `<span class="landing-tokens__ramp">${tokens.filter(byId.primitives.test).filter((n) => n.startsWith(`--luz-${family}-`)).map((n) => `<span ${v(n)}></span>`).join("")}</span>`)
+        .join("")}</div>`;
+      const chain = [
+        `<ol class="landing-tokens__chain">`,
+        `<li><span class="landing-tokens__chip" ${v(primitive)}></span><span class="landing-tokens__chain-kind">${t("level.tokens.chain.primitive")}</span>${label(primitive)}</li>`,
+        `<li><span class="landing-tokens__chip" ${v(need("--luz-brand-fill"))}></span><span class="landing-tokens__chain-kind">${t("level.tokens.chain.semantic")}</span>${label("--luz-brand-fill")}</li>`,
+        `<li><span class="landing-tokens__chain-button" aria-hidden="true">${t("level.tokens.demo.button")}</span><span class="landing-tokens__chain-kind">${t("level.tokens.chain.component")}</span>${label(".button")}</li>`,
+        `</ol>`,
+      ].join("");
+      const modes = `<div class="landing-tokens__modes" aria-hidden="true">${[["light", "light"], ["dark", "dark"], ["high-contrast", "contrast"]]
+        .map(([mode, key]) => `<figure class="landing-tokens__mode">${ui(` data-theme="${mode}"`)}<figcaption>${t(`level.tokens.mode.${key}`)}</figcaption></figure>`)
+        .join("")}</div>`;
+      return `${chain}${ramps}${modes}`;
+    },
+    scales: () =>
+      `<div class="landing-tokens__scales">${[
+        card("spacing", row("bars", ["xs", "sm", "md", "lg", "xl", "2xl"].map((step) => `<li><span class="landing-tokens__bar" ${v(`--luz-space-${step}`)}></span>${label(step)}</li>`)), "gap: var(--luz-space-md);"),
+        card("typography", row("type", ["sm", "base", "lg", "xl", "2xl"].map((step) => `<li><span class="landing-tokens__letter" ${v(`--luz-text-${step}`)}>Aa</span>${label(step)}</li>`)), "font-size: var(--luz-text-2xl);"),
+        card("radius", row("boxes", ["none", "sm", "md", "full"].map((step) => `<li><span class="landing-tokens__box landing-tokens__box--radius" ${v(`--luz-radius-${step}`)}></span>${label(step)}</li>`)), "border-radius: var(--luz-radius-md);"),
+        card("shadows", row("boxes", ["sm", "md", "lg"].map((step) => `<li><span class="landing-tokens__box landing-tokens__box--shadow" ${v(`--luz-shadow-${step}`)}></span>${label(step)}</li>`)), "box-shadow: var(--luz-shadow-lg);"),
+      ].join("")}</div>`,
+    more: () => {
+      const mq = tokens.filter(byId.breakpoints.test);
       const px = (n) => parseFloat(values.get(n)) || 0;
-      const widest = Math.max(...names.map(px));
-      return figure("ruler", names.map((n) => `<li><span class="landing-tokens__bar landing-tokens__bar--share" style="--share:${(px(n) / widest).toFixed(3)}"></span>${label(`${short(n, "--luz-mq-")} ${values.get(n)}`)}</li>`));
+      const widest = Math.max(...mq.map(px));
+      return `<div class="landing-tokens__scales">${[
+        card("motion", row("curves", ["standard", "enter", "exit", "spring"].map((step) => `<li>${curve(`--luz-easing-${step}`)}${label(step)}</li>`)), "transition: opacity\n  var(--luz-duration-base)\n  var(--luz-easing-standard);"),
+        card("breakpoints", row("ruler", mq.map((n) => `<li><span class="landing-tokens__bar landing-tokens__bar--share" style="--share:${(px(n) / widest).toFixed(3)}"></span>${label(`${n.slice("--luz-mq-".length)} ${values.get(n)}`)}</li>`)), "/* a media query reads no property: */\n@media (min-width: 768px) { … }"),
+      ].join("")}</div>`;
     },
   };
-  const sections = groups.map(([key, href, test], i) => {
-    const id = idOf(key);
-    const names = tokens.filter(test);
-    const snippet = TOKEN_SNIPPETS[id];
-    for (const m of snippet.matchAll(/--luz-[\w-]+/g)) need(m[0]);
-    return [
-      `<section class="landing-inside${i % 2 ? " landing-inside--flip" : ""} landing-tokens__group" id="t-${id}" aria-labelledby="t-${id}-title">`,
+  const BLOCKS = [
+    ["color", ["primitives", "semantic"]],
+    ["scales", ["spacing", "typography", "radius", "shadows"]],
+    ["more", ["motion", "breakpoints"]],
+  ];
+  const lost = groups.map(([key]) => key.replace("inside.list.", "")).filter((id) => !BLOCKS.some(([, ids]) => ids.includes(id)));
+  if (lost.length) throw new Error(`the page of the tokens has no block for ${lost.join(", ")}: add it to BLOCKS in tokenSections()`);
+  const blocks = BLOCKS.map(([id, ids], i) =>
+    [
+      `<section class="landing-inside${i % 2 ? " landing-inside--flip" : ""} landing-tokens__block" id="t-${id}" aria-labelledby="t-${id}-title">`,
       `  <div class="landing-inside__copy">`,
-      `    <p class="landing-inside__eyebrow"><span class="landing-tokens__count">${counts[i]}</span><span>${escapeHtml(say("inside.list.tokens"))}</span></p>`,
-      `    <h2 class="landing-inside__title" id="t-${id}-title">${escapeHtml(say(key))}</h2>`,
-      `    <p class="landing-inside__lead">${escapeHtml(say(`level.tokens.${id}.lead`))}</p>`,
-      `    <div class="o-actions"><a class="luz-btn luz-btn--outline" href="${href}" aria-describedby="t-${id}-title">${escapeHtml(say("level.tokens.group.docs"))}</a></div>`,
+      `    <h2 class="landing-inside__title" id="t-${id}-title">${t(`level.tokens.${id}.title`)}</h2>`,
+      `    <p class="landing-inside__lead">${t(`level.tokens.${id}.lead`)}</p>`,
+      `    <ul class="landing-tokens__groups">${ids.map((g) => `<li><a class="landing-tokens__group-link" href="${byId[g].href}">${t(byId[g].key)} <span class="landing-names__n">${byId[g].count}</span></a></li>`).join("")}</ul>`,
       `  </div>`,
-      `  <div class="landing-panel landing-tokens__panel" dir="ltr">`,
-      `    ${specimens[id](names)}`,
-      `    <pre class="luz-code-block" data-lang="css" dir="ltr" tabindex="0" role="region" aria-label="${escapeHtml(say(key))}: CSS"><code>${escapeHtml(snippet)}</code></pre>`,
-      `  </div>`,
+      `  <div class="landing-panel landing-tokens__panel" dir="ltr">${panels[id]()}</div>`,
       `</section>`,
-    ].join("\n");
-  });
+    ].join("\n"),
+  );
+  const demo = [
+    `<fieldset class="landing-demo__picker">`,
+    `<legend>${t("level.tokens.demo.legend")}</legend>`,
+    `<div class="landing-demo__options">`,
+    DEMO_FAMILIES.map((family, i) => `<label class="landing-demo__option"><input type="radio" name="brand" value="${family}"${i ? "" : " checked"}><span class="landing-demo__swatch" ${v(`--luz-${family}-60`)} aria-hidden="true"></span><span dir="ltr">${family}</span></label>`).join(""),
+    `</div>`,
+    `</fieldset>`,
+    `<div class="landing-demo__product">`,
+    `<p class="landing-demo__badge">${t("level.tokens.demo.badge")}</p>`,
+    `<p class="landing-demo__heading">${t("level.tokens.demo.heading")}</p>`,
+    `<p class="landing-demo__text">${t("level.tokens.demo.text")}</p>`,
+    `<span class="landing-demo__button" aria-hidden="true">${t("level.tokens.demo.button")}</span>`,
+    `</div>`,
+    `<p class="landing-demo__caption">${t("level.tokens.demo.code")}</p>`,
+    // plain code, not a highlighted block: the highlighter rewrites a block's markup, and each line is shown by CSS
+    `<p class="landing-demo__code" dir="ltr">${DEMO_FAMILIES.map((family) => `<code class="landing-demo__line" data-family="${family}">--luz-brand-fill: var(${need(`--luz-${family}-60`)});</code>`).join("")}</p>`,
+  ].join("\n");
   const modes = new Set([...read("packages/tokens/src/semantic.css").matchAll(/\[data-theme="([a-z-]+)"\]\s*[,{]/g)].map((m) => m[1]));
   return {
-    tokensections: sections.join("\n"),
-    tokennav: groups.map(([key], i) => `<li><a class="landing-level__jump" href="#t-${idOf(key)}">${escapeHtml(say(key))} <span class="landing-names__n">${counts[i]}</span></a></li>`).join(""),
+    tokendemo: demo,
+    tokenbrands: DEMO_FAMILIES.map((family) => `--demo-${family}:var(${need(`--luz-${family}-60`)})`).join(";"),
+    tokenblocks: blocks.join("\n"),
     ntokens: String(tokens.length),
-    ngroups: String(groups.length),
     nmodes: String(modes.size),
+    ndeps: String(Object.keys(JSON.parse(read("packages/tokens/package.json")).dependencies ?? {}).length),
   };
 }
 
