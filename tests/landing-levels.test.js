@@ -144,21 +144,36 @@ describe("the pages of the three levels", () => {
       expect(stats).not.toContain("level.tokens.stat.groups");
     });
 
-    it.each(LANGS)("in %s: the hero's demo changes the brand with one token, with no script: a radio per family, each drawn by landing.css", (code, prefix) => {
+    it.each(LANGS)("in %s: the hero's demo is a set of looks, each a whole look and feel from the tokens of every group (colour, type, corners, depth, motion), by CSS alone", (code, prefix) => {
       const hero = sectionOf(rendered.get(`${prefix}tokens/`), "hero");
-      const demo = hero;
-      expect(demo).toMatch(/<fieldset\b/);
-      expect(demo).toContain(`<legend>${catalog(code)["level.tokens.demo.legend"]}</legend>`);
-      const families = [...demo.matchAll(/<input type="radio" name="brand" value="([a-z]+)"/g)].map((m) => m[1]);
-      expect(families.length).toBeGreaterThanOrEqual(4);
-      expect(demo).toMatch(new RegExp(`<input type="radio" name="brand" value="${families[0]}" checked`));
-      expect(demo).toContain('class="landing-demo__product"');
-      for (const family of families) {
-        expect(tokens).toContain(`--luz-${family}-60`);
-        expect(css, family).toContain(`.landing-demo:has(input[value="${family}"]:checked)`);
-        expect(demo, family).toContain(`var(--luz-${family}-60)`);
-      }
+      expect(hero).toMatch(/<fieldset\b/);
+      expect(hero).toContain(`<legend>${catalog(code)["level.tokens.demo.legend"]}</legend>`);
+      const looks = [...hero.matchAll(/<input type="radio" name="look" value="([a-z]+)"/g)].map((m) => m[1]);
+      expect(looks.length).toBeGreaterThanOrEqual(4);
+      expect(hero).toMatch(new RegExp(`<input type="radio" name="look" value="${looks[0]}" checked`));
+      expect(hero).toContain('class="landing-demo__product"');
       expect(hero).not.toContain("<script");
+      const reads = {};
+      for (const look of looks) {
+        // its name, in the language of the page
+        expect(hero, look).toContain(`>${catalog(code)[`level.tokens.look.${look}`]}</span></label>`);
+        // landing.css gives the look every property the product reads
+        const rule = new RegExp(`\\.landing-demo:has\\(input\\[value="${look}"\\]:checked\\)\\s*\\{([^}]*)\\}`).exec(css)?.[1] ?? "";
+        for (const prop of ["--demo-brand", "--demo-font", "--demo-radius", "--demo-shadow", "--demo-ease", "--demo-duration"]) expect(rule, `${look}: ${prop}`).toContain(`${prop}:`);
+        // the code says the tokens the look reads, one of each group, every one a token of luz-tokens.css
+        const block = new RegExp(`<code class="landing-demo__look" data-look="${look}">([^<]*)</code>`).exec(hero)?.[1] ?? "";
+        const named = [...block.matchAll(/var\((--luz-[\w-]+)\)/g)].map((m) => m[1]);
+        for (const name of named) expect(tokens, `${look}: ${name}`).toContain(name);
+        const group = (re) => named.find((n) => re.test(n));
+        reads[look] = [group(/^--luz-(blue|teal|green|purple|red|yellow|gray)-\d+$/), group(/^--luz-font-/), group(/^--luz-radius-/), group(/^--luz-shadow-|^--luz-easing-/), group(/^--luz-easing-/)];
+        expect(reads[look].every(Boolean), `${look} reads ${named}`).toBe(true);
+      }
+      // every look is its own: no two share their colour, and any two differ in at least three of the five
+      expect(new Set(looks.map((l) => reads[l][0])).size).toBe(looks.length);
+      for (const a of looks) for (const b of looks) if (a < b) expect(reads[a].filter((x, i) => x !== reads[b][i]).length, `${a} vs ${b}`).toBeGreaterThanOrEqual(3);
+      // the hero itself follows the look: its primary button reads the look's corners and type
+      expect(css).toMatch(/\.landing-tokens__hero \.luz-btn--primary\s*\{[^}]*var\(--demo-radius\)[^}]*\}/);
+      expect(css).toMatch(/\.landing-tokens__hero \.luz-btn--primary\s*\{[^}]*var\(--demo-font\)[^}]*\}/);
     });
 
     it.each(LANGS)("in %s: three steps, install, use and make it yours, each with code to copy", (code, prefix) => {
