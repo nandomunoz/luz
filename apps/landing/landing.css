@@ -2935,35 +2935,29 @@ home-light:defined ~ .landing-light__nojs {
   display: block;
 }
 
-/* The numbers, a quiet row at the foot of the band */
-.landing-tokens__hero .landing-level__stats {
+/* The numbers: one quiet line of reassurance under the buttons that wraps
+   and stays centred at any width. Room between two facts, not a dot, which
+   would start a line once it wraps; the bold number says where one begins */
+.landing-tokens__facts {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: var(--luz-space-md) var(--luz-space-2xl);
+  gap: var(--luz-space-3xs) var(--luz-space-lg);
   margin: 0;
   padding: 0;
-  border: 0;
-}
-
-.landing-level__stats > div {
-  display: flex;
-  flex-direction: column-reverse;
-  align-items: center;
-  gap: var(--luz-space-3xs);
-}
-
-.landing-level__stats dt {
+  list-style: none;
   font-family: var(--luz-font-sans);
   font-size: var(--luz-text-sm);
   color: var(--luz-text-secondary);
 }
 
-.landing-level__stats dd {
+.landing-tokens__facts > li {
   margin: 0;
-  font-family: var(--luz-font-heading);
-  font-size: var(--luz-text-2xl);
-  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.landing-tokens__facts strong {
+  font-weight: 600;
   color: var(--luz-text-primary);
 }
 
@@ -3480,8 +3474,7 @@ home-light:defined ~ .landing-light__nojs {
 @media (prefers-reduced-motion: no-preference) {
   /* The hero, one piece after another */
   .landing-tokens__head > *,
-  .landing-tokens__stage,
-  .landing-tokens__hero .landing-level__stats {
+  .landing-tokens__stage {
     animation: landing-rise var(--luz-duration-lazy) var(--luz-easing-enter) both;
   }
 
@@ -3501,8 +3494,8 @@ home-light:defined ~ .landing-light__nojs {
     animation-delay: var(--luz-duration-slower);
   }
 
-  .landing-tokens__hero .landing-level__stats {
-    animation-delay: var(--luz-duration-lazy);
+  .landing-tokens__head > :nth-child(5) {
+    animation-delay: var(--luz-duration-slower);
   }
 
   /* The marked word: its tint sweeps in from the start of the line */

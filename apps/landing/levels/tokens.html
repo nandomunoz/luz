@@ -12,16 +12,16 @@
             <a class="luz-btn luz-btn--primary" href="#steps">{{t:level.tokens.cta.steps}}</a>
             <a class="luz-btn luz-btn--outline" href="/docs/tokens/">{{t:level.tokens.docs}}</a>
           </div>
+          <ul class="landing-tokens__facts">
+            <li><strong>{{ntokens}}</strong> {{t:level.tokens.stat.tokens}}</li>
+            <li><strong>{{nmodes}}</strong> {{t:level.tokens.stat.modes}}</li>
+            <li><strong>{{weight1}}</strong> {{t:level.tokens.stat.weight}}</li>
+            <li><strong>{{ndeps}}</strong> {{t:level.tokens.stat.deps}}</li>
+          </ul>
         </div>
         <div class="landing-tokens__stage">
           {{tokendemo}}
         </div>
-        <dl class="landing-level__stats">
-          <div><dt>{{t:level.tokens.stat.tokens}}</dt><dd>{{ntokens}}</dd></div>
-          <div><dt>{{t:level.tokens.stat.modes}}</dt><dd>{{nmodes}}</dd></div>
-          <div><dt>{{t:level.tokens.stat.weight}}</dt><dd>{{weight1}}</dd></div>
-          <div><dt>{{t:level.tokens.stat.deps}}</dt><dd>{{ndeps}}</dd></div>
-        </dl>
       </section>
 
       <section class="o-stack luz-section landing-tokens__steps" id="steps" aria-labelledby="steps-title">
