@@ -87,8 +87,8 @@ import { SITE_URL } from "./i18n.js";
 
 const LANDING = { route: "/", file: "apps/landing/index.html" };
 
-/** The pages of the levels (tokens, core, catalog): each is the home's template with the <main> of apps/landing/levels/<name>.html. */
-const LEVELS = ["tokens", "core", "catalog"];
+/** The pages of the levels (tokens, core, catalog) and of the skill (ai): each is the home's template with the <main> of apps/landing/levels/<name>.html. */
+const LEVELS = ["tokens", "core", "catalog", "ai"];
 
 /** Where the virtual pages of the docs languages are (never on disk): apps/docs/_virtual/<code>/<path>.html. */
 const VIRTUAL_DOCS = "apps/docs/_virtual";

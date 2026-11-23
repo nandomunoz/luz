@@ -46,6 +46,7 @@ import { panel as sitewideBlock } from "./catalog-blocks/sitewide.js";
 import { panel as structureBlock } from "./catalog-blocks/structure.js";
 import { CASCADE, FITS_KINDS, fileKinds, fitsKindsOf, isKindFile, kindPatterns } from "./kinds.js";
 import { fillAiMarkers } from "./ai.js";
+import { aiSections } from "./ai-page.js";
 import { DEBUG_FILE, DEBUG_ROUTE, hasDebugPage, renderDebug } from "./debug.js";
 import { FILES, catalogComponents, catalogFilesIn, renderComponentLinks, renderSnippets, snippetData } from "./snippets.js";
 import { assertInlineHtml, loadLocales, localizeDocsLinks, lookup, markDocsLinks, renderAlternates, renderLangLinks, renderPageLinks, renderSwitcher, unusedKeys } from "./i18n.js";
@@ -120,9 +121,10 @@ const PLACEHOLDERS = new Set([
   "list1", "list2", "list3", "tokendemo", "tokenlooks", "tokenblocks", "ntokens", "nmodes", "ndeps",
   "coredemo", "coreblocks", "ncomponents", "nobjects", "ndepscore",
   "catalogdemo", "catalogblocks", "catalogsheets", "ncatalog", "nchunks", "ndepscatalog",
+  "aiblocks", "naiagents", "naiskills", "naitargets", "ndepsai",
 ]);
 /** Values inserted as HTML, not escaped. Only the generator produces them. */
-const RAW_VALUES = new Set(["content", "nav", "pagehead", "rail", "endnav", "pagefoot", "generated", "alternates", "langswitch", "langlinks", "endir", "notice", "contentattrs", "list1", "list2", "list3", "tokendemo", "tokenblocks", "coredemo", "coreblocks", "catalogdemo", "catalogblocks", "catalogsheets"]);
+const RAW_VALUES = new Set(["content", "nav", "pagehead", "rail", "endnav", "pagefoot", "generated", "alternates", "langswitch", "langlinks", "endir", "notice", "contentattrs", "list1", "list2", "list3", "tokendemo", "tokenblocks", "coredemo", "coreblocks", "catalogdemo", "catalogblocks", "catalogsheets", "aiblocks"]);
 
 /** Where the home page's languages live, from the repository root. */
 export const I18N_DIR = "apps/landing/i18n";
@@ -1784,6 +1786,7 @@ function levelLists(site, locale, used) {
   return {
     ...tokenSections({ say, tokens, groups: GROUPS, counts, families: Object.keys(tokenJson.color), root, read }),
     ...catalogSections({ say, root, groups: docsGroups("catalog", 0), sheets: allCatalogSheets, dependencies: Object.keys(JSON.parse(read("packages/catalog/package.json")).dependencies ?? {}).length, chunks: FILES.catalog.chunks.length }),
+    ...aiSections({ say, root, block: levelBlock, escapeHtml }),
     ...coreSections({ say, groups: docsGroups("components", sheets("packages/core/src/components").length), objects: objects.length, dependencies: Object.keys(JSON.parse(read("packages/core/package.json")).dependencies ?? {}).length }),
     list1: [
       `<div class="landing-names" style="--n:${GROUPS.length}">`,
@@ -1828,7 +1831,8 @@ function levelBlock({ i, id, anchor, title, lead, links, panel, aside = "", wide
     `  <div class="landing-inside__copy">`,
     `    <h2 class="landing-inside__title" id="${anchor}-${id}-title">${title}</h2>`,
     `    <p class="landing-inside__lead">${lead}</p>`,
-    `    <ul class="landing-block__groups">${links.map((l) => `<li><a class="landing-block__link" href="${l.href}">${l.label} <span class="landing-names__n">${l.count}</span></a></li>`).join("")}</ul>${aside}`,
+    // a link with no count (the page of the skill links its docs) has no number; a block with no link has no list
+    `    ${links.length ? `<ul class="landing-block__groups">${links.map((l) => `<li><a class="landing-block__link" href="${l.href}">${l.label}${l.count === "" ? "" : ` <span class="landing-names__n">${l.count}</span>`}</a></li>`).join("")}</ul>` : ""}${aside}`,
     `  </div>`,
     // the tokens' specimens are drawn left to right; the live pieces of core and the catalog follow the page's direction
     `  <div class="landing-panel landing-block__panel"${wide ? "" : ' dir="ltr"'}>${panel}</div>`,
@@ -2506,6 +2510,12 @@ export function levelTemplate(home, fragment, name, file = "the home's template"
   // (catalogSections() writes them, in the order of the cascade), before the landing's own
   const landingCss = '<link rel="stylesheet" href="/apps/landing/landing.css">';
   if (name === "catalog" && !home.includes(landingCss)) throw new Error(`${file}: the page of the catalog links its stylesheets before ${landingCss}, which the home's template lacks`);
+  // The page of the skill shows the home's terminal in its hero: one conversation, written once, in the home's template
+  if (name === "ai") {
+    const cli = /<figure class="landing-cli"[\s\S]*?<\/figure>/.exec(home);
+    if (!cli || !fragment.includes("{{cli}}")) throw new Error(`${file}: the page of the skill puts the home's terminal (<figure class="landing-cli">) where its fragment says {{cli}}`);
+    fragment = fragment.replace("{{cli}}", () => cli[0]);
+  }
   const before = home.slice(0, open.index + open[0].length).replace(landingCss, name === "catalog" ? `{{catalogsheets}}\n  ${landingCss}` : landingCss);
   const after = home.slice(icons);
   // The links (<a>) to a section of the home, outside the skip link; the icons (<use>) stay the page's own

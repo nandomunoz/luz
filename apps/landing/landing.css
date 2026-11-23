@@ -5079,3 +5079,60 @@ home-light:defined ~ .landing-light__nojs {
     flex-wrap: wrap;
   }
 }
+
+/* ====================== The page of the skill (apps/landing/levels/ai.html) ======================
+   The hero holds the home's terminal with no frame of its own around it (the
+   terminal is the frame); the blocks are the levels' blocks, their panels a
+   table of commands or of assistants, cards of agents and skills, or a list */
+.landing-ai__stage {
+  max-inline-size: 46rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  box-shadow: none;
+}
+
+.landing-ai .landing-cli__note {
+  margin: 0;
+}
+
+/* A table scrolls inside its panel on a narrow screen, from the keyboard too */
+.landing-ai__scroll {
+  overflow-x: auto;
+}
+
+.landing-ai__table {
+  inline-size: 100%;
+  margin: 0;
+}
+
+.landing-ai__table th[scope="row"] {
+  white-space: nowrap;
+}
+
+.landing-ai__card {
+  grid-template-rows: auto 1fr auto;
+}
+
+.landing-ai__text {
+  margin: 0;
+  font-size: var(--luz-text-sm);
+  color: var(--luz-text-secondary);
+}
+
+.landing-ai__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--luz-space-xs);
+  margin: 0;
+  font-size: var(--luz-text-xs);
+  color: var(--luz-text-secondary);
+}
+
+.landing-ai__limits {
+  display: grid;
+  gap: var(--luz-space-sm);
+  margin: 0;
+  padding-inline-start: var(--luz-space-lg);
+}

@@ -1,0 +1,89 @@
+    <!-- The page of the luz-start skill (@luz-ds/ai): the home's template with this <main> (levelTemplate() in
+         scripts/docs-site/site.js). For a developer who does not yet know what the skill does: the hero, one line and
+         the home's terminal (the cli placeholder, copied from the home, never written twice), how to install and use it (three
+         steps), what it does, the agents and skills it adds, the assistants it works with and what it never does
+         (scripts/docs-site/ai-page.js reads them from the package), and what to use until it is on npm -->
+    <div class="landing-level">
+      <section class="landing-intro landing-demo landing-ai" id="hero" aria-labelledby="hero-title">
+        <div class="landing-intro__head">
+          <p class="landing-inside__eyebrow"><svg aria-hidden="true"><use href="#i0"/></svg><span>{{t:inside.l4.eyebrow}}</span></p>
+          <h1 class="landing-intro__title" id="hero-title">{{html:inside.l4.title}}</h1>
+          <p class="landing-intro__what">{{t:level.ai.what}}</p>
+          <div class="o-actions">
+            <a class="luz-btn luz-btn--primary" href="#steps">{{t:level.ai.cta.steps}}</a>
+            <a class="luz-btn luz-btn--outline" href="/docs/get-started/ai/#skill">{{t:level.ai.docs}}</a>
+          </div>
+          <ul class="landing-intro__facts">
+            <li><strong>{{naiagents}}</strong> {{t:level.ai.stat.agents}}</li>
+            <li><strong>{{naiskills}}</strong> {{t:level.ai.stat.skills}}</li>
+            <li><strong>{{naitargets}}</strong> {{t:level.ai.stat.targets}}</li>
+            <li><strong>{{ndepsai}}</strong> {{t:level.catalog.stat.deps}}</li>
+          </ul>
+          <p class="landing-cli__note"><span class="luz-badge luz-badge--primary">{{t:inside.l4.soon}}</span></p>
+        </div>
+        <div class="landing-intro__stage landing-ai__stage">
+          {{cli}}
+        </div>
+      </section>
+
+      <section class="o-stack luz-section landing-path" id="steps" aria-labelledby="steps-title">
+        <h2 class="luz-section__title" id="steps-title">{{t:level.ai.steps.title}}</h2>
+        <ol class="landing-path__list">
+          <li class="landing-path__step landing-path__step--1" id="install">
+            <p class="landing-path__title">{{t:level.ai.steps.1.title}}</p>
+            <p class="landing-path__text">{{t:level.ai.steps.1.text}}</p>
+            <div class="landing-install">
+              <div class="landing-install__bar">
+                <span class="landing-install__label">{{t:level.ai.terminal}}</span>
+                <button class="luz-copy-btn" type="button" data-copy-from="ai-init" aria-label="{{t:level.ai.copy.init}}" hidden>{{t:see.copy}}</button>
+              </div>
+              <pre class="luz-code-block" data-lang="bash" dir="ltr" tabindex="0" role="region" aria-label="{{t:level.ai.steps.1.title}}"><code id="ai-init">npx @luz-ds/ai init --target claude</code></pre>
+            </div>
+          </li>
+          <li class="landing-path__step landing-path__step--2">
+            <p class="landing-path__title">{{t:level.ai.steps.2.title}}</p>
+            <p class="landing-path__text">{{t:level.ai.steps.2.text}}</p>
+            <div class="landing-install">
+              <div class="landing-install__bar">
+                <span class="landing-install__label">{{t:level.ai.assistant}}</span>
+                <button class="luz-copy-btn" type="button" data-copy-from="ai-ask" aria-label="{{t:level.ai.copy.ask}}" hidden>{{t:see.copy}}</button>
+              </div>
+              <pre class="luz-code-block" data-lang="text" tabindex="0" role="region" aria-label="{{t:level.ai.steps.2.title}}"><code id="ai-ask">{{t:level.ai.steps.2.ask}}</code></pre>
+            </div>
+          </li>
+          <li class="landing-path__step landing-path__step--3">
+            <p class="landing-path__title">{{t:level.ai.steps.3.title}}</p>
+            <p class="landing-path__text">{{t:level.ai.steps.3.text}}</p>
+            <div class="landing-install">
+              <div class="landing-install__bar">
+                <span class="landing-install__label">{{t:level.ai.terminal}}</span>
+                <button class="luz-copy-btn" type="button" data-copy-from="ai-doctor" aria-label="{{t:level.ai.copy.doctor}}" hidden>{{t:see.copy}}</button>
+              </div>
+              <pre class="luz-code-block" data-lang="bash" dir="ltr" tabindex="0" role="region" aria-label="{{t:level.ai.steps.3.title}}"><code id="ai-doctor">npx @luz-ds/ai doctor</code></pre>
+            </div>
+          </li>
+          <li class="landing-path__step landing-path__step--result">
+            <p class="landing-path__title">{{t:level.ai.steps.result.title}}</p>
+            <ul class="landing-path__outcomes">
+              <li>{{t:level.ai.steps.result.1}}</li>
+              <li>{{t:level.ai.steps.result.2}}</li>
+              <li>{{t:level.ai.steps.result.3}}</li>
+            </ul>
+          </li>
+        </ol>
+      </section>
+
+      <div class="landing-level__blocks">
+        {{aiblocks}}
+      </div>
+
+      <section class="landing-level__next" id="next" aria-labelledby="next-title">
+        <h2 class="luz-section__title" id="next-title">{{t:level.ai.next.title}}</h2>
+        <p class="landing-inside__lead">{{t:level.ai.next.lead}}</p>
+        <div class="o-actions">
+          <a class="luz-btn luz-btn--primary" href="/docs/kinds/">{{t:level.catalog.next.kinds}}</a>
+          <a class="luz-btn luz-btn--outline" href="/docs/get-started/ai/">{{t:level.ai.next.docs}}</a>
+        </div>
+      </section>
+
+    </div>
