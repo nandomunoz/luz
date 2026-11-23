@@ -38,7 +38,7 @@ function measure() {
   }
 
   // Used: for each <use>, the shapes of its symbol with the value they get in the clone
-  // (the sprite's ids are i0 to i13; the globe of the light draws its own, from script)
+  // (the sprite's ids are i0 and up; the globe of the light draws its own, from script)
   for (const use of document.querySelectorAll('use[href^="#i"]')) {
     const id = (use.getAttribute('href') ?? '').replace(/^#/, '');
     if (!/^i\d+$/.test(id)) continue;
@@ -85,7 +85,7 @@ test.describe('the icons of the home page', () => {
     test(`${route}: every inline outline icon is drawn at 1.5 with round ends and no fill`, async ({ page }) => {
       await page.goto(route);
       const { inline } = await page.evaluate(measure);
-      expect(inline.length, 'the levels, the kinds and the eyebrows are inline').toBeGreaterThan(15);
+      expect(inline.length, 'the levels, the kinds and the eyebrows are inline').toBeGreaterThanOrEqual(15);
       expect(faults(inline)).toEqual([]);
     });
 
@@ -99,9 +99,12 @@ test.describe('the icons of the home page', () => {
     test(`${route}: every <use> points to a symbol on the 24 grid`, async ({ page }) => {
       await page.goto(route);
       const { symbols } = await page.evaluate(measure);
-      expect(symbols.length).toBeGreaterThan(30);
+      expect(symbols.length).toBeGreaterThanOrEqual(30);
       expect(symbols.filter((s) => s.viewBox !== '0 0 24 24').map((s) => s.id)).toEqual([]);
-      expect(new Set(symbols.map((s) => s.id)).size, 'i0 to i13 are all used').toBeGreaterThanOrEqual(14);
+      // The sprite holds no symbol that nothing draws (the tick and the cross of the fit lists went with them)
+      const drawn = new Set(symbols.map((s) => s.id));
+      const sprite = await page.evaluate(() => [...document.querySelectorAll('symbol[id^="i"]')].map((el) => el.id));
+      expect(sprite.filter((id) => !drawn.has(id)), 'symbols of the sprite that no <use> points to').toEqual([]);
     });
   }
 });

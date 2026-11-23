@@ -282,7 +282,7 @@ test.describe('Arabic typography', () => {
     const style = (selector) =>
       page.locator(selector).first().evaluate((el) => ({ font: getComputedStyle(el).fontFamily, spacing: getComputedStyle(el).letterSpacing }));
     const sans = await page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--luz-font-sans').trim());
-    for (const selector of ['h1', '.luz-section__title', '.luz-section__eyebrow', '.luz-section__lead', '.landing-install__label', '.landing-cut__label', '.luz-site-footer__col-title', '.site-badge']) {
+    for (const selector of ['h1', '.landing-inside__title', '.landing-inside__eyebrow', '.landing-inside__lead', '.landing-install__label', '.luz-site-footer__col-title', '.site-badge']) {
       await expect(page.locator(selector).first(), selector).toBeAttached();
       const { font, spacing } = await style(selector);
       expect(font, selector).not.toMatch(/ET Book/i);
@@ -291,8 +291,7 @@ test.describe('Arabic typography', () => {
       expect(plain(font), selector).toBe(plain(sans));
       expect(['normal', '0px'], `${selector} letter-spacing`).toContain(spacing);
     }
-    // The three English words of "Why" stay marked as English inside the Arabic page; code keeps its mono face
-    await expect(page.locator('.landing-word[lang="en"]')).toHaveCount(3);
+    // Code keeps its mono face
     const { font } = await style('pre code');
     expect(font).toMatch(/mono/i);
   });

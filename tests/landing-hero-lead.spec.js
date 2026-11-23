@@ -2,8 +2,8 @@
 /**
  * Two things of the home's first screen and the page's rhythm, in English, Spanish and Arabic.
  *
- * The lead of the hero spells the name out: "... start a project with LUZ, the Light, Usable and Zero-dependency
- * design system, or migrate it page by page ...". The four words LUZ, Light, Usable and Zero-dependency are <strong>
+ * The lead of the hero spells the name out: "... Start with LUZ, the Light, Usable and Zero-dependency
+ * design system." The four words LUZ, Light, Usable and Zero-dependency are <strong>
  * (weight 600, the strong ink); "Zero-dependency" never breaks at its hyphen; there are no parentheses. Spanish and
  * Arabic keep the three words in English (lang="en").
  *

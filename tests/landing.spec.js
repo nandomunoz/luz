@@ -2,15 +2,11 @@
  * LUZ Design System — Landing page checks
  * The home (apps/landing, served at /, /es/ and /ar/), section by section, in
  * the order of the page: the hero and the light (the first screen), the four
- * levels of "What's inside", "Why LUZ" (three words, three charts, and the
- * lists of who it fits), "Semantic HTML, styled" (native), "Three color modes",
- * and the footer (a brand and two columns).
+ * levels of "What's inside", the FAQ, and the footer (a brand and two columns).
  *
  * It is a level-3 consumer on top of catalog's landing files, with the base color
  * modes and the six lights of the hour. What other files own is not repeated
- * here: the fit lists, the boxes of the modes and the panel of native HTML are
- * in tests/landing-home.spec.js; their sources in tests/landing-home.test.js;
- * the header, the drawer and the language switch in tests/site-header.spec.js
+ * here: the header, the drawer and the language switch in tests/site-header.spec.js
  * and tests/landing-i18n.spec.js; <home-light> in tests/home-light.spec.js;
  * the numbers in the copy in tests/landing-numbers.test.js. The documentation,
  * with every component and its guidance, is in tests/docs.spec.js.
@@ -31,9 +27,9 @@ test.use({ timezoneId: TIMEZONE, storageState: NO_CHOICE });
 
 const MODES = ['light', 'dark', 'high-contrast'];
 /** The ids of the sections of the home, in the order of the page: the four levels are four sections. */
-const SECTIONS = ['hero', 'light', 'inside', 'inside-2', 'inside-3', 'inside-4', 'why', 'native', 'modes', 'faq'];
+const SECTIONS = ['hero', 'light', 'inside', 'inside-2', 'inside-3', 'inside-4', 'faq'];
 /** The sections of the drawer's "On this page", in the order of the page. */
-const DRAWER = ['inside', 'why', 'native', 'modes', 'faq'];
+const DRAWER = ['inside', 'faq'];
 const ROUTES = [
   ['/', 'en'],
   ['/es/', 'es'],
@@ -212,7 +208,7 @@ test.describe('Landing page', () => {
 
   test.describe('the map of the page', () => {
     for (const [route, lang] of ROUTES) {
-      test(`${route}: ten sections, in order, one h1, each named by its heading (${lang})`, async ({ page }) => {
+      test(`${route}: seven sections, in order, one h1, each named by its heading (${lang})`, async ({ page }) => {
         await open(page, route);
 
         // The sections of the page: the groups of the FAQ are sections inside the FAQ, with no id
@@ -220,7 +216,7 @@ test.describe('Landing page', () => {
         await expect(page.locator('h1')).toHaveCount(1);
         await expect(page.locator('#hero h1')).toHaveCount(1);
         // The sections that went, with their ids
-        for (const gone of ['what', 'see', 'adopt', 'fit', 'type', 'start']) await expect(page.locator(`#${gone}`), `#${gone}`).toHaveCount(0);
+        for (const gone of ['what', 'see', 'adopt', 'fit', 'type', 'start', 'why', 'native', 'modes']) await expect(page.locator(`#${gone}`), `#${gone}`).toHaveCount(0);
         // Every section is named by a heading of its own: h1 for the hero, h2 for the others
         const named = await page.locator('main section[id]').evaluateAll((all) =>
           all.map((el) => {
@@ -237,22 +233,12 @@ test.describe('Landing page', () => {
         // textContent: the eyebrows are set in capitals by CSS, which innerText would return
         const text = async (selector) => plain((await page.locator(selector).first().textContent()) ?? '');
 
-        // Why LUZ is headed by the section head of catalog's section.css
-        await expect(page.locator('section#why')).toHaveClass(/\bluz-section\b/);
-        expect(await text('#why .luz-section__eyebrow')).toBe(plain(words['why.eyebrow']));
-        expect(await text('#why h2.luz-section__title')).toBe(plain(words['why.title']));
-        expect(await text('#why .luz-section__lead')).toBe(plain(words['why.lead']));
-        // The stressed word of "Three words, one promise." is an em
-        await expect(page.locator('#why h2 em')).toHaveCount(1);
-
         // The other sections are headed by the home's own: an eyebrow with its icon, a title with one marked word, a lead
         const heads = [
           ['inside', 'inside.l1'],
           ['inside-2', 'inside.l2'],
           ['inside-3', 'inside.l3'],
           ['inside-4', 'inside.l4'],
-          ['native', 'native'],
-          ['modes', 'modes'],
           ['faq', 'faq'],
         ];
         for (const [id, key] of heads) {
@@ -470,7 +456,7 @@ test.describe('Landing page', () => {
       // Both ends are stressed: the human and the AI
       await expect(hero.locator('h1 em')).toHaveText(['humans', 'AI']);
       await expect(hero.locator('.luz-hero__lead')).toHaveText(
-        'Tokens, CSS and a little vanilla JavaScript, built on what the browser already does: start a project with LUZ, the Light, Usable and Zero-dependency design system, or migrate it page by page. Every component works before JavaScript loads, and every change starts with a failing test.',
+        'Tokens, CSS and a little vanilla JavaScript, built on what the browser already does. Start with LUZ, the Light, Usable and Zero-dependency design system.',
       );
       await expect(hero.locator('.luz-hero__lead strong')).toHaveText(['LUZ', 'Light', 'Usable', 'Zero-dependency']);
       // No eyebrow over the title, no second line under the lead, and the lead carries no link
@@ -791,171 +777,6 @@ test.describe('Landing page', () => {
     });
   });
 
-  /* ---- 4. why: three words, three charts --------------------------------- */
-
-  test.describe('why', () => {
-    test('three cards in a grid: Light, Usable, Zero-dependency, each named by its word, which stays English', async ({ page }) => {
-      await open(page);
-
-      const cards = page.locator('#why .landing-why > article.luz-card');
-      await expect(cards).toHaveCount(3);
-      const titles = await cards.evaluateAll((all) => all.map((el) => [el.querySelector('h3')?.textContent?.trim(), el.querySelector('h3')?.lang, el.getAttribute('aria-labelledby') === el.querySelector('h3')?.id]));
-      expect(titles).toEqual([
-        ['Light', 'en', true],
-        ['Usable', 'en', true],
-        ['Zero-dependency', 'en', true],
-      ]);
-      for (const [index, word] of ['light', 'usable', 'zero'].entries()) {
-        await expect(cards.nth(index).locator('.landing-word__sub')).toHaveText(EN[`why.${word}.sub`]);
-        await expect(cards.nth(index).locator('p.luz-card__body')).toBeVisible();
-      }
-      // They are laid out in a row from a wide window
-      await page.setViewportSize({ width: 1280, height: 900 });
-      const tops = await cards.evaluateAll((all) => all.map((el) => Math.round(el.getBoundingClientRect().top)));
-      expect(new Set(tops).size, 'one row at 1280px').toBe(1);
-    });
-
-    test('Light: a bar for each package with its weight in KB, the longest being the heaviest, and a total that adds up', async ({ page }) => {
-      await open(page);
-
-      const card = page.locator('#why .landing-why__card--light');
-      const chart = card.locator('ul.luz-bar-list__rows');
-      await expect(chart).toHaveAccessibleName(EN['why.weight.list']);
-      const bars = await chart.locator('li.luz-bar-list__row').evaluateAll((all) =>
-        all.map((li) => {
-          const meter = li.querySelector('meter');
-          return {
-            name: li.querySelector('.luz-bar-list__name')?.textContent?.trim(),
-            figure: li.querySelector('.luz-bar-list__figure')?.textContent?.trim(),
-            hidden: meter?.getAttribute('aria-hidden'),
-            value: Number(meter?.getAttribute('value')),
-            max: Number(meter?.getAttribute('max')),
-          };
-        }),
-      );
-      expect(bars.map((bar) => bar.name)).toEqual(['tokens', 'core', 'catalog']);
-      // The figure is the text; the meter beside it is the picture, out of the accessibility tree
-      expect(bars.every((bar) => bar.hidden === 'true')).toBe(true);
-      for (const bar of bars) {
-        expect(bar.figure).toMatch(new RegExp(`^[\\d.]+ ${EN['why.weight.unit']}$`));
-        expect(bar.value).toBeLessThanOrEqual(bar.max);
-      }
-      // The longest bar is the one that fills its meter, and it is the heaviest package whichever that is: the figures
-      // come from the build (budgets and dist), so the test does not name it
-      const longest = bars.find((bar) => bar.value === bar.max);
-      expect(longest, 'one bar fills its meter').toBeTruthy();
-      expect(kb(longest?.figure ?? ''), 'and has the largest figure').toBe(Math.max(...bars.map((bar) => kb(bar.figure ?? ''))));
-      for (const bar of bars) expect(bar.max, `${bar.name} has the same scale as the others`).toBe(longest?.max);
-      // The total is the sum of the bars (each figure is rounded to a tenth)
-      const total = kb(await card.locator('figcaption strong').innerText());
-      expect(Math.abs(total - bars.reduce((sum, bar) => sum + kb(bar.figure ?? ''), 0))).toBeLessThanOrEqual(0.5);
-      await expect(card.locator('figcaption')).toContainText(EN['why.weight.caption']);
-    });
-
-    // The total adds only the three bars, so it says so (it used to say "All of LUZ"); literals, not the catalog
-    for (const [route, words] of [
-      ['/', 'The three base packages:'],
-      ['/es/', 'Los tres paquetes base:'],
-      ['/ar/', 'الحزم الأساسية الثلاث:'],
-    ]) {
-      test(`Light: the total of the weight chart names the three base packages, and is their sum (${route})`, async ({ page }) => {
-        await open(page, route);
-
-        const card = page.locator('#why .landing-why__card--light');
-        const total = card.locator('figcaption strong');
-        expect((await total.innerText()).trim().startsWith(words), `"${await total.innerText()}" starts with "${words}"`).toBe(true);
-        const figures = await card.locator('li.luz-bar-list__row .luz-bar-list__figure').allInnerTexts();
-        expect(figures).toHaveLength(3);
-        // The decimal separator is the language's (a comma in Spanish)
-        const first = (text) => Number((/(\d+(?:[.,]\d+)?)/.exec(text)?.[1] ?? '').replace(',', '.'));
-        const sum = figures.reduce((acc, figure) => acc + first(figure), 0);
-        const shown = first(await total.innerText());
-        expect(Math.abs(shown - sum)).toBeLessThanOrEqual(0.5);
-      });
-    }
-
-    test('Usable: seven shares of 100% or less, in the order the catalog names them, and what is short of 100% is in the statement', async ({ page }) => {
-      await open(page);
-
-      const card = page.locator('#why .landing-why__card').nth(1);
-      await expect(card.locator('ul.luz-bar-list__rows')).toHaveAccessibleName(EN['why.usable.list']);
-      const names = ['contrast', 'rtl', 'no-js', 'focus', 'forced', 'issues', 'tests'].map((key) => EN[`why.usable.m.${key}`]);
-      await expect(card.locator('.luz-bar-list__name')).toHaveText(names);
-      const shares = await card.locator('.luz-bar-list__figure').evaluateAll((all) => all.map((el) => el.textContent?.trim()));
-      for (const share of shares) {
-        expect(share).toMatch(/^\d+%$/);
-        expect(parseInt(share ?? '0', 10)).toBeLessThanOrEqual(100);
-      }
-      await expect(card.locator('figcaption')).toContainText(EN['why.usable.caption']);
-      // The line under the chart points at the statement
-      const statement = card.locator('p.luz-card__body a');
-      await expect(statement).toHaveAttribute('href', '/docs/accessibility/');
-      await expect(statement).toHaveText('statement');
-    });
-
-    test('Zero-dependency: every kind of dependency is a bar at 0, and the total says so', async ({ page }) => {
-      await open(page);
-
-      const card = page.locator('#why .landing-why__card--zero');
-      await expect(card.locator('ul.luz-bar-list__rows')).toHaveAccessibleName(EN['why.zero.list']);
-      const kinds = ['css-frameworks', 'css-preprocessors', 'js-frameworks', 'highlighters', 'icon-libraries', 'utilities', 'search-and-motion'];
-      await expect(card.locator('.luz-bar-list__name')).toHaveText(kinds.map((kind) => EN[`why.zero.cat.${kind}`]));
-      await expect(card.locator('.luz-bar-list__figure')).toHaveText(kinds.map(() => '0'));
-      await expect(card.locator('li.luz-bar-list__row--zero')).toHaveCount(kinds.length);
-      await expect(card.locator('figcaption strong')).toHaveText(EN['why.zero.total'].replace('{n}', '0'));
-    });
-
-    for (const [route, lang] of ROUTES) {
-      test(`${route}: the words are English and their lines are in the language of the page (${lang})`, async ({ page }) => {
-        const words = catalog(lang);
-        await open(page, route);
-
-        for (const word of ['light', 'usable', 'zero']) {
-          await expect(page.locator(`#why-${word}`)).toHaveText(EN[`why.${word}.word`]);
-          await expect(page.locator(`#why-${word} + .landing-word__sub`)).toHaveText(words[`why.${word}.sub`]);
-        }
-        // A reader gets the share as text: the chart's bars are pictures
-        for (const meter of await page.locator('#why .luz-bar-list__meter').all()) await expect(meter).toHaveAttribute('aria-hidden', 'true');
-        // The three charts are catalog's bar list, in cells; the home keeps no class of its own for them
-        await expect(page.locator('#why figure.luz-bar-list.luz-bar-list--cells')).toHaveCount(3);
-        await expect(page.locator('#why .luz-bar-list__meter')).toHaveCount(await page.locator('#why .luz-bar-list__row').count());
-        await expect(page.locator('[class*="landing-bar"], [class*="landing-chart"]')).toHaveCount(0);
-      });
-    }
-  });
-
-  /* ---- 5. native, 6. modes: their heads and calls to action --------------- */
-
-  test.describe('native and modes', () => {
-    test('native: three points and a link to every HTML tag', async ({ page }) => {
-      await open(page);
-
-      const points = page.locator('#native .landing-inside__points > li');
-      await expect(points).toHaveCount(3);
-      for (const [index, key] of ['p1', 'p2', 'p3'].entries()) await expect(points.nth(index).locator('strong')).toHaveText(EN[`native.${key}.name`]);
-      const cta = page.locator('#native a.landing-inside__cta');
-      await expect(cta).toHaveText(EN['native.tags']);
-      await expect(cta).toHaveAttribute('href', '/docs/html/');
-      await expect(cta).toHaveClass(/\bluz-btn--primary\b/);
-      // The counts are written by the build: some components are CSS only, of all of them (tests/landing-native.spec.js has the figures)
-      const [cssOnly, components] = (await page.locator('#native .landing-native__js').innerText()).match(/\d+/g).map(Number);
-      expect(cssOnly).toBeGreaterThan(0);
-      expect(cssOnly).toBeLessThan(components);
-    });
-
-    test('modes: three boxes, one per mode, in the order Light, Dark, High contrast, each telling its own mode', async ({ page }) => {
-      await open(page);
-
-      const cuts = page.locator('#modes .landing-cut');
-      await expect(cuts).toHaveCount(3);
-      expect(await cuts.evaluateAll((all) => all.map((el) => el.getAttribute('data-theme')))).toEqual(MODES);
-      for (const [index, key] of ['light', 'dark', 'contrast'].entries()) {
-        await expect(cuts.nth(index).locator('.landing-ui__title')).toHaveText(EN[`modes.${key}.title`]);
-        await expect(cuts.nth(index).locator('.landing-ui__text')).toHaveText(EN[`modes.${key}.text`]);
-      }
-    });
-  });
-
   /* ---- The footer -------------------------------------------------------- */
 
   test.describe('footer', () => {
@@ -1137,7 +958,7 @@ test.describe('Landing page', () => {
           expect((await section.innerText()).trim().length, id).toBeGreaterThan(20);
         }
         await expect(page.locator('h1')).toBeVisible();
-        for (const id of ['inside', 'inside-2', 'inside-3', 'inside-4', 'why', 'native', 'modes', 'faq']) {
+        for (const id of ['inside', 'inside-2', 'inside-3', 'inside-4', 'faq']) {
           for (const element of await page.locator(`#${id} h2, #${id} h3`).all()) await expect(element).toBeVisible();
         }
         expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBe(0);
@@ -1164,7 +985,7 @@ test.describe('Landing page', () => {
       for (const id of KINDS) await expect(page.locator(`#inside-4 a[href="/docs/kinds/${id}/"]`), id).toBeVisible();
     });
 
-    test('the controls that need a script are not shown: the Copy buttons and the buttons of the modes', async ({ page }) => {
+    test('the controls that need a script are not shown: the Copy buttons', async ({ page }) => {
       await page.goto('/');
 
       // Levels 1 to 3 have two each (npm, CDN); level 4 is a prompt, with nothing to copy from the page
@@ -1172,14 +993,14 @@ test.describe('Landing page', () => {
       expect(await copy.count()).toBeGreaterThanOrEqual(6);
       await expect(page.locator('#inside-4 [data-copy-from]')).toHaveCount(0);
       for (const control of await copy.all()) await expect(control).toBeHidden();
-      for (const control of await page.locator('#modes [data-apply-mode]').all()) await expect(control).toBeHidden();
     });
 
     test('the snippets are text that can be selected, and the code blocks are focusable regions', async ({ page }) => {
       await page.goto('/');
 
       const blocks = page.locator('main pre.luz-code-block, main pre.luz-terminal__code'); // the terminal's code is not a .luz-code-block
-      expect(await blocks.count()).toBeGreaterThanOrEqual(12);
+      // Three for each of the three levels: npm, CDN and the code example
+      expect(await blocks.count()).toBeGreaterThanOrEqual(9);
       await expect(page.locator('#inside-4 pre')).toHaveCount(0);
       for (const block of await blocks.all()) {
         await expect(block).toHaveAttribute('tabindex', '0');
@@ -1332,7 +1153,7 @@ test.describe('Landing page', () => {
       await open(page);
 
       const heights = await page
-        .locator('.site-header__nav a, #inside a, #native a, #why a.luz-btn, .luz-site-footer a')
+        .locator('.site-header__nav a, #inside a, .luz-site-footer a')
         .evaluateAll((links) => links.map((el) => el.getBoundingClientRect().height));
       expect(heights.length).toBeGreaterThan(14);
       for (const height of heights) expect(height).toBeGreaterThanOrEqual(24);

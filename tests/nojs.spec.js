@@ -316,14 +316,14 @@ for (const home of ['/', '/es/', '/ar/']) {
   });
 }
 
-// The home: nine sections in a fixed order (the hero, the light, the four levels of "inside", why, native and modes), all of them
-// words and native elements; what needs a script (the buttons of Modes, the copy buttons) is not shown dead
-const SECTIONS = ['hero', 'light', 'inside', 'inside-2', 'inside-3', 'inside-4', 'why', 'native', 'modes', 'faq'];
+// The home: seven sections in a fixed order (the hero, the light, the four levels of "inside" and the FAQ), all of them
+// words and native elements; what needs a script (the copy buttons) is not shown dead
+const SECTIONS = ['hero', 'light', 'inside', 'inside-2', 'inside-3', 'inside-4', 'faq'];
 const HOME_CATALOG = { '/': 'en', '/es/': 'es', '/ar/': 'ar' };
 const homeCatalog = (home) => JSON.parse(readFileSync(fileURLToPath(new URL(`../apps/landing/i18n/${HOME_CATALOG[home]}.json`, import.meta.url)), 'utf-8'));
 
 for (const home of ['/', '/es/', '/ar/']) {
-  test(`${home}: the ten sections are in the page, in order, and every one but the light has words`, async ({ page }) => {
+  test(`${home}: the seven sections are in the page, in order, and every one but the light has words`, async ({ page }) => {
     await page.goto(home);
     expect(await page.locator('main section[id]').evaluateAll((all) => all.map((el) => el.id))).toEqual(SECTIONS);
     await expect(page.locator('h1')).toHaveCount(1);
@@ -351,50 +351,6 @@ for (const home of ['/', '/es/', '/ar/']) {
     });
     const sentences = shown.filter((text) => words.includes(text) && /\s/.test(text) && /[.!?\u061F]$/.test(text));
     expect(sentences, `visible text in #light: ${JSON.stringify(shown)}`).not.toEqual([]);
-  });
-
-  test(`${home}: the buttons of the three modes are not shown without a script, and the boxes are pictures`, async ({ page }) => {
-    await page.goto(home);
-    const buttons = page.locator('#modes [data-apply-mode]');
-    await expect(buttons).toHaveCount(3);
-    for (const button of await buttons.all()) await expect(button).toBeHidden();
-    // A control that is in the page and visible must be able to do something: the boxes keep their words
-    for (const picture of await page.locator('#modes .landing-cut__picture').all()) await expect(picture).toBeVisible();
-  });
-
-  test(`${home}: Native is three scenes of code and its result, plain text and native elements, with no script`, async ({ page }) => {
-    // Under reduced motion the panel rests on its first scene, on its last frame (the loop is CSS)
-    await page.emulateMedia({ reducedMotion: 'reduce' });
-    await page.goto(home);
-    const panel = page.locator('#native .landing-typed__panel');
-    await expect(panel).toBeVisible();
-    const scenes = panel.locator('.landing-typed__scene');
-    await expect(scenes).toHaveCount(3);
-    const code = scenes.nth(0).locator('pre.luz-code-block');
-    await expect(code).toBeVisible();
-    await expect(code).toContainText('<details open>');
-    // The code of the other two scenes is in the page too, as text: a field and a button with no class, then a link and a button with one
-    expect(await scenes.nth(1).locator('pre.luz-code-block').textContent()).toContain('<input');
-    expect(await scenes.nth(1).locator('pre.luz-code-block').textContent()).toContain('<button');
-    expect(await scenes.nth(2).locator('pre.luz-code-block').textContent()).toContain('luz-btn luz-btn--danger');
-    // The result is a picture of the code: native elements, inert
-    await expect(scenes.nth(0).locator('.landing-typed__result')).toHaveJSProperty('inert', true);
-    await expect(scenes.nth(0).locator('.landing-typed__state--luz details')).toBeVisible();
-    // The points and the link to every tag are plain links and text
-    await expect(page.locator('#native a.landing-inside__cta')).toBeVisible();
-  });
-
-  test(`${home}: the three mode cards are re-scoped by their own data-theme, with no script`, async ({ page }) => {
-    await page.goto(home);
-    const surfaces = [];
-    for (const mode of ['light', 'dark', 'high-contrast']) {
-      const card = page.locator(`#modes [data-theme="${mode}"]`);
-      await expect(card, mode).toHaveCount(1);
-      const surface = channels(await colorOf(card, '--luz-surface-page'));
-      expect(surface, mode).toEqual(vejer(mode, '--luz-surface-page'));
-      surfaces.push(surface.join());
-    }
-    expect(new Set(surfaces).size).toBe(3);
   });
 
   test(`${home}: the footer lists its four groups of links, the four colour modes and the legal line, and the three languages are in the header`, async ({ page }) => {
