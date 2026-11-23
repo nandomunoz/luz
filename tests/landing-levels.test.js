@@ -195,8 +195,10 @@ describe("the pages of the three levels", () => {
       expect(css).toMatch(/\.landing-demo__picker legend\s*\{[^}]*clip-path:\s*inset\(50%\)/);
     });
 
-    it("on a phone the hero and its demo lose their frames: no border on either, and the demo no side padding", () => {
-      const phone = [...css.matchAll(/@media \(max-width: 640px\) \{([\s\S]*?)\n\}/g)].map((m) => m[1]).join("\n");
+    it("while the demo is one column (phone and tablet) the hero and its demo lose their frames: no border on either, and the demo no side padding", () => {
+      // the demo turns to two columns at 900px (landing.css): below it, one column and no frames
+      expect(css).toMatch(/@media \(min-width: 900px\) \{\s*\.landing-tokens__stage \{\s*grid-template-columns: minmax\(0, 1fr\) minmax\(0, 1fr\)/);
+      const phone = [...css.matchAll(/@media \(max-width: 899px\) \{([\s\S]*?)\n\}/g)].map((m) => m[1]).join("\n");
       const rule = (selector) => new RegExp(`${selector.replace(/[.$]/g, "\\$&")}\\s*\\{([^}]*)\\}`).exec(phone)?.[1] ?? "";
       expect(rule(".landing-tokens__hero")).toMatch(/border:\s*0/);
       expect(rule(".landing-tokens__hero")).toMatch(/border-radius:\s*0/);
