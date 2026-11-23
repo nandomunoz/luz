@@ -284,6 +284,17 @@
   }
 }
 
+/* The hero's sentence and lead are the size of a section's title and lead
+   (--luz-text-4xl and --luz-text-lg) at every width: the catalog's hero steps
+   them down on a phone, and a phone is where the text must not shrink */
+.luz-hero__title {
+  font-size: var(--luz-text-4xl);
+}
+
+.luz-hero__lead {
+  font-size: var(--luz-text-lg);
+}
+
 /* The brand on a line of its own, centred above the sentence and the largest
    thing on the page: 3.75 times the title's step (em, so it follows the
    title's 4xl, 3xl and 2xl at each width: about 183px on a desktop), and lit
