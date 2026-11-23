@@ -208,6 +208,18 @@ describe("the pages of the three levels", () => {
       expect(sectionOf(html, "t-more")).toContain("landing-tokens__curve");
     });
 
+    it.each(LANGS)("in %s: the breakpoints are devices, small wireframes as wide as their breakpoint, not bars", (code, prefix) => {
+      const more = sectionOf(rendered.get(`${prefix}tokens/`), "t-more");
+      expect(more).not.toContain("landing-tokens__specimen--ruler");
+      const list = /<ul class="landing-tokens__specimen landing-tokens__specimen--devices"[^>]*>([\s\S]*?)<\/ul>/.exec(more)?.[1] ?? "";
+      const devices = [...list.matchAll(/<li><span class="landing-tokens__device landing-tokens__device--([a-z]+)" style="--share:([\d.]+)"><\/span><code class="landing-tokens__label">([a-z]+) (\d+)px<\/code><\/li>/g)];
+      const mq = tokens.filter((n) => n.startsWith("--luz-mq-"));
+      expect(devices.map((m) => `--luz-mq-${m[3]}`)).toEqual(mq);
+      expect(devices.map((m) => m[1])).toEqual(["phone", "tablet", "laptop", "laptop", "desktop", "desktop"]);
+      const widest = Math.max(...devices.map((m) => Number(m[4])));
+      for (const [, , share, , px] of devices) expect(Number(share)).toBeCloseTo(Number(px) / widest, 3);
+    });
+
     it.each(LANGS)("in %s: the page ends with the next step: core, and the docs", (code, prefix) => {
       const next = sectionOf(rendered.get(`${prefix}tokens/`), "next");
       expect(next).toContain(catalog(code)["level.tokens.next.title"]);

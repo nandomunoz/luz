@@ -50,6 +50,18 @@ function blocks(text, prelude) {
   return { found, rest: rest + text.slice(at) };
 }
 
+/** The page of the tokens as the build writes it, built once for the tests that read it. */
+let built;
+const tokensPage = () => {
+  if (!built) {
+    const site = scanSite(join(repo, "apps/docs"), repo);
+    const home = read("apps/landing/index.html");
+    const levels = ["tokens", "core", "components"].map((name) => ({ name, file: `apps/landing/levels/${name}.html`, html: read(`apps/landing/levels/${name}.html`) }));
+    built = buildSite(site, { extra: [...landingDocuments(site, "apps/landing/index.html", home), ...levelDocuments(site, { file: "apps/landing/index.html", html: home }, levels)] });
+  }
+  return quoted(built.rendered.get("/tokens/"));
+};
+
 const motion = blocks(css, /@media\s*\(prefers-reduced-motion:\s*no-preference\)/g);
 const moving = motion.found.join("\n");
 
@@ -64,8 +76,8 @@ describe("the motion of the page of the tokens", () => {
     expect(motion.rest).not.toMatch(/(^|[;{\s])(animation|animation-name|transition)\s*:/);
   });
 
-  it("has the hero come in, the sections rise, the specimens draw and the cards lift", () => {
-    for (const name of ["landing-rise", "landing-mark-sweep", "landing-grow-y", "landing-grow-x", "landing-draw"]) expect(css, name).toMatch(new RegExp(`@keyframes ${name}\\b`));
+  it("has the hero come in, the sections rise, the specimens draw, the devices appear and the cards lift", () => {
+    for (const name of ["landing-rise", "landing-mark-sweep", "landing-grow-y", "landing-device-in", "landing-draw"]) expect(css, name).toMatch(new RegExp(`@keyframes ${name}\\b`));
     expect(moving).toMatch(/\.landing-tokens__head > \*[^{]*\{[^}]*animation/);
     expect(moving).toMatch(/\.landing-tokens__step:hover/);
     expect(moving).toMatch(/\.landing-tokens__group-link:hover::after/);
@@ -85,22 +97,14 @@ describe("the motion of the page of the tokens", () => {
   });
 
   it("draws the easing curves by their stroke: each path has pathLength=1", () => {
-    const site = scanSite(join(repo, "apps/docs"), repo);
-    const home = read("apps/landing/index.html");
-    const levels = ["tokens", "core", "components"].map((name) => ({ name, file: `apps/landing/levels/${name}.html`, html: read(`apps/landing/levels/${name}.html`) }));
-    const built = buildSite(site, { extra: [...landingDocuments(site, "apps/landing/index.html", home), ...levelDocuments(site, { file: "apps/landing/index.html", html: home }, levels)] });
-    const page = quoted(built.rendered.get("/tokens/"));
+    const page = tokensPage();
     const curves = page.match(/<svg class="landing-tokens__curve"[\s\S]*?<\/svg>/g) ?? [];
     expect(curves.length).toBe(4);
     for (const svg of curves) expect(svg).toMatch(/<path pathLength="1" d="M0\.0,44\.0 C/);
   });
 
   it("animates each curve with the easing it shows: a dot that runs across steadily and up with var(--ease), the curve's token", () => {
-    const site = scanSite(join(repo, "apps/docs"), repo);
-    const home = read("apps/landing/index.html");
-    const levels = ["tokens", "core", "components"].map((name) => ({ name, file: `apps/landing/levels/${name}.html`, html: read(`apps/landing/levels/${name}.html`) }));
-    const built = buildSite(site, { extra: [...landingDocuments(site, "apps/landing/index.html", home), ...levelDocuments(site, { file: "apps/landing/index.html", html: home }, levels)] });
-    const page = quoted(built.rendered.get("/tokens/"));
+    const page = tokensPage();
     const plots = [...page.matchAll(/<span class="landing-tokens__plot">([\s\S]*?)<\/span><code class="landing-tokens__label">([a-z]+)<\/code>/g)];
     expect(plots.map((m) => m[2])).toEqual(["standard", "enter", "exit", "spring"]);
     for (const [, plot, name] of plots) {
