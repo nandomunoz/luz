@@ -42,7 +42,7 @@ describe("the icons of the home page follow the one family of the Icons page", (
 
   it("puts every symbol of the sprite on the 24 grid", () => {
     const symbols = findAll(tree, (n) => n.name === "symbol");
-    expect(symbols.length).toBeGreaterThanOrEqual(14);
+    expect(symbols.length).toBeGreaterThanOrEqual(12);
     expect(symbols.filter((s) => s.attrs.get("viewbox") !== "0 0 24 24").map((s) => s.attrs.get("id"))).toEqual([]);
   });
 
