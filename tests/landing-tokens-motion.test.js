@@ -14,7 +14,7 @@
  *  - the curves of the motion block are drawn by their stroke, so their path says pathLength="1";
  *  - each curve is animated with the easing it shows (owner, 2026-11-23): a dot runs along it, across at a steady
  *    pace and up with `var(--ease)`, the curve's own token, so it traces the curve (and the spring overshoots). The
- *    scroll drives it (nothing moves on its own), and the pointer or the focus on the card loops it at the token's
+ *    scroll drives it (nothing moves on its own), and the pointer or the focus on its section loops it at the token's
  *    pace, so no motion starts by itself and lasts (WCAG 2.2.2). With less motion there is no dot.
  */
 import { readFileSync } from "node:fs";
@@ -121,8 +121,8 @@ describe("the motion of the page of the tokens", () => {
     expect(scroll).toMatch(/\.landing-tokens__dot\s*\{[^}]*animation:\s*landing-dot-x\b[^}]*animation-timeline:\s*view\(\)/);
     expect(scroll).toMatch(/\.landing-tokens__dot > span\s*\{[^}]*animation:\s*landing-dot-y var\(--ease\)[^}]*animation-timeline:\s*view\(\)/);
     // the loop: only while the card has the pointer or the focus
-    expect(moving).toMatch(/\.landing-tokens__scale--motion:is\(:hover, :focus-within\) \.landing-tokens__dot\s*\{[^}]*infinite/);
-    expect(moving).toMatch(/\.landing-tokens__scale--motion:is\(:hover, :focus-within\) \.landing-tokens__dot > span\s*\{[^}]*var\(--ease\)[^}]*infinite/);
+    expect(moving).toMatch(/\.landing-tokens__block--motion:is\(:hover, :focus-within\) \.landing-tokens__dot\s*\{[^}]*infinite/);
+    expect(moving).toMatch(/\.landing-tokens__block--motion:is\(:hover, :focus-within\) \.landing-tokens__dot > span\s*\{[^}]*var\(--ease\)[^}]*infinite/);
     for (const name of ["landing-dot-x", "landing-dot-y"]) expect(css, name).toMatch(new RegExp(`@keyframes ${name}\\b`));
   });
 });

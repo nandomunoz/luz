@@ -105,7 +105,8 @@ describe("the pages of the three levels", () => {
     const BLOCKS = [
       ["color", ["primitives", "semantic"]],
       ["scales", ["spacing", "typography", "radius", "shadows"]],
-      ["more", ["motion", "breakpoints"]],
+      ["motion", ["motion"]],
+      ["breakpoints", ["breakpoints"]],
     ];
     const DOCS = { primitives: "palette", semantic: "color", spacing: "spacing", typography: "typography", radius: "radius", shadows: "shadows", motion: "motion", breakpoints: "layout" };
     /** A section by its id, from its opening tag to the next section (or the end of the main). */
@@ -166,7 +167,7 @@ describe("the pages of the three levels", () => {
         const rule = new RegExp(`\\.landing-demo:has\\(input\\[value="${look}"\\]:checked\\)\\s*\\{([^}]*)\\}`).exec(css)?.[1] ?? "";
         for (const prop of ["--demo-brand", "--demo-font", "--demo-radius", "--demo-shadow", "--demo-ease", "--demo-duration"]) expect(rule, `${look}: ${prop}`).toContain(`${prop}:`);
         // the code says the tokens the look reads, one of each group, every one a token of luz-tokens.css
-        const block = new RegExp(`<code class="landing-demo__look" data-look="${look}">([^<]*)</code>`).exec(hero)?.[1] ?? "";
+        const block = (new RegExp(`<code class="landing-demo__look" data-look="${look}">([\\s\\S]*?)</code>`).exec(hero)?.[1] ?? "").replace(/<[^>]+>/g, "");
         const named = [...block.matchAll(/var\((--luz-[\w-]+)\)/g)].map((m) => m[1]);
         for (const name of named) expect(tokens, `${look}: ${name}`).toContain(name);
         const group = (re) => named.find((n) => re.test(n));
@@ -190,14 +191,14 @@ describe("the pages of the three levels", () => {
       expect(at('class="landing-demo__product"')).toBeLessThan(at('class="landing-demo__editor"'));
       expect(at('class="landing-demo__editor"')).toBeLessThan(at('class="landing-demo__code"'));
       // the code is a rule, so it reads as CSS a developer would write
-      expect(hero).toMatch(/<code class="landing-demo__look" data-look="[a-z]+">\.card \{\n/);
+      expect(hero).toMatch(/<code class="landing-demo__look" data-look="[a-z]+"><span class="landing-demo__sel">\.card<\/span> \{\n/);
       // the legend names the group for a screen reader, out of sight
       expect(css).toMatch(/\.landing-demo__picker legend\s*\{[^}]*clip-path:\s*inset\(50%\)/);
     });
 
     it("while the demo is one column (phone and tablet) the hero and its demo lose their frames: no border on either, and the demo no side padding", () => {
       // the demo turns to two columns at 900px (landing.css): below it, one column and no frames
-      expect(css).toMatch(/@media \(min-width: 900px\) \{\s*\.landing-tokens__stage \{\s*grid-template-columns: minmax\(0, 1fr\) minmax\(0, 1fr\)/);
+      expect(css).toMatch(/@media \(min-width: 900px\) \{\s*\.landing-demo__window \{\s*grid-template-columns: minmax\(0, [\d.]+fr\) minmax\(0, 1fr\)/);
       const phone = [...css.matchAll(/@media \(max-width: 899px\) \{([\s\S]*?)\n\}/g)].map((m) => m[1]).join("\n");
       const rule = (selector) => new RegExp(`${selector.replace(/[.$]/g, "\\$&")}\\s*\\{([^}]*)\\}`).exec(phone)?.[1] ?? "";
       expect(rule(".landing-tokens__hero")).toMatch(/border:\s*0/);
@@ -206,6 +207,23 @@ describe("the pages of the three levels", () => {
       expect(stage).toMatch(/border:\s*0/);
       expect(stage).toMatch(/box-shadow:\s*none/);
       expect(stage).toMatch(/padding-inline:\s*0/);
+    });
+
+    it.each(LANGS)("in %s: the product and its code are one browser window, the page beside its devtools, glued with no gap", (code, prefix) => {
+      const hero = sectionOf(rendered.get(`${prefix}tokens/`), "hero");
+      const win = hero.slice(hero.indexOf('class="landing-demo__window"'));
+      expect(hero).toContain('class="landing-demo__window"');
+      const at = (needle) => win.indexOf(needle);
+      expect(at('class="landing-demo__chrome"')).toBeGreaterThan(0);
+      expect(at('class="landing-demo__chrome"')).toBeLessThan(at('class="landing-demo__viewport"'));
+      expect(at('class="landing-demo__viewport"')).toBeLessThan(at('class="landing-demo__product"'));
+      expect(at('class="landing-demo__product"')).toBeLessThan(at('class="landing-demo__editor"'));
+      // devtools colours: a property and its value apart
+      expect(win).toMatch(/<span class="landing-demo__prop">--luz-brand-fill<\/span>: <span class="landing-demo__val">var\(--luz-[a-z]+-60\)<\/span>;/);
+      // one frame: the window has the border, the panes none, and no gap between them
+      expect(css).toMatch(/\.landing-demo__window\s*\{[^}]*border:[^}]*overflow:\s*hidden/);
+      expect(css).toMatch(/\.landing-demo__window\s*\{[^}]*gap:\s*0/);
+      expect(css).toMatch(/\.landing-demo__editor\s*\{[^}]*border:\s*0/);
     });
 
     it.each(LANGS)("in %s: three steps, install, use and make it yours, each with code to copy", (code, prefix) => {
@@ -221,12 +239,12 @@ describe("the pages of the three levels", () => {
       for (const body of codesOf(steps)) for (const m of body.matchAll(/--luz-[\w-]+/g)) expect(tokens, m[0]).toContain(m[0]);
     });
 
-    it.each(LANGS)("in %s: three blocks, color, scales and the rest, each a level of the home that links every group it holds to its docs", (code, prefix) => {
+    it.each(LANGS)("in %s: four blocks, color, scales, motion and breakpoints, each a level of the home that links every group it holds to its docs", (code, prefix) => {
       const html = rendered.get(`${prefix}tokens/`);
       const starts = BLOCKS.map(([id]) => html.search(new RegExp(`<section\\b[^>]*\\sid="t-${id}"`)));
       expect(starts.every((at) => at > 0), starts.join()).toBe(true);
       expect([...starts].sort((a, b) => a - b)).toEqual(starts);
-      expect(html.match(/<section\b[^>]*\sid="t-/g)).toHaveLength(3);
+      expect(html.match(/<section\b[^>]*\sid="t-/g)).toHaveLength(4);
       let total = 0;
       BLOCKS.forEach(([id, groups], i) => {
         const block = sectionOf(html, `t-${id}`);
@@ -244,19 +262,46 @@ describe("the pages of the three levels", () => {
       expect(total).toBe(tokens.length);
     });
 
-    it.each(LANGS)("in %s: color draws the chain primitive, semantic, component and the three modes; scales and the rest read their tokens through --v", (code, prefix) => {
+    it.each(LANGS)("in %s: color shows one token in three modes, a matrix of semantic tokens by mode, over the palette in ramps on a grid of steps; scales and the rest read their tokens through --v", (code, prefix) => {
       const html = rendered.get(`${prefix}tokens/`);
       const color = sectionOf(html, "t-color");
-      expect(color).toContain('class="landing-tokens__chain"');
-      for (const key of ["primitive", "semantic", "component"]) expect(color).toContain(catalog(code)[`level.tokens.chain.${key}`]);
-      for (const mode of ["light", "dark", "high-contrast"]) expect(color).toContain(`data-theme="${mode}"`);
+      expect(color).not.toContain("landing-tokens__chain");
+      expect(color).not.toContain("landing-tokens__modes");
+      // the matrix: a table, the modes as its column heads, a semantic token per row, a cell per mode drawn in that mode
+      const matrix = /<table class="landing-tokens__matrix">([\s\S]*?)<\/table>/.exec(color)?.[1] ?? "";
+      expect(matrix).toContain(`<caption>${catalog(code)["level.tokens.color.modes"]}</caption>`);
+      const heads = [...matrix.matchAll(/<th scope="col"[^>]*>([^<]*)<\/th>/g)].map((m) => m[1]);
+      expect(heads.slice(-3)).toEqual(["light", "dark", "contrast"].map((key) => catalog(code)[`level.tokens.mode.${key}`]));
+      const rows = [...matrix.matchAll(/<tr><th scope="row"><code>(--luz-[\w-]+)<\/code><\/th>([\s\S]*?)<\/tr>/g)];
+      expect(rows.length).toBeGreaterThanOrEqual(4);
+      for (const [, name, cells] of rows) {
+        expect(tokens).toContain(name);
+        const themes = [...cells.matchAll(/<td data-theme="([a-z-]+)"><span class="landing-tokens__cell" style="--v:var\((--luz-[\w-]+)\)"><\/span><\/td>/g)];
+        expect(themes.map((m) => m[1]), name).toEqual(["light", "dark", "high-contrast"]);
+        for (const m of themes) expect(m[2]).toBe(name);
+      }
+      // the palette: a head of steps, a row per family on that grid, a gap where a family has no step
+      const palette = /<div class="landing-tokens__palette"[^>]*>([\s\S]*?)<\/div>/.exec(color)?.[1] ?? "";
+      const steps = [...palette.matchAll(/<span class="landing-tokens__stepno">(\d+)<\/span>/g)].map((m) => Number(m[1]));
+      expect(steps).toEqual([10, 20, 30, 40, 50, 60, 70, 80, 90, 100]);
+      const families = Object.keys(JSON.parse(read("packages/tokens/tokens.json")).color);
+      for (const family of families) {
+        const row = new RegExp(`<span class="landing-tokens__family">${family}</span>((?:<span[^>]*></span>){10})`).exec(palette)?.[1];
+        expect(row, family).toBeTruthy();
+        const cells = [...row.matchAll(/<span([^>]*)><\/span>/g)].map((m) => m[1]);
+        steps.forEach((step, i) => {
+          if (tokens.includes(`--luz-${family}-${step}`)) expect(cells[i], `${family}-${step}`).toContain(`--v:var(--luz-${family}-${step})`);
+          else expect(cells[i], `${family}-${step}`).toContain("landing-tokens__gap");
+        });
+      }
+      expect(color).toContain(catalog(code)["level.tokens.color.palette"].replace("{n:primitives}", String(tokens.filter((n) => families.some((f) => n.startsWith(`--luz-${f}-`))).length)));
       const scales = sectionOf(html, "t-scales");
       for (const name of ["--luz-space-md", "--luz-text-2xl", "--luz-radius-md", "--luz-shadow-lg"]) expect(scales).toContain(`--v:var(${name})`);
-      expect(sectionOf(html, "t-more")).toContain("landing-tokens__curve");
+      expect(sectionOf(html, "t-motion")).toContain("landing-tokens__curve");
     });
 
     it.each(LANGS)("in %s: the breakpoints are devices, small wireframes as wide as their breakpoint, not bars", (code, prefix) => {
-      const more = sectionOf(rendered.get(`${prefix}tokens/`), "t-more");
+      const more = sectionOf(rendered.get(`${prefix}tokens/`), "t-breakpoints");
       expect(more).not.toContain("landing-tokens__specimen--ruler");
       const list = /<ul class="landing-tokens__specimen landing-tokens__specimen--devices"[^>]*>([\s\S]*?)<\/ul>/.exec(more)?.[1] ?? "";
       const devices = [...list.matchAll(/<li><span class="landing-tokens__device landing-tokens__device--([a-z]+)" style="--share:([\d.]+)"><\/span><code class="landing-tokens__label">([a-z]+) (\d+)px<\/code><\/li>/g)];
@@ -265,6 +310,17 @@ describe("the pages of the three levels", () => {
       expect(devices.map((m) => m[1])).toEqual(["phone", "tablet", "laptop", "laptop", "desktop", "desktop"]);
       const widest = Math.max(...devices.map((m) => Number(m[4])));
       for (const [, , share, , px] of devices) expect(Number(share)).toBeCloseTo(Number(px) / widest, 3);
+    });
+
+    it.each(LANGS)("in %s: motion and breakpoints are sections of their own, their panel the specimen and its code with no card inside", (code, prefix) => {
+      const html = rendered.get(`${prefix}tokens/`);
+      for (const id of ["motion", "breakpoints"]) {
+        const block = sectionOf(html, `t-${id}`);
+        expect(block, id).toContain(`class="landing-tokens__specimen landing-tokens__specimen--${id === "motion" ? "curves" : "devices"}"`);
+        expect(block, id).not.toContain("landing-tokens__scale");
+        expect(block, id).toContain('<pre class="luz-code-block" data-lang="css"');
+      }
+      expect(html).not.toContain('id="t-more"');
     });
 
     it.each(LANGS)("in %s: the page ends with the next step: core, and the docs", (code, prefix) => {

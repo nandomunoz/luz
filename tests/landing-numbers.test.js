@@ -25,7 +25,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import * as i18n from "../scripts/docs-site/i18n.js";
 import { buildSite, landingDocuments, scanSite } from "../scripts/docs-site/site.js";
 import { makeSite } from "./helpers/docs-i18n-size-fixture.js";
-import { levelPagesOf } from "./helpers/level-pages.js";
+import { LEVEL_NAMES, levelPagesOf } from "./helpers/level-pages.js";
 
 const repo = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (path) => readFileSync(join(repo, path), "utf-8");
@@ -228,7 +228,8 @@ describe("the numbers in the pages of the LUZ home, in every language", () => {
 
   it("each page has the count written by the build where the catalog has its placeholder, and no placeholder left", () => {
     for (const doc of docs) {
-      const html = rendered.get(doc.route);
+      // the home of the language and the pages of its levels, which share its catalog
+      const html = [doc.route, ...LEVEL_NAMES.map((name) => `${doc.route}${name}/`)].map((route) => rendered.get(route) ?? "").join("\n");
       const code = doc.locale.code;
       expect(html, code).not.toMatch(/\{n:/);
       for (const [key, value] of withNumbers(code)) {
