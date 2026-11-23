@@ -2480,7 +2480,14 @@ home-light:defined ~ .landing-light__nojs {
    marked word, the primary button and the product read it, and the one line
    of code that says it shows */
 .landing-tokens__hero {
-  --demo-brand: var(--demo-blue);
+  --demo-brand: var(--look-classic-brand);
+  --demo-font: var(--look-classic-font);
+  --demo-radius: var(--look-classic-radius);
+  --demo-shadow: var(--look-classic-shadow);
+  --demo-ease: var(--look-classic-ease);
+  --demo-duration: var(--look-classic-duration);
+  --demo-line: 1px;
+  --demo-edge: var(--luz-divider);
 
   display: grid;
   justify-items: center;
@@ -2532,7 +2539,9 @@ home-light:defined ~ .landing-light__nojs {
 
 .landing-tokens__hero .luz-btn--primary {
   border-color: var(--demo-brand);
+  border-radius: var(--demo-radius);
   background: var(--demo-brand);
+  font-family: var(--demo-font);
   color: var(--luz-text-on-fill);
 }
 
@@ -2552,10 +2561,23 @@ home-light:defined ~ .landing-light__nojs {
 }
 
 /* On a narrow screen the radios come first, so the product that changes is
-   under the finger that picks */
+   under the finger that picks; the tokens it reads come after it */
 @media (max-width: 899px) {
   .landing-demo__controls {
-    order: -1;
+    display: contents;
+  }
+
+  .landing-demo__title {
+    order: -3;
+  }
+
+  .landing-demo__picker {
+    order: -2;
+  }
+
+  .landing-demo__caption,
+  .landing-demo__code {
+    order: 1;
   }
 
   .landing-tokens__what {
@@ -2570,15 +2592,19 @@ home-light:defined ~ .landing-light__nojs {
   }
 }
 
+/* The product reads the look: its type, its corners (a card's no rounder
+   than 1rem, so a pill look keeps a card), its edge, its depth */
 .landing-demo__product {
   display: grid;
   justify-items: start;
   gap: var(--luz-space-sm);
   padding: var(--luz-space-lg);
-  border: 1px solid var(--luz-divider);
+  border: var(--demo-line) solid var(--demo-edge);
   border-block-start: 4px solid var(--demo-brand);
-  border-radius: var(--luz-radius-md);
+  border-radius: min(var(--demo-radius), 1rem);
   background: var(--luz-surface);
+  box-shadow: var(--demo-shadow);
+  font-family: var(--demo-font);
 }
 
 .landing-demo__product > p {
@@ -2597,7 +2623,7 @@ home-light:defined ~ .landing-light__nojs {
 .landing-demo__logo {
   inline-size: 1.25rem;
   block-size: 1.25rem;
-  border-radius: var(--luz-radius-sm);
+  border-radius: var(--demo-radius);
   background: var(--demo-brand);
 }
 
@@ -2619,16 +2645,16 @@ home-light:defined ~ .landing-light__nojs {
 .landing-demo__badge {
   margin-block-start: var(--luz-space-xs);
   padding: var(--luz-space-3xs) var(--luz-space-xs);
-  border-radius: var(--luz-radius-full);
+  border-radius: var(--demo-radius);
   background: var(--demo-brand);
-  font-family: var(--luz-font-sans);
+  font-family: var(--demo-font);
   font-size: var(--luz-text-xs);
   font-weight: 600;
   color: var(--luz-text-on-fill);
 }
 
 .landing-demo__heading {
-  font-family: var(--luz-font-heading);
+  font-family: var(--demo-font);
   font-size: var(--luz-text-2xl);
   line-height: 1.1;
   color: var(--luz-text-primary);
@@ -2650,9 +2676,10 @@ home-light:defined ~ .landing-light__nojs {
   align-items: center;
   min-block-size: 2.5rem;
   padding-inline: var(--luz-space-lg);
-  border-radius: var(--luz-radius-md);
+  border-radius: var(--demo-radius);
   background: var(--demo-brand);
-  font-family: var(--luz-font-sans);
+  box-shadow: var(--demo-shadow);
+  font-family: var(--demo-font);
   font-weight: 600;
   color: var(--luz-text-on-fill);
 }
@@ -2660,7 +2687,7 @@ home-light:defined ~ .landing-light__nojs {
 /* The link keeps the ink of the text (a brand colour as text would fail in
    one of the modes); the brand is its underline */
 .landing-demo__link {
-  font-family: var(--luz-font-sans);
+  font-family: var(--demo-font);
   font-weight: 600;
   color: var(--luz-text-primary);
   text-decoration: underline 2px var(--demo-brand);
@@ -2671,7 +2698,7 @@ home-light:defined ~ .landing-light__nojs {
   inline-size: 100%;
   block-size: 0.4rem;
   margin-block-start: var(--luz-space-xs);
-  border-radius: var(--luz-radius-full);
+  border-radius: var(--demo-radius);
   background: var(--luz-chart-track);
 }
 
@@ -2732,7 +2759,7 @@ home-light:defined ~ .landing-light__nojs {
   border: 1px solid var(--luz-divider);
   border-radius: var(--luz-radius-full);
   background: var(--luz-surface);
-  font-family: var(--luz-font-mono);
+  font-family: var(--o-font);
   font-size: var(--luz-text-sm);
   color: var(--luz-text-primary);
   cursor: pointer;
@@ -2759,11 +2786,12 @@ home-light:defined ~ .landing-light__nojs {
   outline-offset: 2px;
 }
 
+/* Each option shows its look: its colour, its corner, its type */
 .landing-demo__swatch {
   inline-size: 1.25rem;
   block-size: 1.25rem;
-  border-radius: var(--luz-radius-full);
-  background: var(--v);
+  border-radius: var(--o-radius);
+  background: var(--o-brand);
 }
 
 .landing-demo__caption {
@@ -2782,8 +2810,9 @@ home-light:defined ~ .landing-light__nojs {
   background: var(--luz-surface-strong);
 }
 
-.landing-demo__line {
+.landing-demo__look {
   display: none;
+  white-space: pre-wrap;
   padding: 0;
   background: none;
   font-family: var(--luz-font-mono);
@@ -2800,52 +2829,82 @@ home-light:defined ~ .landing-light__nojs {
   .landing-demo__product *,
   .landing-demo__code {
     transition:
-      background-color var(--luz-duration-slow) var(--luz-easing-standard),
-      border-color var(--luz-duration-slow) var(--luz-easing-standard),
-      text-decoration-color var(--luz-duration-slow) var(--luz-easing-standard);
+      background-color var(--demo-duration) var(--demo-ease),
+      border-color var(--demo-duration) var(--demo-ease),
+      border-radius var(--demo-duration) var(--demo-ease),
+      box-shadow var(--demo-duration) var(--demo-ease),
+      text-decoration-color var(--demo-duration) var(--demo-ease);
   }
 }
 
-.landing-demo:has(input[value="blue"]:checked) {
-  --demo-brand: var(--demo-blue);
+
+/* Each look: its tokens (written on the hero by the generator), and its code */
+.landing-demo:has(input[value="classic"]:checked) {
+  --demo-brand: var(--look-classic-brand);
+  --demo-font: var(--look-classic-font);
+  --demo-radius: var(--look-classic-radius);
+  --demo-shadow: var(--look-classic-shadow);
+  --demo-ease: var(--look-classic-ease);
+  --demo-duration: var(--look-classic-duration);
 }
 
-.landing-demo:has(input[value="blue"]:checked) .landing-demo__line[data-family="blue"] {
+.landing-demo:has(input[value="classic"]:checked) .landing-demo__look[data-look="classic"] {
   display: block;
 }
 
-.landing-demo:has(input[value="teal"]:checked) {
-  --demo-brand: var(--demo-teal);
+.landing-demo:has(input[value="modern"]:checked) {
+  --demo-brand: var(--look-modern-brand);
+  --demo-font: var(--look-modern-font);
+  --demo-radius: var(--look-modern-radius);
+  --demo-shadow: var(--look-modern-shadow);
+  --demo-ease: var(--look-modern-ease);
+  --demo-duration: var(--look-modern-duration);
 }
 
-.landing-demo:has(input[value="teal"]:checked) .landing-demo__line[data-family="teal"] {
+.landing-demo:has(input[value="modern"]:checked) .landing-demo__look[data-look="modern"] {
   display: block;
 }
 
-.landing-demo:has(input[value="green"]:checked) {
-  --demo-brand: var(--demo-green);
+.landing-demo:has(input[value="playful"]:checked) {
+  --demo-brand: var(--look-playful-brand);
+  --demo-font: var(--look-playful-font);
+  --demo-radius: var(--look-playful-radius);
+  --demo-shadow: var(--look-playful-shadow);
+  --demo-ease: var(--look-playful-ease);
+  --demo-duration: var(--look-playful-duration);
 }
 
-.landing-demo:has(input[value="green"]:checked) .landing-demo__line[data-family="green"] {
+.landing-demo:has(input[value="playful"]:checked) .landing-demo__look[data-look="playful"] {
   display: block;
 }
 
-.landing-demo:has(input[value="purple"]:checked) {
-  --demo-brand: var(--demo-purple);
+.landing-demo:has(input[value="calm"]:checked) {
+  --demo-brand: var(--look-calm-brand);
+  --demo-font: var(--look-calm-font);
+  --demo-radius: var(--look-calm-radius);
+  --demo-shadow: var(--look-calm-shadow);
+  --demo-ease: var(--look-calm-ease);
+  --demo-duration: var(--look-calm-duration);
 }
 
-.landing-demo:has(input[value="purple"]:checked) .landing-demo__line[data-family="purple"] {
+.landing-demo:has(input[value="calm"]:checked) .landing-demo__look[data-look="calm"] {
   display: block;
 }
 
-.landing-demo:has(input[value="red"]:checked) {
-  --demo-brand: var(--demo-red);
+.landing-demo:has(input[value="brutal"]:checked) {
+  --demo-brand: var(--look-brutal-brand);
+  --demo-font: var(--look-brutal-font);
+  --demo-radius: var(--look-brutal-radius);
+  --demo-shadow: var(--look-brutal-shadow);
+  --demo-ease: var(--look-brutal-ease);
+  --demo-duration: var(--look-brutal-duration);
+  --demo-line: 2px;
+  --demo-edge: var(--luz-text-primary);
 }
 
-.landing-demo:has(input[value="red"]:checked) .landing-demo__line[data-family="red"] {
+.landing-demo:has(input[value="brutal"]:checked) .landing-demo__look[data-look="brutal"] {
   display: block;
 }
-
 
 /* The numbers, a quiet row at the foot of the band */
 .landing-tokens__hero .landing-level__stats {
@@ -3434,29 +3493,31 @@ home-light:defined ~ .landing-light__nojs {
   /* The demo's product answers a new brand: each family names its own
      keyframes, so a change of radio starts the animation again */
   .landing-demo__product {
-    animation-duration: var(--luz-duration-slow);
-    animation-timing-function: var(--luz-easing-spring);
+    animation-duration: var(--demo-duration);
+    animation-timing-function: var(--demo-ease);
+    animation-fill-mode: both;
   }
 
-  .landing-demo:has(input[value="blue"]:checked) .landing-demo__product {
-    animation-name: landing-pop-blue;
+  .landing-demo:has(input[value="classic"]:checked) .landing-demo__product {
+    animation-name: landing-look-classic;
   }
 
-  .landing-demo:has(input[value="teal"]:checked) .landing-demo__product {
-    animation-name: landing-pop-teal;
+  .landing-demo:has(input[value="modern"]:checked) .landing-demo__product {
+    animation-name: landing-look-modern;
   }
 
-  .landing-demo:has(input[value="green"]:checked) .landing-demo__product {
-    animation-name: landing-pop-green;
+  .landing-demo:has(input[value="playful"]:checked) .landing-demo__product {
+    animation-name: landing-look-playful;
   }
 
-  .landing-demo:has(input[value="purple"]:checked) .landing-demo__product {
-    animation-name: landing-pop-purple;
+  .landing-demo:has(input[value="calm"]:checked) .landing-demo__product {
+    animation-name: landing-look-calm;
   }
 
-  .landing-demo:has(input[value="red"]:checked) .landing-demo__product {
-    animation-name: landing-pop-red;
+  .landing-demo:has(input[value="brutal"]:checked) .landing-demo__product {
+    animation-name: landing-look-brutal;
   }
+
 
   /* The cards lift under the pointer, and the arrow of a group points on */
   .landing-tokens__step,
@@ -3629,32 +3690,37 @@ home-light:defined ~ .landing-light__nojs {
   }
 }
 
-@keyframes landing-pop-blue {
-  40% {
-    scale: 0.98;
+@keyframes landing-look-classic {
+  from {
+    opacity: 0.3;
+    translate: 0 0.75rem;
   }
 }
 
-@keyframes landing-pop-teal {
-  40% {
-    scale: 0.98;
+@keyframes landing-look-modern {
+  from {
+    opacity: 0.3;
+    translate: 0 0.75rem;
   }
 }
 
-@keyframes landing-pop-green {
-  40% {
-    scale: 0.98;
+@keyframes landing-look-playful {
+  from {
+    opacity: 0.3;
+    translate: 0 0.75rem;
   }
 }
 
-@keyframes landing-pop-purple {
-  40% {
-    scale: 0.98;
+@keyframes landing-look-calm {
+  from {
+    opacity: 0.3;
+    translate: 0 0.75rem;
   }
 }
 
-@keyframes landing-pop-red {
-  40% {
-    scale: 0.98;
+@keyframes landing-look-brutal {
+  from {
+    opacity: 0.3;
+    translate: 0 0.75rem;
   }
 }

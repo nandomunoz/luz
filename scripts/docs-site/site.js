@@ -113,7 +113,7 @@ const PLACEHOLDERS = new Set([
   // The weight of each of the home's levels of adoption (budgets.json against dist)
   "weight1", "weight2", "weight3",
   // What each level of the home brings, as a list of names read from the packages
-  "list1", "list2", "list3", "tokendemo", "tokenbrands", "tokenblocks", "ntokens", "nmodes", "ndeps",
+  "list1", "list2", "list3", "tokendemo", "tokenlooks", "tokenblocks", "ntokens", "nmodes", "ndeps",
 ]);
 /** Values inserted as HTML, not escaped. Only the generator produces them. */
 const RAW_VALUES = new Set(["content", "nav", "pagehead", "rail", "endnav", "pagefoot", "generated", "alternates", "langswitch", "langlinks", "endir", "notice", "contentattrs", "list1", "list2", "list3", "tokendemo", "tokenblocks"]);
@@ -1782,11 +1782,12 @@ function levelLists(site, locale, used) {
  * does not yet know what a token is: what it is and how to use it, at a glance
  * (owner, 2026-11-23). The generator writes, from the packages and never typed:
  *
- *  - {{tokendemo}}, the hero's demo: a radio per brand family that repaints
- *    the hero and a small product through one token, by CSS alone (landing.css,
- *    `.landing-demo:has(input[value=…]:checked)`), with the line that changes;
- *    {{tokenbrands}} is the style of its panel, a property per family
- *    (`--demo-<family>`), so landing.css reads no primitive;
+ *  - {{tokendemo}}, the hero's demo: a radio per look (DEMO_LOOKS) that
+ *    restyles the hero and a small product, colour, type, corners, depth and
+ *    motion, by CSS alone (landing.css, `.landing-demo:has(input[value=…]:checked)`),
+ *    with the tokens the look reads; {{tokenlooks}} is the style of the hero, a
+ *    property per look and part (`--look-<id>-<part>`), so landing.css reads no
+ *    primitive;
  *  - {{tokenblocks}}, three sections of the home's kind, colour, scales and the
  *    rest, each linking the groups of levelLists() it holds to their docs with
  *    their counts, over a panel that draws a few tokens (read through `--v`, so
@@ -1796,7 +1797,19 @@ function levelLists(site, locale, used) {
  *
  * A token named here that luz-tokens.css does not define fails the build.
  */
-const DEMO_FAMILIES = ["blue", "teal", "green", "purple", "red"];
+/**
+ * The looks of the hero's demo: the same markup, a whole look and feel from the
+ * tokens of every group. Any two differ in at least three of colour, type,
+ * corners, depth and motion (tests/landing-levels.test.js).
+ */
+const DEMO_LOOKS = [
+  { id: "classic", brand: "--luz-blue-60", font: "--luz-font-serif", radius: "--luz-radius-md", shadow: "--luz-shadow-sm", ease: "--luz-easing-standard", duration: "--luz-duration-base" },
+  { id: "modern", brand: "--luz-purple-60", font: "--luz-font-sans", radius: "--luz-radius-md", shadow: "--luz-shadow-lg", ease: "--luz-easing-enter", duration: "--luz-duration-slow" },
+  { id: "playful", brand: "--luz-teal-60", font: "--luz-font-sans", radius: "--luz-radius-full", shadow: "--luz-shadow-md", ease: "--luz-easing-spring", duration: "--luz-duration-slower" },
+  { id: "calm", brand: "--luz-green-60", font: "--luz-font-serif", radius: "--luz-radius-sm", shadow: "--luz-shadow-md", ease: "--luz-easing-enter", duration: "--luz-duration-lazy" },
+  { id: "brutal", brand: "--luz-red-60", font: "--luz-font-mono", radius: "--luz-radius-none", shadow: "--luz-shadow-sm", ease: "--luz-easing-linear", duration: "--luz-duration-fast" },
+];
+const LOOK_PARTS = ["brand", "font", "radius", "shadow", "ease", "duration"];
 /** The device each breakpoint is drawn as, a small wireframe as wide as the breakpoint. */
 const DEVICES = { sm: "phone", md: "tablet", lg: "laptop", xl: "laptop", xxl: "desktop", xxxl: "desktop" };
 
@@ -1899,18 +1912,29 @@ function tokenSections({ say, tokens, groups, counts, families, read }) {
     `<fieldset class="landing-demo__picker">`,
     `<legend>${t("level.tokens.demo.legend")}</legend>`,
     `<div class="landing-demo__options">`,
-    DEMO_FAMILIES.map((family, i) => `<label class="landing-demo__option"><input type="radio" name="brand" value="${family}"${i ? "" : " checked"}><span class="landing-demo__swatch" ${v(`--luz-${family}-60`)} aria-hidden="true"></span><span dir="ltr">${family}</span></label>`).join(""),
+    DEMO_LOOKS.map((look, i) => `<label class="landing-demo__option" style="--o-brand:var(${need(look.brand)});--o-font:var(${need(look.font)});--o-radius:var(${need(look.radius)})"><input type="radio" name="look" value="${look.id}"${i ? "" : " checked"}><span class="landing-demo__swatch" aria-hidden="true"></span><span>${t(`level.tokens.look.${look.id}`)}</span></label>`).join(""),
     `</div>`,
     `</fieldset>`,
     `<p class="landing-demo__caption">${t("level.tokens.demo.code")}</p>`,
-    // plain code, not a highlighted block: the highlighter rewrites a block's markup, and each line is shown by CSS
-    `<p class="landing-demo__code" dir="ltr">${DEMO_FAMILIES.map((family) => `<code class="landing-demo__line" data-family="${family}">--luz-brand-fill: var(${need(`--luz-${family}-60`)});</code>`).join("")}</p>`,
+    // plain code, not a highlighted block: the highlighter rewrites a block's markup, and each look's block is shown by CSS
+    `<p class="landing-demo__code" dir="ltr">${DEMO_LOOKS.map(
+      (look) =>
+        `<code class="landing-demo__look" data-look="${look.id}">${escapeHtml(
+          [
+            `--luz-brand-fill: var(${look.brand});`,
+            `font-family: var(${look.font});`,
+            `border-radius: var(${look.radius});`,
+            `box-shadow: var(${look.shadow});`,
+            `transition: var(${look.duration}) var(${look.ease});`,
+          ].join("\n"),
+        )}</code>`,
+    ).join("")}</p>`,
     `</div>`,
   ].join("\n");
   const modes = new Set([...read("packages/tokens/src/semantic.css").matchAll(/\[data-theme="([a-z-]+)"\]\s*[,{]/g)].map((m) => m[1]));
   return {
     tokendemo: demo,
-    tokenbrands: DEMO_FAMILIES.map((family) => `--demo-${family}:var(${need(`--luz-${family}-60`)})`).join(";"),
+    tokenlooks: DEMO_LOOKS.flatMap((look) => LOOK_PARTS.map((part) => `--look-${look.id}-${part}:var(${need(look[part])})`)).join(";"),
     tokenblocks: blocks.join("\n"),
     ntokens: String(tokens.length),
     nmodes: String(modes.size),
