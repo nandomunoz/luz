@@ -1826,7 +1826,8 @@ function tokenSections({ say, tokens, groups, counts, families, read }) {
   const label = (text) => `<code class="landing-tokens__label">${escapeHtml(text)}</code>`;
   const css = (text) => {
     for (const m of text.matchAll(/--luz-[\w-]+/g)) need(m[0]);
-    return `<pre class="luz-code-block" data-lang="css" dir="ltr"><code>${escapeHtml(text)}</code></pre>`;
+    // focusable, so a block that scrolls on a narrow screen scrolls from the keyboard too
+    return `<pre class="luz-code-block" data-lang="css" dir="ltr" tabindex="0"><code>${escapeHtml(text)}</code></pre>`;
   };
   const byId = Object.fromEntries(groups.map(([key, href, test], i) => [key.replace("inside.list.", ""), { key, href, test, count: counts[i] }]));
   const curve = (name) => {
@@ -1837,25 +1838,30 @@ function tokenSections({ say, tokens, groups, counts, families, read }) {
   };
   const card = (name, specimen, code) => `<div class="landing-tokens__scale landing-tokens__scale--${name}"><p class="landing-tokens__scale-title">${t(`inside.list.${name}`)}</p>${specimen}${css(code)}</div>`;
   const row = (cls, items) => `<ul class="landing-tokens__specimen landing-tokens__specimen--${cls}" aria-hidden="true">${items.join("")}</ul>`;
-  const ui = (attrs = "") =>
-    `<span class="landing-tokens__ui"${attrs}><span class="landing-tokens__ui-title">Aa</span><span class="landing-tokens__ui-line"></span><span class="landing-tokens__ui-line landing-tokens__ui-line--short"></span><span class="landing-tokens__ui-button"></span></span>`;
   const panels = {
+    // One token, three modes: a table of semantic tokens by mode, each cell drawn in its mode (data-theme), over
+    // the palette, a ramp per family on one grid of steps with a gap where a family has no step
     color: () => {
-      const primitive = "--luz-blue-60";
-      const ramps = `<div class="landing-tokens__ramps" aria-hidden="true">${families
-        .map((family) => `<span class="landing-tokens__ramp">${tokens.filter(byId.primitives.test).filter((n) => n.startsWith(`--luz-${family}-`)).map((n) => `<span ${v(n)}></span>`).join("")}</span>`)
-        .join("")}</div>`;
-      const chain = [
-        `<ol class="landing-tokens__chain">`,
-        `<li><span class="landing-tokens__chip" ${v(primitive)}></span><span class="landing-tokens__chain-kind">${t("level.tokens.chain.primitive")}</span>${label(primitive)}</li>`,
-        `<li><span class="landing-tokens__chip" ${v(need("--luz-brand-fill"))}></span><span class="landing-tokens__chain-kind">${t("level.tokens.chain.semantic")}</span>${label("--luz-brand-fill")}</li>`,
-        `<li><span class="landing-tokens__chain-button" aria-hidden="true">${t("level.tokens.demo.button")}</span><span class="landing-tokens__chain-kind">${t("level.tokens.chain.component")}</span>${label(".button")}</li>`,
-        `</ol>`,
+      const MODES = [["light", "light"], ["dark", "dark"], ["high-contrast", "contrast"]];
+      const ROWS = ["--luz-surface", "--luz-text-primary", "--luz-brand-fill", "--luz-color-danger"];
+      const matrix = [
+        `<table class="landing-tokens__matrix">`,
+        `<caption>${t("level.tokens.color.modes")}</caption>`,
+        `<thead><tr><td></td>${MODES.map(([, key]) => `<th scope="col">${t(`level.tokens.mode.${key}`)}</th>`).join("")}</tr></thead>`,
+        `<tbody>${ROWS.map((name) => `<tr><th scope="row"><code>${need(name)}</code></th>${MODES.map(([mode]) => `<td data-theme="${mode}"><span class="landing-tokens__cell" ${v(name)}></span></td>`).join("")}</tr>`).join("")}</tbody>`,
+        `</table>`,
       ].join("");
-      const modes = `<div class="landing-tokens__modes" aria-hidden="true">${[["light", "light"], ["dark", "dark"], ["high-contrast", "contrast"]]
-        .map(([mode, key]) => `<figure class="landing-tokens__mode">${ui(` data-theme="${mode}"`)}<figcaption>${t(`level.tokens.mode.${key}`)}</figcaption></figure>`)
-        .join("")}</div>`;
-      return `${chain}${ramps}${modes}`;
+      const primitives = tokens.filter(byId.primitives.test);
+      const steps = [...new Set(primitives.map((n) => Number(n.split("-").pop())))].sort((a, b) => a - b);
+      const palette = [
+        `<div class="landing-tokens__palette" aria-hidden="true" style="--steps:${steps.length}">`,
+        `<span></span>${steps.map((step) => `<span class="landing-tokens__stepno">${step}</span>`).join("")}`,
+        families
+          .map((family) => `<span class="landing-tokens__family">${family}</span>${steps.map((step) => (known.has(`--luz-${family}-${step}`) ? `<span class="landing-tokens__tile" ${v(`--luz-${family}-${step}`)}></span>` : `<span class="landing-tokens__gap"></span>`)).join("")}`)
+          .join(""),
+        `</div>`,
+      ].join("");
+      return `${matrix}<p class="landing-tokens__palette-title">${t("level.tokens.color.palette")}</p>${palette}`;
     },
     scales: () =>
       `<div class="landing-tokens__scales">${[
@@ -1864,30 +1870,31 @@ function tokenSections({ say, tokens, groups, counts, families, read }) {
         card("radius", row("boxes", ["none", "sm", "md", "full"].map((step) => `<li><span class="landing-tokens__box landing-tokens__box--radius" ${v(`--luz-radius-${step}`)}></span>${label(step)}</li>`)), "border-radius: var(--luz-radius-md);"),
         card("shadows", row("boxes", ["sm", "md", "lg"].map((step) => `<li><span class="landing-tokens__box landing-tokens__box--shadow" ${v(`--luz-shadow-${step}`)}></span>${label(step)}</li>`)), "box-shadow: var(--luz-shadow-lg);"),
       ].join("")}</div>`,
-    more: () => {
+    // Motion and breakpoints, a section each: the specimen, then its code, with no card inside the panel
+    motion: () =>
+      `${row("curves", ["standard", "enter", "exit", "spring"].map((step) => `<li><span class="landing-tokens__plot">${curve(`--luz-easing-${step}`)}<span class="landing-tokens__dot" style="--ease:var(${need(`--luz-easing-${step}`)})" aria-hidden="true"><span></span></span></span>${label(step)}</li>`))}${css("transition: opacity\n  var(--luz-duration-base)\n  var(--luz-easing-standard);")}`,
+    breakpoints: () => {
       const mq = tokens.filter(byId.breakpoints.test);
       const px = (n) => parseFloat(values.get(n)) || 0;
       const widest = Math.max(...mq.map(px));
-      return `<div class="landing-tokens__scales">${[
-        card("motion", row("curves", ["standard", "enter", "exit", "spring"].map((step) => `<li><span class="landing-tokens__plot">${curve(`--luz-easing-${step}`)}<span class="landing-tokens__dot" style="--ease:var(${need(`--luz-easing-${step}`)})" aria-hidden="true"><span></span></span></span>${label(step)}</li>`)), "transition: opacity\n  var(--luz-duration-base)\n  var(--luz-easing-standard);"),
-        card("breakpoints", row("devices", mq.map((n) => {
-          const step = n.slice("--luz-mq-".length);
-          if (!DEVICES[step]) throw new Error(`the page of the tokens has no device for ${n}: add it to DEVICES in scripts/docs-site/site.js`);
-          return `<li><span class="landing-tokens__device landing-tokens__device--${DEVICES[step]}" style="--share:${(px(n) / widest).toFixed(3)}"></span>${label(`${step} ${values.get(n)}`)}</li>`;
-        })), "/* a media query reads no property: */\n@media (min-width: 768px) { … }"),
-      ].join("")}</div>`;
+      return `${row("devices", mq.map((n) => {
+        const step = n.slice("--luz-mq-".length);
+        if (!DEVICES[step]) throw new Error(`the page of the tokens has no device for ${n}: add it to DEVICES in scripts/docs-site/site.js`);
+        return `<li><span class="landing-tokens__device landing-tokens__device--${DEVICES[step]}" style="--share:${(px(n) / widest).toFixed(3)}"></span>${label(`${step} ${values.get(n)}`)}</li>`;
+      }))}${css("/* a media query reads no property: */\n@media (min-width: 768px) { … }")}`;
     },
   };
   const BLOCKS = [
     ["color", ["primitives", "semantic"]],
     ["scales", ["spacing", "typography", "radius", "shadows"]],
-    ["more", ["motion", "breakpoints"]],
+    ["motion", ["motion"]],
+    ["breakpoints", ["breakpoints"]],
   ];
   const lost = groups.map(([key]) => key.replace("inside.list.", "")).filter((id) => !BLOCKS.some(([, ids]) => ids.includes(id)));
   if (lost.length) throw new Error(`the page of the tokens has no block for ${lost.join(", ")}: add it to BLOCKS in tokenSections()`);
   const blocks = BLOCKS.map(([id, ids], i) =>
     [
-      `<section class="landing-inside${i % 2 ? " landing-inside--flip" : ""} landing-tokens__block" id="t-${id}" aria-labelledby="t-${id}-title">`,
+      `<section class="landing-inside${i % 2 ? " landing-inside--flip" : ""} landing-tokens__block landing-tokens__block--${id}" id="t-${id}" aria-labelledby="t-${id}-title">`,
       `  <div class="landing-inside__copy">`,
       `    <h2 class="landing-inside__title" id="t-${id}-title">${t(`level.tokens.${id}.title`)}</h2>`,
       `    <p class="landing-inside__lead">${t(`level.tokens.${id}.lead`)}</p>`,
@@ -1909,6 +1916,11 @@ function tokenSections({ say, tokens, groups, counts, families, read }) {
     `</div>`,
     `</fieldset>`,
     `</div>`,
+    // One browser window: its bar, the page (the product, in the look's tokens) and, glued beside it, the
+    // devtools that say the tokens the look reads
+    `<div class="landing-demo__window">`,
+    `<div class="landing-demo__chrome" aria-hidden="true"><span></span><span></span><span></span></div>`,
+    `<div class="landing-demo__viewport">`,
     `<div class="landing-demo__product">`,
     `<span class="landing-demo__bar" aria-hidden="true"><span class="landing-demo__logo"></span><span class="landing-demo__nav"></span><span class="landing-demo__nav"></span><span class="landing-demo__avatar"></span></span>`,
     `<p class="landing-demo__badge">${t("level.tokens.demo.badge")}</p>`,
@@ -1917,25 +1929,24 @@ function tokenSections({ say, tokens, groups, counts, families, read }) {
     `<span class="landing-demo__row" aria-hidden="true"><span class="landing-demo__button">${t("level.tokens.demo.button")}</span><span class="landing-demo__link">${t("level.tokens.demo.link")}</span></span>`,
     `<span class="landing-demo__meter" aria-hidden="true"><span></span></span>`,
     `</div>`,
+    `</div>`,
     `<div class="landing-demo__editor">`,
-    `<p class="landing-demo__caption"><span class="landing-demo__dots" aria-hidden="true"><span></span><span></span><span></span></span>${t("level.tokens.demo.code")}</p>`,
+    `<p class="landing-demo__caption"><span>${t("level.tokens.demo.code")}</span></p>`,
     // a <pre> that keeps its indent, but not a .luz-code-block: the highlighter would rewrite its markup, and each
-    // look's block is shown by CSS
-    `<pre class="landing-demo__code" dir="ltr" tabindex="0" aria-label="${t("level.tokens.demo.code")}">${DEMO_LOOKS.map(
-      (look) =>
-        `<code class="landing-demo__look" data-look="${look.id}">${escapeHtml(
-          [
-            ".card {",
-            `  --luz-brand-fill: var(${look.brand});`,
-            `  font-family: var(${look.font});`,
-            `  border-radius: var(${look.radius});`,
-            `  box-shadow: var(${look.shadow});`,
-            `  transition: var(${look.duration})`,
-            `    var(${look.ease});`,
-            "}",
-          ].join("\n"),
-        )}</code>`,
-    ).join("")}</pre>`,
+    // look's block is shown by CSS; a property and its value in the colours of the devtools
+    `<pre class="landing-demo__code" dir="ltr" tabindex="0" aria-label="${t("level.tokens.demo.code")}">${DEMO_LOOKS.map((look) => {
+      const decl = (prop, value, indent = "  ") => `${indent}<span class="landing-demo__prop">${prop}</span>: <span class="landing-demo__val">${escapeHtml(value)}</span>;`;
+      return `<code class="landing-demo__look" data-look="${look.id}">${[
+        `<span class="landing-demo__sel">.card</span> {`,
+        decl("--luz-brand-fill", `var(${look.brand})`),
+        decl("font-family", `var(${look.font})`),
+        decl("border-radius", `var(${look.radius})`),
+        decl("box-shadow", `var(${look.shadow})`),
+        decl("transition", `var(${look.duration})\n    var(${look.ease})`),
+        "}",
+      ].join("\n")}</code>`;
+    }).join("")}</pre>`,
+    `</div>`,
     `</div>`,
   ].join("\n");
   const modes = new Set([...read("packages/tokens/src/semantic.css").matchAll(/\[data-theme="([a-z-]+)"\]\s*[,{]/g)].map((m) => m[1]));

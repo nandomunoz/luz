@@ -1787,6 +1787,128 @@ h2.docs-demo__title {
   margin-bottom: 0;
 }
 
+/* Breakpoints as devices: a small wireframe of a phone, a tablet, a laptop or
+   a monitor for each, as wide as its own token (--luz-mq-*) times one scale,
+   so no width is typed; a header line and two lines of text inside. A
+   picture (aria-hidden): the list under it names them */
+.docs-devices {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--luz-space-md) var(--luz-space-lg);
+  margin: var(--luz-space-sm) 0 var(--luz-space-lg);
+  padding: 0;
+  list-style: none;
+}
+
+.docs-devices > li {
+  display: grid;
+  justify-items: center;
+  gap: var(--luz-space-xs);
+  margin: 0;
+}
+
+.docs-devices code {
+  padding: 0;
+  background: none;
+  font-family: var(--luz-font-mono);
+  font-size: var(--luz-text-xs);
+  color: var(--luz-text-secondary);
+  white-space: nowrap;
+}
+
+.docs-device {
+  position: relative;
+  display: block;
+  inline-size: calc(var(--docs-device-w) * 0.055);
+  border: 1.5px solid var(--luz-text-secondary);
+  border-radius: var(--luz-radius-sm);
+  background-color: var(--luz-surface);
+  background-image:
+    linear-gradient(var(--luz-brand-primary), var(--luz-brand-primary)),
+    linear-gradient(var(--luz-divider), var(--luz-divider)),
+    linear-gradient(var(--luz-divider), var(--luz-divider));
+  background-position:
+    20% 18%,
+    20% 45%,
+    20% 62%;
+  background-repeat: no-repeat;
+  background-size:
+    35% 2px,
+    60% 2px,
+    45% 2px;
+}
+
+.docs-device--sm {
+  --docs-device-w: var(--luz-mq-sm);
+}
+
+.docs-device--md {
+  --docs-device-w: var(--luz-mq-md);
+}
+
+.docs-device--lg {
+  --docs-device-w: var(--luz-mq-lg);
+}
+
+.docs-device--xl {
+  --docs-device-w: var(--luz-mq-xl);
+}
+
+.docs-device--xxl {
+  --docs-device-w: var(--luz-mq-xxl);
+}
+
+.docs-device--xxxl {
+  --docs-device-w: var(--luz-mq-xxxl);
+}
+
+.docs-device--phone {
+  aspect-ratio: 9 / 17;
+  border-radius: var(--luz-radius-md);
+}
+
+.docs-device--tablet {
+  aspect-ratio: 3 / 4;
+  border-radius: var(--luz-radius-md);
+}
+
+/* A laptop: the screen over a base a little wider */
+.docs-device--laptop {
+  aspect-ratio: 16 / 10;
+  margin-block-end: 4px;
+  border-end-start-radius: 0;
+  border-end-end-radius: 0;
+}
+
+.docs-device--laptop::after {
+  content: "";
+  position: absolute;
+  inset-inline: -12%;
+  inset-block-start: calc(100% + 1.5px);
+  block-size: 3px;
+  border-radius: 0 0 var(--luz-radius-sm) var(--luz-radius-sm);
+  background: var(--luz-text-secondary);
+}
+
+/* A monitor: the screen on a stand */
+.docs-device--desktop {
+  aspect-ratio: 16 / 9;
+  margin-block-end: 7px;
+}
+
+.docs-device--desktop::after {
+  content: "";
+  position: absolute;
+  inset-inline-start: 50%;
+  inset-block-start: calc(100% + 1.5px);
+  inline-size: 30%;
+  block-size: 6px;
+  border-block-end: 2px solid var(--luz-text-secondary);
+  background: linear-gradient(var(--luz-text-secondary), var(--luz-text-secondary)) center / 2px 100% no-repeat;
+  translate: -50% 0;
+}
+
 .docs-scale-list,
 .docs-specimens,
 .docs-fonts,

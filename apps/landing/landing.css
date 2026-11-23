@@ -2575,10 +2575,55 @@ home-light:defined ~ .landing-light__nojs {
   }
 }
 
+/* The window: the page and, glued to it, its devtools; beside it from the
+   width where the demo turns to two columns, under it before */
+.landing-demo__window {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+  min-inline-size: 0;
+  border: 1px solid color-mix(in oklab, var(--luz-text-primary) 16%, transparent);
+  border-radius: var(--luz-radius-md);
+  background: var(--luz-surface-page);
+  overflow: hidden;
+}
+
+.landing-demo__chrome {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 6px;
+  padding: var(--luz-space-xs) var(--luz-space-sm);
+  border-block-end: 1px solid color-mix(in oklab, var(--luz-text-primary) 12%, transparent);
+  background: var(--luz-surface-strong);
+}
+
+.landing-demo__chrome > span {
+  inline-size: 10px;
+  block-size: 10px;
+  border-radius: var(--luz-radius-full);
+  background: color-mix(in oklab, var(--luz-text-primary) 22%, transparent);
+}
+
+.landing-demo__viewport {
+  display: grid;
+  align-content: center;
+  min-inline-size: 0;
+  padding: var(--luz-space-lg);
+}
+
 @media (min-width: 900px) {
-  .landing-tokens__stage {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    align-items: stretch;
+  .landing-demo__window {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  }
+
+  .landing-demo__editor {
+    border-inline-start: 1px solid color-mix(in oklab, var(--luz-text-primary) 14%, transparent);
+  }
+}
+
+@media (max-width: 899px) {
+  .landing-demo__editor {
+    border-block-start: 1px solid color-mix(in oklab, var(--luz-text-primary) 14%, transparent);
   }
 }
 
@@ -2614,14 +2659,13 @@ home-light:defined ~ .landing-light__nojs {
   justify-content: center;
 }
 
-/* The code, in an editor: a title bar, then the rule with room around it */
+/* The devtools: a tab, then the rule, docked to the page with no frame of
+   their own (the window has it) */
 .landing-demo__editor {
   display: grid;
   grid-template-rows: auto 1fr;
   min-inline-size: 0;
-  overflow: hidden;
-  border: 1px solid color-mix(in oklab, var(--luz-text-primary) 14%, transparent);
-  border-radius: var(--luz-radius-md);
+  border: 0;
   background: var(--luz-surface-strong);
 }
 
@@ -2822,39 +2866,40 @@ home-light:defined ~ .landing-light__nojs {
 
 .landing-demo__caption {
   display: flex;
-  align-items: center;
-  gap: var(--luz-space-sm);
   margin: 0;
-  padding: var(--luz-space-xs) var(--luz-space-md);
   border-block-end: 1px solid color-mix(in oklab, var(--luz-text-primary) 12%, transparent);
   font-family: var(--luz-font-sans);
   font-size: var(--luz-text-xs);
   font-weight: 600;
-  color: var(--luz-text-secondary);
+  color: var(--luz-text-primary);
 }
 
-.landing-demo__dots {
-  display: inline-flex;
-  gap: 5px;
-}
-
-.landing-demo__dots > span {
-  inline-size: 9px;
-  block-size: 9px;
-  border-radius: var(--luz-radius-full);
-  background: color-mix(in oklab, var(--luz-text-primary) 22%, transparent);
+/* The open tab of the devtools: its label over a line in the brand */
+.landing-demo__caption > span {
+  padding: var(--luz-space-xs) var(--luz-space-md);
+  box-shadow: inset 0 -2px 0 var(--demo-brand);
 }
 
 .landing-demo__code {
-  align-self: center;
+  align-self: start;
   margin: 0;
-  background: none;
-  border-block: 0;
-  border-inline-end: 0;
-  border-radius: 0;
-  padding: var(--luz-space-lg);
+  padding: var(--luz-space-md) var(--luz-space-lg);
   overflow-x: auto;
-  border-inline-start: 3px solid var(--demo-brand);
+  border: 0;
+  border-radius: 0;
+  background: none;
+}
+
+.landing-demo__sel {
+  color: var(--luz-code-name);
+}
+
+.landing-demo__prop {
+  color: var(--luz-code-property);
+}
+
+.landing-demo__val {
+  color: var(--luz-code-string);
 }
 
 .landing-demo__look {
@@ -3092,142 +3137,122 @@ home-light:defined ~ .landing-light__nojs {
   color: var(--luz-text-primary);
 }
 
-/* Color: the chain from the palette to a component */
-.landing-tokens__chain {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--luz-space-md);
-  margin: 0;
+/* Color: one name, three modes. A table of semantic tokens by mode, each
+   cell drawn in its mode (data-theme on the cell redefines the tokens there),
+   so the same name is seen taking the colour of each mode */
+.landing-tokens__matrix {
+  inline-size: 100%;
+  border-collapse: separate;
+  border-spacing: var(--luz-space-xs);
+  margin: calc(var(--luz-space-xs) * -1);
+  table-layout: fixed;
+}
+
+.landing-tokens__matrix caption {
+  padding-block-end: var(--luz-space-sm);
+  padding-inline-start: var(--luz-space-xs);
+  caption-side: top;
+  text-align: start;
+  font-family: var(--luz-font-sans);
+  font-size: var(--luz-text-sm);
+  font-weight: 600;
+  color: var(--luz-text-primary);
+}
+
+.landing-tokens__matrix th,
+.landing-tokens__matrix td {
   padding: 0;
-  list-style: none;
-}
-
-.landing-tokens__chain > li {
-  position: relative;
-  display: grid;
-  justify-items: center;
-  align-content: start;
-  gap: var(--luz-space-xs);
-  min-inline-size: 0;
-  text-align: center;
-}
-
-.landing-tokens__chain > li + li::before {
-  content: "→";
-  position: absolute;
-  inset-block-start: 0.9rem;
-  inset-inline-start: calc(var(--luz-space-md) / -2);
-  translate: -50% 0;
-  color: var(--luz-text-secondary);
-}
-
-.landing-tokens__chain .landing-tokens__label {
+  border: 0;
+  background: none;
   white-space: normal;
-  overflow-wrap: anywhere;
+}
+
+.landing-tokens__matrix thead th {
+  padding-block-end: var(--luz-space-3xs);
+  font-family: var(--luz-font-sans);
   font-size: var(--luz-text-xs);
-}
-
-.landing-tokens__chip {
-  inline-size: 2.5rem;
-  block-size: 2.5rem;
-  border-radius: var(--luz-radius-md);
-  background: var(--v);
-}
-
-.landing-tokens__chain-button {
-  display: inline-flex;
-  align-items: center;
-  min-block-size: 2.5rem;
-  padding-inline: var(--luz-space-md);
-  border-radius: var(--luz-radius-md);
-  background: var(--luz-brand-fill);
-  font-family: var(--luz-font-sans);
-  font-size: var(--luz-text-sm);
   font-weight: 600;
-  color: var(--luz-text-on-fill);
-  max-inline-size: 100%;
-  text-align: center;
-}
-
-.landing-tokens__chain-kind {
-  font-family: var(--luz-font-sans);
-  font-size: var(--luz-text-sm);
-  font-weight: 600;
-  color: var(--luz-text-primary);
-}
-
-.landing-tokens__ramps {
-  display: grid;
-  gap: 3px;
-}
-
-.landing-tokens__ramp {
-  display: grid;
-  grid-template-columns: repeat(10, minmax(0, 1fr));
-  gap: 3px;
-}
-
-.landing-tokens__ramp > span {
-  block-size: 1.25rem;
-  border-radius: var(--luz-radius-sm);
-  background: var(--v);
-}
-
-/* The same card in the three modes, each framed so a light one on a dark
-   page does not glare; the caption sits outside the mode */
-.landing-tokens__modes {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--luz-space-sm);
-}
-
-.landing-tokens__mode {
-  display: grid;
-  gap: var(--luz-space-xs);
-  margin: 0;
-}
-
-.landing-tokens__ui {
-  display: grid;
-  gap: var(--luz-space-xs);
-  padding: var(--luz-space-md);
-  border: 1px solid var(--luz-divider);
-  border-radius: var(--luz-radius-md);
-  background: var(--luz-surface);
-  box-shadow: 0 0 0 1px color-mix(in oklab, currentcolor 12%, transparent);
-}
-
-.landing-tokens__ui-title {
-  font-family: var(--luz-font-heading);
-  font-size: var(--luz-text-xl);
-  line-height: 1;
-  color: var(--luz-text-primary);
-}
-
-.landing-tokens__ui-line {
-  block-size: 0.35rem;
-  border-radius: var(--luz-radius-full);
-  background: var(--luz-text-secondary);
-}
-
-.landing-tokens__ui-line--short {
-  inline-size: 60%;
-}
-
-.landing-tokens__ui-button {
-  inline-size: 60%;
-  block-size: 1.25rem;
-  margin-block-start: var(--luz-space-3xs);
-  border-radius: var(--luz-radius-sm);
-  background: var(--luz-brand-fill);
-}
-
-.landing-tokens__mode figcaption {
-  font-family: var(--luz-font-sans);
-  font-size: var(--luz-text-sm);
-  font-style: normal;
   text-align: center;
   color: var(--luz-text-secondary);
+}
+
+.landing-tokens__matrix thead td,
+.landing-tokens__matrix tbody th {
+  inline-size: 40%;
+}
+
+.landing-tokens__matrix tbody th {
+  text-align: start;
+  font-weight: 400;
+}
+
+.landing-tokens__matrix tbody th code {
+  padding: 0;
+  background: none;
+  font-family: var(--luz-font-mono);
+  font-size: var(--luz-text-xs);
+  color: var(--luz-text-primary);
+  white-space: normal;
+  word-break: break-all;
+}
+
+/* The cell: the mode's page around the token's colour */
+.landing-tokens__matrix tbody td {
+  padding: 5px;
+  border-radius: var(--luz-radius-md);
+  background: var(--luz-surface-page);
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--luz-text-primary) 14%, transparent);
+}
+
+.landing-tokens__cell {
+  display: block;
+  block-size: 1.75rem;
+  border-radius: var(--luz-radius-sm);
+  background: var(--v);
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--luz-text-primary) 12%, transparent);
+}
+
+/* The palette: a ramp per family on one grid of steps, a gap where a family
+   has no step, the steps as a head */
+.landing-tokens__palette-title {
+  margin: var(--luz-space-sm) 0 0;
+  font-family: var(--luz-font-sans);
+  font-size: var(--luz-text-sm);
+  font-weight: 600;
+  color: var(--luz-text-primary);
+}
+
+.landing-tokens__palette {
+  display: grid;
+  grid-template-columns: 3.5rem repeat(var(--steps), minmax(0, 1fr));
+  align-items: center;
+  gap: 3px;
+}
+
+.landing-tokens__stepno,
+.landing-tokens__family {
+  font-family: var(--luz-font-mono);
+  font-size: var(--luz-text-xs);
+  color: var(--luz-text-secondary);
+}
+
+.landing-tokens__stepno {
+  white-space: nowrap;
+  text-align: center;
+}
+
+.landing-tokens__tile,
+.landing-tokens__gap {
+  block-size: 1.25rem;
+  border-radius: 2px;
+}
+
+.landing-tokens__tile {
+  background: var(--v);
+}
+
+.landing-tokens__gap {
+  border: 1px dashed color-mix(in oklab, var(--luz-text-primary) 12%, transparent);
 }
 
 /* Scales and the rest: a card per group, its specimen over its one line */
@@ -3385,7 +3410,7 @@ home-light:defined ~ .landing-light__nojs {
    breakpoint against the widest; a header line and two lines of text inside */
 .landing-tokens__specimen--devices {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 4.5rem), 1fr));
   align-items: end;
   gap: var(--luz-space-md) var(--luz-space-sm);
 }
@@ -3595,17 +3620,17 @@ home-light:defined ~ .landing-light__nojs {
   }
 
   /* Each easing curve runs its own easing: a dot traces it. The pointer or
-     the focus on the card loops it at the token's pace; the scroll drives it
+     the focus on its section loops it at the token's pace; the scroll drives it
      below */
   .landing-tokens__dot {
     display: block;
   }
 
-  .landing-tokens__scale--motion:is(:hover, :focus-within) .landing-tokens__dot {
+  .landing-tokens__block--motion:is(:hover, :focus-within) .landing-tokens__dot {
     animation: landing-dot-x-loop calc(var(--luz-duration-lazy) * 2) linear infinite;
   }
 
-  .landing-tokens__scale--motion:is(:hover, :focus-within) .landing-tokens__dot > span {
+  .landing-tokens__block--motion:is(:hover, :focus-within) .landing-tokens__dot > span {
     animation: landing-dot-y-loop calc(var(--luz-duration-lazy) * 2) var(--ease) infinite;
   }
 
