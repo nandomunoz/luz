@@ -1,6 +1,6 @@
 ---
 name: qa-release
-description: Run the LUZ release QA checklist: lint, size/strings/exceptions/pack/contrast checks, unit tests and Playwright (chromium and chromium-nojs), then write an evidence report and list what needs manual or browser review. Use before a release or when asked for "QA", "release check" or "evidence". Never runs firefox or webkit.
+description: "Run the LUZ release QA checklist: lint, size/strings/exceptions/pack/contrast checks, unit tests and Playwright (chromium and chromium-nojs), then write an evidence report and list what needs manual or browser review. Use before a release or when asked for \"QA\", \"release check\" or \"evidence\". Never runs firefox or webkit."
 ---
 
 # QA release

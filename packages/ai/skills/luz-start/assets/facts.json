@@ -1,0 +1,46 @@
+{
+  "versions": {
+    "tokens": "0.4.1",
+    "core": "0.4.1",
+    "catalog": "0.4.1",
+    "check": "0.3.2"
+  },
+  "kinds": [
+    "landing",
+    "blog",
+    "app",
+    "docs"
+  ],
+  "stacks": [
+    {
+      "id": "vanilla",
+      "name": "Plain HTML",
+      "ext": ""
+    },
+    {
+      "id": "astro",
+      "name": "Astro",
+      "ext": ".astro"
+    },
+    {
+      "id": "react",
+      "name": "React (Vite, Next.js)",
+      "ext": ".jsx,.tsx"
+    },
+    {
+      "id": "vue",
+      "name": "Vue (Vite, Nuxt)",
+      "ext": ".vue"
+    },
+    {
+      "id": "angular",
+      "name": "Angular",
+      "ext": ""
+    },
+    {
+      "id": "other",
+      "name": "Other",
+      "ext": ""
+    }
+  ]
+}

@@ -206,10 +206,13 @@ function main(argv) {
     const manifestPath = resolve(packagesDir, dir, "package.json");
     const readmePath = resolve(packagesDir, dir, "README.md");
     if (!existsSync(manifestPath) || !existsSync(readmePath)) continue;
+    const manifest = JSON.parse(readFileSync(manifestPath, "utf-8"));
+    // A private package is not published: no agent loads it from npm, so its README has no block
+    if (manifest.private) continue;
     const changelogPath = resolve(packagesDir, dir, "CHANGELOG.md");
     const block = renderAiSection({
       name: dir,
-      manifest: JSON.parse(readFileSync(manifestPath, "utf-8")),
+      manifest,
       changelog: existsSync(changelogPath) ? readFileSync(changelogPath, "utf-8") : null,
       siteUrl: SITE_URL,
       checkVersion,

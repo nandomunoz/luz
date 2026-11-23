@@ -1,6 +1,6 @@
 ---
 name: test-writer
-description: Writes the failing test for LUZ (TDD), committed before the change. Use once a change to `packages/`, `apps/` or `scripts/` has been explored and its shape is settled, before the first commit (it may already be in the working tree): given the behaviour the change must have, writes the vitest or Playwright test that encodes it, runs it, and confirms it fails for the right reason (the red commit). Edits only `tests/` (specs, unit tests, fixtures, helpers); never `packages/*/src`, `apps/` or `scripts/`. Never makes a test pass by weakening it.
+description: "Writes the failing test for LUZ (TDD), committed before the change. Use once a change to `packages/`, `apps/` or `scripts/` has been explored and its shape is settled, before the first commit (it may already be in the working tree): given the behaviour the change must have, writes the vitest or Playwright test that encodes it, runs it, and confirms it fails for the right reason (the red commit). Edits only `tests/` (specs, unit tests, fixtures, helpers); never `packages/*/src`, `apps/` or `scripts/`. Never makes a test pass by weakening it."
 model: claude-sonnet-5-5
 effort: high
 tools: Read, Grep, Glob, Bash, Edit, Write

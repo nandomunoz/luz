@@ -1,0 +1,49 @@
+{
+  "$comment": "The closed lists of front matter fields, per kind of file and per target. Claude Code ignores a misspelled field without a word, so the check reads these. The portable six are the open Agent Skills specification; the rest are Claude Code's own (dashes in a skill, camelCase in a subagent). A target is added here, with a test, when its list has been read at the source.",
+  "skill": {
+    "portable": ["name", "description", "license", "compatibility", "metadata", "allowed-tools"],
+    "claude": [
+      "name",
+      "description",
+      "license",
+      "compatibility",
+      "metadata",
+      "allowed-tools",
+      "when_to_use",
+      "argument-hint",
+      "arguments",
+      "disable-model-invocation",
+      "user-invocable",
+      "disallowed-tools",
+      "model",
+      "effort",
+      "context",
+      "agent",
+      "background",
+      "hooks",
+      "paths",
+      "shell"
+    ]
+  },
+  "agent": {
+    "claude": [
+      "name",
+      "description",
+      "tools",
+      "disallowedTools",
+      "model",
+      "permissionMode",
+      "maxTurns",
+      "skills",
+      "mcpServers",
+      "hooks",
+      "memory",
+      "background",
+      "effort",
+      "isolation",
+      "color",
+      "initialPrompt"
+    ]
+  },
+  "limits": { "description": 1024, "compatibility": 500, "name": 64, "bodyLines": 500, "agentsMdBytes": 32768 }
+}
