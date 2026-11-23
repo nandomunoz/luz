@@ -2409,8 +2409,10 @@ home-light:defined ~ .landing-light__nojs {
    the home's. The names are a grid of tags that fills the width, each tinted by its
    weight (--share); the home's masonry needs the fixed height of its panel */
 .landing-level {
+  --level-gap: calc(var(--luz-space-4xl) * 1.5);
+
   display: grid;
-  gap: var(--luz-space-3xl);
+  gap: var(--level-gap);
   min-inline-size: 0;
   /* the home's hero has the room of its first screen; here the header's own */
   padding-block-start: var(--luz-space-3xl);
@@ -2493,10 +2495,10 @@ home-light:defined ~ .landing-light__nojs {
   justify-items: center;
   gap: var(--luz-space-2xl);
   padding: var(--luz-space-3xl) min(var(--luz-space-2xl), 5%) var(--luz-space-2xl);
-  border: 1px solid color-mix(in oklab, var(--demo-brand) 22%, transparent);
-  border-radius: var(--luz-radius-md);
+  border: 0;
+  border-radius: 0;
   background:
-    radial-gradient(120% 80% at 50% 0%, color-mix(in oklab, var(--demo-brand) 16%, var(--luz-surface-page)), var(--luz-surface-page) 70%);
+    radial-gradient(ellipse closest-side at 50% 50%, color-mix(in oklab, var(--demo-brand) 16%, transparent), color-mix(in oklab, var(--demo-brand) 6%, transparent) 55%, transparent);
   text-align: center;
 }
 
@@ -2604,11 +2606,20 @@ home-light:defined ~ .landing-light__nojs {
   background: color-mix(in oklab, var(--luz-text-primary) 22%, transparent);
 }
 
+/* The page fills its pane: no margin around the product, which keeps the
+   brand line on top and loses its own frame inside the window's */
 .landing-demo__viewport {
   display: grid;
-  align-content: center;
   min-inline-size: 0;
-  padding: var(--luz-space-lg);
+  padding: 0;
+}
+
+.landing-demo__window .landing-demo__product {
+  align-content: center;
+  border-inline: 0;
+  border-block-end: 0;
+  border-radius: 0;
+  box-shadow: none;
 }
 
 @media (min-width: 900px) {
@@ -2627,16 +2638,11 @@ home-light:defined ~ .landing-light__nojs {
   }
 }
 
-/* While the demo is one column (a phone, a tablet: below the 900px where it
-   turns to two) the frames go: the band keeps its tint with no border, and
-   the demo sits on it with no border, no shadow and no side padding, so its
+/* The band has no border at any width (owner, 2026-11-23). While the demo is
+   one column (a phone, a tablet: below the 900px where it turns to two) its
+   frames go too: the demo sits on the band with no border, no shadow and no side padding, so its
    content has the whole width */
 @media (max-width: 899px) {
-  .landing-tokens__hero {
-    border: 0;
-    border-radius: 0;
-  }
-
   .landing-tokens__stage {
     padding-inline: 0;
     border: 0;
@@ -3031,24 +3037,133 @@ home-light:defined ~ .landing-light__nojs {
 }
 
 .landing-tokens__step-list {
+  --path-gap: var(--luz-space-xl);
+
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr));
-  gap: var(--luz-space-lg);
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--path-gap);
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
 .landing-tokens__step {
+  position: relative;
   display: grid;
   grid-template-rows: auto auto 1fr;
   align-content: start;
   gap: var(--luz-space-sm);
   min-inline-size: 0;
+  margin: 0;
   padding: var(--luz-space-lg);
   border: 1px solid var(--luz-divider);
   border-radius: var(--luz-radius-md);
   background: var(--luz-surface);
+}
+
+/* The path: one piece from a step to the next, a line across the gap from
+   border to border (a box is positioned from its padding edge, so its 1px
+   border is added) and the arrow where it arrives, an SVG mask painted in
+   the colour of the boxes' border, so the two cannot part. Down, while the
+   steps are one column */
+.landing-tokens__step--1::after,
+.landing-tokens__step--2::after,
+.landing-tokens__step--3::after {
+  content: "";
+  position: absolute;
+  inset-block-start: calc(100% + 1px);
+  inset-inline-start: calc(50% - 5px);
+  inline-size: 10px;
+  block-size: var(--path-gap);
+  background: var(--luz-divider);
+  mask:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M1.5 4l3.5 4 3.5-4' fill='none' stroke='%23000' stroke-width='1.2'/%3E%3C/svg%3E") center bottom / 10px 10px no-repeat,
+    linear-gradient(#000, #000) center top / 1px 100% no-repeat;
+  pointer-events: none;
+}
+
+/* Two columns: 1 and 2 above, 3 under 2, the result beside 3; 1 joins 2
+   across, 2 joins 3 down, 3 joins the result back across */
+@media (min-width: 800px) {
+  .landing-tokens__step-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-areas:
+      "one two"
+      "result three";
+  }
+
+  .landing-tokens__step--1 {
+    grid-area: one;
+  }
+
+  .landing-tokens__step--2 {
+    grid-area: two;
+  }
+
+  .landing-tokens__step--3 {
+    grid-area: three;
+  }
+
+  .landing-tokens__step--result {
+    grid-area: result;
+  }
+
+  .landing-tokens__step--1::after,
+  .landing-tokens__step--3::after {
+    inset-block-start: calc(2.5rem - 5px);
+    inline-size: var(--path-gap);
+    block-size: 10px;
+  }
+
+  .landing-tokens__step--1::after {
+    inset-inline-start: calc(100% + 1px);
+    mask:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M4 1.5l4 3.5-4 3.5' fill='none' stroke='%23000' stroke-width='1.2'/%3E%3C/svg%3E") right center / 10px 10px no-repeat,
+      linear-gradient(#000, #000) left center / 100% 1px no-repeat;
+  }
+
+  .landing-tokens__step--3::after {
+    inset-inline-start: auto;
+    inset-inline-end: calc(100% + 1px);
+    mask:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M6 1.5L2 5l4 3.5' fill='none' stroke='%23000' stroke-width='1.2'/%3E%3C/svg%3E") left center / 10px 10px no-repeat,
+      linear-gradient(#000, #000) right center / 100% 1px no-repeat;
+  }
+
+  /* Right to left the path runs the other way: the arrows across turn round */
+  .landing-tokens__step--1:dir(rtl)::after,
+  .landing-tokens__step--3:dir(rtl)::after {
+    scale: -1 1;
+  }
+}
+
+/* What you get: the end of the path, in words, a tick before each */
+.landing-tokens__step--result {
+  border-style: dashed;
+  background: color-mix(in oklab, var(--luz-brand-primary) 5%, var(--luz-surface-page));
+}
+
+.landing-tokens__outcomes {
+  display: grid;
+  gap: var(--luz-space-sm);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.landing-tokens__outcomes > li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--luz-space-sm);
+  margin: 0;
+  color: var(--luz-text-primary);
+}
+
+.landing-tokens__outcomes > li::before {
+  content: "✓";
+  font-family: var(--luz-font-sans);
+  font-weight: 600;
+  color: var(--luz-color-success);
 }
 
 .landing-tokens__step-title {
@@ -3071,8 +3186,7 @@ home-light:defined ~ .landing-light__nojs {
 /* The three blocks */
 .landing-tokens {
   display: grid;
-  gap: var(--luz-space-4xl);
-  padding-block: var(--luz-space-4xl);
+  gap: var(--level-gap);
 }
 
 .landing-tokens__block {
@@ -3137,122 +3251,167 @@ home-light:defined ~ .landing-light__nojs {
   color: var(--luz-text-primary);
 }
 
-/* Color: one name, three modes. A table of semantic tokens by mode, each
-   cell drawn in its mode (data-theme on the cell redefines the tokens there),
-   so the same name is seen taking the colour of each mode */
-.landing-tokens__matrix {
-  inline-size: 100%;
-  border-collapse: separate;
-  border-spacing: var(--luz-space-xs);
-  margin: calc(var(--luz-space-xs) * -1);
-  table-layout: fixed;
-}
-
-.landing-tokens__matrix caption {
-  padding-block-end: var(--luz-space-sm);
-  padding-inline-start: var(--luz-space-xs);
-  caption-side: top;
-  text-align: start;
-  font-family: var(--luz-font-sans);
-  font-size: var(--luz-text-sm);
-  font-weight: 600;
-  color: var(--luz-text-primary);
-}
-
-.landing-tokens__matrix th,
-.landing-tokens__matrix td {
-  padding: 0;
-  border: 0;
-  background: none;
-  white-space: normal;
-}
-
-.landing-tokens__matrix thead th {
-  padding-block-end: var(--luz-space-3xs);
-  font-family: var(--luz-font-sans);
-  font-size: var(--luz-text-xs);
-  font-weight: 600;
-  text-align: center;
-  color: var(--luz-text-secondary);
-}
-
-.landing-tokens__matrix thead td,
-.landing-tokens__matrix tbody th {
-  inline-size: 40%;
-}
-
-.landing-tokens__matrix tbody th {
-  text-align: start;
-  font-weight: 400;
-}
-
-.landing-tokens__matrix tbody th code {
-  padding: 0;
-  background: none;
-  font-family: var(--luz-font-mono);
-  font-size: var(--luz-text-xs);
-  color: var(--luz-text-primary);
-  white-space: normal;
-  word-break: break-all;
-}
-
-/* The cell: the mode's page around the token's colour */
-.landing-tokens__matrix tbody td {
-  padding: 5px;
-  border-radius: var(--luz-radius-md);
-  background: var(--luz-surface-page);
-  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--luz-text-primary) 14%, transparent);
-}
-
-.landing-tokens__cell {
-  display: block;
-  block-size: 1.75rem;
-  border-radius: var(--luz-radius-sm);
-  background: var(--v);
-  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--luz-text-primary) 12%, transparent);
-}
-
-/* The palette: a ramp per family on one grid of steps, a gap where a family
-   has no step, the steps as a head */
-.landing-tokens__palette-title {
-  margin: var(--luz-space-sm) 0 0;
-  font-family: var(--luz-font-sans);
-  font-size: var(--luz-text-sm);
-  font-weight: 600;
-  color: var(--luz-text-primary);
-}
-
-.landing-tokens__palette {
+/* Color: a level like the others, its panel a mosaic of tiles that touch,
+   each its name inside. The semantic tokens in large tiles, read live so
+   they follow the mode, each with the ink it is made to carry; beside them
+   the primitives, deep, mid and pale for every family, with their value
+   and a gray that reads on them (the generator measures it) */
+.landing-tokens__mosaic {
   display: grid;
-  grid-template-columns: 3.5rem repeat(var(--steps), minmax(0, 1fr));
-  align-items: center;
-  gap: 3px;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+  border-radius: var(--luz-radius-sm);
+  overflow: hidden;
 }
 
-.landing-tokens__stepno,
-.landing-tokens__family {
-  font-family: var(--luz-font-mono);
-  font-size: var(--luz-text-xs);
-  color: var(--luz-text-secondary);
-}
 
-.landing-tokens__stepno {
-  white-space: nowrap;
-  text-align: center;
+.landing-tokens__semantic,
+.landing-tokens__swatches {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
 .landing-tokens__tile,
-.landing-tokens__gap {
-  block-size: 1.25rem;
-  border-radius: 2px;
-}
-
-.landing-tokens__tile {
+.landing-tokens__swatch {
+  display: grid;
+  align-content: end;
+  gap: 2px;
+  min-inline-size: 0;
+  margin: 0;
+  padding: var(--luz-space-xs) var(--luz-space-sm);
   background: var(--v);
+  color: var(--ink);
 }
 
-.landing-tokens__gap {
-  border: 1px dashed color-mix(in oklab, var(--luz-text-primary) 12%, transparent);
+.landing-tokens__tile code,
+.landing-tokens__swatch code,
+.landing-tokens__swatch span {
+  padding: 0;
+  background: none;
+  font-family: var(--luz-font-mono);
+  font-size: var(--luz-text-xs);
+  color: inherit;
+  overflow-wrap: anywhere;
+}
+
+/* The semantic tiles: surface tall over its strong step and the divider;
+   beside them the ink, tall, over the danger fill */
+.landing-tokens__semantic {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(5, minmax(3.5rem, 1fr));
+}
+
+.landing-tokens__tile:nth-child(1) {
+  grid-area: 1 / 1 / 4 / 2;
+}
+
+.landing-tokens__tile:nth-child(2) {
+  grid-area: 4 / 1 / 5 / 2;
+}
+
+.landing-tokens__tile:nth-child(3) {
+  grid-area: 5 / 1 / 6 / 2;
+}
+
+.landing-tokens__tile:nth-child(4) {
+  grid-area: 1 / 2 / 5 / 3;
+}
+
+.landing-tokens__tile:nth-child(5) {
+  grid-area: 5 / 2 / 6 / 3;
+}
+
+/* The primitives: a row per family, deep to pale */
+.landing-tokens__swatches {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-auto-rows: minmax(3.5rem, 1fr);
+}
+
+/* From a phone up the semantic tiles are a band of four columns over the
+   primitives: the surface and the ink tall, the strong surface over the
+   divider, the danger fill tall at the end */
+@media (min-width: 480px) {
+  .landing-tokens__semantic {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-rows: repeat(2, minmax(4rem, auto));
+  }
+
+  .landing-tokens__tile:nth-child(1) {
+    grid-area: 1 / 1 / 3 / 2;
+  }
+
+  .landing-tokens__tile:nth-child(2) {
+    grid-area: 1 / 3 / 2 / 4;
+  }
+
+  .landing-tokens__tile:nth-child(3) {
+    grid-area: 2 / 3 / 3 / 4;
+  }
+
+  .landing-tokens__tile:nth-child(4) {
+    grid-area: 1 / 2 / 3 / 3;
+  }
+
+  .landing-tokens__tile:nth-child(5) {
+    grid-area: 1 / 4 / 3 / 5;
+  }
+}
+
+/* A primitive's name stays whole: on a narrow tile, smaller type and less
+   padding; a semantic tile is large, and its name may wrap at a hyphen */
+.landing-tokens__swatch code {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 640px) {
+  .landing-tokens__swatch {
+    padding-inline: var(--luz-space-xs);
+  }
+
+  .landing-tokens__swatch code,
+  .landing-tokens__swatch span {
+    font-size: calc(var(--luz-text-xs) * 0.75);
+  }
+}
+
+@media (max-width: 360px) {
+  .landing-tokens__block--color .landing-tokens__panel {
+    padding: var(--luz-space-2xs);
+  }
+
+  .landing-tokens__swatch {
+    padding-inline: var(--luz-space-2xs);
+  }
+
+  .landing-tokens__swatch code,
+  .landing-tokens__swatch span {
+    font-size: calc(var(--luz-text-xs) * 0.66);
+  }
+}
+
+/* Scales: a level like the others, the text on one side (the sides swap from
+   one section to the next, so the page zigzags) and on the other the four
+   cards as a 2 x 2. The cards are the frames, so the panel holds them with
+   none of its own; on a phone one column */
+.landing-tokens__block--scales .landing-tokens__panel {
+  padding: 0;
+  border: 0;
+  background: none;
+  box-shadow: none;
+}
+
+.landing-tokens__block--scales .landing-tokens__scales {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (max-width: 640px) {
+  .landing-tokens__block--scales .landing-tokens__scales {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 /* Scales and the rest: a card per group, its specimen over its one line */
@@ -3597,7 +3756,11 @@ home-light:defined ~ .landing-light__nojs {
       background-color var(--luz-duration-base) var(--luz-easing-standard);
   }
 
-  .landing-tokens__step:hover,
+  /* A step only deepens: it does not move, so the path stays joined */
+  .landing-tokens__step:hover {
+    box-shadow: var(--luz-shadow-md);
+  }
+
   .landing-tokens__scale:hover {
     translate: 0 -3px;
     box-shadow: var(--luz-shadow-md);
@@ -3650,6 +3813,7 @@ home-light:defined ~ .landing-light__nojs {
 
     .landing-tokens__steps > *,
     .landing-tokens__block > *,
+    .landing-tokens__block--scales .landing-tokens__scale,
     .landing-tokens__next {
       animation: landing-rise linear both;
       animation-timeline: view();

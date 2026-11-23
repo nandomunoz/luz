@@ -1839,29 +1839,41 @@ function tokenSections({ say, tokens, groups, counts, families, read }) {
   const card = (name, specimen, code) => `<div class="landing-tokens__scale landing-tokens__scale--${name}"><p class="landing-tokens__scale-title">${t(`inside.list.${name}`)}</p>${specimen}${css(code)}</div>`;
   const row = (cls, items) => `<ul class="landing-tokens__specimen landing-tokens__specimen--${cls}" aria-hidden="true">${items.join("")}</ul>`;
   const panels = {
-    // One token, three modes: a table of semantic tokens by mode, each cell drawn in its mode (data-theme), over
-    // the palette, a ramp per family on one grid of steps with a gap where a family has no step
+    // A mosaic: the semantic tokens in large tiles, read live so they follow the mode, each with the semantic ink
+    // it is made to carry; then the primitives, three steps of every family (deep, mid, pale), each with its value
+    // and the gray, of the two ends of the scale, that reads on it (4.5:1 at least, or the build fails)
     color: () => {
-      const MODES = [["light", "light"], ["dark", "dark"], ["high-contrast", "contrast"]];
-      const ROWS = ["--luz-surface", "--luz-text-primary", "--luz-brand-fill", "--luz-color-danger"];
-      const matrix = [
-        `<table class="landing-tokens__matrix">`,
-        `<caption>${t("level.tokens.color.modes")}</caption>`,
-        `<thead><tr><td></td>${MODES.map(([, key]) => `<th scope="col">${t(`level.tokens.mode.${key}`)}</th>`).join("")}</tr></thead>`,
-        `<tbody>${ROWS.map((name) => `<tr><th scope="row"><code>${need(name)}</code></th>${MODES.map(([mode]) => `<td data-theme="${mode}"><span class="landing-tokens__cell" ${v(name)}></span></td>`).join("")}</tr>`).join("")}</tbody>`,
-        `</table>`,
-      ].join("");
-      const primitives = tokens.filter(byId.primitives.test);
-      const steps = [...new Set(primitives.map((n) => Number(n.split("-").pop())))].sort((a, b) => a - b);
-      const palette = [
-        `<div class="landing-tokens__palette" aria-hidden="true" style="--steps:${steps.length}">`,
-        `<span></span>${steps.map((step) => `<span class="landing-tokens__stepno">${step}</span>`).join("")}`,
-        families
-          .map((family) => `<span class="landing-tokens__family">${family}</span>${steps.map((step) => (known.has(`--luz-${family}-${step}`) ? `<span class="landing-tokens__tile" ${v(`--luz-${family}-${step}`)}></span>` : `<span class="landing-tokens__gap"></span>`)).join("")}`)
-          .join(""),
-        `</div>`,
-      ].join("");
-      return `${matrix}<p class="landing-tokens__palette-title">${t("level.tokens.color.palette")}</p>${palette}`;
+      const SEMANTIC = [
+        ["--luz-surface", "--luz-text-primary"],
+        ["--luz-surface-strong", "--luz-text-primary"],
+        ["--luz-divider", "--luz-text-primary"],
+        ["--luz-text-primary", "--luz-surface"],
+        ["--luz-color-danger-fill", "--luz-text-on-fill"],
+      ];
+      const json = JSON.parse(read("packages/tokens/tokens.json")).color;
+      const hexOf = (family, step) => String(json[family][step].value ?? json[family][step].$value).toLowerCase();
+      const lum = (hex) => {
+        const c = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255).map((x) => (x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4));
+        return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+      };
+      const ratio = (x, y) => (Math.max(lum(x), lum(y)) + 0.05) / (Math.min(lum(x), lum(y)) + 0.05);
+      const grays = Object.keys(json.gray);
+      const ends = [grays[0], grays[grays.length - 1]];
+      const inkOf = (hex) => {
+        const best = ends.map((step) => [step, ratio(hex, hexOf("gray", step))]).sort((x, y) => y[1] - x[1])[0];
+        if (best[1] < 4.5) throw new Error(`the page of the tokens has no gray that reads on ${hex}: change the steps of its mosaic`);
+        return best[0];
+      };
+      const semantic = `<ul class="landing-tokens__semantic">${SEMANTIC.map(([bg, ink]) => `<li class="landing-tokens__tile" style="--v:var(${need(bg)});--ink:var(${need(ink)})"><code>${bg}</code></li>`).join("")}</ul>`;
+      const swatches = `<ul class="landing-tokens__swatches">${families
+        .flatMap((family) =>
+          [60, 40, 20].map((step) => {
+            const hex = hexOf(family, step);
+            return `<li class="landing-tokens__swatch" style="--v:var(${need(`--luz-${family}-${step}`)});--ink:var(--luz-gray-${inkOf(hex)})"><code>--luz-${family}-${step}</code><span>${hex}</span></li>`;
+          }),
+        )
+        .join("")}</ul>`;
+      return `<div class="landing-tokens__mosaic">${semantic}${swatches}</div>`;
     },
     scales: () =>
       `<div class="landing-tokens__scales">${[
