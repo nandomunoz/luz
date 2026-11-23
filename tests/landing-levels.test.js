@@ -13,6 +13,7 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { buildSite, landingDocuments, levelDocuments, scanSite } from "../scripts/docs-site/site.js";
+import { quoted } from "./helpers/quoted-attributes.js";
 
 const repo = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (file) => readFileSync(join(repo, file), "utf-8");
@@ -26,7 +27,10 @@ const site = scanSite(join(repo, "apps/docs"), repo);
 const home = read(HOME);
 const levels = NAMES.map((name) => ({ name, file: `apps/landing/levels/${name}.html`, html: read(`apps/landing/levels/${name}.html`) }));
 const extra = [...landingDocuments(site, HOME, home), ...levelDocuments(site, { file: HOME, html: home }, levels)];
-const { rendered, problems } = buildSite(site, { extra });
+const built = buildSite(site, { extra });
+/** What the build wrote, with the quotes of its attributes restored to read it. */
+const rendered = new Map([...built.rendered].map(([route, page]) => [route, quoted(page)]));
+const { problems } = built;
 const catalog = (code) => JSON.parse(read(`apps/landing/i18n/${code}.json`));
 const hrefsOf = (html, pattern) => [...html.matchAll(pattern)].map((m) => m[1]);
 /** The tag lists of a pane of the home: the blocks a reader sees under "List". */
@@ -74,8 +78,12 @@ describe("the pages of the three levels", () => {
   it.each(NAMES.flatMap((name) => LANGS.map(([code, prefix]) => [name, code, prefix])))("%s in %s: its links to the home are the language's, and the page links to the docs of its level", (name, code, prefix) => {
     const html = rendered.get(`${prefix}${name}/`);
     // no link to a section the page does not have: they go to the home of the language
-    expect(hrefsOf(html, /href="(#[^"]*)"/g).filter((href) => href !== "#main-content" && !href.startsWith("#all") && !href.startsWith("#install") && !href.startsWith("#hero"))).toEqual([]);
+    expect(hrefsOf(html, /<a\b[^>]*\shref="(#[^"]*)"/g).filter((href) => href !== "#main-content" && !href.startsWith("#all") && !href.startsWith("#install") && !href.startsWith("#hero"))).toEqual([]);
     expect(html).toMatch(new RegExp(`href="${prefix}#inside"`));
+    // the icons are the page's own: a <use> keeps pointing at the sprite, never at the home
+    const uses = hrefsOf(html, /<use\b[^>]*\shref="([^"]*)"/g);
+    expect(uses.length).toBeGreaterThan(0);
+    expect(uses.filter((href) => !/^#i\d+$/.test(href))).toEqual([]);
     expect(html).toMatch(/href="[^"]*\/docs\/(tokens|components|catalog)\/"/);
   });
 

@@ -63,6 +63,9 @@ import {
   buildSearchIndex,
   buildSite,
   landingDocuments,
+  levelDocuments,
+  levelRoutes,
+  levelTemplate,
   parseFrontMatter,
   readInside,
   relativizeLinks,
@@ -82,6 +85,9 @@ import { AI_ROUTES, exampleAssets, exampleDocuments, manifestAssets, renderLlmsF
 import { SITE_URL } from "./i18n.js";
 
 const LANDING = { route: "/", file: "apps/landing/index.html" };
+
+/** The pages of the levels (tokens, core, components): each is the home's template with the <main> of apps/landing/levels/<name>.html. */
+const LEVELS = ["tokens", "core", "components"];
 
 /** Where the virtual pages of the docs languages are (never on disk): apps/docs/_virtual/<code>/<path>.html. */
 const VIRTUAL_DOCS = "apps/docs/_virtual";
@@ -150,11 +156,22 @@ export function docsSite({ repoRoot, relative: relativeUrls, outRoot, pagesBase 
    * language a virtual file next to it (apps/landing/<code>/index.html),
    * which the build and the dev server render from the template.
    */
-  const landings = () =>
-    landingDocuments(scan(), LANDING.file, "").map(({ route, locale }) => {
+  const landings = () => [
+    ...landingDocuments(scan(), LANDING.file, "").map(({ route, locale }) => {
       const file = route === LANDING.route ? LANDING.file : `apps/landing${route}index.html`;
       return { route, file, kind: "landing", locale, virtual: file !== LANDING.file };
-    });
+    }),
+    // The pages of the levels, in every language: no file of their own on disk, a landing in every other way
+    ...levelRoutes(scan(), LEVELS).map(({ route, file, locale, suffix, level }) => ({
+      route,
+      file,
+      kind: "landing",
+      locale,
+      suffix,
+      level,
+      virtual: true,
+    })),
+  ];
 
   /**
    * The pages of each docs language (/es/docs/…): one virtual document per
@@ -222,9 +239,14 @@ export function docsSite({ repoRoot, relative: relativeUrls, outRoot, pagesBase 
   const virtualOf = (id) => known().virtual.get(id);
   /** The template, read inside apps/landing (SEC-PLG-1/2). */
   const landingSource = () => readInside(landingAbs, [dirname(landingAbs)]);
+  /** The <main> of a level's page, read inside apps/landing (SEC-PLG-1/2). */
+  const levelSource = (name) => readInside(resolve(dirname(landingAbs), "levels", `${name}.html`), [dirname(landingAbs)]);
+  /** The pages of the levels as `extra` documents: the home's template with each level's <main>. */
+  const levelPages = () =>
+    levelDocuments(scan(), { file: LANDING.file, html: landingSource() }, LEVELS.map((name) => ({ name, html: levelSource(name) })));
   /** The source of a virtual document: the landing's template, or the file of the page a docs language shows (its translation, else the English page). */
   const virtualSource = (doc) => {
-    if (doc.kind === "landing") return landingSource();
+    if (doc.kind === "landing") return doc.level ? levelTemplate(landingSource(), levelSource(doc.level), doc.level, LANDING.file) : landingSource();
     if (doc.kind === "debug") return renderDebug({ site: scan() });
     const language = scan().docsI18n?.byCode.get(doc.locale.code);
     const page = language && localize(scan(), language).byRoute.get(doc.route);
@@ -280,7 +302,7 @@ export function docsSite({ repoRoot, relative: relativeUrls, outRoot, pagesBase 
   /** Render everything and check it; returns the link problems. */
   const check = () =>
     buildSite(scan(), {
-      extra: landingDocuments(scan(), LANDING.file, landingSource()),
+      extra: [...landingDocuments(scan(), LANDING.file, landingSource()), ...levelPages()],
       // Every page of every docs language: a broken link or fragment in any language fails the build
       languages: true,
       ...urlOptions(),
@@ -329,7 +351,7 @@ export function docsSite({ repoRoot, relative: relativeUrls, outRoot, pagesBase 
       const doc = virtualOf(id);
       if (!doc) return undefined;
       if (existsSync(id)) {
-        throw new Error(`${doc.file}: ${doc.kind === "landing" ? `the landing of /${doc.locale.code}/` : doc.route} is generated; remove this file`);
+        throw new Error(`${doc.file}: ${doc.kind === "landing" ? `the landing ${doc.route}` : doc.route} is generated; remove this file`);
       }
       return virtualSource(doc);
     },
@@ -470,6 +492,7 @@ export function docsSite({ repoRoot, relative: relativeUrls, outRoot, pagesBase 
       const rel = inDocs ? relative(docsDir, file).split(sep).join("/") : null;
       const generated =
         file === landingAbs ||
+        file.startsWith(resolve(dirname(landingAbs), "levels") + sep) ||
         file.startsWith(resolve(repoRoot, "apps/debug") + sep) ||
         file.startsWith(sharedAbs + sep) ||
         file.startsWith(i18nAbs + sep) ||
@@ -507,7 +530,7 @@ export function docsSite({ repoRoot, relative: relativeUrls, outRoot, pagesBase 
           out = renderPage(page, scan(), { root: relativeUrls ? rootFor(doc.route) : "/", dev: command !== "build", ...urlOptions() });
         } else if (doc.kind === "landing") {
           // Errors and line numbers point at the template, for every language
-          out = renderDocument(html, LANDING.file, doc.route, scan(), { locale: doc.locale, siteUrl: relativeUrls ? siteUrl : "", unquote: false });
+          out = renderDocument(html, LANDING.file, doc.route, scan(), { locale: doc.locale, siteUrl: relativeUrls ? siteUrl : "", unquote: false, suffix: doc.suffix });
         }
         if (command === "build") {
           const root = relativeUrls ? rootFor(doc.route) : "/";

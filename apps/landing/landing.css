@@ -3349,3 +3349,76 @@ html[data-native="b"] .landing-typed__modes {
   stroke-linecap: round;
   stroke-linejoin: round;
 }
+
+/* The page of a level (apps/landing/levels): the hero, then every element of the
+   level, then how to install it, in a column of its own whose gaps are shorter than
+   the home's. The names are a grid of tags that fills the width, each tinted by its
+   weight (--share); the home's masonry needs the fixed height of its panel */
+.landing-level {
+  display: grid;
+  gap: var(--luz-space-3xl);
+  min-inline-size: 0;
+}
+
+.landing-level__hero .landing-inside__points {
+  max-inline-size: 36rem;
+  margin-inline: auto;
+  text-align: start;
+}
+
+.landing-level__list {
+  display: grid;
+  gap: var(--luz-space-xl);
+}
+
+.landing-level__list .landing-names__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 11rem), 1fr));
+  gap: var(--luz-space-xs);
+  min-block-size: 0;
+}
+
+.landing-level__list .landing-names__list > li {
+  display: block;
+  min-inline-size: 0;
+}
+
+.landing-level__list .landing-names__list a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--luz-space-xs);
+  min-block-size: 2.75rem;
+  padding: var(--luz-space-xs) var(--luz-space-sm);
+  border-radius: var(--luz-radius-sm);
+  background: color-mix(in oklab, var(--luz-brand-primary) calc(6% + var(--share, 0) * 24%), var(--luz-surface-page));
+  color: var(--luz-text-primary);
+  line-height: 1.25;
+}
+
+.landing-level__list .landing-names__list a:hover {
+  border-color: var(--luz-brand-primary);
+  color: var(--luz-text-primary);
+}
+
+.landing-level__list .landing-names__n {
+  color: inherit;
+  font-family: var(--luz-font-mono);
+  font-size: var(--luz-text-xs);
+}
+
+.landing-level__install {
+  max-inline-size: 60rem;
+  inline-size: 100%;
+  margin-inline: auto;
+}
+
+/* The page of a level has no chapters of the home's size: the gap between the main's children (the column, the icons) is zero,
+   and the column keeps its own */
+.landing-wrap:has(> .landing-level) {
+  row-gap: 0;
+}
+
+.landing-level__hero .o-actions {
+  margin-block-start: var(--luz-space-lg);
+}

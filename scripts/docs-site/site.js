@@ -1558,23 +1558,26 @@ function renderNotice(site, page) {
 
 /**
  * The language values of a template: {{lang}}, {{dir}}, {{home}} and, on a
- * home page (`home: true`), {{alternates}}, {{langswitch}} and {{langlinks}}.
+ * home page (`home: true`), {{alternates}}, {{langswitch}} and {{langlinks}}
+ * (`suffix`: the path of a page of a level after the language's home, "tokens/").
  * On a docs `page` (the not-found page apart) {{alternates}} is its canonical
  * link and the alternates of the languages that translated it, and
  * {{langswitch}} the switcher, when the docs have more than one language.
  */
-function languageValues(site, locale, { home = false, siteUrl = "", page = null, used = null } = {}) {
+function languageValues(site, locale, { home = false, siteUrl = "", page = null, used = null, suffix = "" } = {}) {
   const i18n = site.i18n;
   const translated = home && i18n && locale;
+  // A page of a level (/tokens/) is in each language at the language's home plus its own path: the alternates and the switch say so
+  const hrefOf = (l) => l.route + suffix;
   const values = {
     lang: locale?.code ?? "en",
     dir: locale?.dir ?? "ltr",
     // On a docs page only: the home page's catalogs and tests pin the lists of its dialog as they are
     endir: page && locale?.dir === "rtl" ? ' dir="ltr"' : "",
     home: locale?.route ?? "/",
-    alternates: translated ? renderAlternates(i18n, locale, siteUrl) : "",
-    langswitch: translated ? renderSwitcher(i18n, locale, lookup(locale, "lang.label", `${I18N_DIR}/${locale.code}.json`, null)) : "",
-    langlinks: translated ? renderLangLinks(i18n, locale) : "",
+    alternates: translated ? (suffix ? renderPageLinks(hrefOf(locale), [...i18n.locales.map((l) => [l.code, hrefOf(l)]), ["x-default", hrefOf(i18n.default)]], siteUrl) : renderAlternates(i18n, locale, siteUrl)) : "",
+    langswitch: translated ? renderSwitcher(i18n, locale, lookup(locale, "lang.label", `${I18N_DIR}/${locale.code}.json`, null), { hrefOf }) : "",
+    langlinks: translated ? renderLangLinks(i18n, locale, { hrefOf }) : "",
     weights: translated ? renderWeights(site, locale, used ?? site.usage?.used) : "",
     packages: translated ? renderPackages(site, locale, used ?? site.usage?.used) : "",
     checks: translated ? renderChecks(site, locale, used ?? site.usage?.used) : "",
@@ -2060,7 +2063,7 @@ export function renderDocument(html, file, route, site, options = {}) {
     placeholders: true,
     locale,
     used: options.used,
-    values: languageValues(site, locale, { home: true, siteUrl: options.siteUrl, used: options.used }),
+    values: languageValues(site, locale, { home: true, siteUrl: options.siteUrl, used: options.used, suffix: options.suffix }),
   }).replace(/<!--[\s\S]*?-->/g, ""));
   // The transforms that read quoted attributes (the links to the docs of a language, then, in the pages build, the
   // relative links, the boot script and the CSP) come first; the quotes go last. `options.unquote: false` leaves them to
@@ -2076,6 +2079,51 @@ export function renderDocument(html, file, route, site, options = {}) {
 export function landingDocuments(site, file, html) {
   if (!site.i18n) return [{ route: "/", file, html }];
   return site.i18n.locales.map((locale) => ({ route: locale.route, file, html, locale }));
+}
+
+/**
+ * The template of a page of a level (tokens, core, components): the home's, with the
+ * inside of its <main> up to the icons replaced by `fragment`, the title and the
+ * description by the level's own (`level.<name>.meta.*`), and the links to a section
+ * of the home (`#inside`, `#faq`) by the same links on the language's home, because the
+ * page does not have those sections. Nothing else is written twice: the head, the
+ * header, the drawer, the icons and the footer are the home's.
+ */
+export function levelTemplate(home, fragment, name, file = "the home's template") {
+  const open = /<main\b[^>]*>\n/.exec(home);
+  const icons = home.indexOf("<!-- Icons used more than once");
+  if (!open || icons < open.index) throw new Error(`${file}: a level page needs the <main> and the comment "Icons used more than once" of the home's template`);
+  const before = home.slice(0, open.index + open[0].length);
+  const after = home.slice(icons);
+  // The links (<a>) to a section of the home, outside the skip link; the icons (<use>) stay the page's own
+  const toHome = (html) => html.replace(/<a\b[^>]*>/g, (tag) => tag.replace(/\shref="#(?!main-content")/, ' href="{{home}}#'));
+  const named = (html) => html.replace("{{t:meta.title}}", `{{t:level.${name}.meta.title}}`).replace("{{t:meta.description}}", `{{t:level.${name}.meta.description}}`);
+  return `${toHome(named(before))}\n${fragment.trim()}\n\n    ${toHome(after)}`;
+}
+
+/**
+ * The address of the page of each level in every language of the registry: the
+ * language's home plus `<name>/`, and `file`, the virtual file a build entry has,
+ * which never exists on disk. No template: the routes of the build and of the links.
+ */
+export function levelRoutes(site, names) {
+  const locales = site.i18n ? site.i18n.locales : [undefined];
+  return names.flatMap((name) =>
+    locales.map((locale) => {
+      const route = `${locale?.route ?? "/"}${name}/`;
+      return { route, file: `apps/landing${route}index.html`, locale, suffix: `${name}/`, level: name };
+    }),
+  );
+}
+
+/**
+ * The pages of the levels as `extra` documents of buildSite(), after the home's:
+ * `levels` is [{ name, html }] (the fragment of apps/landing/levels/<name>.html),
+ * `home` is { file, html }.
+ */
+export function levelDocuments(site, home, levels) {
+  const fragments = new Map(levels.map(({ name, html }) => [name, html]));
+  return levelRoutes(site, levels.map(({ name }) => name)).map((doc) => ({ ...doc, html: levelTemplate(home.html, fragments.get(doc.level), doc.level, home.file) }));
 }
 
 /**
@@ -2219,7 +2267,7 @@ export function buildSite(site, { extra = [], unchecked = [], root, languages = 
     for (const page of view.pages) add(page, view);
   }
   for (const doc of extra) {
-    const html = renderDocument(doc.html, doc.file, doc.route, site, { reader, locale: doc.locale, used });
+    const html = renderDocument(doc.html, doc.file, doc.route, site, { reader, locale: doc.locale, used, suffix: doc.suffix });
     const links = [...sourceLinks(doc.html, doc.file, 1, false), ...partialLinks(doc.html)];
     const { ids, links: renderedLinks } = readHtml(html, `${doc.file} (rendered as ${doc.route})`);
     // Links written by the generator or a catalog: the language's home, the switcher, links inside a string

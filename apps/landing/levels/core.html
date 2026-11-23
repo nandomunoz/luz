@@ -1,0 +1,46 @@
+    <!-- The page of a level: the home's template with this <main> (levelTemplate() in scripts/docs-site/site.js) -->
+    <div class="landing-level">
+      <section class="luz-hero luz-hero--centered o-stack landing-level__hero" id="hero" aria-labelledby="hero-title">
+        <div class="luz-hero__copy">
+          <p class="landing-inside__eyebrow"><svg aria-hidden="true"><use href="#i0"/></svg><span>{{t:inside.l2.eyebrow}}</span></p>
+          <h1 class="luz-hero__title" id="hero-title">{{html:inside.l2.title}}</h1>
+          <p class="luz-hero__lead">{{t:inside.l2.lead}}</p>
+          <ul class="landing-inside__points">
+            <li><svg aria-hidden="true"><use href="#i1"/></svg><span><strong>{{t:inside.l2.p1.name}}</strong> {{t:inside.l2.p1.text}}</span></li>
+            <li><svg aria-hidden="true"><use href="#i2"/></svg><span><strong>{{t:inside.l2.p2.name}}</strong> {{t:inside.l2.p2.text}}</span></li>
+            <li><svg class="ic" aria-hidden="true"><use href="#i3"/></svg><span><strong>{{t:inside.weight}}</strong> {{weight2}} {{t:inside.gzip}}</span></li>
+          </ul>
+          <div class="o-actions">
+            <a class="luz-btn luz-btn--primary luz-btn--lg" href="/docs/components/">{{t:level.core.docs}}</a>
+            <a class="luz-btn luz-btn--outline luz-btn--lg" href="{{home}}">{{t:level.back}}</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="o-stack luz-section landing-level__all" id="all" aria-labelledby="all-title">
+        <h2 class="luz-section__title" id="all-title">{{t:level.core.all}}</h2>
+        <div class="landing-level__list">
+          {{list2}}
+        </div>
+      </section>
+
+      <section class="o-stack luz-section landing-level__install" id="install" aria-labelledby="install-title">
+        <h2 class="luz-section__title" id="install-title">{{t:inside.tab.install}}</h2>
+        <div class="landing-install">
+          <div class="landing-install__bar">
+            <span class="landing-install__label">{{t:inside.install.npm}}</span>
+            <button class="luz-copy-btn" type="button" data-copy-from="in2-npm" aria-label="{{t:inside.copy.npm}}" hidden>{{t:see.copy}}</button>
+          </div>
+          <pre class="luz-code-block" data-lang="bash" dir="ltr" tabindex="0" role="region" aria-label="{{t:inside.install.npm}}"><code id="in2-npm">npm install @luz-ds/tokens @luz-ds/core</code></pre>
+        </div>
+        <div class="landing-install">
+          <div class="landing-install__bar">
+            <span class="landing-install__label">{{t:inside.install.cdn}}</span>
+            <button class="luz-copy-btn" type="button" data-copy-from="in2-cdn" aria-label="{{t:inside.copy.cdn}}" hidden>{{t:see.copy}}</button>
+          </div>
+          <pre class="luz-code-block" data-lang="html" dir="ltr" tabindex="0" role="region" aria-label="{{t:inside.install.cdn}}"><code id="in2-cdn">&lt;link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@luz-ds/tokens@{{version}}/dist/luz-tokens.min.css">
+&lt;link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@luz-ds/core@{{version}}/dist/luz.min.css">
+&lt;script type="module" src="https://cdn.jsdelivr.net/npm/@luz-ds/core@{{version}}/dist/luz.min.js">&lt;/script></code></pre>
+        </div>
+      </section>
+    </div>
