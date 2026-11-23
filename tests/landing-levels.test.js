@@ -1,7 +1,7 @@
 /**
- * The pages of the three levels, tokens, core and components (the catalog): a page of its own each, in the look of the
+ * The pages of the three levels, tokens, core and catalog: a page of its own each, in the look of the
  * home, with every element of the level listed (owner, 2026-11-23). They are routes of the site, `/tokens/`, `/core/`
- * and `/components/`, and `/es/…`, `/ar/…` in the other languages.
+ * and `/catalog/`, and `/es/…`, `/ar/…` in the other languages.
  *
  * Each page is the home's template with its <main> replaced by `apps/landing/levels/<name>.html`
  * (`levelDocuments()`): the head, the header, the drawer and the footer are the home's, and nothing is written twice.
@@ -13,14 +13,18 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { buildSite, landingDocuments, levelDocuments, scanSite } from "../scripts/docs-site/site.js";
+import { siteNumbers } from "../scripts/docs-site/i18n.js";
+import { FITS_KINDS, kindPatterns } from "../scripts/docs-site/kinds.js";
+import { FILES } from "../scripts/docs-site/snippets.js";
+import { readdirSync } from "node:fs";
 import { quoted } from "./helpers/quoted-attributes.js";
 
 const repo = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (file) => readFileSync(join(repo, file), "utf-8");
 const HOME = "apps/landing/index.html";
-const NAMES = ["tokens", "core", "components"];
+const NAMES = ["tokens", "core", "catalog"];
 /** The level of the home each page is the page of, and the list the home shows for it. */
-const LEVEL = { tokens: { key: "l1", list: "in1-list" }, core: { key: "l2", list: "in2-list" }, components: { key: "l3", list: "in3-list" } };
+const LEVEL = { tokens: { key: "l1", list: "in1-list" }, core: { key: "l2", list: "in2-list" }, catalog: { key: "l3", list: "in3-list" } };
 const LANGS = [["en", "/"], ["es", "/es/"], ["ar", "/ar/"]];
 
 const site = scanSite(join(repo, "apps/docs"), repo);
@@ -67,7 +71,7 @@ describe("the pages of the three levels", () => {
     expect(hrefsOf(footer, /<li><a href="([^"]*)" hreflang/g).slice(0, 3)).toEqual(["/", "/es/", "/ar/"].map((p) => `${p}${name}/`));
   });
 
-  it.each(["core", "components"].flatMap((name) => LANGS.map(([code, prefix]) => [name, code, prefix])))("%s in %s: lists every element the home lists for the level, link for link", (name, code, prefix) => {
+  it.each(["core", "catalog"].flatMap((name) => LANGS.map(([code, prefix]) => [name, code, prefix])))("%s in %s: lists every element the home lists for the level, link for link", (name, code, prefix) => {
     const page = rendered.get(`${prefix}${name}/`);
     const wanted = listsOf(rendered.get(prefix), LEVEL[name].list);
     expect(wanted.length).toBeGreaterThan(0);
@@ -91,7 +95,7 @@ describe("the pages of the three levels", () => {
     for (const [, prefix] of LANGS) {
       const html = rendered.get(prefix);
       for (const name of NAMES) {
-        const id = { tokens: "inside", core: "inside-2", components: "inside-3" }[name];
+        const id = { tokens: "inside", core: "inside-2", catalog: "inside-3" }[name];
         const start = html.search(new RegExp(`<section\\b[^>]*\\sid="${id}"`));
         const section = html.slice(start, html.indexOf("<section", start + 1));
         expect(section, `${prefix} #${id}`).toMatch(new RegExp(`<a\\b[^>]*class="luz-btn[^"]*"[^>]*href="${prefix}${name}/"`));
@@ -120,9 +124,9 @@ describe("the pages of the three levels", () => {
 
     it.each(LANGS)("in %s: the hero is the page's own, not a level of the home: centred, one line that says what a token is, and the demo inside it", (code, prefix) => {
       const hero = sectionOf(rendered.get(`${prefix}tokens/`), "hero");
-      expect(hero).toMatch(/^<section class="landing-tokens__hero landing-demo"/);
+      expect(hero).toMatch(/^<section class="landing-intro landing-demo"/);
       expect(hero).not.toMatch(/landing-inside\b/);
-      const what = /<p class="landing-tokens__what">([\s\S]*?)<\/p>/.exec(hero)?.[1] ?? "";
+      const what = /<p class="landing-intro__what">([\s\S]*?)<\/p>/.exec(hero)?.[1] ?? "";
       expect(what).toBe(catalog(code)["level.tokens.what"]);
       // one line: a sentence a developer reads at once, with no example to decode
       expect(what.replace(/<[^>]+>/g, "").length).toBeLessThanOrEqual(140);
@@ -136,12 +140,12 @@ describe("the pages of the three levels", () => {
 
     it.each(LANGS)("in %s: the hero's numbers are one quiet line under its buttons: the tokens, the modes, the weight and no dependency", (code, prefix) => {
       const hero = sectionOf(rendered.get(`${prefix}tokens/`), "hero");
-      const head = hero.slice(hero.indexOf('class="landing-tokens__head"'), hero.indexOf('class="landing-tokens__stage"'));
+      const head = hero.slice(hero.indexOf('class="landing-intro__head"'), hero.indexOf('class="landing-intro__stage"'));
       // in the head, after the buttons: a line of reassurance, not a block of its own at the foot of the band
       expect(head.indexOf('class="o-actions"')).toBeGreaterThan(0);
-      expect(head.indexOf('class="landing-tokens__facts"')).toBeGreaterThan(head.indexOf('class="o-actions"'));
+      expect(head.indexOf('class="landing-intro__facts"')).toBeGreaterThan(head.indexOf('class="o-actions"'));
       expect(hero).not.toContain("landing-level__stats");
-      const facts = /<ul class="landing-tokens__facts">([\s\S]*?)<\/ul>/.exec(head)?.[1] ?? "";
+      const facts = /<ul class="landing-intro__facts">([\s\S]*?)<\/ul>/.exec(head)?.[1] ?? "";
       const items = [...facts.matchAll(/<li><strong>([^<]+)<\/strong> ([^<]+)<\/li>/g)].map((m) => [m[1], m[2]]);
       const deps = Object.keys(JSON.parse(read("packages/tokens/package.json")).dependencies ?? {}).length;
       expect(items.map(([n]) => n).filter((n, i) => i !== 2)).toEqual([String(tokens.length), "3", String(deps)]);
@@ -178,8 +182,8 @@ describe("the pages of the three levels", () => {
       expect(new Set(looks.map((l) => reads[l][0])).size).toBe(looks.length);
       for (const a of looks) for (const b of looks) if (a < b) expect(reads[a].filter((x, i) => x !== reads[b][i]).length, `${a} vs ${b}`).toBeGreaterThanOrEqual(3);
       // the hero itself follows the look: its primary button reads the look's corners and type
-      expect(css).toMatch(/\.landing-tokens__hero \.luz-btn--primary\s*\{[^}]*var\(--demo-radius\)[^}]*\}/);
-      expect(css).toMatch(/\.landing-tokens__hero \.luz-btn--primary\s*\{[^}]*var\(--demo-font\)[^}]*\}/);
+      expect(css).toMatch(/\.landing-intro \.luz-btn--primary\s*\{[^}]*var\(--demo-radius\)[^}]*\}/);
+      expect(css).toMatch(/\.landing-intro \.luz-btn--primary\s*\{[^}]*var\(--demo-font\)[^}]*\}/);
     });
 
     it.each(LANGS)("in %s: the demo reads top down: the title and the looks centred above, then the product beside the code in an editor; the legend is for screen readers only", (code, prefix) => {
@@ -202,10 +206,10 @@ describe("the pages of the three levels", () => {
       const phone = [...css.matchAll(/@media \(max-width: 899px\) \{([\s\S]*?)\n\}/g)].map((m) => m[1]).join("\n");
       const rule = (selector) => new RegExp(`${selector.replace(/[.$]/g, "\\$&")}\\s*\\{([^}]*)\\}`).exec(phone)?.[1] ?? "";
       // the band itself has no border at any width, not only on a phone (owner, 2026-11-23)
-      const band = new RegExp("\\.landing-tokens__hero\\s*\\{([^}]*)\\}").exec(css)?.[1] ?? "";
+      const band = new RegExp("\\.landing-intro\\s*\\{([^}]*)\\}").exec(css)?.[1] ?? "";
       expect(band).toMatch(/border:\s*0/);
       expect(band).toMatch(/border-radius:\s*0/);
-      const stage = rule(".landing-tokens__stage");
+      const stage = rule(".landing-intro__stage");
       expect(stage).toMatch(/border:\s*0/);
       expect(stage).toMatch(/box-shadow:\s*none/);
       expect(stage).toMatch(/padding-inline:\s*0/);
@@ -234,7 +238,7 @@ describe("the pages of the three levels", () => {
     it.each(LANGS)("in %s: three steps, install, use and make it yours, each with code to copy", (code, prefix) => {
       const steps = sectionOf(rendered.get(`${prefix}tokens/`), "steps");
       expect(steps).toMatch(/<h2\b[^>]*>/);
-      const items = [...steps.matchAll(/<li class="landing-tokens__step landing-tokens__step--(\w+)"/g)].map((m) => m[1]);
+      const items = [...steps.matchAll(/<li class="landing-path__step landing-path__step--(\w+)"/g)].map((m) => m[1]);
       expect(items).toEqual(["1", "2", "3", "result"]);
       for (const n of [1, 2, 3]) expect(steps).toContain(catalog(code)[`level.tokens.steps.${n}.title`]);
       const ids = [...steps.matchAll(/data-copy-from="([^"]+)"/g)].map((m) => m[1]);
@@ -246,21 +250,21 @@ describe("the pages of the three levels", () => {
 
     it.each(LANGS)("in %s: the steps are a path joined by lines, 1 and 2 above, 3 under 2, and in the corner left what you get, in words", (code, prefix) => {
       const steps = sectionOf(rendered.get(`${prefix}tokens/`), "steps");
-      const result = steps.slice(steps.indexOf('landing-tokens__step--result'));
+      const result = steps.slice(steps.indexOf('landing-path__step--result'));
       expect(result).toContain(catalog(code)["level.tokens.steps.result.title"]);
-      const outcomes = [...(/<ul class="landing-tokens__outcomes">([\s\S]*?)<\/ul>/.exec(result)?.[1] ?? "").matchAll(/<li>([\s\S]*?)<\/li>/g)].map((m) => m[1]);
+      const outcomes = [...(/<ul class="landing-path__outcomes">([\s\S]*?)<\/ul>/.exec(result)?.[1] ?? "").matchAll(/<li>([\s\S]*?)<\/li>/g)].map((m) => m[1]);
       expect(outcomes).toEqual([1, 2, 3].map((n) => catalog(code)[`level.tokens.steps.result.${n}`]));
       expect(result).not.toContain("landing-tokens__result");
       // the path: two columns, 1 2 above and the result beside 3 below; a line joins each step to the next
-      expect(css).toMatch(/\.landing-tokens__step-list\s*\{[^}]*grid-template-areas:\s*"one two"\s*"result three"/);
-      for (const n of ["1", "2", "3"]) expect(css, n).toMatch(new RegExp(`\\.landing-tokens__step--${n}::after[^{]*\\{[^}]*content:\\s*""`));
+      expect(css).toMatch(/\.landing-path__list\s*\{[^}]*grid-template-areas:\s*"one two"\s*"result three"/);
+      for (const n of ["1", "2", "3"]) expect(css, n).toMatch(new RegExp(`\\.landing-path__step--${n}::after[^{]*\\{[^}]*content:\\s*""`));
       // a line spans the gap between two boxes, from border to border, and goes into neither
-      expect(css).not.toMatch(/\.landing-tokens__step--\d::after[^{]*\{[^}]*calc\(100% - /);
+      expect(css).not.toMatch(/\.landing-path__step--\d::after[^{]*\{[^}]*calc\(100% - /);
       // line and arrow are one piece, an SVG mask painted in the border's colour, so they cannot part
-      expect(css).toMatch(/\.landing-tokens__step--1::after[^{]*\{[^}]*background:\s*var\(--luz-divider\)[^}]*mask:[^}]*url\("data:image\/svg\+xml/);
-      expect(css).not.toMatch(/\.landing-tokens__step--[\w]+::before/);
+      expect(css).toMatch(/\.landing-path__step--1::after[^{]*\{[^}]*background:\s*var\(--luz-divider\)[^}]*mask:[^}]*url\("data:image\/svg\+xml/);
+      expect(css).not.toMatch(/\.landing-path__step--[\w]+::before/);
       // and a step does not move under the pointer, so the path stays joined
-      expect(css).not.toMatch(/\.landing-tokens__step:hover[^{]*\{[^}]*translate/);
+      expect(css).not.toMatch(/\.landing-path__step:hover[^{]*\{[^}]*translate/);
     });
 
     it.each(LANGS)("in %s: four blocks, color, scales, motion and breakpoints, each a level of the home that links every group it holds to its docs", (code, prefix) => {
@@ -276,49 +280,41 @@ describe("the pages of the three levels", () => {
         expect(block, id).toContain(`<h2 class="landing-inside__title" id="t-${id}-title">${catalog(code)[`level.tokens.${id}.title`]}</h2>`);
         expect(block, id).toContain(`<p class="landing-inside__lead">${catalog(code)[`level.tokens.${id}.lead`]}</p>`);
         for (const group of groups) {
-          const link = new RegExp(`<a class="landing-tokens__group-link" href="(/${code})?/docs/tokens/${DOCS[group]}/"(?: hreflang="en")?>${catalog(code)[`inside.list.${group}`].replace(/&/g, "&amp;")} <span class="landing-names__n">(\\d+)</span></a>`).exec(block);
+          const link = new RegExp(`<a class="landing-block__link" href="(/${code})?/docs/tokens/${DOCS[group]}/"(?: hreflang="en")?>${catalog(code)[`inside.list.${group}`].replace(/&/g, "&amp;")} <span class="landing-names__n">(\\d+)</span></a>`).exec(block);
           expect(link, `${id}: ${group}`).toBeTruthy();
           total += Number(link[2]);
         }
-        expect(block, id).toContain('class="landing-panel landing-tokens__panel"');
+        expect(block, id).toContain('class="landing-panel landing-block__panel"');
         for (const body of codesOf(block)) for (const m of body.matchAll(/--luz-[\w-]+/g)) expect(tokens, `${id}: ${m[0]}`).toContain(m[0]);
       });
       expect(total).toBe(tokens.length);
     });
 
-    it.each(LANGS)("in %s: color is a mosaic in the framed panel: the semantic tokens in large tiles that follow the mode, and the primitives in deep, mid and pale tiles with their value; scales and the rest read their tokens through --v", (code, prefix) => {
+    it.each(LANGS)("in %s: color is two cards in the look of the scales: the semantic colours as chips that follow the mode, and the primitives a ramp per family with every step; scales and the rest read their tokens through --v", (code, prefix) => {
       const html = rendered.get(`${prefix}tokens/`);
       const color = sectionOf(html, "t-color");
-      expect(color).not.toContain("landing-tokens__matrix");
-      expect(color).not.toContain("landing-tokens__palette");
-      // the semantic tiles: a name each, the colour read live (so it follows the mode), a semantic ink on it
-      const semantic = [...color.matchAll(/<li class="landing-tokens__tile" style="--v:var\((--luz-[\w-]+)\);--ink:var\((--luz-[\w-]+)\)"><code>(--luz-[\w-]+)<\/code><\/li>/g)];
-      expect(semantic.length).toBeGreaterThanOrEqual(5);
-      for (const [, bg, ink, name] of semantic) {
-        expect(name).toBe(bg);
-        expect(tokens).toContain(bg);
-        expect(tokens).toContain(ink);
-        expect(bg, `${bg} is semantic`).not.toMatch(/^--luz-(blue|gray|green|red|yellow|teal|purple)-\d+$/);
+      for (const gone of ["matrix", "palette", "mosaic", "tile", "swatch"]) expect(color, gone).not.toMatch(new RegExp(`landing-(block|cards?|spec)__${gone}`));
+      // two cards as the scales', each its title, its specimen and its line of code
+      expect(color).toMatch(/<div class="landing-panel landing-block__panel" dir="ltr"><div class="landing-cards"><div class="landing-card landing-card--semantic"><p class="landing-card__title">/);
+      expect(color).toContain('<div class="landing-card landing-card--primitives"><p class="landing-card__title">');
+      expect(color.match(/<pre class="luz-code-block"/g)?.length).toBe(2);
+      // the semantic chips: read live, so they follow the mode; each labelled with its name
+      const chips = [...color.matchAll(/<li><span class="landing-spec__box landing-spec__box--color" style="--v:var\((--luz-[\w-]+)\)"><\/span><code class="landing-spec__label">([\w-]+)<\/code><\/li>/g)];
+      expect(chips.length).toBeGreaterThanOrEqual(5);
+      for (const [, name, text] of chips) {
+        expect(name).toBe(`--luz-${text}`);
+        expect(tokens).toContain(name);
+        expect(name, `${name} is semantic`).not.toMatch(/^--luz-(blue|gray|green|red|yellow|teal|purple)-\d+$/);
       }
-      // the primitive tiles: three steps of every family, deep to pale, each its name and its value, an ink that reads on it
+      // the primitives: a ramp per family, every step of tokens.json, in its order
       const json = JSON.parse(read("packages/tokens/tokens.json")).color;
-      const swatches = [...color.matchAll(/<li class="landing-tokens__swatch" style="--v:var\(--luz-([a-z]+)-(\d+)\);--ink:var\(--luz-gray-(\d+)\)"><code>--luz-\1-\2<\/code><span>(#[0-9a-f]{6})<\/span><\/li>/g)];
-      expect(swatches.map((m) => m[1])).toEqual(Object.keys(json).flatMap((f) => [f, f, f]));
-      const lum = (hex) => {
-        const c = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255).map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4));
-        return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
-      };
-      const ratio = (a, b) => (Math.max(lum(a), lum(b)) + 0.05) / (Math.min(lum(a), lum(b)) + 0.05);
-      for (const [, family, step, inkStep, hex] of swatches) {
-        expect(hex, `${family}-${step}`).toBe((json[family][step].value ?? json[family][step].$value).toLowerCase());
-        const ink = json.gray[inkStep].value ?? json.gray[inkStep].$value;
-        expect(ratio(hex, ink), `${family}-${step} on gray-${inkStep}`).toBeGreaterThanOrEqual(4.5);
-      }
-      // in the look of the site: the text as any level's, the mosaic inside the framed panel, its tiles touching
-      expect(css).not.toMatch(/\.landing-tokens__block--color \.landing-inside__copy\s*\{[^}]*background/);
-      expect(css).not.toMatch(/\.landing-tokens__block--color \.landing-tokens__panel\s*\{[^}]*display:\s*contents/);
-      expect(color).toMatch(/<div class="landing-panel landing-tokens__panel" dir="ltr"><div class="landing-tokens__mosaic">/);
-      expect(css).toMatch(/\.landing-tokens__mosaic\s*\{[^}]*gap:\s*0[^}]*overflow:\s*hidden/);
+      const ramps = [...color.matchAll(/<li><code class="landing-spec__label">([a-z]+)<\/code><span class="landing-tokens__ramp">((?:<span style="--v:var\(--luz-[a-z]+-\d+\)"><\/span>)+)<\/span><\/li>/g)];
+      expect(ramps.map((m) => m[1])).toEqual(Object.keys(json));
+      for (const [, family, steps] of ramps) expect([...steps.matchAll(/--luz-([a-z]+)-(\d+)/g)].map((m) => `${m[1]}-${m[2]}`), family).toEqual(Object.keys(json[family]).map((step) => `${family}-${step}`));
+      // in the look of the site: the text as any level's, the cards the only frames
+      expect(css).not.toMatch(/\.landing-block--color \.landing-inside__copy\s*\{[^}]*background/);
+      expect(css).toMatch(/\.landing-block__panel:has\(> \.landing-cards\)\s*\{[^}]*border:\s*0/);
+      expect(css).not.toMatch(/landing-(block|cards?|spec)__(mosaic|tile|swatch)/);
       const scales = sectionOf(html, "t-scales");
       for (const name of ["--luz-space-md", "--luz-text-2xl", "--luz-radius-md", "--luz-shadow-lg"]) expect(scales).toContain(`--v:var(${name})`);
       expect(sectionOf(html, "t-motion")).toContain("landing-tokens__curve");
@@ -326,9 +322,9 @@ describe("the pages of the three levels", () => {
 
     it.each(LANGS)("in %s: the breakpoints are devices, small wireframes as wide as their breakpoint, not bars", (code, prefix) => {
       const more = sectionOf(rendered.get(`${prefix}tokens/`), "t-breakpoints");
-      expect(more).not.toContain("landing-tokens__specimen--ruler");
-      const list = /<ul class="landing-tokens__specimen landing-tokens__specimen--devices"[^>]*>([\s\S]*?)<\/ul>/.exec(more)?.[1] ?? "";
-      const devices = [...list.matchAll(/<li><span class="landing-tokens__device landing-tokens__device--([a-z]+)" style="--share:([\d.]+)"><\/span><code class="landing-tokens__label">([a-z]+) (\d+)px<\/code><\/li>/g)];
+      expect(more).not.toContain("landing-spec--ruler");
+      const list = /<ul class="landing-spec landing-spec--devices"[^>]*>([\s\S]*?)<\/ul>/.exec(more)?.[1] ?? "";
+      const devices = [...list.matchAll(/<li><span class="landing-tokens__device landing-tokens__device--([a-z]+)" style="--share:([\d.]+)"><\/span><code class="landing-spec__label">([a-z]+) (\d+)px<\/code><\/li>/g)];
       const mq = tokens.filter((n) => n.startsWith("--luz-mq-"));
       expect(devices.map((m) => `--luz-mq-${m[3]}`)).toEqual(mq);
       expect(devices.map((m) => m[1])).toEqual(["phone", "tablet", "laptop", "laptop", "desktop", "desktop"]);
@@ -340,22 +336,22 @@ describe("the pages of the three levels", () => {
       const html = rendered.get(`${prefix}tokens/`);
       for (const id of ["motion", "breakpoints"]) {
         const block = sectionOf(html, `t-${id}`);
-        expect(block, id).toContain(`class="landing-tokens__specimen landing-tokens__specimen--${id === "motion" ? "curves" : "devices"}"`);
-        expect(block, id).not.toContain("landing-tokens__scale");
+        expect(block, id).toContain(`class="landing-spec landing-spec--${id === "motion" ? "curves" : "devices"}"`);
+        expect(block, id).not.toContain("landing-card");
         expect(block, id).toContain('<pre class="luz-code-block" data-lang="css"');
       }
       expect(html).not.toContain('id="t-more"');
     });
 
     it("scales are a level like the others, zigzagging with them: the four cards a 2 x 2 in a panel with no frame of its own, one column on a phone", () => {
-      const panel = new RegExp("\\.landing-tokens__block--scales \\.landing-tokens__panel\\s*\\{([^}]*)\\}").exec(css)?.[1] ?? "";
+      const panel = new RegExp("\\.landing-block__panel:has\\(> \\.landing-cards\\)\\s*\\{([^}]*)\\}").exec(css)?.[1] ?? "";
       expect(panel).toMatch(/border:\s*0/);
       expect(panel).toMatch(/padding:\s*0/);
       // no more cards as the section's own grid items, nor the text in the middle
-      expect(css).not.toMatch(/\.landing-tokens__block--scales[^{]*\{[^}]*display:\s*contents/);
-      expect(css).not.toMatch(/\.landing-tokens__block--scales[^{]*\{[^}]*grid-template-areas/);
-      expect(css).toMatch(/\.landing-tokens__block--scales \.landing-tokens__scales\s*\{[^}]*grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/);
-      expect(css).toMatch(/@media \(max-width: 640px\) \{\s*\.landing-tokens__block--scales \.landing-tokens__scales\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1fr\)/);
+      expect(css).not.toMatch(/\.landing-block--scales[^{]*\{[^}]*display:\s*contents/);
+      expect(css).not.toMatch(/\.landing-block--scales[^{]*\{[^}]*grid-template-areas/);
+      expect(css).toMatch(/\.landing-block__panel > \.landing-cards\s*\{[^}]*grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/);
+      expect(css).toMatch(/@media \(max-width: 640px\) \{\s*\.landing-block__panel > \.landing-cards\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1fr\)/);
     });
 
     it.each(LANGS)("in %s: the page ends with the next step: core, and the docs", (code, prefix) => {
@@ -371,5 +367,210 @@ describe("the pages of the three levels", () => {
       expect(html).not.toContain("landing-tokens__name");
       expect(html).not.toContain("landing-level__list");
     });
+  });
+});
+
+describe("the page of core: the HTML you write comes styled, a class adds a component, your CSS wins", () => {
+  const css = read("apps/landing/landing.css");
+  const numbers = siteNumbers(repo);
+  const VIEWS = ["bare", "classes", "yours"];
+  const core = (prefix) => rendered.get(`${prefix}core/`);
+  const sectionOf = (html, id) => {
+    const start = html.search(new RegExp(`<section\\b[^>]*\\sid="${id}"`));
+    if (start < 0) return "";
+    const next = html.indexOf("<section", start + 1);
+    return html.slice(start, next < 0 ? html.indexOf("</main>", start) : next);
+  };
+
+  it.each(LANGS)("in %s: the hero is the tokens' kind of hero (one line, two buttons, four numbers read from the packages) over a demo of one page written three ways", (code, prefix) => {
+    const hero = sectionOf(core(prefix), "hero");
+    expect(hero).toMatch(/^<section class="landing-intro landing-demo landing-views"/);
+    expect(hero).toContain('class="landing-intro__what"');
+    expect(hero.match(/<a class="luz-btn/g)).toHaveLength(2);
+    expect(hero).toContain('href="#steps"');
+    const facts = [...hero.matchAll(/<li><strong>([^<]+)<\/strong> ([^<]+)<\/li>/g)].map((m) => m[1]);
+    expect(facts).toHaveLength(4);
+    expect(facts.slice(0, 2)).toEqual([String(numbers.components), String(numbers.objects)]);
+    expect(facts[3]).toBe("0");
+  });
+
+  it.each(LANGS)("in %s: the demo is one page, three views (no classes, with classes, with your CSS), a radio each with the first checked; the page is real core markup the keyboard does not enter", (code, prefix) => {
+    const hero = sectionOf(core(prefix), "hero");
+    const radios = [...hero.matchAll(/<input type="radio" name="view" value="([a-z]+)"( checked)?>/g)];
+    expect(radios.map((m) => m[1])).toEqual(VIEWS);
+    expect(radios.map((m) => Boolean(m[2]))).toEqual([true, false, false]);
+    expect(hero).toMatch(/<fieldset class="landing-demo__picker">\s*<legend>[^<]+<\/legend>/);
+    expect(hero).toContain('<div class="landing-demo__product landing-views__product" inert>');
+    // each page is what lies between its wrapper and the next one, less the closing tags that belong to the wrapper and to the window around it
+    const chunks = hero.split('<div class="landing-views__page" data-view="').slice(1).map((chunk) => {
+      let inside = chunk.slice(chunk.indexOf('">') + 2, chunk.indexOf('<div class="landing-demo__editor"') > 0 && chunk.includes('<div class="landing-demo__editor"') && !chunk.includes('<div class="landing-views__page"') ? chunk.indexOf('<div class="landing-demo__editor"') : chunk.length);
+      const count = (re) => (inside.match(re) ?? []).length;
+      while (count(/<\/div>/g) > count(/<div\b/g)) inside = inside.slice(0, inside.lastIndexOf("</div>")).trimEnd();
+      return [chunk.slice(0, chunk.indexOf('"')), inside];
+    });
+    const pages = Object.fromEntries(chunks);
+    expect(Object.keys(pages)).toEqual(VIEWS);
+    // step one: elements and nothing else, no class and no id
+    expect(pages.bare).not.toMatch(/class=|id=/);
+    expect(pages.bare).toContain("<button");
+    // step two adds the classes of components; step three is that page, and the difference is a rule
+    expect(pages.classes).toMatch(/luz-btn luz-btn--primary/);
+    expect(pages.classes).toMatch(/luz-field/);
+    expect(pages.yours.replaceAll("-yours", "")).toBe(pages.classes);
+    // the same markup, as listings in the colours of the devtools, one per view
+    const listings = Object.fromEntries([...hero.matchAll(/<code class="landing-demo__look" data-look="([a-z]+)">([\s\S]*?)<\/code>/g)].map((m) => [m[1], m[2]]));
+    expect(Object.keys(listings)).toEqual(VIEWS);
+    const plain = (text) => text.replace(/<\/?span\b[^>]*>/g, "");
+    expect(plain(listings.bare)).not.toContain("class=");
+    expect(plain(listings.classes)).toContain("luz-btn--primary");
+    expect(plain(listings.yours).startsWith(plain(listings.classes))).toBe(true);
+    expect(listings.yours).toMatch(/border-radius<\/span>: <span class="landing-demo__val">var\(--luz-radius-full\)<\/span>/);
+    expect(listings.yours).toMatch(/text-transform<\/span>: <span class="landing-demo__val">uppercase<\/span>/);
+  });
+
+  it("shows the checked view by CSS alone, laid over the others so the window keeps its height, and the reader's rule is what the listing says, unlayered", () => {
+    for (const view of VIEWS) {
+      expect(css).toContain(`.landing-views:has(input[value="${view}"]:checked) :is(.landing-views__page[data-view="${view}"], .landing-demo__look[data-look="${view}"])`);
+    }
+    expect(css).toMatch(/\.landing-views__page,\s*\.landing-views \.landing-demo__look\s*\{[^}]*grid-area:\s*1 \/ 1[^}]*visibility:\s*hidden/);
+    // the listing's two lines are the rule's two lines, and the rule is outside every @layer, so it wins with no !important
+    const rule = /\.landing-views__page\[data-view="yours"\] \.luz-btn\s*\{([^}]*)\}/.exec(css)?.[1] ?? "";
+    expect(rule).toMatch(/border-radius:\s*var\(--luz-radius-full\)/);
+    expect(rule).toMatch(/text-transform:\s*uppercase/);
+    expect(rule).not.toMatch(/!important/);
+    expect(css).not.toMatch(/@layer/);
+  });
+
+  it.each(LANGS)("in %s: four blocks, forms, content, feedback and layout, in the sides of the home (the page zigzags), each cards of real components and the line of HTML that writes them, linking the docs' groups they cover with their counts", (code, prefix) => {
+    const html = core(prefix);
+    const groups = new Map();
+    for (const page of site.pages.filter((p) => p.meta.area === "components" && p.meta.group)) groups.set(page.meta.group, (groups.get(page.meta.group) ?? 0) + 1);
+    const BLOCKS = [["forms", ["actions", "forms"]], ["content", ["content", "navigation"]], ["feedback", ["feedback", "media"]], ["layout", ["helpers", "objects"]]];
+    BLOCKS.forEach(([id, covered], i) => {
+      const block = sectionOf(html, `c-${id}`);
+      expect(block, id).toMatch(new RegExp(`^<section class="landing-inside${i % 2 ? " landing-inside--flip" : ""} landing-block landing-block--${id}"`));
+      expect(block.match(/<h2\b/g), id).toHaveLength(1);
+      const links = [...block.matchAll(/<a class="landing-block__link" href="([^"]+)"[^>]*>[^<]+<span class="landing-names__n">(\d+)<\/span>/g)];
+      // the docs of a language are its own (/es/docs/…) once it has them
+      expect(links.map((m) => m[1].replace(/^\/(es|ar)\//, "/")), id).toEqual(covered.map((g) => (g === "objects" ? "/docs/components/layout/" : `/docs/components/#group-${g}`)));
+      expect(links.map((m) => Number(m[2])), id).toEqual(covered.map((g) => (g === "objects" ? numbers.objects : groups.get(g))));
+      // the panel holds cards, each its title, its component (inert: the keyboard stays out of it) and one line of code
+      const cards = block.match(/<div class="landing-card landing-card--[a-z]+">[\s\S]*?<\/pre><\/div>/g) ?? [];
+      expect(cards.length, id).toBeGreaterThanOrEqual(2);
+      for (const card of cards) {
+        expect(card).toMatch(/<p class="landing-card__title">[^<]+<\/p><div class="landing-core__live" inert>/);
+        expect(card).toMatch(/<pre class="luz-code-block" data-lang="html" dir="ltr" tabindex="0">/);
+      }
+    });
+    expect(html).toContain('class="luz-btn luz-btn--primary"');
+    expect(html).toContain('class="o-stack"');
+  });
+
+  it("gives a panel of cards no frame of its own, in every block", () => {
+    expect(css).toMatch(/\.landing-block__panel:has\(> \.landing-cards\)\s*\{[^}]*border:\s*0/);
+  });
+
+  it.each(LANGS)("in %s: three steps (install, write HTML, add a class) and what you get, then the next step to the catalog, and the whole list folded at the end", (code, prefix) => {
+    const html = core(prefix);
+    const steps = sectionOf(html, "steps");
+    expect(steps.match(/class="landing-path__step landing-path__step--(1|2|3|result)"/g)).toHaveLength(4);
+    expect(steps.match(/<li>/g)).toHaveLength(3);
+    expect(steps).toContain("npm install @luz-ds/tokens @luz-ds/core");
+    const next = sectionOf(html, "next");
+    expect(next).toContain(`href="${prefix}catalog/"`);
+    expect(next).toMatch(/href="(\/(es|ar))?\/docs\/components\/"/);
+    const all = sectionOf(html, "all");
+    expect(all).toMatch(/<details class="landing-level__fold">\s*<summary id="all-title">[^<]+<\/summary>/);
+    expect(all).toContain("landing-names");
+  });
+});
+
+describe("the page of the catalog: a stylesheet per piece, linked only when used, its script loaded when the piece is there", () => {
+  const css = read("apps/landing/landing.css");
+  const sheets = readdirSync(join(repo, "packages/catalog/src/components")).filter((n) => n.endsWith(".css") && n !== "index.css" && !n.startsWith("_")).map((n) => n.slice(0, -4));
+  const catalogPage = (prefix) => rendered.get(`${prefix}catalog/`);
+  const sectionOf = (html, id) => {
+    const start = html.search(new RegExp(`<section\\b[^>]*\\sid="${id}"`));
+    if (start < 0) return "";
+    const next = html.indexOf("<section", start + 1);
+    return html.slice(start, next < 0 ? html.indexOf("</main>", start) : next);
+  };
+
+  it("lives at /catalog/ (it was /components/), and the home links it there", () => {
+    expect(rendered.has("/catalog/")).toBe(true);
+    expect(rendered.has("/components/")).toBe(false);
+    expect(rendered.get("/")).toContain('href="/catalog/"');
+    expect(rendered.get("/")).not.toContain('href="/components/"');
+  });
+
+  it.each(LANGS)("in %s: the hero has one line, two buttons and four numbers read from the packages (the pieces, the scripts, the weight, the dependencies)", (code, prefix) => {
+    const hero = sectionOf(catalogPage(prefix), "hero");
+    expect(hero).toMatch(/^<section class="landing-intro landing-demo landing-views"/);
+    expect(hero.match(/<a class="luz-btn/g)).toHaveLength(2);
+    const facts = [...hero.matchAll(/<li><strong>([^<]+)<\/strong> ([^<]+)<\/li>/g)].map((m) => m[1]);
+    expect(facts).toHaveLength(4);
+    expect(facts[0]).toBe(String(sheets.length));
+    expect(facts[1]).toBe(String(FILES.catalog.chunks.length));
+    expect(facts[3]).toBe("0");
+  });
+
+  it.each(LANGS)("in %s: the demo picks a kind of site: a wireframe of its patterns beside the links of the stylesheets it needs, in cascade order, then the script", (code, prefix) => {
+    const hero = sectionOf(catalogPage(prefix), "hero");
+    const radios = [...hero.matchAll(/<input type="radio" name="view" value="([a-z]+)"( checked)?>/g)];
+    expect(radios.map((m) => m[1])).toEqual(FITS_KINDS);
+    expect(radios.map((m) => Boolean(m[2]))).toEqual([true, false, false, false]);
+    expect(hero).toContain('<div class="landing-demo__product landing-views__product" inert>');
+    const plain = (text) => text.replace(/<\/?span\b[^>]*>/g, "").replaceAll("&lt;", "<").replaceAll("&gt;", ">").replaceAll("&quot;", '"');
+    for (const kind of FITS_KINDS) {
+      const { files, pages } = kindPatterns(kind, repo, null);
+      const page = new RegExp(`<div class="landing-views__page landing-views__page--site" data-view="${kind}">([\\s\\S]*?)</span></div>(?=<div class="landing-views__page|\\s*</div>)`).exec(hero)?.[1] ?? "";
+      const named = [...page.matchAll(/<code>([a-z-]+)<\/code>/g)].map((m) => m[1]);
+      expect(named.length, kind).toBeGreaterThanOrEqual(5);
+      for (const name of named) expect(pages, `${kind} draws ${name}`).toContain(name);
+      const listing = new RegExp(`<code class="landing-demo__look" data-look="${kind}">([\\s\\S]*?)</code>`).exec(hero)?.[1] ?? "";
+      const lines = plain(listing).split("\n");
+      expect(lines.slice(0, -1), kind).toEqual(files.map((file) => `<link rel="stylesheet" href="…/${file.replace(/\.css$/, ".min.css")}">`));
+      expect(lines.at(-1), kind).toBe('<script type="module" src="…/catalog.min.js"></script>');
+    }
+  });
+
+  it.each(LANGS)("in %s: four blocks, structure, content, charts and site-wide, in the sides of the home, each a card per piece (a wireframe and the stylesheet that draws it) linking the docs' groups they cover with their counts", (code, prefix) => {
+    const html = catalogPage(prefix);
+    const groups = new Map();
+    for (const page of site.pages.filter((p) => p.meta.area === "catalog" && p.meta.group)) groups.set(page.meta.group, (groups.get(page.meta.group) ?? 0) + 1);
+    const BLOCKS = [["structure", ["navigation", "page-structure"]], ["content", ["content"]], ["charts", ["charts"]], ["sitewide", ["site-wide", "documentation"]]];
+    BLOCKS.forEach(([id, covered], i) => {
+      const block = sectionOf(html, `k-${id}`);
+      expect(block, id).toMatch(new RegExp(`^<section class="landing-inside${i % 2 ? " landing-inside--flip" : ""} landing-block landing-block--${id}"`));
+      const links = [...block.matchAll(/<a class="landing-block__link" href="([^"]+)"[^>]*>[^<]+<span class="landing-names__n">(\d+)<\/span>/g)];
+      expect(links.map((m) => m[1].replace(/^\/(es|ar)\//, "/")), id).toEqual(covered.map((g) => `/docs/catalog/#group-${g}`));
+      expect(links.map((m) => Number(m[2])), id).toEqual(covered.map((g) => groups.get(g)));
+      const cards = [...block.matchAll(/<div class="landing-card landing-card--([a-z-]+)"><p class="landing-card__title"><code>([a-z-]+)<\/code><\/p>([\s\S]*?)<\/pre><\/div>/g)];
+      expect(cards.length, id).toBe(4);
+      for (const [, name, title, body] of cards) {
+        expect(title).toBe(name);
+        expect(sheets, `${name} is a stylesheet of the catalog`).toContain(name);
+        expect(body).toContain('class="landing-wf"');
+        expect(body).toContain(`components/${name}.min.css`);
+      }
+    });
+  });
+
+  it.each(LANGS)("in %s: three steps (install, link the pieces you use, add the script once) and what you get, then the next step to the kinds of site, and the whole list folded at the end", (code, prefix) => {
+    const html = catalogPage(prefix);
+    const steps = sectionOf(html, "steps");
+    expect(steps.match(/class="landing-path__step landing-path__step--(1|2|3|result)"/g)).toHaveLength(4);
+    expect(steps).toContain("npm install @luz-ds/tokens @luz-ds/core @luz-ds/catalog");
+    expect(steps).toContain("components/search.min.css");
+    expect(steps).toContain("catalog.min.js");
+    expect(sectionOf(html, "next")).toMatch(/href="(\/(es|ar))?\/docs\/kinds\/"/);
+    const all = sectionOf(html, "all");
+    expect(all).toMatch(/<details class="landing-level__fold">\s*<summary id="all-title">[^<]+<\/summary>/);
+    expect(all).toContain("landing-names");
+  });
+
+  it("draws a wireframe as a grid its generator places, and a kind of site large", () => {
+    expect(css).toMatch(/\.landing-wf\s*\{[^}]*grid-template-columns:\s*repeat\(var\(--cols\), minmax\(0, 1fr\)\)/);
+    expect(css).toMatch(/\.landing-wf--page\s*\{[^}]*block-size/);
   });
 });

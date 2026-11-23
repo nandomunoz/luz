@@ -56,7 +56,7 @@ const tokensPage = () => {
   if (!built) {
     const site = scanSite(join(repo, "apps/docs"), repo);
     const home = read("apps/landing/index.html");
-    const levels = ["tokens", "core", "components"].map((name) => ({ name, file: `apps/landing/levels/${name}.html`, html: read(`apps/landing/levels/${name}.html`) }));
+    const levels = ["tokens", "core", "catalog"].map((name) => ({ name, file: `apps/landing/levels/${name}.html`, html: read(`apps/landing/levels/${name}.html`) }));
     built = buildSite(site, { extra: [...landingDocuments(site, "apps/landing/index.html", home), ...levelDocuments(site, { file: "apps/landing/index.html", html: home }, levels)] });
   }
   return quoted(built.rendered.get("/tokens/"));
@@ -78,9 +78,9 @@ describe("the motion of the page of the tokens", () => {
 
   it("has the hero come in, the sections rise, the specimens draw, the devices appear and the cards lift", () => {
     for (const name of ["landing-rise", "landing-mark-sweep", "landing-grow-y", "landing-device-in", "landing-draw"]) expect(css, name).toMatch(new RegExp(`@keyframes ${name}\\b`));
-    expect(moving).toMatch(/\.landing-tokens__head > \*[^{]*\{[^}]*animation/);
-    expect(moving).toMatch(/\.landing-tokens__step:hover/);
-    expect(moving).toMatch(/\.landing-tokens__group-link:hover::after/);
+    expect(moving).toMatch(/\.landing-intro__head > \*[^{]*\{[^}]*animation/);
+    expect(moving).toMatch(/\.landing-path__step:hover/);
+    expect(moving).toMatch(/\.landing-block__link:hover::after/);
   });
 
   it("drives the scroll animations only where the browser has view(): elsewhere every section is simply there", () => {
@@ -101,11 +101,12 @@ describe("the motion of the page of the tokens", () => {
     const curves = page.match(/<svg class="landing-tokens__curve"[\s\S]*?<\/svg>/g) ?? [];
     expect(curves.length).toBe(4);
     for (const svg of curves) expect(svg).toMatch(/<path pathLength="1" d="M0\.0,44\.0 C/);
-  });
+    // the first test to read the page builds the whole site: it takes longer than the default 5 s when the suites run together
+  }, 30000);
 
   it("animates each curve with the easing it shows: a dot that runs across steadily and up with var(--ease), the curve's token", () => {
     const page = tokensPage();
-    const plots = [...page.matchAll(/<span class="landing-tokens__plot">([\s\S]*?)<\/span><code class="landing-tokens__label">([a-z]+)<\/code>/g)];
+    const plots = [...page.matchAll(/<span class="landing-tokens__plot">([\s\S]*?)<\/span><code class="landing-spec__label">([a-z]+)<\/code>/g)];
     expect(plots.map((m) => m[2])).toEqual(["standard", "enter", "exit", "spring"]);
     for (const [, plot, name] of plots) {
       expect(plot, name).toContain('<svg class="landing-tokens__curve"');
@@ -121,8 +122,8 @@ describe("the motion of the page of the tokens", () => {
     expect(scroll).toMatch(/\.landing-tokens__dot\s*\{[^}]*animation:\s*landing-dot-x\b[^}]*animation-timeline:\s*view\(\)/);
     expect(scroll).toMatch(/\.landing-tokens__dot > span\s*\{[^}]*animation:\s*landing-dot-y var\(--ease\)[^}]*animation-timeline:\s*view\(\)/);
     // the loop: only while the card has the pointer or the focus
-    expect(moving).toMatch(/\.landing-tokens__block--motion:is\(:hover, :focus-within\) \.landing-tokens__dot\s*\{[^}]*infinite/);
-    expect(moving).toMatch(/\.landing-tokens__block--motion:is\(:hover, :focus-within\) \.landing-tokens__dot > span\s*\{[^}]*var\(--ease\)[^}]*infinite/);
+    expect(moving).toMatch(/\.landing-block--motion:is\(:hover, :focus-within\) \.landing-tokens__dot\s*\{[^}]*infinite/);
+    expect(moving).toMatch(/\.landing-block--motion:is\(:hover, :focus-within\) \.landing-tokens__dot > span\s*\{[^}]*var\(--ease\)[^}]*infinite/);
     for (const name of ["landing-dot-x", "landing-dot-y"]) expect(css, name).toMatch(new RegExp(`@keyframes ${name}\\b`));
   });
 });
