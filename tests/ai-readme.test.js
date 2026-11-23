@@ -379,6 +379,27 @@ describe("renderAiSection({ name, manifest, changelog, siteUrl })", () => {
 
 /* ---- applyAiSection: the README around the block ------------------------- */
 
+describe("a second tool, @luz-ds/ai, next to @luz-ds/check", () => {
+  const AI = { name: "@luz-ds/ai", version: "0.0.0", license: "MIT" };
+  const block = (over = {}) => lib().renderAiSection({ name: "ai", manifest: AI, changelog: null, siteUrl: SITE, checkVersion: "0.3.2", ...over });
+
+  it("tells an agent to run the tool at its own version, not at the version of check", () => {
+    expect(block({ manifest: { ...AI, version: "0.1.0" } })).toContain("`npx @luz-ds/ai@0.1.0 --help`");
+    expect(block({ name: "check", manifest: { name: "@luz-ds/check", version: "0.3.2", license: "MIT" } })).toContain("`npx @luz-ds/check@0.3.2 --help`");
+  });
+
+  it("does not say check is not on npm when check is released, though this tool is not", () => {
+    const text = block();
+    expect(text).toContain("Not released yet");
+    expect(text).not.toMatch(/@luz-ds\/check` is not on npm yet/);
+    expect(text).toContain("npx @luz-ds/check@0.3.2 <files>");
+  });
+
+  it("still says it when neither is released", () => {
+    expect(block({ checkVersion: "0.0.0" })).toMatch(/@luz-ds\/check` is not on npm yet/);
+  });
+});
+
 describe("applyAiSection(readme, block)", () => {
   const block = () => render("core", CORE, FIRST_RELEASE);
   const README = "# @luz-ds/core\n\nIntro.\n\n## Install\n\nText.\n\n## License\n\nMIT\n";
@@ -596,8 +617,8 @@ describe("the script's capabilities (security-auditor Q1, condition a)", () => {
 describe("the release flow runs ai-readme in the version step, without lifecycle hooks", () => {
   const pkg = JSON.parse(read("package.json"));
 
-  it("the root package.json has a release:version script: changeset version, the versions of the install pages, then ai-readme --write", () => {
-    expect(pkg.scripts["release:version"]).toBe("changeset version && node scripts/release-sync.js && node scripts/ai-readme.js --write");
+  it("the root package.json has a release:version script: changeset version, the versions of the install pages, ai-readme --write, then the facts and starters of the luz-start skill", () => {
+    expect(pkg.scripts["release:version"]).toBe("changeset version && node scripts/release-sync.js && node scripts/ai-readme.js --write && node scripts/build-ai-facts.js");
   });
 
   it("has no prerelease:version or postrelease:version script (pnpm runs those hooks; --ignore-scripts does not cover them)", () => {

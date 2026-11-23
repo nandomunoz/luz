@@ -12,7 +12,7 @@ import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "no
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { plan, readHosts, summary } from "../scripts/ai-eval-run.js";
+import { plan, readHosts, summary, unsafeFixture } from "../scripts/ai-eval-run.js";
 import { loadCases } from "../scripts/ai-eval-grade.js";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -73,9 +73,30 @@ describe("the hosts file", () => {
     expect(() => read({ hosts: [{ id: "a", command: ["x", "{prompt}"], timeoutSec: 99999 }] })).toThrow(/timeoutSec/);
   });
 
+  it("refuses a host that is a shell, which would read the prompt of a case as code", () => {
+    for (const shell of ["sh", "bash", "/bin/zsh", "cmd", "C:\\Windows\\System32\\cmd.exe", "pwsh"]) expect(() => read({ hosts: [{ id: "a", command: [shell, "-c", "tool {prompt}"] }] }), shell).toThrow(/shell/);
+  });
+
+  it("takes a list of variable names as `env`, and nothing else", () => {
+    expect(read({ hosts: [{ ...STUB_HOST, env: ["SOME_KEY"] }] })[0].env).toEqual(["SOME_KEY"]);
+    expect(() => read({ hosts: [{ ...STUB_HOST, env: ["A=1"] }] })).toThrow(/env/);
+    expect(() => read({ hosts: [{ ...STUB_HOST, env: "SOME_KEY" }] })).toThrow(/env/);
+  });
+
   it("names no model: which ones run is the owner's, in the hosts file", () => {
     const src = readFileSync(join(root, "scripts/ai-eval-run.js"), "utf-8");
     expect(src.replace(/\/\*\*[\s\S]*?\*\//, "")).not.toMatch(/\b(gpt|opus|sonnet|haiku|gemini|fable)\b/i);
+  });
+});
+
+describe("a fixture", () => {
+  it("is refused when it would run in the session of the person running the evals: a dotfile, a hook, a package.json", () => {
+    for (const bad of [".claude/settings.json", ".mcp.json", ".envrc", ".git/hooks/pre-commit", "package.json", "a/package.json", "Makefile", "docs/.hidden/x"]) expect(unsafeFixture(bad), bad).toBe(true);
+    for (const ok of ["README.md", "index.html", "docs/notes.txt"]) expect(unsafeFixture(ok), ok).toBe(false);
+  });
+
+  it("is not one of the fixtures of the real cases", () => {
+    for (const c of loadCases(root)) for (const path of Object.keys(c.fixture)) expect(unsafeFixture(path), `${c.id}: ${path}`).toBe(false);
   });
 });
 
@@ -153,6 +174,17 @@ describe("node scripts/ai-eval-run.js", () => {
     expect(by.without.setupTouched).toEqual([]);
     const clean = JSON.parse(readFileSync(join(tmp, "out.json"), "utf-8")).results.find((x) => x.arm === "with");
     expect(clean.setupTouched).toEqual([]);
+  });
+
+  it("gives the host a small environment and only the variables the hosts file names", () => {
+    const show = { id: "show", command: [process.execPath, "-e", 'console.log("KEY=" + (process.env.LUZ_EVAL_SECRET ?? "unset") + " OTHER=" + (process.env.LUZ_EVAL_OTHER ?? "unset"))', "{prompt}"], timeoutSec: 30 };
+    const env = { ...process.env, LUZ_EVAL_SECRET: "s3cret", LUZ_EVAL_OTHER: "o" };
+    const out = join(tmp, "env.json");
+    const run = (host) => spawnSync(process.execPath, [join(root, "scripts/ai-eval-run.js"), "--hosts", hosts([host]), "--case", "landing-vanilla", "--arm", "without", "--run", "--out", out], { encoding: "utf-8", env, timeout: 60000 });
+    expect(run(show).status).toBe(0);
+    expect(JSON.parse(readFileSync(out, "utf-8")).results[0].stdoutTail).toContain("KEY=unset OTHER=unset");
+    expect(run({ ...show, env: ["LUZ_EVAL_SECRET"] }).status).toBe(0);
+    expect(JSON.parse(readFileSync(out, "utf-8")).results[0].stdoutTail).toContain("KEY=s3cret OTHER=unset");
   });
 
   it("stops a host that is too slow, and grades what it left", () => {

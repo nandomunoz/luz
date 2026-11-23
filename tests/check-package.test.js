@@ -265,16 +265,16 @@ describe("scripts/build-check.js: the build", () => {
 /* ---- The lists the scripts read -------------------------------------------------- */
 
 describe("scripts/luz-packages.js: tools are published and have no CSS", () => {
-  it("TOOLS is [check]: after the libraries, not a base package", () => {
-    expect(TOOLS).toEqual(["check"]);
+  it("TOOLS is [check, ai]: after the libraries, not a base package", () => {
+    expect(TOOLS).toEqual(["check", "ai"]);
     expect(BASE).not.toContain("check");
     expect(PACKAGES, "PACKAGES stays the CSS libraries: the docs tests and the CSS probes read it; there is no kind of site left (F5b)").toEqual(BASE);
     expect(PACKAGES).not.toContain("check");
   });
 
-  it("PUBLISHED is [...PACKAGES, ...TOOLS]: check is published last, nothing depends on it", () => {
+  it("PUBLISHED is [...PACKAGES, ...TOOLS]: the tools are published last, nothing depends on them", () => {
     expect(PUBLISHED).toEqual([...PACKAGES, ...TOOLS]);
-    expect(PUBLISHED.at(-1)).toBe("check");
+    expect(PUBLISHED.at(-1)).toBe("ai");
   });
 
   it("documents TOOLS in the header comment of the file", () => {
@@ -319,7 +319,7 @@ describe("the release scripts read PUBLISHED, and the CSS probes keep PACKAGES",
   it("the root build ends with the bundle of check, after catalog: root script luzcheck:build (spec 7.1)", () => {
     const pkg = json("package.json");
     expect(pkg.scripts?.["luzcheck:build"]).toBe("node scripts/build-check.js");
-    expect(pkg.scripts?.build).toMatch(/pnpm catalog:build && pnpm luzcheck:build$/);
+    expect(pkg.scripts?.build).toMatch(/pnpm catalog:build && pnpm luzcheck:build && pnpm ai:build$/);
   });
 
   it("the root has no script that npm runs on its own for check (no pre or post hook of the release scripts)", () => {
@@ -422,7 +422,8 @@ describe("the changesets: @luz-ds/check has its own version (D7)", () => {
 
   it("couples: every changeset that names another @luz-ds package also names @luz-ds/check (7.3), so a release never ships a stale snapshot", () => {
     const uncoupled = changesets
-      .filter((c) => c.bumps.some((b) => b.name !== "@luz-ds/check") && !c.bumps.some((b) => b.name === "@luz-ds/check"))
+      // @luz-ds/ai holds no snapshot of the classes, so a changeset of its own needs no check beside it
+      .filter((c) => c.bumps.some((b) => !["@luz-ds/check", "@luz-ds/ai"].includes(b.name)) && !c.bumps.some((b) => b.name === "@luz-ds/check"))
       .map((c) => c.file);
     expect(uncoupled).toEqual([]);
   });

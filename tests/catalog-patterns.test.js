@@ -243,15 +243,15 @@ describe("landing, cms, app and docs are not packages any more", () => {
     expect(Object.keys(packages).sort()).toEqual(["BASE", "PACKAGES", "PUBLISHED", "TOOLS"]);
     expect(packages.BASE).toEqual(["tokens", "core", "catalog"]);
     expect(packages.PACKAGES).toEqual(["tokens", "core", "catalog"]);
-    expect(packages.TOOLS).toEqual(["check"]);
-    expect(packages.PUBLISHED).toEqual(["tokens", "core", "catalog", "check"]);
+    expect(packages.TOOLS).toEqual(["check", "ai"]);
+    expect(packages.PUBLISHED).toEqual(["tokens", "core", "catalog", "check", "ai"]);
     expect(read("scripts/luz-packages.js")).not.toMatch(/SITE_KINDS/);
   });
 
   it("the root package.json has no `<kind>:build` script, and its build is tokens, core, catalog and check", () => {
     const scripts = json("package.json").scripts;
     for (const kind of KINDS) expect(scripts[`${kind}:build`], `${kind}:build`).toBeUndefined();
-    expect(scripts.build).toBe("pnpm tokens:build && pnpm core:build && pnpm catalog:build && pnpm luzcheck:build");
+    expect(scripts.build).toBe("pnpm tokens:build && pnpm core:build && pnpm catalog:build && pnpm luzcheck:build && pnpm ai:build");
   });
 
   it("no manifest, workspace or lockfile entry names a package of the four", () => {

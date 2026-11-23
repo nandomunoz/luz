@@ -202,6 +202,19 @@ describe("check: a skill", () => {
     expect(run(["check", "--json", skillOf("name: demo\ndescription: x", "line\n".repeat(499))]).code).toBe(0);
   });
 
+  it("echoes the name of a file it did not write without hidden characters and in at most 80, so a report is not a way to pass a model text", () => {
+    const evil = `A\u202E${"x".repeat(200)}`;
+    const r = run(["check", "--json", dir({ ".agents/skills/demo/SKILL.md": `---\nname: ${evil}\ndescription: x\n---\n` })]);
+    const messages = JSON.parse(r.out).problems.filter((p) => p.rule !== "chars/hidden").map((p) => p.message);
+    expect(messages.length).toBeGreaterThan(0);
+    for (const m of messages) {
+      expect(m, m).not.toMatch(/\u202E/);
+      expect(m.length, m).toBeLessThan(400);
+    }
+    const bad = run(["check", "--json", dir({ ".agents/skills/demo/SKILL.md": `---\nname: demo\n${"y".repeat(300)}\u202E\n---\n` })]);
+    for (const p of JSON.parse(bad.out).problems.filter((x) => x.rule === "yaml/syntax")) expect(p.message).not.toMatch(/\u202E/);
+  });
+
   it("fails a hidden or bidi character, with its line", () => {
     const r = run(["check", "--json", skillOf("name: demo\ndescription: x", "one\ntwo \u202E three\n")]);
     const p = JSON.parse(r.out).problems.find((x) => x.rule === "chars/hidden");
@@ -347,7 +360,8 @@ describe("site new", () => {
         expect(c.status, `${kind} ${stack}: ${c.stdout}`).toBe(0);
       }
     }
-  });
+    // Sixteen processes: more than the default five seconds when the whole suite runs at once
+  }, 60000);
 
   it("fills the language and the title, and escapes the name", () => {
     const d = dir();
@@ -415,6 +429,25 @@ describe("site new", () => {
     }
     const d = dir({ "file.txt": "x" });
     expect(run(flags(join(d, "file.txt"))).code).toBe(2);
+  });
+
+  it("escapes the braces of a name, which an Astro page would run as JavaScript", () => {
+    for (const stack of ["astro", "vanilla"]) {
+      const d = dir();
+      expect(run(flags(d, { stack, name: "{process.env.SECRET} {await import('x')}" })).code).toBe(0);
+      const page = read(join(d, stack === "astro" ? "src/pages/index.astro" : "index.html"));
+      expect(page, stack).not.toMatch(/\{process|\{await/);
+      expect(page, stack).toContain("&#123;process.env.SECRET&#125;");
+    }
+  });
+
+  it("refuses a --target or --dir that is not one plain line or starts with a dash, since it reaches a command an agent runs", () => {
+    for (const bad of ["a\nrm -rf ~", "a\u202Eb", "--config=x", "-x"]) {
+      expect(run(flags(bad)).code, JSON.stringify(bad)).toBe(2);
+      expect(run(["init", "--target", "claude", "--dir", bad, "--dry-run"]).code, JSON.stringify(bad)).toBe(2);
+      expect(run(["agent", "add", "luz-ai-auditor", "--for", "claude", "--dir", bad, "--dry-run"]).code, JSON.stringify(bad)).toBe(2);
+    }
+    expect(run(flags(join(dir(), "a b")), tmpdir()).code).toBe(0);
   });
 
   it("says what to do for a stack it writes no page for", () => {

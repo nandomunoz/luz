@@ -79,6 +79,7 @@
  * (this file is the pin of that date); Node 20 (D14-A) replaces Node 18 in the
  * luz-tokens text.
  */
+import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
@@ -97,10 +98,11 @@ import { columnOf, linksOf, preOf, readPage, repo, sectionsOf, sentencesOf, tabl
 
 const ROUTE = "/docs/get-started/ai/";
 const PAGE_FILE = "apps/docs/pages/get-started/ai.html";
-const IDS = ["start", "start-site", "files", "check", "rules", "agent", "limits"];
+const IDS = ["start", "start-site", "skill", "files", "check", "rules", "agent", "limits"];
 const TITLES = {
   start: "Give your agent LUZ",
   "start-site": "Start a site",
+  skill: "Install the luz-start skill",
   files: "What an agent can read",
   check: "Check what an agent wrote",
   rules: "What check blocks and what it warns about",
@@ -232,7 +234,7 @@ describe("the page: front matter and its place", () => {
 /* ---- The seven sections ----------------------------------------------------------- */
 
 describe("the page: seven h2, in the order and with the titles of the ux answer", () => {
-  it("has the h2 ids start, start-site, files, check, rules, agent and limits, in that order", () => {
+  it("has the h2 ids start, start-site, skill, files, check, rules, agent and limits, in that order", () => {
     expect([...sections().keys()]).toEqual(IDS);
   });
 
@@ -444,6 +446,36 @@ describe("aiArtifacts(site): the rows of that table", () => {
 
 /* ---- check: the command, the exit codes, a real sample, the JSON fields ---------- */
 
+describe("skill: Install the luz-start skill", () => {
+  const help = () => spawnSync(process.execPath, [join(repo, "packages/ai/skills/luz-start/scripts/luz-start.mjs"), "init", "--help"], { encoding: "utf-8" }).stdout;
+  const text = () => `${textOf(section("skill"))}\n${preOf(section("skill")).join("\n")}`;
+
+  it("shows the command as npx @luz-ds/ai init, with the scope and a target", () => {
+    expect(preOf(section("skill")).join("\n")).toContain("npx @luz-ds/ai init --target claude");
+  });
+
+  it("names only options and targets that `init --help` has", () => {
+    const usage = help();
+    expect(usage).toContain("--target");
+    for (const flag of new Set(text().match(/(?<![\w-])--[a-z][a-z-]*/g) ?? [])) expect(usage, `${flag} is not an option of init`).toContain(flag);
+    for (const target of ["claude", "codex", "gemini", "cursor"]) {
+      expect(text(), target).toContain(target);
+      expect(usage, target).toContain(target);
+    }
+  });
+
+  it("says init writes the folder each assistant reads, and says the package is not on npm yet; the folders are in the README, since llms-full names no .claude/ path", () => {
+    expect(text()).toMatch(/writes the folder each one reads/);
+    expect(text()).not.toMatch(/\.claude\//);
+    expect(text()).toMatch(/not on npm yet/);
+  });
+
+  it("says a field left out stays [ADAPT] and the agent stops and asks", () => {
+    expect(text()).toMatch(/\[ADAPT: …\]/);
+    expect(text()).toMatch(/stops and asks/);
+  });
+});
+
 describe("check: Check what an agent wrote", () => {
   const codeText = () => `${textOf(section("check"))}\n${preOf(section("check")).join("\n")}`;
 
@@ -454,8 +486,9 @@ describe("check: Check what an agent wrote", () => {
   it("names every option of luz-check --help, and no option it does not have", () => {
     const text = codeText();
     for (const flag of FLAGS) expect(text, flag).toContain(flag);
-    // The whole page: every `--word` that is not a LUZ token is an option of the tool
-    const page = `${textOf(contentOf())}\n${preOf(contentOf()).join("\n")}`;
+    // The page but the section of the skill: every `--word` that is not a LUZ token is an option of the tool
+    const without = contentOf().replace(section("skill"), "");
+    const page = `${textOf(without)}\n${preOf(without).join("\n")}`;
     const used = [...new Set(page.match(/(?<![\w-])--[a-z][a-z-]*/g) ?? [])].filter((flag) => !flag.startsWith("--luz-"));
     const known = new Set(FLAGS);
     for (const flag of used) expect(known.has(flag), `${flag} is not an option of luz-check`).toBe(true);

@@ -164,6 +164,16 @@ describe("syncVersions: the commands an agent is told to run (npx)", () => {
     expect(get("apps/docs/pages/get-started/ai.html")).toContain("<code>npx @luz-ds/check@0.2.0</code>");
   });
 
+  it("writes the version of @luz-ds/ai in a page too, once it has a release, and leaves its placeholder alone", () => {
+    put("apps/docs/pages/get-started/ai.html", page("title: AI", "<p>Run <code>npx @luz-ds/ai@0.0.0 init --target claude</code>.</p>"));
+    manifest("ai", "0.0.0");
+    syncVersions(root);
+    expect(get("apps/docs/pages/get-started/ai.html")).toContain("npx @luz-ds/ai@0.0.0 init");
+    manifest("ai", "0.1.0");
+    syncVersions(root);
+    expect(get("apps/docs/pages/get-started/ai.html")).toContain("<code>npx @luz-ds/ai@0.1.0 init --target claude</code>");
+  });
+
   it("moves the `source` of the translation of a page whose command changed", () => {
     const body = get("apps/docs/pages/get-started/ai.html").replace(/^<!-- luz:page\n[\s\S]*?\n-->\n/, "");
     put("apps/docs/i18n/es/pages/get-started/ai.html", page(`title: IA\nsource: ${sourceHash(body)}\nreviewed: false`, body));
@@ -247,6 +257,7 @@ describe("this repository", () => {
   it("runs the sync between `changeset version` and the README blocks in `pnpm release:version`", () => {
     const script = JSON.parse(readFileSync(`${repo}package.json`, "utf-8")).scripts["release:version"];
 
-    expect(script).toBe("changeset version && node scripts/release-sync.js && node scripts/ai-readme.js --write");
+    // Then the facts and starters of the luz-start skill, which carry the versions and the CDN links
+    expect(script).toBe("changeset version && node scripts/release-sync.js && node scripts/ai-readme.js --write && node scripts/build-ai-facts.js");
   });
 });
