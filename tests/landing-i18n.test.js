@@ -397,7 +397,9 @@ describe("the new home page: catalogs and rendered pages (F5)", () => {
   const { rendered: written, problems } = buildSite(site, { extra: docs });
   // What the build wrote (its size is what the ceiling weighs) and the same page with the quotes of its values restored
   const rendered = new Map([...written].map(([route, page]) => [route, quoted(page)]));
-  const SECTIONS = ["hero", "light", "inside", "inside-2", "inside-3", "inside-4", "why", "native", "modes", "faq"];
+  const SECTIONS = ["hero", "light", "inside", "inside-2", "inside-3", "inside-4", "faq"];
+  /** Sections the home no longer has (owner, 2026-11-23): the home is the hero, the four levels and the FAQ. */
+  const GONE = ["why", "native", "modes"];
   const placeholders = (value) => [...value.matchAll(/\{[a-z]+(?::[a-z]+)?\}/g)].map((m) => m[0]).sort();
   /** Values that are the same word in the three languages: a brand, a command, a symbol. */
   /**
@@ -467,11 +469,12 @@ describe("the new home page: catalogs and rendered pages (F5)", () => {
     }
   });
 
-  it("each language renders the ten sections in order (the fit lists are inside why), one h1 and no template syntax left", () => {
+  it("each language renders the seven sections in order and none other at the top level, one h1 and no template syntax left", () => {
     for (const doc of docs) {
       const html = rendered.get(doc.route);
       const at = SECTIONS.map((id) => html.search(new RegExp(`<section\\b[^>]*\\sid="${id}"`)));
       expect(at.every((place) => place > -1), `${doc.route} has ${SECTIONS.join(", ")}: ${at.join()}`).toBe(true);
+      for (const id of GONE) expect(html, `${doc.route} has no #${id}`).not.toMatch(new RegExp(`\\sid="${id}"|href="#${id}"`));
       expect([...at].sort((a, b) => a - b), `${doc.route} in order`).toEqual(at);
       expect(html.match(/<h1\b/g), doc.route).toHaveLength(1);
       expect(html, doc.route).not.toMatch(/\{\{|\}\}|\{n:/);
