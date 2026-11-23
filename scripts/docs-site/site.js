@@ -1818,7 +1818,7 @@ function tokenSections({ say, tokens, groups, counts, families, read }) {
     const m = /cubic-bezier\(([^)]+)\)/.exec(values.get(need(name)));
     const [x1, y1, x2, y2] = m ? m[1].split(",").map(Number) : [0, 0, 1, 1];
     const at = (x, y) => `${(x * 40).toFixed(1)},${(44 - y * 40).toFixed(1)}`;
-    return `<svg class="landing-tokens__curve" viewBox="-2 -12 44 60" aria-hidden="true"><path class="landing-tokens__axis" d="M0,44 H40 M0,44 V4"/><path d="M${at(0, 0)} C${at(x1, y1)} ${at(x2, y2)} ${at(1, 1)}"/></svg>`;
+    return `<svg class="landing-tokens__curve" viewBox="-2 -12 44 60" aria-hidden="true"><path class="landing-tokens__axis" d="M0,44 H40 M0,44 V4"/><path pathLength="1" d="M${at(0, 0)} C${at(x1, y1)} ${at(x2, y2)} ${at(1, 1)}"/></svg>`;
   };
   const card = (name, specimen, code) => `<div class="landing-tokens__scale"><p class="landing-tokens__scale-title">${t(`inside.list.${name}`)}</p>${specimen}${css(code)}</div>`;
   const row = (cls, items) => `<ul class="landing-tokens__specimen landing-tokens__specimen--${cls}" aria-hidden="true">${items.join("")}</ul>`;

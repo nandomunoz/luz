@@ -3291,3 +3291,205 @@ home-light:defined ~ .landing-light__nojs {
   justify-self: stretch;
   justify-content: center;
 }
+
+/* Motion: the hero comes in, the sections rise as they scroll into view, the
+   specimens draw themselves, the cards lift under the pointer and the demo's
+   product answers a new brand. All of it only when motion is welcome, timed
+   by the motion tokens; the scroll-driven part only where the browser has
+   view(), so elsewhere every section is simply there */
+@media (prefers-reduced-motion: no-preference) {
+  /* The hero, one piece after another */
+  .landing-tokens__head > *,
+  .landing-tokens__stage,
+  .landing-tokens__hero .landing-level__stats {
+    animation: landing-rise var(--luz-duration-lazy) var(--luz-easing-enter) both;
+  }
+
+  .landing-tokens__head > :nth-child(2) {
+    animation-delay: var(--luz-duration-fast);
+  }
+
+  .landing-tokens__head > :nth-child(3) {
+    animation-delay: var(--luz-duration-base);
+  }
+
+  .landing-tokens__head > :nth-child(4) {
+    animation-delay: var(--luz-duration-slow);
+  }
+
+  .landing-tokens__stage {
+    animation-delay: var(--luz-duration-slower);
+  }
+
+  .landing-tokens__hero .landing-level__stats {
+    animation-delay: var(--luz-duration-lazy);
+  }
+
+  /* The marked word: its tint sweeps in from the start of the line */
+  .landing-tokens__hero .landing-mark {
+    background-image: linear-gradient(color-mix(in oklab, var(--demo-brand) 18%, transparent), color-mix(in oklab, var(--demo-brand) 18%, transparent));
+    background-color: transparent;
+    background-position: left center;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    animation: landing-mark-sweep var(--luz-duration-lazy) var(--luz-easing-standard) var(--luz-duration-slower) both;
+  }
+
+  .landing-tokens__hero .landing-mark:dir(rtl) {
+    background-position: right center;
+  }
+
+  /* The demo's product answers a new brand: each family names its own
+     keyframes, so a change of radio starts the animation again */
+  .landing-demo__product {
+    animation-duration: var(--luz-duration-slow);
+    animation-timing-function: var(--luz-easing-spring);
+  }
+
+  .landing-demo:has(input[value="blue"]:checked) .landing-demo__product {
+    animation-name: landing-pop-blue;
+  }
+
+  .landing-demo:has(input[value="teal"]:checked) .landing-demo__product {
+    animation-name: landing-pop-teal;
+  }
+
+  .landing-demo:has(input[value="green"]:checked) .landing-demo__product {
+    animation-name: landing-pop-green;
+  }
+
+  .landing-demo:has(input[value="purple"]:checked) .landing-demo__product {
+    animation-name: landing-pop-purple;
+  }
+
+  .landing-demo:has(input[value="red"]:checked) .landing-demo__product {
+    animation-name: landing-pop-red;
+  }
+
+  /* The cards lift under the pointer, and the arrow of a group points on */
+  .landing-tokens__step,
+  .landing-tokens__scale,
+  .landing-demo__option,
+  .landing-level .luz-btn {
+    transition:
+      translate var(--luz-duration-base) var(--luz-easing-standard),
+      box-shadow var(--luz-duration-base) var(--luz-easing-standard),
+      border-color var(--luz-duration-base) var(--luz-easing-standard),
+      background-color var(--luz-duration-base) var(--luz-easing-standard);
+  }
+
+  .landing-tokens__step:hover,
+  .landing-tokens__scale:hover {
+    translate: 0 -3px;
+    box-shadow: var(--luz-shadow-md);
+  }
+
+  .landing-demo__option:hover {
+    translate: 0 -1px;
+  }
+
+  .landing-tokens__group-link::after {
+    transition: translate var(--luz-duration-base) var(--luz-easing-standard);
+  }
+
+  .landing-tokens__group-link:hover::after {
+    translate: 3px 0;
+  }
+
+  .landing-tokens__group-link:dir(rtl):hover::after {
+    translate: -3px 0;
+  }
+
+  /* The sections rise as they come into view, and the specimens draw */
+  @supports (animation-timeline: view()) {
+    .landing-tokens__steps > *,
+    .landing-tokens__block > *,
+    .landing-tokens__next {
+      animation: landing-rise linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 70%;
+    }
+
+    .landing-tokens__specimen--bars .landing-tokens__bar {
+      transform-origin: bottom;
+      animation: landing-grow-y linear both;
+      animation-timeline: view();
+      animation-range: entry 20% cover 35%;
+    }
+
+    .landing-tokens__specimen--ruler .landing-tokens__bar {
+      transform-origin: left;
+      animation: landing-grow-x linear both;
+      animation-timeline: view();
+      animation-range: entry 20% cover 35%;
+    }
+
+    .landing-tokens__curve path:not(.landing-tokens__axis) {
+      stroke-dasharray: 1;
+      animation: landing-draw linear both;
+      animation-timeline: view();
+      animation-range: entry 20% cover 40%;
+    }
+  }
+}
+
+@keyframes landing-rise {
+  from {
+    opacity: 0;
+    translate: 0 1.25rem;
+  }
+}
+
+@keyframes landing-mark-sweep {
+  from {
+    background-size: 0% 100%;
+  }
+}
+
+@keyframes landing-grow-y {
+  from {
+    scale: 1 0;
+  }
+}
+
+@keyframes landing-grow-x {
+  from {
+    scale: 0 1;
+  }
+}
+
+@keyframes landing-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+}
+
+@keyframes landing-pop-blue {
+  40% {
+    scale: 0.98;
+  }
+}
+
+@keyframes landing-pop-teal {
+  40% {
+    scale: 0.98;
+  }
+}
+
+@keyframes landing-pop-green {
+  40% {
+    scale: 0.98;
+  }
+}
+
+@keyframes landing-pop-purple {
+  40% {
+    scale: 0.98;
+  }
+}
+
+@keyframes landing-pop-red {
+  40% {
+    scale: 0.98;
+  }
+}
