@@ -176,6 +176,20 @@ describe("the pages of the three levels", () => {
       expect(css).toMatch(/\.landing-tokens__hero \.luz-btn--primary\s*\{[^}]*var\(--demo-font\)[^}]*\}/);
     });
 
+    it.each(LANGS)("in %s: the demo reads top down: the title and the looks centred above, then the product beside the code in an editor; the legend is for screen readers only", (code, prefix) => {
+      const hero = sectionOf(rendered.get(`${prefix}tokens/`), "hero");
+      const at = (needle) => hero.indexOf(needle);
+      expect(at('class="landing-demo__top"')).toBeGreaterThan(0);
+      expect(at('class="landing-demo__top"')).toBeLessThan(at("<fieldset"));
+      expect(at("</fieldset>")).toBeLessThan(at('class="landing-demo__product"'));
+      expect(at('class="landing-demo__product"')).toBeLessThan(at('class="landing-demo__editor"'));
+      expect(at('class="landing-demo__editor"')).toBeLessThan(at('class="landing-demo__code"'));
+      // the code is a rule, so it reads as CSS a developer would write
+      expect(hero).toMatch(/<code class="landing-demo__look" data-look="[a-z]+">\.card \{\n/);
+      // the legend names the group for a screen reader, out of sight
+      expect(css).toMatch(/\.landing-demo__picker legend\s*\{[^}]*clip-path:\s*inset\(50%\)/);
+    });
+
     it.each(LANGS)("in %s: three steps, install, use and make it yours, each with code to copy", (code, prefix) => {
       const steps = sectionOf(rendered.get(`${prefix}tokens/`), "steps");
       expect(steps).toMatch(/<h2\b[^>]*>/);
