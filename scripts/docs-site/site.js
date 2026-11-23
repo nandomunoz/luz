@@ -1816,15 +1816,15 @@ function levelLists(site, locale, used) {
  * A block of a level's page, the way the home's sections are: the words (h2, lead, one link per group of the docs it
  * covers with its count) on one side and a panel on the other, the sides swapping from one block to the next so the
  * page zigzags. `anchor` is the prefix of its id (`t-color`), `links` are [{ href, label, count }] with `label`
- * already escaped, and `panel` is the panel's inside.
+ * already escaped, `panel` is the panel's inside and `aside` what follows the links in the words' column.
  */
-function levelBlock({ i, id, anchor, title, lead, links, panel }) {
+function levelBlock({ i, id, anchor, title, lead, links, panel, aside = "" }) {
   return [
     `<section class="landing-inside${i % 2 ? " landing-inside--flip" : ""} landing-block landing-block--${id}" id="${anchor}-${id}" aria-labelledby="${anchor}-${id}-title">`,
     `  <div class="landing-inside__copy">`,
     `    <h2 class="landing-inside__title" id="${anchor}-${id}-title">${title}</h2>`,
     `    <p class="landing-inside__lead">${lead}</p>`,
-    `    <ul class="landing-block__groups">${links.map((l) => `<li><a class="landing-block__link" href="${l.href}">${l.label} <span class="landing-names__n">${l.count}</span></a></li>`).join("")}</ul>`,
+    `    <ul class="landing-block__groups">${links.map((l) => `<li><a class="landing-block__link" href="${l.href}">${l.label} <span class="landing-names__n">${l.count}</span></a></li>`).join("")}</ul>${aside}`,
     `  </div>`,
     `  <div class="landing-panel landing-block__panel" dir="ltr">${panel}</div>`,
     `</section>`,
@@ -2001,7 +2001,7 @@ const CORE_VIEWS = ["bare", "classes", "yours"];
  *    with no class (the bare elements), the same page with the classes of its components, and with one rule of the
  *    reader's own, which wins with no `!important` because core is in a cascade layer. The page is real core markup,
  *    inert, so the keyboard stays out of it; the HTML beside it is the same markup, in the colours of the devtools;
- *  - {{coreblocks}}, four blocks (forms, content, feedback and layout) in the order and the sides of the home, each
+ *  - {{coreblocks}}, five blocks (actions, forms, content, feedback and layout) in the order and the sides of the home, each
  *    with cards of real components and the line of HTML that writes them, linking the docs' groups they cover with
  *    their counts;
  *  - {{ncomponents}}, {{nobjects}} and {{ndepscore}}, the hero's numbers.
@@ -2012,33 +2012,106 @@ function coreSections({ say, groups, objects, dependencies }) {
   const card = (name, live, code) => `<div class="landing-card landing-card--${name}"><p class="landing-card__title">${t(`level.core.card.${name}`)}</p><div class="landing-core__live" inert>${live}</div>${html(code)}</div>`;
   const wire = (n) => '<span class="landing-wire"></span>'.repeat(n);
   const sample = {
-    actions: `<div class="o-actions"><button class="luz-btn luz-btn--primary" type="button">${t("level.core.sample.save")}</button><button class="luz-btn luz-btn--outline" type="button">${t("level.core.sample.cancel")}</button><button class="luz-btn luz-btn--ghost" type="button">${t("level.core.sample.skip")}</button></div>`,
-    fields: `<div class="luz-field"><label class="luz-field__label" for="core-email">${t("level.core.sample.email")}</label><input class="luz-input" id="core-email" type="email" value="you@example.com"><div class="luz-field__helper">${t("level.core.sample.hint")}</div></div>`,
-    content: `<div class="luz-card"><h3 class="luz-card__title">${t("level.core.sample.title")}</h3><p class="luz-card__body">${t("level.core.sample.body")}</p><span class="luz-tag luz-tag--blue luz-tag--dot">${t("level.core.sample.tag")}</span></div>`,
-    navigation: `<nav class="luz-tabs"><a class="luz-tab">${t("level.core.sample.tab1")}</a><a class="luz-tab">${t("level.core.sample.tab2")}</a><a class="luz-tab">${t("level.core.sample.tab3")}</a></nav>`,
-    alerts: `<div class="luz-alert luz-alert--success"><div><div class="luz-alert__title">${t("level.core.sample.alert.title")}</div><div class="luz-alert__body">${t("level.core.sample.alert.body")}</div></div></div>`,
-    status: `<progress class="luz-progress" value="67" max="100"></progress><meter class="luz-meter" value="40" min="0" max="100"></meter>`,
+    actions: `<div class="landing-core__buttons"><div class="o-row"><button class="luz-btn luz-btn--primary" type="button">${t("level.core.sample.save")}</button><button class="luz-btn luz-btn--secondary" type="button">${t("level.core.sample.cancel")}</button><button class="luz-btn luz-btn--outline" type="button">${t("level.core.sample.skip")}</button><button class="luz-btn luz-btn--ghost" type="button">${t("level.core.sample.move")}</button><button class="luz-btn luz-btn--danger" type="button">${t("level.core.sample.delete")}</button></div><div class="o-row"><button class="luz-btn luz-btn--primary luz-btn--sm" type="button">${t("level.core.sample.small")}</button><button class="luz-btn luz-btn--primary" type="button">${t("level.core.sample.medium")}</button><button class="luz-btn luz-btn--primary luz-btn--lg" type="button">${t("level.core.sample.large")}</button></div></div>`,
+    copy: `<div class="o-stack">${[["npm install @luz-ds/core", "copylabel"]].map(([text, label]) => `<div class="landing-core__copy"><code>${escapeHtml(text)}</code><button class="luz-copy-btn" type="button" data-copy="${escapeHtml(text)}" aria-label="${t(`level.core.sample.${label}`)}">${t("see.copy")}</button></div>`).join("")}</div>`,
+    dropdown: `<div class="luz-dropdown"><button class="luz-btn luz-btn--secondary" type="button">${t("level.core.sample.actionsmenu")}</button><div class="landing-core__menu"><ul class="luz-dropdown__list"><li><a class="luz-dropdown__item">${t("level.core.sample.edit")}</a></li><li><button class="luz-dropdown__item" type="button">${t("level.core.sample.duplicate")}</button></li><li><button class="luz-dropdown__item" type="button" aria-disabled="true">${t("level.core.sample.move")}</button></li><li><hr class="luz-dropdown__separator"></li><li><button class="luz-dropdown__item luz-dropdown__item--danger" type="button">${t("level.core.sample.deleteproject")}</button></li></ul></div></div>`,
+    alerts: `<div class="o-stack"><div class="luz-alert luz-alert--success"><div><div class="luz-alert__title">${t("level.core.sample.alert.title")}</div><div class="luz-alert__body">${t("level.core.sample.alert.body")}</div></div></div><div class="luz-alert luz-alert--error"><div><div class="luz-alert__title">${t("level.core.sample.alert2.title")}</div><div class="luz-alert__body">${t("level.core.sample.alert2.body")}</div></div></div></div>`,
+    status: `<div class="o-stack"><progress class="luz-progress" value="67" max="100"></progress><progress class="luz-progress" value="25" max="100"></progress></div>`,
+    modal: `<dialog class="luz-modal" open><div class="luz-modal__header"><button class="luz-modal__close" type="button" aria-label="${t("level.core.sample.modal.close")}">×</button><h4 class="luz-modal__title">${t("level.core.sample.modal.title")}</h4></div><div class="luz-modal__body"><p>${t("level.core.sample.modal.body")}</p></div><div class="luz-modal__footer"><button class="luz-btn luz-btn--ghost" type="button">${t("level.core.sample.cancel")}</button><button class="luz-btn luz-btn--danger" type="button">${t("level.core.sample.modal.confirm")}</button></div></dialog>`,
+    toast: `<div class="luz-toast" role="status"><div class="luz-toast__content"><div class="luz-toast__kind">${t("level.core.sample.toast.kind")}</div><div class="luz-toast__msg">${t("level.core.sample.toast.msg")}</div></div><button class="luz-toast__close" type="button" aria-label="${t("level.core.sample.toast.dismiss")}">×</button></div>`,
+    tooltip: `<div class="luz-tooltip"><button class="luz-btn luz-btn--outline luz-btn--sm" type="button" aria-describedby="core-tip">${t("level.core.sample.tip.button")}</button><div class="luz-tooltip__text" role="tooltip" id="core-tip">${t("level.core.sample.tip.text")}</div></div>`,
+    image: `<div class="luz-image luz-image--21x9"></div>`,
+    player: `<div class="luz-player" data-type="audio" role="group" aria-label="${t("level.core.sample.player")}"><div class="luz-player-controls luz-player-controls--audio"><button class="luz-player-btn luz-player-playpause" type="button" aria-label="${t("level.core.sample.play")}"><svg class="icon-play" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4.5v15l12-7.5L7 4.5Z"/></g></svg></button><div class="luz-player-progress-row luz-player-progress-row--audio"><span class="luz-player-time">1:04</span><input class="luz-player-seekbar" type="range" min="0" max="1000" value="320" aria-label="${t("level.core.sample.seek")}"><span class="luz-player-time">3:20</span></div></div></div>`,
     stack: `<div class="o-stack">${wire(3)}</div>`,
     row: `<div class="o-row">${wire(4)}</div>`,
     grid: `<div class="o-grid o-grid--auto landing-core__grid">${wire(6)}</div>`,
     media: `<div class="o-media"><span class="landing-wire landing-wire--icon"></span><div class="o-media__body o-stack">${wire(2)}</div></div>`,
   };
   const lines = {
-    actions: '<button class="luz-btn luz-btn--primary">',
-    fields: '<div class="luz-field">\n  <label class="luz-field__label">\n  <input class="luz-input">',
-    content: '<div class="luz-card">\n  <h3 class="luz-card__title">',
-    navigation: '<nav class="luz-tabs">\n  <a class="luz-tab">',
-    alerts: '<div class="luz-alert luz-alert--success">',
+    actions: '<button class="luz-btn luz-btn--primary luz-btn--lg">',
+    copy: '<button class="luz-copy-btn" data-copy="npm install">',
+    dropdown: '<div class="luz-dropdown">\n  <button popovertarget="menu">\n  <div class="luz-dropdown__menu" popover>',
+    alerts: '<div class="luz-alert luz-alert--error">',
+    modal: '<dialog class="luz-modal">',
+    toast: '<div class="luz-toast" role="status">',
+    tooltip: '<div class="luz-tooltip">',
+    image: '<div class="luz-image">',
+    player: '<div class="luz-player" data-type="audio">',
     status: '<progress class="luz-progress" value="67">',
     stack: '<div class="o-stack">',
     row: '<div class="o-row">',
     grid: '<div class="o-grid o-grid--auto">',
     media: '<div class="o-media">',
   };
+  // A real form, with every kind of control a form has: text, email and password (one invalid), a date, a select, a text
+  // area, a plan to choose, a range with its output, checkboxes (one disabled), a switch, and the buttons. The form
+  // is inert, so the keyboard stays out of it; the markup of a field is beside it
+  // `more` marks what a phone leaves out, so the form stays short there
+  const field = (id, label, control, extra = "", more = false) => `<div class="luz-field${more ? " landing-form__more" : ""}"><label class="luz-field__label" for="${id}">${label}</label>${control}${extra}</div>`;
+  const check = (type, name, id, label, attrs = "", more = false) => `<div class="luz-check-item${more ? " landing-form__more" : ""}"><input type="${type}"${name ? ` name="${name}"` : ""} id="${id}"${attrs}><label for="${id}">${label}</label></div>`;
+  const formPanel = () => {
+    const w = (key) => t(`level.core.sample.${key}`);
+    const form = [
+      `<form class="landing-form" action="#" inert>`,
+      `<fieldset class="luz-fieldset"><legend>${w("account")}</legend>`,
+      field("core-f-name", w("name"), '<input class="luz-input" id="core-f-name" type="text" value="Ada Lovelace">'),
+      field("core-f-email", w("email"), '<input class="luz-input" id="core-f-email" type="email" value="ada@example.com">', `<div class="luz-field__helper">${w("hint")}</div>`),
+      field("core-f-password", w("password"), '<input class="luz-input luz-input--error" id="core-f-password" type="password" value="1234" aria-invalid="true">', `<div class="luz-field__error"><span class="u-sr-only">Error: </span>${w("passworderror")}</div>`),
+      field("core-f-country", w("country"), `<select class="luz-select" id="core-f-country"><option>${w("opt1")}</option><option>${w("opt2")}</option><option>${w("opt3")}</option></select>`),
+      field("core-f-date", w("birthday"), '<input class="luz-input" id="core-f-date" type="date" value="1815-12-10">', "", true),
+      field("core-f-phone", w("phone"), '<input class="luz-input" id="core-f-phone" type="tel" value="+44 20 7946 0000">', "", true),
+      field("core-f-message", w("message"), `<textarea class="luz-input luz-input--textarea" id="core-f-message" rows="3">${w("messagetext")}</textarea>`, "", true),
+      `</fieldset>`,
+      `<fieldset class="luz-fieldset"><legend>${w("plan")}</legend>`,
+      `<div class="luz-check-group" role="group" aria-label="${w("plan")}">${check("radio", "core-plan", "core-f-free", w("free"), " checked")}${check("radio", "core-plan", "core-f-team", w("team"))}${check("radio", "core-plan", "core-f-ent", w("enterprise"))}</div>`,
+      field("core-f-seats", `${w("seats")} <output class="luz-output">12</output>`, '<input class="luz-input" id="core-f-seats" type="range" min="1" max="50" value="12">', "", true),
+      `<div class="luz-check-group" role="group" aria-label="${w("notify")}">${check("checkbox", "", "core-f-by-email", w("byemail"), " checked")}${check("checkbox", "", "core-f-by-push", w("bypush"))}${check("checkbox", "", "core-f-by-sms", w("bysms"), " disabled", true)}</div>`,
+      `<label class="luz-toggle"><input class="luz-toggle__input" type="checkbox" role="switch" checked><span class="luz-toggle__track" aria-hidden="true"><span class="luz-toggle__thumb"></span></span><span class="luz-toggle__label">${w("digest")}</span></label>`,
+      check("checkbox", "", "core-f-terms", w("terms"), "", true),
+      `</fieldset>`,
+      `<div class="o-actions"><button class="luz-btn luz-btn--primary" type="submit">${w("create")}</button><button class="luz-btn luz-btn--outline" type="button">${w("cancel")}</button></div>`,
+      `</form>`,
+    ].join("");
+    return `<div class="landing-core__live" inert>${form.replace(' inert>', ">")}</div>`;
+  };
+  // The markup of a field, under the words beside the form
+  const formCode = () =>
+    `${html('<form>\n  <fieldset class="luz-fieldset">\n    <legend>…</legend>\n    <div class="luz-field">\n      <label class="luz-field__label">…</label>\n      <input class="luz-input">\n    </div>\n  </fieldset>\n  <button class="luz-btn luz-btn--primary">…</button>\n</form>')}`;
+  // A real page of a project, made of every piece of the content and navigation groups: the skip link (drawn as it
+  // shows on focus), the breadcrumb and the colour mode in its bar; the avatar, the meta line and a tag; the tabs; the
+  // prose with its inline code, a figure, a card with a meter and an accordion; a table, a code block, the icon grid,
+  // a band and the pagination. Inert, so the keyboard stays out of it
+  const pagePanel = () => {
+    const w = (key) => t(`level.core.page.${key}`);
+    const icon = (name, d) => `<li class="luz-icon-item"><span class="luz-icon-display"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${d}</svg></span><span class="luz-icon-name">${name}</span></li>`;
+    const chevron = '<svg class="luz-accordion__end" data-luz-flip aria-hidden="true" focusable="false" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>';
+    const row = (name, tag, tone, cpu) => `<tr><td data-label="${w("col.service")}">${name}</td><td data-label="${w("col.status")}"><span class="luz-tag luz-tag--${tone} luz-tag--dot">${w(tag)}</span></td><td data-label="${w("col.cpu")}">${cpu}%<meter class="luz-meter" value="${cpu}" min="0" max="100" aria-hidden="true"></meter></td></tr>`;
+    const page = [
+      `<div class="landing-page">`,
+      `<div class="landing-page__bar"><a class="luz-skip-link">${t("skip")}</a><ol class="luz-breadcrumb"><li><a class="luz-breadcrumb__item">${w("crumb")}</a></li><li><a class="luz-breadcrumb__item" aria-current="page">${t("level.core.sample.title")}</a></li></ol><button class="luz-theme-mode__button" style="--luz-theme-mode-line: var(--luz-outline); --luz-theme-mode-hover: var(--luz-surface-hover); --luz-theme-mode-focus: var(--luz-focus-ring); --luz-theme-mode-on: var(--luz-brand-fill); --luz-theme-mode-on-text: var(--luz-text-on-fill); --luz-theme-mode-bg: var(--luz-surface); --luz-theme-mode-edge: var(--luz-divider); --luz-theme-mode-text: var(--luz-text-secondary)" type="button" aria-label="${w("mode")}"><svg class="luz-theme-mode__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M19.5 14.5A8 8 0 1 1 9.5 4.5a6.5 6.5 0 0 0 10 10Z"/></svg></button></div>`,
+      `<div class="landing-page__head"><span class="luz-avatar luz-avatar--lg" role="img" aria-label="Ana Ruiz">AR</span><div class="landing-page__title"><h3>${t("level.core.sample.title")} <span class="luz-tag luz-tag--green luz-tag--dot">${t("level.core.sample.tag")}</span></h3><p class="luz-meta"><span>${w("meta.by")}</span> <time datetime="2026-10-12">${w("meta.date")}</time> <span>${w("meta.read")}</span></p></div></div>`,
+      `<nav class="luz-tabs"><a class="luz-tab" aria-current="page">${t("level.core.sample.tab1")}</a><a class="luz-tab">${t("level.core.sample.tab2")}</a><a class="luz-tab">${t("level.core.sample.tab3")}</a></nav>`,
+      `<div class="landing-page__grid">`,
+      `<div class="o-stack"><div class="luz-prose"><p>${w("prose")}</p><ul><li>${w("li1")}</li><li>${w("li2")}</li></ul><p>${w("limit")} <code class="luz-code-inline">rate_limit</code>.</p></div>`,
+      `<figure class="luz-figure"><div class="luz-figure__media"><svg viewBox="0 0 320 96" role="img" aria-label="${w("figure")}" fill="currentColor"><rect x="8" y="64" width="40" height="32"/><rect x="60" y="52" width="40" height="44"/><rect x="112" y="40" width="40" height="56"/><rect x="164" y="30" width="40" height="66"/><rect x="216" y="16" width="40" height="80"/><rect x="268" y="4" width="40" height="92"/></svg></div><figcaption class="luz-figure__caption">${w("figure")}</figcaption></figure></div>`,
+      `<div class="o-stack"><div class="luz-card"><h4 class="luz-card__title">${w("uptime")}</h4><p class="luz-card__body">${w("uptime.body")}</p><meter class="luz-meter" value="99" min="0" max="100" aria-hidden="true"></meter></div>`,
+      `<div class="luz-accordion"><details open><summary><span>${w("q1")}</span>${chevron}</summary><p>${w("a1")}</p></details><details><summary><span>${w("q2")}</span>${chevron}</summary><p>${w("a2")}</p></details></div></div>`,
+      `</div>`,
+      `<div class="luz-table-wrap"><table class="luz-table"><caption>${w("services")}</caption><thead><tr><th scope="col">${w("col.service")}</th><th scope="col">${w("col.status")}</th><th scope="col">${w("col.cpu")}</th></tr></thead><tbody>${row("api-gateway", "running", "green", 12)}${row("data-pipeline", "degraded", "yellow", 78)}${row("mailer", "stopped", "red", 0)}</tbody></table></div>`,
+      `<pre class="luz-code-block" data-lang="css" dir="ltr"><code>.route {\n  rate_limit: 100/min;\n}</code></pre>`,
+      `<ul class="luz-icon-grid">${icon("menu", '<path d="M4 6h16M4 12h16M4 18h16"/>')}${icon("search", '<circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/>')}${icon("close", '<path d="M6 6l12 12M18 6L6 18"/>')}${icon("check", '<path d="m5 12.5 4.5 4.5L19 7"/>')}</ul>`,
+      `<div class="o-stack luz-band"><h4>${w("band.title")}</h4><p>${w("band.text")}</p></div>`,
+      `<nav><ul class="luz-pagination"><li><a class="luz-pagination__link" rel="prev">${w("prev")}</a></li><li><a class="luz-pagination__link" aria-current="page">1</a></li><li><a class="luz-pagination__link">2</a></li><li><a class="luz-pagination__link">3</a></li><li><a class="luz-pagination__link" rel="next">${w("next")}</a></li></ul></nav>`,
+      `</div>`,
+    ].join("");
+    return `<div class="landing-core__live" inert>${page}</div>`;
+  };
+  const pageCode = () => html('<nav class="luz-tabs">\n  <a class="luz-tab" aria-current="page">…</a>\n</nav>\n<div class="luz-card">…</div>\n<table class="luz-table">…</table>\n<ul class="luz-pagination">…</ul>');
   const BLOCKS = [
-    ["forms", ["actions", "fields"], [["actions"], ["forms"]]],
-    ["content", ["content", "navigation"], [["content"], ["navigation"]]],
-    ["feedback", ["alerts", "status"], [["feedback"], ["media"]]],
+    ["actions", ["actions", "copy", "dropdown"], [["actions"]]],
+    ["forms", [], [["forms"]]],
+    ["content", [], [["content"], ["navigation"]]],
+    ["feedback", ["alerts", "status", "modal", "toast", "tooltip", "image", "player"], [["feedback"], ["media"]]],
     ["layout", ["stack", "row", "grid", "media"], [["helpers"]]],
   ];
   const linkOf = (id) => ({
@@ -2054,7 +2127,8 @@ function coreSections({ say, groups, objects, dependencies }) {
       title: t(`level.core.${id}.title`),
       lead: t(`level.core.${id}.lead`),
       links: [...covers.flat(), ...(id === "layout" ? ["objects"] : [])].map(linkOf),
-      panel: `<div class="landing-cards">${cards.map((name) => card(name, sample[name], lines[name])).join("")}</div>`,
+      aside: id === "forms" ? formCode() : id === "content" ? pageCode() : "",
+      panel: id === "forms" ? formPanel() : id === "content" ? pagePanel() : `<div class="landing-cards">${cards.map((name) => card(name, sample[name], lines[name])).join("")}</div>`,
     }),
   );
   // The page, once per view: the same words, the markup a step further each time

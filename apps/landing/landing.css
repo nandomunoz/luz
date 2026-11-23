@@ -3948,6 +3948,95 @@ home-light:defined ~ .landing-light__nojs {
   margin: 0;
 }
 
+/* Actions: the dropdown drawn open over the copy button in the bar of a
+   snippet; beside them, the buttons, every variant then every size */
+@media (min-width: 641px) {
+  .landing-block--actions .landing-block__panel > .landing-cards {
+    grid-template-areas:
+      "dropdown actions"
+      "copy actions";
+    grid-template-rows: auto 1fr;
+  }
+
+  .landing-block--actions .landing-card--actions {
+    grid-area: actions;
+  }
+
+  .landing-block--actions .landing-card--copy {
+    grid-area: copy;
+  }
+
+  .landing-block--actions .landing-card--dropdown {
+    grid-area: dropdown;
+  }
+}
+
+/* The panel takes the wider side, as in the forms and content blocks, so the
+   buttons keep to two rows */
+@media (min-width: 1024px) {
+  .landing-block--actions {
+    grid-template-columns: minmax(0, 0.6fr) minmax(0, 1.4fr);
+  }
+}
+
+.landing-block--actions .landing-card--dropdown .landing-core__live {
+  align-content: start;
+}
+
+.landing-core__buttons {
+  display: grid;
+  gap: var(--luz-space-md);
+}
+
+.landing-core__buttons > .o-row {
+  align-items: center;
+}
+
+.landing-core__copy {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--luz-space-sm);
+  padding: var(--luz-space-xs) var(--luz-space-xs) var(--luz-space-xs) var(--luz-space-sm);
+  border: 1px solid var(--luz-divider);
+  border-radius: var(--luz-radius-md);
+  background: var(--luz-surface-strong);
+}
+
+.landing-core__copy > .luz-copy-btn {
+  flex: none;
+  white-space: nowrap;
+}
+
+.landing-core__copy > code {
+  overflow: hidden;
+  padding: 0;
+  background: none;
+  font-size: var(--luz-text-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.landing-core__live .luz-dropdown {
+  display: grid;
+  justify-items: start;
+  gap: var(--luz-space-2xs);
+}
+
+/* The list the dropdown opens, drawn open: the popover itself is closed until it is asked for */
+.landing-core__menu {
+  min-inline-size: 11rem;
+  padding: var(--luz-space-3xs);
+  border: 1px solid var(--luz-divider);
+  border-radius: var(--luz-radius-md);
+  background: var(--luz-surface);
+  box-shadow: var(--luz-shadow-md);
+}
+
+.landing-core__live .luz-input--textarea {
+  min-block-size: 0;
+}
+
 .landing-wire {
   display: block;
   block-size: 1.25rem;
@@ -4045,4 +4134,336 @@ home-light:defined ~ .landing-light__nojs {
 
 .landing-views__page--site > .landing-wf {
   align-self: stretch;
+}
+
+/* The form of core's forms block, laid out as a settings page: the fields two
+   by two where there is room, the plan as cards to choose from, the
+   notifications in a row, and the buttons at the end over a rule */
+.landing-form {
+  display: grid;
+  gap: var(--luz-space-lg);
+  min-inline-size: 0;
+}
+
+.landing-form .luz-fieldset {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  gap: var(--luz-space-md) var(--luz-space-lg);
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+}
+
+/* The panel is the one frame: each group of the form is a section of it, its
+   title over the fields and a rule between one group and the next */
+.landing-form .luz-fieldset + .luz-fieldset {
+  padding-block-start: var(--luz-space-lg);
+  border-block-start: 1px solid var(--luz-divider);
+}
+
+.landing-form .luz-fieldset > legend {
+  grid-column: 1 / -1;
+  float: inline-start;
+  inline-size: 100%;
+  margin: 0 0 var(--luz-space-md);
+  padding: 0;
+  font-family: var(--luz-font-heading);
+  font-size: var(--luz-text-lg);
+  font-weight: 400;
+  letter-spacing: normal;
+  text-transform: none;
+  color: var(--luz-text-primary);
+}
+
+.landing-form .luz-field {
+  margin: 0;
+}
+
+.landing-form :is(.luz-field:has(textarea, [type="range"]), .luz-check-group, .luz-toggle, .luz-fieldset > .luz-check-item) {
+  grid-column: 1 / -1;
+}
+
+.landing-form .luz-check-group:has([type="radio"]) {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
+  gap: var(--luz-space-sm);
+}
+
+.landing-form .luz-check-item:has([type="radio"]) {
+  margin: 0;
+  padding: var(--luz-space-sm) var(--luz-space-md);
+  border: 1px solid var(--luz-divider);
+  border-radius: var(--luz-radius-md);
+  background: var(--luz-surface);
+}
+
+.landing-form .luz-check-item:has([type="radio"]:checked) {
+  border-color: var(--luz-brand-primary);
+  background: color-mix(in oklab, var(--luz-brand-primary) 8%, var(--luz-surface));
+  box-shadow: inset 0 0 0 1px var(--luz-brand-primary);
+}
+
+.landing-form .luz-check-group:has([type="checkbox"]) {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: var(--luz-space-xs) var(--luz-space-lg);
+}
+
+.landing-form .luz-check-group:has([type="checkbox"]) > .luz-check-item {
+  margin: 0;
+}
+
+.landing-form > .o-actions {
+  justify-content: flex-end;
+  padding-block-start: var(--luz-space-md);
+  border-block-start: 1px solid var(--luz-divider);
+}
+
+/* The forms block on a wide screen: the form, its two groups side by side, and
+   beside it the words, which stay in view while the form goes by (sticky),
+   with the markup of a field under them */
+.landing-block--forms .landing-inside__copy > .luz-code-block {
+  margin-block-start: var(--luz-space-md);
+}
+
+@media (min-width: 1024px) {
+  .landing-block--forms {
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.6fr);
+    align-items: start;
+  }
+
+  .landing-block--forms .landing-inside__copy {
+    position: sticky;
+    inset-block-start: var(--luz-space-3xl);
+  }
+
+  .landing-form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--luz-space-xl);
+  }
+
+  .landing-form .luz-fieldset {
+    grid-template-columns: minmax(0, 1fr);
+    align-content: start;
+  }
+
+  .landing-form .luz-fieldset + .luz-fieldset {
+    padding-block-start: 0;
+    padding-inline-start: var(--luz-space-xl);
+    border-block-start: 0;
+    border-inline-start: 1px solid var(--luz-divider);
+  }
+
+  .landing-form .luz-check-group:has([type="radio"]) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .landing-form > .o-actions {
+    grid-column: 1 / -1;
+  }
+}
+
+/* The content block, as the forms one: on a wide screen the page beside the
+   words, which stay in view while it goes by, with the markup under them */
+.landing-block--content .landing-inside__copy > .luz-code-block {
+  margin-block-start: var(--luz-space-md);
+}
+
+@media (min-width: 1024px) {
+  .landing-block--content {
+    grid-template-columns: minmax(0, 0.6fr) minmax(0, 1.4fr);
+    align-items: start;
+  }
+
+  .landing-block--content .landing-inside__copy {
+    position: sticky;
+    inset-block-start: var(--luz-space-3xl);
+  }
+}
+
+/* The page of a project made of every piece of content and navigation: its
+   bar (the skip link as it shows on focus, the breadcrumb, the colour mode),
+   its head, the tabs, two columns, then the table, the code, the icons, a
+   band held inside the page and the pagination */
+.landing-page {
+  display: grid;
+  gap: var(--luz-space-lg);
+  min-inline-size: 0;
+}
+
+.landing-page > *,
+.landing-page :is(.luz-card, .luz-figure, .luz-accordion, .luz-tabs, .luz-breadcrumb, .luz-meta, .luz-table-wrap) {
+  margin: 0;
+}
+
+.landing-page__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--luz-space-sm) var(--luz-space-md);
+  padding-block-end: var(--luz-space-sm);
+  border-block-end: 1px solid var(--luz-divider);
+}
+
+.landing-page__bar .luz-breadcrumb {
+  flex: 1;
+}
+
+.landing-page .luz-skip-link {
+  position: static;
+  flex: none;
+  font-size: var(--luz-text-sm);
+  transform: none;
+}
+
+.landing-page__head {
+  display: flex;
+  align-items: center;
+  gap: var(--luz-space-md);
+}
+
+.landing-page__title > h3 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--luz-space-sm);
+  margin: 0;
+  font-family: var(--luz-font-heading);
+  font-size: var(--luz-text-xl);
+  font-weight: 400;
+}
+
+.landing-page__title > .luz-meta {
+  margin-block-start: var(--luz-space-3xs);
+}
+
+.landing-page__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  align-items: start;
+  gap: var(--luz-space-lg);
+}
+
+.landing-page .luz-prose > :first-child {
+  margin-block-start: 0;
+}
+
+.landing-page .luz-icon-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 5rem), 1fr));
+}
+
+.landing-page .luz-band {
+  padding: var(--luz-space-md) var(--luz-space-lg);
+  border-radius: var(--luz-radius-md);
+  box-shadow: none;
+  clip-path: none;
+}
+
+.landing-page .luz-band > h4 {
+  margin: 0;
+  font-family: var(--luz-font-heading);
+  font-size: var(--luz-text-lg);
+  font-weight: 400;
+}
+
+/* On a phone the form keeps its essentials: the fields a reader fills first,
+   the plan, the notifications, the switch and the buttons */
+@media (max-width: 640px) {
+  .landing-form .landing-form__more {
+    display: none;
+  }
+}
+
+/* Feedback and media: every piece of the two groups, two by two, the dialog
+   beside the alerts and the progress; the dialog and the tooltip drawn open,
+   in the flow of their card */
+@media (min-width: 641px) {
+  .landing-block--feedback .landing-block__panel > .landing-cards {
+    grid-template-areas:
+      "alerts modal"
+      "status modal"
+      "toast tooltip"
+      "image player";
+  }
+
+  .landing-block--feedback .landing-card--alerts {
+    grid-area: alerts;
+  }
+
+  .landing-block--feedback .landing-card--status {
+    grid-area: status;
+  }
+
+  .landing-block--feedback .landing-card--modal {
+    grid-area: modal;
+  }
+
+  .landing-block--feedback .landing-card--toast {
+    grid-area: toast;
+  }
+
+  .landing-block--feedback .landing-card--tooltip {
+    grid-area: tooltip;
+  }
+
+  .landing-block--feedback .landing-card--image {
+    grid-area: image;
+  }
+
+  .landing-block--feedback .landing-card--player {
+    grid-area: player;
+  }
+}
+
+@media (min-width: 1024px) {
+  .landing-block--feedback {
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.6fr);
+    align-items: start;
+  }
+
+  /* The words stay in view while the cards go by, as in forms and content */
+  .landing-block--feedback .landing-inside__copy {
+    position: sticky;
+    inset-block-start: var(--luz-space-3xl);
+  }
+}
+
+.landing-core__live .luz-modal {
+  position: static;
+  inline-size: auto;
+  max-inline-size: 100%;
+  block-size: auto;
+  margin: 0;
+}
+
+/* On a phone the dialog is a sheet as tall as the screen: in its card it keeps
+   its own height, and its frame */
+@media (max-width: 640px) {
+  .landing-core__live .luz-modal {
+    border: 1px solid var(--luz-divider);
+    border-radius: var(--luz-radius-md);
+  }
+}
+
+.landing-core__live .luz-tooltip .luz-btn {
+  white-space: nowrap;
+}
+
+.landing-core__live .luz-tooltip {
+  justify-self: center;
+  margin-block-start: var(--luz-space-2xl);
+}
+
+.landing-core__live .luz-tooltip__text {
+  visibility: visible;
+  opacity: 1;
+}
+
+.landing-core__live .luz-toast {
+  position: static;
+  max-inline-size: 100%;
 }
