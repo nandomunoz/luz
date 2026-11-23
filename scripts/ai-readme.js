@@ -137,7 +137,7 @@ export function renderAiSection({ name, manifest, changelog, siteUrl, checkVersi
   // A tool has no CSS, so no class list: it is read through its README and its --help
   const tool = TOOLS.includes(name);
   const read = tool
-    ? [`${code("README.md")} in this package: what the command does and its exit codes.`, `${code(`npx ${pkg}${pin} --help`)}: the command's options, from the version you run.`]
+    ? [`${code("README.md")} in this package: what the command does and its exit codes.`, `${code(`npx ${pkg}@${version} --help`)}: the command's options, from the version you run.`]
     : [`${code("dist/classes.json")} in this package: the classes and custom properties its CSS defines. Write only those.`];
   if (WITH_ELEMENTS.has(name)) read.push(`${code("dist/custom-elements.json")} in this package: the \`<luz-*>\` elements it defines, with their attributes.`);
   read.push(
@@ -164,7 +164,8 @@ export function renderAiSection({ name, manifest, changelog, siteUrl, checkVersi
 
   out.push("### Check what you write", "");
   out.push(`Run ${code(`npx @luz-ds/check${pin} <files>`)} on every HTML and CSS file you write, and fix what it reports. To copy the accessibility reviewer into your project: ${code(`npx @luz-ds/check${pin} agent > .claude/agents/luz-accessibility-reviewer.md`)}.`);
-  if (!released) out.push("", `${code("@luz-ds/check")} is not on npm yet: it ships with the first release.`);
+  // True of check, which the block names: of this package only when this package is check or check has no release either
+  if (!released && !(checkVersion && checkVersion !== "0.0.0")) out.push("", `${code("@luz-ds/check")} is not on npm yet: it ships with the first release.`);
   out.push("", END);
   return out.join("\n");
 }

@@ -3,7 +3,8 @@
     "tokens": "0.4.1",
     "core": "0.4.1",
     "catalog": "0.4.1",
-    "check": "0.3.2"
+    "check": "0.3.2",
+    "ai": "0.0.0"
   },
   "kinds": [
     "landing",

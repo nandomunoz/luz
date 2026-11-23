@@ -1,25 +1,98 @@
 # @luz-ds/ai
 
-The `luz-start` skill and, later, the agents and skills of luz-ai. **Not published yet:** this package is private until the plan's phase 5.
+The luz-start skill for AI assistants. It asks what you want to make with LUZ, writes a starter page that [`@luz-ds/check`](https://www.npmjs.com/package/@luz-ds/check) reads without a finding, and finishes it with you. It can also add the agents and skills of luz-ai (accessibility, SEO, Core Web Vitals, AI features, a README, a landing page) to your project. It is a tool, not a stylesheet: it loads nothing in a page.
 
-## What is here
+> **Beta, version 0.x.** This package has its own version, apart from tokens, core and catalog. Pin an exact version and read the changelog before you upgrade.
 
-`skills/luz-start/scripts/luz-start.mjs` is the one executable of the skill. It reads and reports; it never writes a file, never asks a question and never reaches the network. It depends on nothing but Node 20 or later.
+## Use it
 
 ```bash
-node packages/ai/skills/luz-start/scripts/luz-start.mjs doctor
-node packages/ai/skills/luz-start/scripts/luz-start.mjs check .claude --json
+npx @luz-ds/ai init --target claude
+```
+
+That puts the skill in your project, where your assistant reads it. Then tell the assistant what you want to make: "a landing page for my booking app, with LUZ". It asks the rest in a few questions, shows you the plan, and writes nothing until you say go.
+
+| `--target` | Writes | Read by |
+| --- | --- | --- |
+| `claude` | `.claude/skills/luz-start` | Claude Code |
+| `codex` | `.agents/skills/luz-start` | Codex |
+| `gemini` | `.agents/skills/luz-start` | Gemini CLI |
+| `cursor` | `.agents/skills/luz-start` | Cursor (it also reads `.claude/skills`) |
+| `agents-md` | a short LUZ section for `AGENTS.md` | any assistant that reads it |
+
+Give several, comma separated: `--target claude,codex`. `--dry-run` shows what would be written and writes nothing. Nothing is overwritten without `--force`, and a `AGENTS.md` that exists is never touched: the section is printed for you to add. The command never asks a question: a missing `--target` is an error that says so.
+
+The folders are the ones each assistant documents. Claude Code reads `.claude/skills` and does not document `.agents/skills`; Codex, Gemini CLI and Cursor read `.agents/skills`.
+
+## The script
+
+The skill's one executable is the command `luz-ai`. The skill runs it for you, and you can run it yourself.
+
+```bash
+npx @luz-ds/ai site new --name "Acme" --kind landing --stack vanilla --target ./acme --dry-run
+npx @luz-ds/ai agent list
+npx @luz-ds/ai agent add luz-accessibility-auditor --for claude,codex --set "Target conformance level=WCAG 2.2 AA" --dry-run
+npx @luz-ds/ai skill add luz-readme --dry-run
+npx @luz-ds/ai doctor
+npx @luz-ds/ai check .claude
 ```
 
 | Command | What it does |
 | --- | --- |
-| `doctor` | The project, the assistants it has (`.claude`, `.agents`, `.codex`, `.gemini`, `.cursor`, `AGENTS.md`) and a check of the skills and agents it finds. Warns when `AGENTS.md` is over the 32 KiB that Codex reads. |
-| `check` | The front matter and the body of skills (`SKILL.md`) and subagents: strict YAML, the closed list of fields, the name, the description, the 500 lines of a body, hidden characters and references one level deep. |
+| `init` | Puts this skill where your assistant reads it. |
+| `site new` | Writes the starter page of a kind of site (landing page, blog, app, documentation) for plain HTML or Astro. |
+| `agent list`, `agent add` | Lists the four agents of luz-ai, or writes one for Claude Code, Gemini CLI and Codex, with the fields you give it filled in. A field left out stays `[ADAPT: …]`, and the agent stops and asks until it is filled. |
+| `skill list`, `skill add` | Lists the skills, or copies one into `.agents/skills` and `.claude/skills`. |
+| `doctor` | The project, the assistants it has, the skills and agents it finds, and whether the two copies of a skill agree. |
+| `check` | The front matter and the body of skills and agents: strict YAML, the closed list of fields of each assistant, names, descriptions, hidden characters and references. |
+
+Every command takes `--help`, and `--json` prints one JSON object. Only `init`, `site new`, `agent add` and `skill add` write, only the files they name, and never over a file that exists unless `--force` says so, nor through a symbolic link.
 
 | Exit code | Meaning |
 | --- | --- |
 | 0 | nothing blocks |
-| 1 | a problem blocks |
+| 1 | at least one problem blocks (`check`, `doctor`) |
 | 2 | the command was used wrongly |
 
-`skills/luz-start/assets/fields.json` is the closed list of fields per kind of file and target. `assets/facts.json` is written by `node scripts/build-ai-facts.js` from the packages' manifests and fails a test when it is out of step.
+## What it does not do
+
+It makes no network request, runs no program and installs nothing. It does not decide your content, your brand or your final choices: the starter page has `…` where your words go, and the skill counts them. It does not check names, labels, alt text or contrast: the skill says so at the end, so you check them. Codex cannot limit the tools of an agent in the agent's file, so an agent of luz-ai that only reads is read-only there by its instructions alone; set the sandbox of your session.
+
+Loading LUZ from a CDN sends your visitors' IP addresses to the CDN. If you do not want that, install from npm and serve the files from your own server.
+
+The starter pages load LUZ from a CDN, as the prompts of the site do, so tell the person who publishes the site.
+
+LUZ is not affiliated with Anthropic, OpenAI, Google, Anysphere (Cursor) or HeyGen. Claude Code, Codex, Gemini CLI, Cursor and HyperFrames are named only to say which files each reads; their names belong to their owners.
+
+Gemini CLI has no verified name here for every tool, so the one agent that needs to edit files and run commands (`luz-core-web-vitals-optimizer`) is written for Claude Code and Codex only.
+
+<!-- luz:ai-agents:start -->
+## For AI agents
+
+`@luz-ds/ai` 0.0.0 is in beta: any release may break anything. Read the breaking changes below before you update, and use only what the files under "Read first" list.
+
+### Breaking changes
+
+Not released yet: 0.0.0 is the workspace's placeholder; the first release is 0.1.0. Nothing is deprecated and nothing breaks.
+
+### Read first
+
+1. `README.md` in this package: what the command does and its exit codes.
+2. `npx @luz-ds/ai@0.0.0 --help`: the command's options, from the version you run.
+3. https://nandovejer.github.io/luz/llms.txt: the index of the documentation, short enough for a small context.
+4. https://nandovejer.github.io/luz/llms-full.txt: the same pages in full.
+5. https://nandovejer.github.io/luz/examples/: one standalone page of markup for each component and pattern.
+
+### Load order
+
+`@luz-ds/ai` is a command, not a stylesheet: it loads nothing in a page and needs no other LUZ package.
+
+### Check what you write
+
+Run `npx @luz-ds/check@0.3.2 <files>` on every HTML and CSS file you write, and fix what it reports. To copy the accessibility reviewer into your project: `npx @luz-ds/check@0.3.2 agent > .claude/agents/luz-accessibility-reviewer.md`.
+
+<!-- luz:ai-agents:end -->
+
+## License
+
+MIT

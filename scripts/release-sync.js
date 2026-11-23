@@ -31,7 +31,7 @@ import { PUBLISHED } from "./luz-packages.js";
 
 const CDN_URL = /(https:\/\/cdn\.jsdelivr\.net\/npm\/@luz-ds\/)([a-z]+)@([0-9A-Za-z.+-]+)(\/dist\/)/g;
 const PINNED = /(@luz-ds\/)([a-z]+)@(\d+\.\d+\.\d+[0-9A-Za-z.+-]*)/g;
-const NPX = /(npx (?:-y )?@luz-ds\/)(check|tokens)@(\d+\.\d+\.\d+[0-9A-Za-z.+-]*)/g;
+const NPX = /(npx (?:-y )?@luz-ds\/)(check|tokens|ai)@(\d+\.\d+\.\d+[0-9A-Za-z.+-]*)/g;
 const MARKDOWN = ["README.md", "SECURITY.md", "dev/QUICK-REFERENCE.md"];
 const FRONT_MATTER = /^<!-- luz:page\n([\s\S]*?)\n-->\n/;
 

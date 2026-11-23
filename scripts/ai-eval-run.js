@@ -17,7 +17,11 @@
  *   `{prompt}` is the case's prompt and `{dir}` the folder of the run, in any argument; the command runs in that folder
  *   with the environment of this process, and gets no flag from here: a permission mode, a model or a budget is
  *   the owner's, in the command. A run that exceeds `timeoutSec` (300 by default) is stopped and graded as it is; only
- *   the host's own process is stopped, so a tool it started may go on. The host gets the whole environment of this process.
+ *   the host's own process is stopped, so a tool it started may go on. The host gets a small environment (PATH, HOME and
+ *   the few variables of a terminal) and the names in the host's `env` list, never the whole of this process's: a key a
+ *   host needs is named in the hosts file. A shell is not a host (`sh -c "… {prompt}"` would read the prompt as code).
+ *   A fixture with a file whose name starts with a dot, or a `package.json`, is refused: such a file (a hook, a
+ *   `.mcp.json`) would run in the owner's session.
  *   For the "with" arm the skill's own folders are not graded as something the model wrote, but a change to them is
  *   recorded (`setupTouched`) and shown in the summary.
  *
@@ -38,6 +42,13 @@ const SKILL = "packages/ai/skills/luz-start";
 export const ARMS = ["with", "without"];
 const SETUP = [".agents/skills/luz-start/", ".claude/skills/luz-start/"];
 
+const SHELLS = new Set(["sh", "bash", "zsh", "dash", "fish", "ksh", "csh", "tcsh", "cmd", "cmd.exe", "powershell", "powershell.exe", "pwsh", "pwsh.exe"]);
+const BASE_ENV = ["PATH", "HOME", "USERPROFILE", "TMPDIR", "TEMP", "TMP", "LANG", "LC_ALL", "TERM", "SHELL", "SystemRoot", "ComSpec"];
+const ENV_NAME = /^[A-Za-z_][A-Za-z0-9_]*$/;
+
+/** A fixture file that would run in the session of the person running the evals, or change how it runs. */
+export const unsafeFixture = (path) => path.split("/").some((part) => part.startsWith(".")) || /(^|\/)(package\.json|Makefile|\.envrc)$/.test(path);
+
 export function readHosts(file) {
   let data;
   try {
@@ -52,6 +63,8 @@ export function readHosts(file) {
     seen.add(h.id);
     if (!Array.isArray(h.command) || !h.command.length || h.command.some((a) => typeof a !== "string")) throw new Error(`${h.id}: "command" is a list of strings`);
     if (!h.command.some((a) => a.includes("{prompt}"))) throw new Error(`${h.id}: "command" has no {prompt}: the host would not be given the case`);
+    if (SHELLS.has(h.command[0].split(/[\\/]/).pop().toLowerCase())) throw new Error(`${h.id}: "command" starts with a shell (${h.command[0]}), which would read the prompt as code: name the assistant's own command`);
+    if (h.env !== undefined && (!Array.isArray(h.env) || h.env.some((n) => typeof n !== "string" || !ENV_NAME.test(n)))) throw new Error(`${h.id}: "env" is a list of variable names`);
     if (h.timeoutSec !== undefined && !(Number.isInteger(h.timeoutSec) && h.timeoutSec > 0 && h.timeoutSec <= 3600)) throw new Error(`${h.id}: "timeoutSec" is a whole number of seconds, 3600 at most`);
   }
   return data.hosts;
@@ -77,6 +90,7 @@ export function runOne(host, c, arm, { root = repo, keep = false } = {}) {
   const dir = mkdtempSync(join(tmpdir(), "luz-eval-run-"));
   for (const [path, text] of Object.entries(c.fixture ?? {})) {
     if (!resolve(dir, path).startsWith(dir + sep)) throw new Error(`${c.id}: the fixture path ${path} is outside the folder of the run`);
+    if (unsafeFixture(path)) throw new Error(`${c.id}: the fixture file ${path} would run in the session of the person running the evals`);
     mkdirSync(dirname(join(dir, path)), { recursive: true });
     writeFileSync(join(dir, path), text);
   }
@@ -87,7 +101,8 @@ export function runOne(host, c, arm, { root = repo, keep = false } = {}) {
   const before = installed(dir);
   const args = host.command.slice(1).map((a) => a.replaceAll("{prompt}", c.prompt).replaceAll("{dir}", dir));
   const started = Date.now();
-  const r = spawnSync(host.command[0], args, { cwd: dir, encoding: "utf-8", timeout: (host.timeoutSec ?? 300) * 1000, maxBuffer: 64 * 1024 * 1024, stdio: ["ignore", "pipe", "pipe"] });
+  const env = Object.fromEntries([...BASE_ENV, ...(host.env ?? [])].filter((n) => process.env[n] !== undefined).map((n) => [n, process.env[n]]));
+  const r = spawnSync(host.command[0], args, { cwd: dir, env, encoding: "utf-8", timeout: (host.timeoutSec ?? 300) * 1000, maxBuffer: 64 * 1024 * 1024, stdio: ["ignore", "pipe", "pipe"] });
   const after = installed(dir);
   const setupTouched = [...new Set([...before.keys(), ...after.keys()])].filter((k) => before.get(k) !== after.get(k)).sort();
   const result = {

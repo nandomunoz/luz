@@ -1,6 +1,6 @@
 interface:
   display_name: "LUZ start"
-  short_description: "Start a website with LUZ: asks what to make, writes a starter page that passes the LUZ checker, and finishes it with you."
+  short_description: "Start a website with LUZ: asks what to make, writes a starter page that the LUZ checker reads without a finding, and finishes it with you."
   default_prompt: "Use luz-start to help me start a site with LUZ."
 
 policy:

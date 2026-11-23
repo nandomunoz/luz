@@ -27,6 +27,21 @@ keywords: llms.txt, agent, claude, copilot, cursor, manifest, check
       <p>For one kind of site, its page has a prompt made for it and the recipes of its parts: a <a href="/docs/kinds/landing/">landing page</a>, a <a href="/docs/kinds/blog/">blog or a newspaper</a>, a <a href="/docs/kinds/app/">web application</a> or a <a href="/docs/kinds/docs/">documentation site</a>.</p>
     </section>
 
+    <section class="docs-block" aria-labelledby="skill">
+      <h2 class="docs-chapter__title" id="skill">Install the luz-start skill</h2>
+      <p class="docs-lead"><code>luz-start</code> asks what to make with LUZ and writes a starter page.</p>
+      <p><code>@luz-ds/ai</code> is not on npm yet.</p>
+      <div class="docs-snippet">
+        <div class="docs-snippet__bar">
+          <span class="docs-snippet__lang">Shell</span>
+          <button class="luz-copy-btn" type="button" data-copy-from="code-skill-init" aria-label="Copy the command">Copy</button>
+        </div>
+        <pre class="luz-code-block" data-lang="bash" tabindex="0" role="region" aria-label="The command"><code id="code-skill-init">npx @luz-ds/ai init --target claude</code></pre>
+      </div>
+      <p>Targets: <code>claude</code>, <code>codex</code>, <code>gemini</code>, <code>cursor</code>. <code>init</code> writes the folder each one reads.</p>
+      <p>It can add luz-ai's agents: a field you leave out stays <code>[ADAPT: …]</code>, and the agent stops and asks.</p>
+    </section>
+
     <section class="docs-block" aria-labelledby="files">
       <h2 class="docs-chapter__title" id="files">What an agent can read</h2>
       <p class="docs-lead">Every file below is written by the build of this site from the pages you are reading, so an agent and a person get the same facts. Give an agent the URL of <code>llms.txt</code>: it lists the rest.</p>

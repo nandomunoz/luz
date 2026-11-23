@@ -1,13 +1,19 @@
 {
   "name": "@luz-ds/ai",
   "version": "0.0.0",
-  "private": true,
-  "description": "LUZ Design System — the luz-start skill and the agents and skills of luz-ai: not published yet (plan luz-ai-skill, phase 5)",
+  "description": "LUZ Design System — the luz-start skill for AI assistants (Claude Code, Codex, Gemini CLI, Cursor): it asks what you want to make, writes a starter page that @luz-ds/check reads without a finding, and adds the agents and skills of luz-ai",
   "license": "MIT",
   "type": "module",
+  "bin": {
+    "luz-ai": "./dist/skills/luz-start/scripts/luz-start.mjs"
+  },
+  "exports": {
+    "./luz-start/SKILL.md": "./dist/skills/luz-start/SKILL.md",
+    "./package.json": "./package.json"
+  },
   "files": [
-    "skills",
-    "!skills/*/evals"
+    "dist",
+    "LICENSE"
   ],
   "engines": {
     "node": ">=20"
@@ -16,5 +22,24 @@
     "type": "git",
     "url": "https://github.com/nandovejer/luz.git",
     "directory": "packages/ai"
+  },
+  "homepage": "https://github.com/nandovejer/luz#readme",
+  "bugs": {
+    "url": "https://github.com/nandovejer/luz/issues"
+  },
+  "keywords": [
+    "design-system",
+    "cli",
+    "ai-agents",
+    "agent-skills",
+    "claude-code",
+    "codex",
+    "gemini-cli",
+    "cursor",
+    "vanilla"
+  ],
+  "sideEffects": false,
+  "publishConfig": {
+    "access": "public"
   }
 }

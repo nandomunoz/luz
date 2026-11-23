@@ -2,7 +2,7 @@
 title: Trabajar con IA
 description: Qué puede leer un agente de programación con IA, cómo comprobar lo que ha escrito y qué revisor de accesibilidad puedes darle.
 keywords: llms.txt, agente, Claude, Copilot, Cursor, manifiesto, comprobación
-source: e1a054212b1f
+source: 01026c7d662a
 reviewed: false
 -->
     <section class="docs-block" aria-labelledby="start">
@@ -24,6 +24,21 @@ reviewed: false
       <p><a class="luz-btn luz-btn--primary site-prompt-open" href="/prompts/start.txt" data-prompt-open data-prompt-title="El prompt para empezar un sitio">Abrir el prompt</a></p>
       <!-- luz:include prompt-dialog -->
       <p>Para un tipo de sitio concreto, su página tiene un prompt hecho para él y las recetas de sus partes: una <a href="/docs/kinds/landing/">landing page</a>, un <a href="/docs/kinds/blog/">blog o un periódico</a>, una <a href="/docs/kinds/app/">aplicación web</a> o un <a href="/docs/kinds/docs/">sitio de documentación</a>.</p>
+    </section>
+
+    <section class="docs-block" aria-labelledby="skill">
+      <h2 class="docs-chapter__title" id="skill">Instalar la skill luz-start</h2>
+      <p class="docs-lead"><code>luz-start</code> te pregunta qué hacer con LUZ y escribe una página de partida.</p>
+      <p><code>@luz-ds/ai</code> todavía no está en npm.</p>
+      <div class="docs-snippet">
+        <div class="docs-snippet__bar">
+          <span class="docs-snippet__lang">Shell</span>
+          <button class="luz-copy-btn" type="button" data-copy-from="code-skill-init" aria-label="Copiar el comando">Copiar</button>
+        </div>
+        <pre class="luz-code-block" data-lang="bash" tabindex="0" role="region" aria-label="El comando"><code id="code-skill-init">npx @luz-ds/ai init --target claude</code></pre>
+      </div>
+      <p>Destinos: <code>claude</code>, <code>codex</code>, <code>gemini</code>, <code>cursor</code>. <code>init</code> escribe la carpeta que lee cada uno.</p>
+      <p>Puede añadir los agentes de luz-ai: un campo que dejes sin rellenar sigue como <code>[ADAPT: …]</code>, y el agente se detiene y pregunta.</p>
     </section>
 
     <section class="docs-block" aria-labelledby="files">
