@@ -477,6 +477,32 @@ describe("the page of core: the HTML you write comes styled, a class adds a comp
         expect(block).toMatch(/<pre class="luz-code-block" data-lang="html" dir="ltr" tabindex="0">/);
         return;
       }
+      if (id === "actions") {
+        // the button in every variant, every state (hover, pressed and focus drawn as they look), with an icon and with
+        // an icon alone (named by its label), in every size and at the full width
+        for (const variant of ["primary", "secondary", "outline", "ghost", "danger", "sm", "lg", "block"]) expect(block, variant).toMatch(new RegExp(`class="luz-btn [^"]*luz-btn--${variant}\\b`));
+        for (const state of ["hover", "active", "focus"]) expect(block, state).toContain(`data-state="${state}"`);
+        expect(block).toMatch(/<button class="luz-btn[^"]*" type="button" disabled>/);
+        expect(block).toMatch(/<button class="luz-btn[^"]*" type="button"><svg [^>]*aria-hidden="true"/);
+        expect(block).toMatch(/<button class="luz-btn[^"]*" type="button" aria-label="[^"]+"><svg [^>]*aria-hidden="true"[^>]*>(?:(?!<\/button>).)*<\/svg><\/button>/);
+      }
+      if (id === "layout") {
+        // not cards: the plan of an application made of every object of core, each named by its class, with the
+        // utilities and the shared keyframes at work in it, inert, the markup beside it
+        expect(block).toContain('<div class="landing-core__live" inert><div class="landing-plan o-shell">');
+        const objects = [...new Set([...read("packages/core/src/objects/_objects.css").matchAll(/^\s*\.(o-[a-z]+)\b/gm)].map((m) => m[1]))];
+        expect(objects).toHaveLength(numbers.objects);
+        for (const name of objects) {
+          expect(block, name).toMatch(new RegExp(`class="(?:[^"]* )?${name}(?=[\\s"])`));
+          expect(block, name).toMatch(new RegExp(`<code class="landing-plan__name">[^<]*\\b${name}\\b`));
+        }
+        for (const name of ["u-truncate", "u-sr-only", "u-text-muted", "u-text-mono", "u-flex-between"]) expect(block, name).toMatch(new RegExp(`class="[^"]*\\b${name}\\b`));
+        const keyframes = [...read("packages/core/src/components/_animations.css").matchAll(/@keyframes (luz-[a-z-]+)/g), ...read("packages/core/src/components/modal.css").matchAll(/@keyframes (luz-[a-z-]+)/g)].map((m) => m[1]);
+        expect(keyframes.length).toBeGreaterThanOrEqual(5);
+        for (const name of keyframes) expect(css, name).toMatch(new RegExp(`\\.landing-plan[^{]*\\{[^}]*animation: ${name}\\b`));
+        expect(block).toMatch(/<pre class="luz-code-block" data-lang="html" dir="ltr" tabindex="0">/);
+        return;
+      }
       if (id === "feedback") {
         // every piece of the two groups it covers is in one of its cards
         const files = site.pages.filter((p) => p.meta.area === "components" && covered.includes(p.meta.group)).flatMap((p) => [...String(p.meta.files ?? "").matchAll(/components\/([a-z-]+)\.css/g)].map((m) => m[1]));
@@ -485,7 +511,7 @@ describe("the page of core: the HTML you write comes styled, a class adds a comp
       }
       // the panel holds cards, each its title, its component (inert: the keyboard stays out of it) and one line of code
       const cards = block.match(/<div class="landing-card landing-card--[a-z]+">[\s\S]*?<\/pre><\/div>/g) ?? [];
-      expect(cards.length, id).toBeGreaterThanOrEqual(id === "layout" ? 4 : 2);
+      expect(cards.length, id).toBeGreaterThanOrEqual(2);
       for (const card of cards) {
         expect(card).toMatch(/<p class="landing-card__title">[^<]+<\/p><div class="landing-core__live" inert>/);
         expect(card).toMatch(/<pre class="luz-code-block" data-lang="html" dir="ltr" tabindex="0">/);
@@ -493,6 +519,30 @@ describe("the page of core: the HTML you write comes styled, a class adds a comp
     });
     expect(html).toContain('class="luz-btn luz-btn--primary"');
     expect(html).toContain('class="o-stack"');
+  });
+
+  it.each(LANGS)("in %s: shows every class of core's components in its blocks, every variant, size, state and part, but for the few that cannot be shown in a card", (code, prefix) => {
+    const html = core(prefix);
+    const blocks = html.slice(html.indexOf('<div class="landing-level__blocks">'), html.indexOf("landing-level__fold"));
+    const used = new Set([...blocks.matchAll(/class="([^"]+)"/g)].flatMap((m) => m[1].split(/\s+/)));
+    // what a card cannot show: the text a player shows only without JavaScript and the status of a MIDI file, the
+    // colour mode's button fixed to the corner of the window and its live region (hidden by design), and the buttons
+    // of the legacy custom themes, which wait for applyTheme()
+    const UNSHOWN = ["luz-player-fallback", "luz-player-midi-status", "luz-theme-mode__button--fixed", "luz-theme-mode__status", "luz-theme-apply-btn", "luz-theme-mode-btn"];
+    const dir = join(repo, "packages/core/src/components");
+    const missing = readdirSync(dir)
+      .filter((file) => file.endsWith(".css") && !file.startsWith("_"))
+      .flatMap((file) => [...new Set([...read(`packages/core/src/components/${file}`).matchAll(/\.(luz-[a-z0-9_-]+)/g)].map((m) => m[1]))].map((name) => `${file}: ${name}`))
+      .filter((entry) => !used.has(entry.split(": ")[1]) && !UNSHOWN.includes(entry.split(": ")[1]));
+    expect(missing).toEqual([]);
+  });
+
+  it("keeps the words of every block of a level's page in view while its panel goes by, on a wide screen", () => {
+    const wide = css.match(/@media \(min-width: 1024px\) \{\s*\.landing-level__blocks \.landing-inside__copy \{([^}]*)\}/);
+    expect(wide).not.toBeNull();
+    expect(wide[1]).toMatch(/position: sticky;/);
+    expect(wide[1]).toMatch(/inset-block-start: var\(--luz-space-3xl\);/);
+    expect(wide[1]).toMatch(/align-self: start;/);
   });
 
   it("gives a panel of cards no frame of its own, in every block", () => {
