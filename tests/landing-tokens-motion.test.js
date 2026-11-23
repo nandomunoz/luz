@@ -11,7 +11,11 @@
  *  - a scroll-driven animation (`animation-timeline: view()`) only inside `@supports (animation-timeline: view())`,
  *    so a browser without it shows every section at once;
  *  - every duration and delay is a motion token (`--luz-duration-*`), never a typed number of seconds;
- *  - the curves of the motion block are drawn by their stroke, so their path says pathLength="1".
+ *  - the curves of the motion block are drawn by their stroke, so their path says pathLength="1";
+ *  - each curve is animated with the easing it shows (owner, 2026-11-23): a dot runs along it, across at a steady
+ *    pace and up with `var(--ease)`, the curve's own token, so it traces the curve (and the spring overshoots). The
+ *    scroll drives it (nothing moves on its own), and the pointer or the focus on the card loops it at the token's
+ *    pace, so no motion starts by itself and lasts (WCAG 2.2.2). With less motion there is no dot.
  */
 import { readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
@@ -89,5 +93,32 @@ describe("the motion of the page of the tokens", () => {
     const curves = page.match(/<svg class="landing-tokens__curve"[\s\S]*?<\/svg>/g) ?? [];
     expect(curves.length).toBe(4);
     for (const svg of curves) expect(svg).toMatch(/<path pathLength="1" d="M0\.0,44\.0 C/);
+  });
+
+  it("animates each curve with the easing it shows: a dot that runs across steadily and up with var(--ease), the curve's token", () => {
+    const site = scanSite(join(repo, "apps/docs"), repo);
+    const home = read("apps/landing/index.html");
+    const levels = ["tokens", "core", "components"].map((name) => ({ name, file: `apps/landing/levels/${name}.html`, html: read(`apps/landing/levels/${name}.html`) }));
+    const built = buildSite(site, { extra: [...landingDocuments(site, "apps/landing/index.html", home), ...levelDocuments(site, { file: "apps/landing/index.html", html: home }, levels)] });
+    const page = quoted(built.rendered.get("/tokens/"));
+    const plots = [...page.matchAll(/<span class="landing-tokens__plot">([\s\S]*?)<\/span><code class="landing-tokens__label">([a-z]+)<\/code>/g)];
+    expect(plots.map((m) => m[2])).toEqual(["standard", "enter", "exit", "spring"]);
+    for (const [, plot, name] of plots) {
+      expect(plot, name).toContain('<svg class="landing-tokens__curve"');
+      expect(plot, name).toContain(`<span class="landing-tokens__dot" style="--ease:var(--luz-easing-${name})" aria-hidden="true"><span></span></span>`);
+    }
+  });
+
+  it("moves the dots only when motion is welcome: driven by the scroll where view() exists, looped by the pointer or the focus, hidden otherwise", () => {
+    // no dot with less motion
+    expect(motion.rest).toMatch(/\.landing-tokens__dot\s*\{[^}]*display:\s*none/);
+    expect(moving).toMatch(/\.landing-tokens__dot\s*\{[^}]*display:\s*block/);
+    const scroll = blocks(moving, /@supports\s*\(animation-timeline:\s*view\(\)\)/g).found.join("");
+    expect(scroll).toMatch(/\.landing-tokens__dot\s*\{[^}]*animation:\s*landing-dot-x\b[^}]*animation-timeline:\s*view\(\)/);
+    expect(scroll).toMatch(/\.landing-tokens__dot > span\s*\{[^}]*animation:\s*landing-dot-y var\(--ease\)[^}]*animation-timeline:\s*view\(\)/);
+    // the loop: only while the card has the pointer or the focus
+    expect(moving).toMatch(/\.landing-tokens__scale--motion:is\(:hover, :focus-within\) \.landing-tokens__dot\s*\{[^}]*infinite/);
+    expect(moving).toMatch(/\.landing-tokens__scale--motion:is\(:hover, :focus-within\) \.landing-tokens__dot > span\s*\{[^}]*var\(--ease\)[^}]*infinite/);
+    for (const name of ["landing-dot-x", "landing-dot-y"]) expect(css, name).toMatch(new RegExp(`@keyframes ${name}\\b`));
   });
 });
