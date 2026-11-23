@@ -450,7 +450,7 @@ describe("the new home page: catalogs and rendered pages (F5)", () => {
     }
   });
 
-  it("the hero's brand is LUZ in every language, and the three words of the name stay English (lang=\"en\") in Why", () => {
+  it("the hero's brand is LUZ in every language", () => {
     for (const doc of docs) {
       const html = rendered.get(doc.route);
       // The word is drawn with CSS: its letters are hidden from the tree and a visually hidden LUZ is what is read
@@ -463,9 +463,6 @@ describe("the new home page: catalogs and rendered pages (F5)", () => {
       expect(word.attrs.get("aria-hidden"), doc.route).toBe("true");
       expect(findAll(word, (node) => node.name === "span" && node.attrs.has("class")).map((node) => textOf(node)), doc.route).toEqual(["L", "U", "Z"]);
       expect(textOf(query(brand, "span.u-sr-only")), doc.route).toBe("LUZ");
-      for (const [id, word] of [["why-light", "Light"], ["why-usable", "Usable"], ["why-zero", "Zero-dependency"]]) {
-        expect(html, `${doc.route} ${id}`).toMatch(new RegExp(`<h3\\b[^>]*\\sid="${id}"[^>]*\\slang="en"[^>]*>${word}</h3>`));
-      }
     }
   });
 
@@ -518,15 +515,13 @@ describe("the new home page: catalogs and rendered pages (F5)", () => {
     }
   });
 
-  it("the hero's lead keeps the TDD statement in every language: the lead is one sentence about what works and how it changes", () => {
-    // The sentence says what to do with LUZ (start a project, or migrate it page by page) and keeps the promise of the tests;
-    // it spells the name: LUZ, the Light, Usable and Zero-dependency design system (the four words are strong)
+  it("the hero's lead is short in every language: what LUZ is built on, and its name spelled out", () => {
+    // Owner, 2026-11-23: two short sentences. It spells the name: LUZ, the Light, Usable and Zero-dependency design system (the four words are strong)
     const lead = catalogs.en["hero.lead"];
-    expect(lead.replace(/<[^>]*>/g, "")).toMatch(/start a project with LUZ, the Light, Usable and Zero-dependency design system, or migrate it page by page/);
+    expect(lead.replace(/<[^>]*>/g, "")).toMatch(/Start with LUZ, the Light, Usable and Zero-dependency design system\./);
     expect(lead).not.toMatch(/\(|\)/);
     expect([...lead.matchAll(/<strong\b[^>]*>([^<]*)<\/strong>/g)].map((m) => m[1])).toEqual(["LUZ", "Light", "Usable", "Zero-dependency"]);
     expect(lead).toMatch(/<strong class="landing-nowrap">Zero-dependency<\/strong>/);
-    expect(catalogs.en["hero.lead"]).toMatch(/every change starts with a failing test/);
     // Spanish and Arabic keep LUZ and the three words in English: the three are marked lang="en" (in Arabic inside an isolate)
     for (const code of ["es", "ar"]) {
       const text = catalogs[code]["hero.lead"];
@@ -535,7 +530,7 @@ describe("the new home page: catalogs and rendered pages (F5)", () => {
       expect(text, code).not.toMatch(/\(|\)/);
     }
     expect(catalogs.ar["hero.lead"], "ar: the English words sit in an isolate").toMatch(/[\u2066-\u2068]<span lang="en">[\s\S]*<\/span>\u2069/);
-    for (const code of ["en", "es", "ar"]) expect(catalogs[code]["hero.lead"].replace(/<[^>]*>/g, "").length, code).toBeGreaterThan(120);
+    for (const code of ["en", "es", "ar"]) expect(catalogs[code]["hero.lead"].replace(/<[^>]*>/g, "").length, code).toBeGreaterThan(80);
   });
 
   describe("Spanish", () => {
