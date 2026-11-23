@@ -195,6 +195,17 @@ describe("the pages of the three levels", () => {
       expect(css).toMatch(/\.landing-demo__picker legend\s*\{[^}]*clip-path:\s*inset\(50%\)/);
     });
 
+    it("on a phone the hero and its demo lose their frames: no border on either, and the demo no side padding", () => {
+      const phone = [...css.matchAll(/@media \(max-width: 640px\) \{([\s\S]*?)\n\}/g)].map((m) => m[1]).join("\n");
+      const rule = (selector) => new RegExp(`${selector.replace(/[.$]/g, "\\$&")}\\s*\\{([^}]*)\\}`).exec(phone)?.[1] ?? "";
+      expect(rule(".landing-tokens__hero")).toMatch(/border:\s*0/);
+      expect(rule(".landing-tokens__hero")).toMatch(/border-radius:\s*0/);
+      const stage = rule(".landing-tokens__stage");
+      expect(stage).toMatch(/border:\s*0/);
+      expect(stage).toMatch(/box-shadow:\s*none/);
+      expect(stage).toMatch(/padding-inline:\s*0/);
+    });
+
     it.each(LANGS)("in %s: three steps, install, use and make it yours, each with code to copy", (code, prefix) => {
       const steps = sectionOf(rendered.get(`${prefix}tokens/`), "steps");
       expect(steps).toMatch(/<h2\b[^>]*>/);
