@@ -3955,7 +3955,7 @@ home-light:defined ~ .landing-light__nojs {
     grid-template-areas:
       "dropdown actions"
       "copy actions";
-    grid-template-rows: auto 1fr;
+    grid-template-rows: 1fr auto;
   }
 
   .landing-block--actions .landing-card--actions {
@@ -3985,11 +3985,42 @@ home-light:defined ~ .landing-light__nojs {
 
 .landing-core__buttons {
   display: grid;
-  gap: var(--luz-space-md);
+  gap: var(--luz-space-lg);
 }
 
-.landing-core__buttons > .o-row {
+/* A group of buttons under its name: the variants, the states, with an icon,
+   the sizes, the full width */
+.landing-core__group {
+  display: grid;
+  gap: var(--luz-space-xs);
+}
+
+.landing-core__label {
+  margin: 0;
+  font-family: var(--luz-font-mono);
+  font-size: var(--luz-text-xs);
+  color: var(--luz-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.landing-core__group > .o-row {
   align-items: center;
+}
+
+/* Hover, pressed and focus drawn as they look: a specimen is inert, so no
+   pointer or keyboard ever puts it in those states */
+.landing-core__buttons [data-state="hover"] {
+  background: var(--luz-brand-fill-hover);
+}
+
+.landing-core__buttons [data-state="active"] {
+  background: var(--luz-brand-fill-active);
+}
+
+.landing-core__buttons [data-state="focus"] {
+  outline: 2px solid var(--luz-focus-ring);
+  outline-offset: 2px;
 }
 
 .landing-core__copy {
@@ -4023,16 +4054,6 @@ home-light:defined ~ .landing-light__nojs {
   gap: var(--luz-space-2xs);
 }
 
-/* The list the dropdown opens, drawn open: the popover itself is closed until it is asked for */
-.landing-core__menu {
-  min-inline-size: 11rem;
-  padding: var(--luz-space-3xs);
-  border: 1px solid var(--luz-divider);
-  border-radius: var(--luz-radius-md);
-  background: var(--luz-surface);
-  box-shadow: var(--luz-shadow-md);
-}
-
 .landing-core__live .luz-input--textarea {
   min-block-size: 0;
 }
@@ -4055,16 +4076,189 @@ home-light:defined ~ .landing-light__nojs {
   flex: 1 1 3rem;
 }
 
-.landing-core__grid {
-  --luz-grid-min: 3rem;
+
+/* Every block of a level's page on a wide screen: the words stay in view
+   while the panel beside them goes by (sticky), then leave with their block */
+@media (min-width: 1024px) {
+  .landing-level__blocks .landing-inside__copy {
+    position: sticky;
+    inset-block-start: var(--luz-space-3xl);
+    align-self: start;
+  }
 }
 
-.landing-core__grid > .landing-wire {
-  block-size: 2rem;
+/* The layout block: on a wide screen the plan beside the words, as in the
+   content block, with its markup under them */
+.landing-block--layout .landing-inside__copy > .luz-code-block {
+  margin-block-start: var(--luz-space-md);
 }
 
-.o-media__body > .landing-wire {
+@media (min-width: 1024px) {
+  .landing-block--layout {
+    grid-template-columns: minmax(0, 0.6fr) minmax(0, 1.4fr);
+    align-items: start;
+  }
+}
+
+/* The plan of an application made of every object of core: the real objects,
+   held to the size of a card (no full height, no sticky bar, no page width),
+   each region outlined and named by its class */
+.landing-plan {
+  --luz-sidebar-width: 6.5rem;
+  min-height: 0;
+  gap: var(--luz-space-xs);
+  font-family: var(--luz-font-sans);
+  font-size: var(--luz-text-sm);
+}
+
+.landing-plan .o-page {
+  min-block-size: 0;
+}
+
+.landing-plan .o-sticky {
+  position: relative;
+}
+
+.landing-plan .o-container {
+  max-width: none;
+  padding: var(--luz-space-lg) var(--luz-space-sm) var(--luz-space-sm);
+}
+
+.landing-plan__side,
+.landing-plan__region,
+.landing-plan__bar,
+.landing-plan__foot {
+  position: relative;
+  padding: var(--luz-space-lg) var(--luz-space-sm) var(--luz-space-sm);
+  border: 1px dashed color-mix(in oklab, var(--luz-brand-primary) 40%, transparent);
+  border-radius: var(--luz-radius-sm);
+}
+
+.landing-plan__bar,
+.landing-plan__foot {
+  display: flex;
+  align-items: center;
+  gap: var(--luz-space-sm);
+}
+
+.landing-plan__foot > .landing-wire {
+  flex: 1;
+}
+
+.landing-plan__name {
+  position: absolute;
+  inset-block-start: var(--luz-space-3xs);
+  inset-inline-start: var(--luz-space-xs);
+  font-family: var(--luz-font-mono);
+  font-size: var(--luz-text-xs);
+  color: var(--luz-brand-primary);
+  white-space: nowrap;
+}
+
+.landing-plan__status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--luz-space-xs);
+}
+
+.landing-plan__dot {
+  position: relative;
+  inline-size: 0.5rem;
+  block-size: 0.5rem;
+  border-radius: 50%;
+  background: var(--luz-color-success);
+}
+
+.landing-plan__dot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: inherit;
+}
+
+.landing-plan__title {
+  margin: 0;
+  font-weight: 600;
+  color: var(--luz-text-primary);
+}
+
+.landing-plan__meta {
+  margin: 0;
+  font-size: var(--luz-text-xs);
+}
+
+.landing-plan__grid {
+  --luz-grid-min: 4rem;
+}
+
+.landing-plan__tile {
+  block-size: 2.5rem;
+}
+
+.landing-plan__skeleton {
+  border-style: dashed;
+  background: linear-gradient(90deg, var(--luz-surface) 25%, color-mix(in oklab, var(--luz-brand-primary) 18%, var(--luz-surface)) 50%, var(--luz-surface) 75%) 0 0 / 200% 100%;
+}
+
+.landing-plan__spin {
+  inline-size: 0.75rem;
   block-size: 0.75rem;
+  border: 2px solid currentColor;
+  border-inline-end-color: transparent;
+  border-radius: 50%;
+}
+
+/* The shared keyframes at work, a few rounds each so nothing moves for more
+   than five seconds (WCAG 2.2.2), and only when motion is welcome */
+@media (prefers-reduced-motion: no-preference) {
+  .landing-plan__dot::after {
+    animation: luz-pulse var(--luz-duration-lazy) var(--luz-easing-standard) 3;
+  }
+
+  .landing-plan__skeleton {
+    animation: luz-shimmer var(--luz-duration-lazy) var(--luz-easing-linear) 3;
+  }
+
+  .landing-plan__spin {
+    animation: luz-spin var(--luz-duration-slower) var(--luz-easing-linear) 4;
+  }
+
+  .landing-plan__tile {
+    animation: luz-slide-up var(--luz-duration-slow) var(--luz-easing-enter) both;
+  }
+
+  .landing-plan__side > .landing-wire,
+  .landing-plan__foot > .landing-wire {
+    animation: luz-fade-in var(--luz-duration-slow) var(--luz-easing-enter) both;
+  }
+}
+
+/* The image card: every ratio, the wide one across, the others in a row
+   under it, each named */
+.landing-core__ratios {
+  display: grid;
+  /* widths in the ratio of each picture, so the four share one height */
+  grid-template-columns: 1.333fr 1.5fr 1fr 0.5625fr;
+  align-items: end;
+  gap: var(--luz-space-sm);
+}
+
+.landing-core__ratio {
+  display: grid;
+  gap: var(--luz-space-3xs);
+  margin: 0;
+}
+
+.landing-core__ratio--wide {
+  grid-column: 1 / -1;
+}
+
+.landing-core__ratio > figcaption {
+  white-space: nowrap;
+  font-family: var(--luz-font-mono);
+  font-size: var(--luz-text-xs);
+  color: var(--luz-text-secondary);
 }
 
 /* The whole list of core, folded at the end of the page */
@@ -4236,11 +4430,6 @@ home-light:defined ~ .landing-light__nojs {
     align-items: start;
   }
 
-  .landing-block--forms .landing-inside__copy {
-    position: sticky;
-    inset-block-start: var(--luz-space-3xl);
-  }
-
   .landing-form {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     column-gap: var(--luz-space-xl);
@@ -4277,11 +4466,6 @@ home-light:defined ~ .landing-light__nojs {
   .landing-block--content {
     grid-template-columns: minmax(0, 0.6fr) minmax(0, 1.4fr);
     align-items: start;
-  }
-
-  .landing-block--content .landing-inside__copy {
-    position: sticky;
-    inset-block-start: var(--luz-space-3xl);
   }
 }
 
@@ -4322,6 +4506,7 @@ home-light:defined ~ .landing-light__nojs {
 
 .landing-page__head {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--luz-space-md);
 }
@@ -4339,6 +4524,40 @@ home-light:defined ~ .landing-light__nojs {
 
 .landing-page__title > .luz-meta {
   margin-block-start: var(--luz-space-3xs);
+}
+
+.landing-page__title {
+  flex: 1 1 12rem;
+  min-inline-size: 0;
+}
+
+/* A tag of every colour under the meta line, and the team, small and medium
+   avatars, at the end of the head */
+.landing-page__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--luz-space-xs);
+  margin: var(--luz-space-xs) 0 0;
+}
+
+.landing-page__team {
+  display: flex;
+  align-items: center;
+  gap: var(--luz-space-2xs);
+  align-self: start;
+}
+
+/* After the table: the card with an image and the featured plan, side by
+   side when there is room */
+.landing-page__cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  align-items: start;
+  gap: var(--luz-space-lg);
+}
+
+.landing-page .luz-tabs--pill + .luz-tabpanel > .luz-code-block {
+  margin: 0;
 }
 
 .landing-page__grid {
@@ -4387,7 +4606,12 @@ home-light:defined ~ .landing-light__nojs {
       "alerts modal"
       "status modal"
       "toast tooltip"
+      "video video"
       "image player";
+  }
+
+  .landing-block--feedback .landing-card--video {
+    grid-area: video;
   }
 
   .landing-block--feedback .landing-card--alerts {
@@ -4424,12 +4648,6 @@ home-light:defined ~ .landing-light__nojs {
     grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.6fr);
     align-items: start;
   }
-
-  /* The words stay in view while the cards go by, as in forms and content */
-  .landing-block--feedback .landing-inside__copy {
-    position: sticky;
-    inset-block-start: var(--luz-space-3xl);
-  }
 }
 
 .landing-core__live .luz-modal {
@@ -4461,6 +4679,13 @@ home-light:defined ~ .landing-light__nojs {
 .landing-core__live .luz-tooltip__text {
   visibility: visible;
   opacity: 1;
+}
+
+/* The picture that stands in for the film: drawn in the light of the text on
+   a fill over the dark of the player, and held to the height of a card */
+.landing-core__live svg.luz-player-video {
+  block-size: 12rem;
+  color: var(--luz-text-on-fill);
 }
 
 .landing-core__live .luz-toast {

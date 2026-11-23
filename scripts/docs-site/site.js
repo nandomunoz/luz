@@ -2010,22 +2010,81 @@ function coreSections({ say, groups, objects, dependencies }) {
   const t = (key) => escapeHtml(say(key));
   const html = (text) => `<pre class="luz-code-block" data-lang="html" dir="ltr" tabindex="0"><code>${escapeHtml(text)}</code></pre>`;
   const card = (name, live, code) => `<div class="landing-card landing-card--${name}"><p class="landing-card__title">${t(`level.core.card.${name}`)}</p><div class="landing-core__live" inert>${live}</div>${html(code)}</div>`;
-  const wire = (n) => '<span class="landing-wire"></span>'.repeat(n);
+  // The video player, as it looks paused: a drawn picture stands in for the film (the landing ships no video), with
+  // the play button over it, the seek bar, the time, the volume, the captions on, the track and full screen
+  const videoPanel = () => {
+    const w = (key) => t(`level.core.sample.${key}`);
+    const stroke = (d) => `<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${d}</g></svg>`;
+    return [
+      `<div class="luz-player" data-type="video" role="group" aria-label="${w("video")}">`,
+      `<div class="luz-player-media-wrap is-paused"><svg class="luz-player-video" viewBox="0 0 320 135" preserveAspectRatio="xMidYMid slice" role="img" aria-label="${w("poster")}"><rect width="320" height="135" fill="currentColor" opacity=".18"/><circle cx="250" cy="34" r="14" fill="currentColor" opacity=".45"/><path d="M0 135 70 60l50 45 60-70 70 60 70-35v75Z" fill="currentColor" opacity=".35"/></svg><div class="luz-player-overlay" aria-hidden="true"><svg class="luz-play-icon" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4.5v15l12-7.5L7 4.5Z"/></g></svg></div></div>`,
+      `<div class="luz-player-controls"><div class="luz-player-progress-row"><button class="luz-player-btn luz-player-playpause" type="button" aria-label="${w("play")}">${stroke('<path d="M7 4.5v15l12-7.5L7 4.5Z"/>')}</button><input class="luz-player-seekbar" type="range" min="0" max="1000" value="280" style="--luz-seek: 28%" aria-label="${w("seek")}"></div>`,
+      `<div class="luz-player-btns"><span class="luz-player-time">0:12</span><span class="luz-player-spacer"></span><span class="luz-player-time">0:45</span><div class="luz-player-vol-wrap"><button class="luz-player-btn luz-player-mute" type="button" aria-label="${w("mute")}">${stroke('<path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4v-5ZM16 9a4.5 4.5 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/>')}</button><input class="luz-player-seekbar luz-player-volbar" type="range" min="0" max="100" value="70" style="--luz-seek: 70%" aria-label="${w("volume")}"></div><button class="luz-player-btn luz-player-captions" type="button" aria-pressed="true" aria-label="${w("captions")}">CC</button><select class="luz-input luz-player-tracks" aria-label="${w("track")}"><option>${w("tracklang")}</option></select><button class="luz-player-btn luz-player-fullscreen" type="button" aria-label="${w("fullscreen")}">${stroke('<path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/>')}</button></div></div>`,
+      `</div>`,
+    ].join("");
+  };
+  // The buttons: every variant, every state (hover, pressed and focus drawn as they look, since an inert specimen is
+  // never hovered), with an icon and with an icon alone, every size, and the full width of a form or a card
+  const svg = (d) => `<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
+  const ICON = {
+    download: '<path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14"/>',
+    settings: '<circle cx="12" cy="12" r="3"/><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.8 1.8M16.6 16.6l1.8 1.8M5.6 18.4l1.8-1.8M16.6 7.4l1.8-1.8"/>',
+    search: '<circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/>',
+    arrow: '<path d="M5 12h14m0 0-5-5m5 5-5 5"/>',
+  };
+  const actionsPanel = () => {
+    const w = (key) => t(`level.core.sample.${key}`);
+    const btn = (cls, label, attrs = "") => `<button class="luz-btn luz-btn--${cls}" type="button"${attrs}>${label}</button>`;
+    const group = (key, body, cls = "o-row") => `<div class="landing-core__group"><p class="landing-core__label">${w(`btn.${key}`)}</p><div class="${cls}">${body}</div></div>`;
+    return [
+      `<div class="landing-core__buttons">`,
+      group("variants", [btn("primary", w("save")), btn("secondary", w("cancel")), btn("outline", w("skip")), btn("ghost", w("move")), btn("danger", w("delete"))].join("")),
+      group("states", [btn("primary", w("state.rest")), btn("primary", w("state.hover"), ' data-state="hover"'), btn("primary", w("state.active"), ' data-state="active" aria-pressed="true"'), btn("primary", w("state.focus"), ' data-state="focus"'), btn("primary", w("state.disabled"), " disabled")].join("")),
+      group("icons", [btn("primary", `${svg(ICON.download)}${w("download")}`), btn("outline", `${svg(ICON.settings)}${w("settings")}`), btn("ghost", `${w("share")}${svg(ICON.arrow)}`), btn("secondary", svg(ICON.search), ` aria-label="${w("search")}"`)].join("")),
+      group("sizes", [btn("primary luz-btn--sm", w("small")), btn("primary", w("medium")), btn("primary luz-btn--lg", w("large"))].join("")),
+      group("block", btn("primary luz-btn--block", w("create")), "landing-core__block"),
+      `</div>`,
+    ].join("");
+  };
+  // The layout: the plan of an application made of every object of core, each region named by its class, with the
+  // utilities and the shared keyframes at work in it (the skeleton shimmers, the status dot pulses, the save spins,
+  // the cards slide up and fade in), the markup beside it
+  const planPanel = () => {
+    const w = (key) => t(`level.core.plan.${key}`);
+    const name = (cls) => `<code class="landing-plan__name">${cls}</code>`;
+    const wire = (n, cls = "") => `<span class="landing-wire${cls}"></span>`.repeat(n);
+    const plan = [
+      `<div class="landing-plan o-shell">`,
+      `<aside class="landing-plan__side o-stack">${name("o-shell")}<span class="landing-wire landing-wire--icon"></span>${wire(4)}</aside>`,
+      `<div class="o-main o-page landing-plan__region">${name("o-main · o-page")}`,
+      `<header class="o-sticky landing-plan__bar u-flex-between">${name("o-sticky")}<span class="landing-plan__status"><span class="landing-plan__dot"></span><span class="u-text-muted">${w("status")}</span></span><button class="luz-btn luz-btn--ghost luz-btn--sm" type="button">${svg(ICON.search)}<span class="u-sr-only">${t("level.core.sample.search")}</span></button></header>`,
+      `<main class="o-container landing-plan__region">${name("o-container")}`,
+      `<div class="o-stack landing-plan__region">${name("o-stack")}`,
+      `<div class="o-media landing-plan__region">${name("o-media")}<span class="landing-wire landing-wire--icon"></span><div class="o-media__body"><p class="landing-plan__title u-truncate">${w("title")}</p><p class="u-text-muted u-text-mono landing-plan__meta">api-gateway · eu-west</p></div></div>`,
+      `<div class="o-grid o-grid--auto landing-plan__region landing-plan__grid">${name("o-grid")}${wire(5, " landing-plan__tile")}<span class="landing-wire landing-plan__tile landing-plan__skeleton"></span></div>`,
+      `<div class="o-row landing-plan__region">${name("o-row")}${wire(3)}</div>`,
+      `<div class="o-actions landing-plan__region">${name("o-actions")}<button class="luz-btn luz-btn--primary luz-btn--sm" type="button"><span class="landing-plan__spin"></span>${t("level.core.sample.save")}</button><button class="luz-btn luz-btn--outline luz-btn--sm" type="button">${t("level.core.sample.cancel")}</button></div>`,
+      `</div>`,
+      `</main>`,
+      `</div>`,
+      `<footer class="landing-plan__foot">${name("o-shell &gt; footer")}${wire(2)}</footer>`,
+      `</div>`,
+    ].join("");
+    return `<div class="landing-core__live" inert>${plan}</div>`;
+  };
+  const planCode = () => html('<div class="o-shell">\n  <aside>…</aside>\n  <div class="o-main o-page">\n    <header class="o-sticky">…</header>\n    <main class="o-container o-stack">\n      <div class="o-grid o-grid--auto">…</div>\n      <div class="o-actions">…</div>\n    </main>\n  </div>\n</div>');
   const sample = {
-    actions: `<div class="landing-core__buttons"><div class="o-row"><button class="luz-btn luz-btn--primary" type="button">${t("level.core.sample.save")}</button><button class="luz-btn luz-btn--secondary" type="button">${t("level.core.sample.cancel")}</button><button class="luz-btn luz-btn--outline" type="button">${t("level.core.sample.skip")}</button><button class="luz-btn luz-btn--ghost" type="button">${t("level.core.sample.move")}</button><button class="luz-btn luz-btn--danger" type="button">${t("level.core.sample.delete")}</button></div><div class="o-row"><button class="luz-btn luz-btn--primary luz-btn--sm" type="button">${t("level.core.sample.small")}</button><button class="luz-btn luz-btn--primary" type="button">${t("level.core.sample.medium")}</button><button class="luz-btn luz-btn--primary luz-btn--lg" type="button">${t("level.core.sample.large")}</button></div></div>`,
+    actions: actionsPanel(),
     copy: `<div class="o-stack">${[["npm install @luz-ds/core", "copylabel"]].map(([text, label]) => `<div class="landing-core__copy"><code>${escapeHtml(text)}</code><button class="luz-copy-btn" type="button" data-copy="${escapeHtml(text)}" aria-label="${t(`level.core.sample.${label}`)}">${t("see.copy")}</button></div>`).join("")}</div>`,
-    dropdown: `<div class="luz-dropdown"><button class="luz-btn luz-btn--secondary" type="button">${t("level.core.sample.actionsmenu")}</button><div class="landing-core__menu"><ul class="luz-dropdown__list"><li><a class="luz-dropdown__item">${t("level.core.sample.edit")}</a></li><li><button class="luz-dropdown__item" type="button">${t("level.core.sample.duplicate")}</button></li><li><button class="luz-dropdown__item" type="button" aria-disabled="true">${t("level.core.sample.move")}</button></li><li><hr class="luz-dropdown__separator"></li><li><button class="luz-dropdown__item luz-dropdown__item--danger" type="button">${t("level.core.sample.deleteproject")}</button></li></ul></div></div>`,
-    alerts: `<div class="o-stack"><div class="luz-alert luz-alert--success"><div><div class="luz-alert__title">${t("level.core.sample.alert.title")}</div><div class="luz-alert__body">${t("level.core.sample.alert.body")}</div></div></div><div class="luz-alert luz-alert--error"><div><div class="luz-alert__title">${t("level.core.sample.alert2.title")}</div><div class="luz-alert__body">${t("level.core.sample.alert2.body")}</div></div></div></div>`,
+    dropdown: `<div class="luz-dropdown"><button class="luz-btn luz-btn--secondary" type="button">${t("level.core.sample.actionsmenu")}</button><div class="luz-dropdown__menu"><ul class="luz-dropdown__list"><li><a class="luz-dropdown__item">${t("level.core.sample.edit")}</a></li><li><button class="luz-dropdown__item" type="button">${t("level.core.sample.duplicate")}</button></li><li><button class="luz-dropdown__item" type="button" aria-disabled="true">${t("level.core.sample.move")}</button></li><li><hr class="luz-dropdown__separator"></li><li><button class="luz-dropdown__item luz-dropdown__item--danger" type="button">${t("level.core.sample.deleteproject")}</button></li></ul></div></div>`,
+    alerts: `<div class="o-stack">${[["success", "alert", "m8.5 12 2.5 2.5 4.5-5"], ["info", "alert3", "M12 11v5.5M12 7.5v.01"], ["warning", "alert4", "M12 9.5v4M12 16.5v.01"], ["error", "alert2", "m9.5 9.5 5 5m0-5-5 5"]].map(([kind, key, d]) => `<div class="luz-alert luz-alert--${kind}"><div class="luz-alert__icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" focusable="false">${kind === "warning" ? '<path d="M12 4 21 19.5H3Z"/>' : '<circle cx="12" cy="12" r="8.5"/>'}<path d="${d}"/></svg></div><div><div class="luz-alert__title">${t(`level.core.sample.${key}.title`)}</div><div class="luz-alert__body">${t(`level.core.sample.${key}.body`)}</div></div></div>`).join("")}</div>`,
     status: `<div class="o-stack"><progress class="luz-progress" value="67" max="100"></progress><progress class="luz-progress" value="25" max="100"></progress></div>`,
     modal: `<dialog class="luz-modal" open><div class="luz-modal__header"><button class="luz-modal__close" type="button" aria-label="${t("level.core.sample.modal.close")}">×</button><h4 class="luz-modal__title">${t("level.core.sample.modal.title")}</h4></div><div class="luz-modal__body"><p>${t("level.core.sample.modal.body")}</p></div><div class="luz-modal__footer"><button class="luz-btn luz-btn--ghost" type="button">${t("level.core.sample.cancel")}</button><button class="luz-btn luz-btn--danger" type="button">${t("level.core.sample.modal.confirm")}</button></div></dialog>`,
     toast: `<div class="luz-toast" role="status"><div class="luz-toast__content"><div class="luz-toast__kind">${t("level.core.sample.toast.kind")}</div><div class="luz-toast__msg">${t("level.core.sample.toast.msg")}</div></div><button class="luz-toast__close" type="button" aria-label="${t("level.core.sample.toast.dismiss")}">×</button></div>`,
     tooltip: `<div class="luz-tooltip"><button class="luz-btn luz-btn--outline luz-btn--sm" type="button" aria-describedby="core-tip">${t("level.core.sample.tip.button")}</button><div class="luz-tooltip__text" role="tooltip" id="core-tip">${t("level.core.sample.tip.text")}</div></div>`,
-    image: `<div class="luz-image luz-image--21x9"></div>`,
+    image: `<div class="landing-core__ratios"><figure class="landing-core__ratio landing-core__ratio--wide"><div class="luz-image luz-image--21x9"></div><figcaption>21:9</figcaption></figure>${["4x3", "3x2", "1x1", "9x16"].map((r) => `<figure class="landing-core__ratio"><div class="luz-image luz-image--${r}"></div><figcaption>${r.replace("x", ":")}</figcaption></figure>`).join("")}</div>`,
+    video: videoPanel(),
     player: `<div class="luz-player" data-type="audio" role="group" aria-label="${t("level.core.sample.player")}"><div class="luz-player-controls luz-player-controls--audio"><button class="luz-player-btn luz-player-playpause" type="button" aria-label="${t("level.core.sample.play")}"><svg class="icon-play" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4.5v15l12-7.5L7 4.5Z"/></g></svg></button><div class="luz-player-progress-row luz-player-progress-row--audio"><span class="luz-player-time">1:04</span><input class="luz-player-seekbar" type="range" min="0" max="1000" value="320" aria-label="${t("level.core.sample.seek")}"><span class="luz-player-time">3:20</span></div></div></div>`,
-    stack: `<div class="o-stack">${wire(3)}</div>`,
-    row: `<div class="o-row">${wire(4)}</div>`,
-    grid: `<div class="o-grid o-grid--auto landing-core__grid">${wire(6)}</div>`,
-    media: `<div class="o-media"><span class="landing-wire landing-wire--icon"></span><div class="o-media__body o-stack">${wire(2)}</div></div>`,
   };
   const lines = {
     actions: '<button class="luz-btn luz-btn--primary luz-btn--lg">',
@@ -2035,13 +2094,10 @@ function coreSections({ say, groups, objects, dependencies }) {
     modal: '<dialog class="luz-modal">',
     toast: '<div class="luz-toast" role="status">',
     tooltip: '<div class="luz-tooltip">',
-    image: '<div class="luz-image">',
+    image: '<div class="luz-image luz-image--4x3">',
     player: '<div class="luz-player" data-type="audio">',
+    video: '<div class="luz-player" data-type="video">',
     status: '<progress class="luz-progress" value="67">',
-    stack: '<div class="o-stack">',
-    row: '<div class="o-row">',
-    grid: '<div class="o-grid o-grid--auto">',
-    media: '<div class="o-media">',
   };
   // A real form, with every kind of control a form has: text, email and password (one invalid), a date, a select, a text
   // area, a plan to choose, a range with its output, checkboxes (one disabled), a switch, and the buttons. The form
@@ -2053,7 +2109,7 @@ function coreSections({ say, groups, objects, dependencies }) {
     const w = (key) => t(`level.core.sample.${key}`);
     const form = [
       `<form class="landing-form" action="#" inert>`,
-      `<fieldset class="luz-fieldset"><legend>${w("account")}</legend>`,
+      `<fieldset class="luz-fieldset"><legend class="luz-legend">${w("account")}</legend>`,
       field("core-f-name", w("name"), '<input class="luz-input" id="core-f-name" type="text" value="Ada Lovelace">'),
       field("core-f-email", w("email"), '<input class="luz-input" id="core-f-email" type="email" value="ada@example.com">', `<div class="luz-field__helper">${w("hint")}</div>`),
       field("core-f-password", w("password"), '<input class="luz-input luz-input--error" id="core-f-password" type="password" value="1234" aria-invalid="true">', `<div class="luz-field__error"><span class="u-sr-only">Error: </span>${w("passworderror")}</div>`),
@@ -2062,7 +2118,7 @@ function coreSections({ say, groups, objects, dependencies }) {
       field("core-f-phone", w("phone"), '<input class="luz-input" id="core-f-phone" type="tel" value="+44 20 7946 0000">', "", true),
       field("core-f-message", w("message"), `<textarea class="luz-input luz-input--textarea" id="core-f-message" rows="3">${w("messagetext")}</textarea>`, "", true),
       `</fieldset>`,
-      `<fieldset class="luz-fieldset"><legend>${w("plan")}</legend>`,
+      `<fieldset class="luz-fieldset"><legend class="luz-legend">${w("plan")}</legend>`,
       `<div class="luz-check-group" role="group" aria-label="${w("plan")}">${check("radio", "core-plan", "core-f-free", w("free"), " checked")}${check("radio", "core-plan", "core-f-team", w("team"))}${check("radio", "core-plan", "core-f-ent", w("enterprise"))}</div>`,
       field("core-f-seats", `${w("seats")} <output class="luz-output">12</output>`, '<input class="luz-input" id="core-f-seats" type="range" min="1" max="50" value="12">', "", true),
       `<div class="luz-check-group" role="group" aria-label="${w("notify")}">${check("checkbox", "", "core-f-by-email", w("byemail"), " checked")}${check("checkbox", "", "core-f-by-push", w("bypush"))}${check("checkbox", "", "core-f-by-sms", w("bysms"), " disabled", true)}</div>`,
@@ -2071,7 +2127,10 @@ function coreSections({ say, groups, objects, dependencies }) {
       `</fieldset>`,
       `<div class="o-actions"><button class="luz-btn luz-btn--primary" type="submit">${w("create")}</button><button class="luz-btn luz-btn--outline" type="button">${w("cancel")}</button></div>`,
       `</form>`,
-    ].join("");
+    ]
+      .join("")
+      // the name and the email are required: the label says so with its asterisk, the field with the attribute
+      .replace(/<label class="luz-field__label" for="(core-f-(?:name|email))">([^<]*)<\/label><input ([^>]*)>/g, '<label class="luz-field__label luz-field__label--required" for="$1">$2</label><input $3 required>');
     return `<div class="landing-core__live" inert>${form.replace(' inert>', ">")}</div>`;
   };
   // The markup of a field, under the words beside the form
@@ -2084,24 +2143,35 @@ function coreSections({ say, groups, objects, dependencies }) {
   const pagePanel = () => {
     const w = (key) => t(`level.core.page.${key}`);
     const icon = (name, d) => `<li class="luz-icon-item"><span class="luz-icon-display"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${d}</svg></span><span class="luz-icon-name">${name}</span></li>`;
-    const chevron = '<svg class="luz-accordion__end" data-luz-flip aria-hidden="true" focusable="false" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>';
-    const row = (name, tag, tone, cpu) => `<tr><td data-label="${w("col.service")}">${name}</td><td data-label="${w("col.status")}"><span class="luz-tag luz-tag--${tone} luz-tag--dot">${w(tag)}</span></td><td data-label="${w("col.cpu")}">${cpu}%<meter class="luz-meter" value="${cpu}" min="0" max="100" aria-hidden="true"></meter></td></tr>`;
+    const chev = (cls, d, flip = "") => `<svg class="luz-accordion__${cls}"${flip} aria-hidden="true" focusable="false" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="${d}"/></svg>`;
+    const chevron = chev("end", "M9 6l6 6-6 6", " data-luz-flip") + chev("down", "M6 9l6 6 6-6");
+    const themeVars = 'style="--luz-theme-mode-line: var(--luz-outline); --luz-theme-mode-hover: var(--luz-surface-hover); --luz-theme-mode-focus: var(--luz-focus-ring); --luz-theme-mode-on: var(--luz-brand-fill); --luz-theme-mode-on-text: var(--luz-text-on-fill); --luz-theme-mode-bg: var(--luz-surface); --luz-theme-mode-edge: var(--luz-divider); --luz-theme-mode-text: var(--luz-text-secondary)"';
+    const mode = (value, key, d, checked = "") => `<label class="luz-theme-mode__option"><input class="luz-theme-mode__input" type="radio" name="core-mode" value="${value}"${checked}><svg class="luz-theme-mode__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">${d}</svg>${t(`footer.${key}`)}</label>`;
+    const tag = (tone, key) => `<span class="luz-tag luz-tag--${tone}">${w(`tag.${key}`)}</span>`;
+    const row = (name, tag, tone, cpu) => `<tr><td data-label="${w("col.service")}">${name}</td><td data-label="${w("col.status")}"><span class="luz-tag luz-tag--${tone} luz-tag--dot">${w(tag)}</span></td><td class="luz-table__numeric" data-label="${w("col.cpu")}">${cpu}%<meter class="luz-meter" value="${cpu}" min="0" max="100" aria-hidden="true"></meter></td></tr>`;
     const page = [
       `<div class="landing-page">`,
-      `<div class="landing-page__bar"><a class="luz-skip-link">${t("skip")}</a><ol class="luz-breadcrumb"><li><a class="luz-breadcrumb__item">${w("crumb")}</a></li><li><a class="luz-breadcrumb__item" aria-current="page">${t("level.core.sample.title")}</a></li></ol><button class="luz-theme-mode__button" style="--luz-theme-mode-line: var(--luz-outline); --luz-theme-mode-hover: var(--luz-surface-hover); --luz-theme-mode-focus: var(--luz-focus-ring); --luz-theme-mode-on: var(--luz-brand-fill); --luz-theme-mode-on-text: var(--luz-text-on-fill); --luz-theme-mode-bg: var(--luz-surface); --luz-theme-mode-edge: var(--luz-divider); --luz-theme-mode-text: var(--luz-text-secondary)" type="button" aria-label="${w("mode")}"><svg class="luz-theme-mode__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M19.5 14.5A8 8 0 1 1 9.5 4.5a6.5 6.5 0 0 0 10 10Z"/></svg></button></div>`,
-      `<div class="landing-page__head"><span class="luz-avatar luz-avatar--lg" role="img" aria-label="Ana Ruiz">AR</span><div class="landing-page__title"><h3>${t("level.core.sample.title")} <span class="luz-tag luz-tag--green luz-tag--dot">${t("level.core.sample.tag")}</span></h3><p class="luz-meta"><span>${w("meta.by")}</span> <time datetime="2026-10-12">${w("meta.date")}</time> <span>${w("meta.read")}</span></p></div></div>`,
-      `<nav class="luz-tabs"><a class="luz-tab" aria-current="page">${t("level.core.sample.tab1")}</a><a class="luz-tab">${t("level.core.sample.tab2")}</a><a class="luz-tab">${t("level.core.sample.tab3")}</a></nav>`,
+      `<div class="landing-page__bar"><a class="luz-skip-link">${t("skip")}</a><ol class="luz-breadcrumb"><li><a class="luz-breadcrumb__item">${w("crumb")}</a></li><li><a class="luz-breadcrumb__item" aria-current="page">${t("level.core.sample.title")}</a></li></ol><button class="luz-theme-mode__button" ${themeVars} type="button" aria-label="${w("mode")}"><svg class="luz-theme-mode__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M19.5 14.5A8 8 0 1 1 9.5 4.5a6.5 6.5 0 0 0 10 10Z"/></svg></button></div>`,
+      `<div class="landing-page__head"><span class="luz-avatar luz-avatar--lg" role="img" aria-label="Ana Ruiz">AR</span><div class="landing-page__title"><h3>${t("level.core.sample.title")} <span class="luz-tag luz-tag--green luz-tag--dot">${t("level.core.sample.tag")}</span></h3><p class="luz-meta"><span>${w("meta.by")}</span> <time datetime="2026-10-12">${w("meta.date")}</time> <span>${w("meta.read")}</span></p><p class="landing-page__tags">${tag("gray", "internal")}${tag("blue", "beta")}${tag("teal", "documented")}${tag("purple", "new")}</p></div><span class="landing-page__team"><span class="luz-avatar luz-avatar--sm" role="img" aria-label="Luis Gómez">LG</span><span class="luz-avatar luz-avatar--md" role="img" aria-label="Mia Chen">MC</span></span></div>`,
+      `<dl class="luz-meta luz-meta--facts"><div><dt>${w("fact.region")}</dt><dd>eu-west</dd></div><div><dt>${w("fact.plan")}</dt><dd>${t("level.core.sample.team")}</dd></div><div><dt>${w("fact.requests")}</dt><dd>${w("fact.requests.value")}</dd></div></dl>`,
+      `<nav class="luz-tabs"><a class="luz-tab" aria-current="page">${t("level.core.sample.tab1")} <span class="luz-badge luz-badge--primary">4</span></a><a class="luz-tab">${t("level.core.sample.tab2")} <span class="luz-badge luz-badge--gray">12</span></a><a class="luz-tab">${t("level.core.sample.tab3")} <span class="luz-badge luz-badge--danger">3</span></a></nav>`,
       `<div class="landing-page__grid">`,
       `<div class="o-stack"><div class="luz-prose"><p>${w("prose")}</p><ul><li>${w("li1")}</li><li>${w("li2")}</li></ul><p>${w("limit")} <code class="luz-code-inline">rate_limit</code>.</p></div>`,
       `<figure class="luz-figure"><div class="luz-figure__media"><svg viewBox="0 0 320 96" role="img" aria-label="${w("figure")}" fill="currentColor"><rect x="8" y="64" width="40" height="32"/><rect x="60" y="52" width="40" height="44"/><rect x="112" y="40" width="40" height="56"/><rect x="164" y="30" width="40" height="66"/><rect x="216" y="16" width="40" height="80"/><rect x="268" y="4" width="40" height="92"/></svg></div><figcaption class="luz-figure__caption">${w("figure")}</figcaption></figure></div>`,
       `<div class="o-stack"><div class="luz-card"><h4 class="luz-card__title">${w("uptime")}</h4><p class="luz-card__body">${w("uptime.body")}</p><meter class="luz-meter" value="99" min="0" max="100" aria-hidden="true"></meter></div>`,
       `<div class="luz-accordion"><details open><summary><span>${w("q1")}</span>${chevron}</summary><p>${w("a1")}</p></details><details><summary><span>${w("q2")}</span>${chevron}</summary><p>${w("a2")}</p></details></div></div>`,
       `</div>`,
-      `<div class="luz-table-wrap"><table class="luz-table"><caption>${w("services")}</caption><thead><tr><th scope="col">${w("col.service")}</th><th scope="col">${w("col.status")}</th><th scope="col">${w("col.cpu")}</th></tr></thead><tbody>${row("api-gateway", "running", "green", 12)}${row("data-pipeline", "degraded", "yellow", 78)}${row("mailer", "stopped", "red", 0)}</tbody></table></div>`,
-      `<pre class="luz-code-block" data-lang="css" dir="ltr"><code>.route {\n  rate_limit: 100/min;\n}</code></pre>`,
+      `<div class="luz-table-wrap"><table class="luz-table luz-table--compact luz-table--sticky-col"><caption>${w("services")}</caption><thead><tr><th scope="col">${w("col.service")}</th><th scope="col">${w("col.status")}</th><th class="luz-table__numeric" scope="col">${w("col.cpu")}</th></tr></thead><tbody>${row("api-gateway", "running", "green", 12)}${row("data-pipeline", "degraded", "yellow", 78)}${row("mailer", "stopped", "red", 0)}</tbody></table></div>`,
+      `<div class="landing-page__cards">`,
+      `<article class="luz-card luz-card--media"><div class="luz-card__media luz-image luz-image--21x9"></div><div class="luz-card__body o-stack"><span>${tag("gray", "guide")}</span><h4 class="luz-card__title">${w("guide.title")}</h4><p>${w("guide.text")}</p></div><div class="luz-card__actions o-actions"><a class="luz-btn luz-btn--primary">${w("guide.read")}</a></div></article>`,
+      `<div class="luz-card luz-card--featured"><h4 class="luz-card__title">${t("level.core.sample.team")}</h4><p class="luz-card__body">${w("plan.text")} <span class="luz-tag luz-tag--blue">${w("plan.chosen")}</span></p><p class="luz-card__price"><span class="u-sr-only">${w("price.now")} </span><data value="12">${w("price")}</data> <s><span class="u-sr-only">${w("price.was")} </span>${w("price.old")}</s></p><div class="luz-card__actions o-actions"><a class="luz-btn luz-btn--primary luz-btn--block">${w("plan.upgrade")}</a></div></div>`,
+      `</div>`,
+      `<nav class="luz-tabs luz-tabs--pill"><a class="luz-tab" aria-current="page">CSS</a><a class="luz-tab">HTML</a><a class="luz-tab">JS</a></nav>`,
+      `<div class="luz-tabpanel"><pre class="luz-code-block" data-lang="css" dir="ltr"><code>.route {\n  rate_limit: 100/min;\n}</code></pre></div>`,
       `<ul class="luz-icon-grid">${icon("menu", '<path d="M4 6h16M4 12h16M4 18h16"/>')}${icon("search", '<circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/>')}${icon("close", '<path d="M6 6l12 12M18 6L6 18"/>')}${icon("check", '<path d="m5 12.5 4.5 4.5L19 7"/>')}</ul>`,
       `<div class="o-stack luz-band"><h4>${w("band.title")}</h4><p>${w("band.text")}</p></div>`,
-      `<nav><ul class="luz-pagination"><li><a class="luz-pagination__link" rel="prev">${w("prev")}</a></li><li><a class="luz-pagination__link" aria-current="page">1</a></li><li><a class="luz-pagination__link">2</a></li><li><a class="luz-pagination__link">3</a></li><li><a class="luz-pagination__link" rel="next">${w("next")}</a></li></ul></nav>`,
+      `<nav><ul class="luz-pagination"><li><a class="luz-pagination__link" rel="prev">${w("prev")}</a></li><li><a class="luz-pagination__link" aria-current="page">1</a></li><li><a class="luz-pagination__link">2</a></li><li><a class="luz-pagination__link">3</a></li><li class="luz-pagination__gap" aria-hidden="true">…</li><li><a class="luz-pagination__link">12</a></li><li><a class="luz-pagination__link" rel="next">${w("next")}</a></li></ul></nav>`,
+      `<fieldset class="luz-theme-mode__group" ${themeVars}><legend class="luz-theme-mode__legend">${t("footer.mode")}</legend>${mode("auto", "auto", '<path d="M12 7.5a4.5 4.5 0 0 0 0 9ZM12 7.5a4.5 4.5 0 0 1 0 9M12 2.5v2M12 19.5v2M2.5 12h2M5.3 5.3l1.4 1.4M5.3 18.7l1.4-1.4"/><path d="M12 7.5a4.5 4.5 0 0 0 0 9Z" fill="currentColor"/>', " checked")}${mode("light", "light", '<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/>')}${mode("dark", "dark", '<path d="M19.5 14.5A8 8 0 1 1 9.5 4.5a6.5 6.5 0 0 0 10 10Z"/>')}${mode("high-contrast", "contrast", '<circle cx="12" cy="12" r="8.5"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17Z" fill="currentColor"/>')}</fieldset>`,
       `</div>`,
     ].join("");
     return `<div class="landing-core__live" inert>${page}</div>`;
@@ -2111,8 +2181,8 @@ function coreSections({ say, groups, objects, dependencies }) {
     ["actions", ["actions", "copy", "dropdown"], [["actions"]]],
     ["forms", [], [["forms"]]],
     ["content", [], [["content"], ["navigation"]]],
-    ["feedback", ["alerts", "status", "modal", "toast", "tooltip", "image", "player"], [["feedback"], ["media"]]],
-    ["layout", ["stack", "row", "grid", "media"], [["helpers"]]],
+    ["feedback", ["alerts", "status", "modal", "toast", "tooltip", "image", "player", "video"], [["feedback"], ["media"]]],
+    ["layout", [], [["helpers"]]],
   ];
   const linkOf = (id) => ({
     href: id === "objects" ? "/docs/components/layout/" : `/docs/components/#group-${id}`,
@@ -2127,8 +2197,8 @@ function coreSections({ say, groups, objects, dependencies }) {
       title: t(`level.core.${id}.title`),
       lead: t(`level.core.${id}.lead`),
       links: [...covers.flat(), ...(id === "layout" ? ["objects"] : [])].map(linkOf),
-      aside: id === "forms" ? formCode() : id === "content" ? pageCode() : "",
-      panel: id === "forms" ? formPanel() : id === "content" ? pagePanel() : `<div class="landing-cards">${cards.map((name) => card(name, sample[name], lines[name])).join("")}</div>`,
+      aside: id === "forms" ? formCode() : id === "content" ? pageCode() : id === "layout" ? planCode() : "",
+      panel: id === "forms" ? formPanel() : id === "content" ? pagePanel() : id === "layout" ? planPanel() : `<div class="landing-cards">${cards.map((name) => card(name, sample[name], lines[name])).join("")}</div>`,
     }),
   );
   // The page, once per view: the same words, the markup a step further each time
