@@ -40,7 +40,6 @@ import { existsSync, lstatSync, readFileSync, readdirSync, realpathSync, statSyn
 import { gzipSync } from "node:zlib";
 import { dirname, join, relative, resolve, sep } from "node:path";
 import { HtmlError, compactHtml, readHtml, tags } from "./html.js";
-import { BASE, PACKAGES } from "../luz-packages.js";
 import { fileKinds, fitsKindsOf, isKindFile } from "./kinds.js";
 import { fillAiMarkers } from "./ai.js";
 import { DEBUG_FILE, DEBUG_ROUTE, hasDebugPage, renderDebug } from "./debug.js";
@@ -111,19 +110,13 @@ const PLACEHOLDERS = new Set([
   "notice", "contentattrs",
   // The version the packages share (packages/core/package.json): the CDN snippets and the footer of the home
   "version",
-  // The home's weights (budgets.json against packages/*/dist), a list written by the build
-  "weights",
-  // The home's layers of packages and their dependencies (packages/*/package.json)
-  "packages",
-  // The home's checks: the test files of tests/ by what they check
-  "checks",
   // The weight of each of the home's levels of adoption (budgets.json against dist)
   "weight1", "weight2", "weight3",
   // What each level of the home brings, as a list of names read from the packages
   "list1", "list2", "list3",
 ]);
 /** Values inserted as HTML, not escaped. Only the generator produces them. */
-const RAW_VALUES = new Set(["content", "nav", "pagehead", "rail", "endnav", "pagefoot", "generated", "alternates", "langswitch", "langlinks", "endir", "notice", "contentattrs", "weights", "packages", "checks", "list1", "list2", "list3"]);
+const RAW_VALUES = new Set(["content", "nav", "pagehead", "rail", "endnav", "pagefoot", "generated", "alternates", "langswitch", "langlinks", "endir", "notice", "contentattrs", "list1", "list2", "list3"]);
 
 /** Where the home page's languages live, from the repository root. */
 export const I18N_DIR = "apps/landing/i18n";
@@ -1578,9 +1571,6 @@ function languageValues(site, locale, { home = false, siteUrl = "", page = null,
     alternates: translated ? (suffix ? renderPageLinks(hrefOf(locale), [...i18n.locales.map((l) => [l.code, hrefOf(l)]), ["x-default", hrefOf(i18n.default)]], siteUrl) : renderAlternates(i18n, locale, siteUrl)) : "",
     langswitch: translated ? renderSwitcher(i18n, locale, lookup(locale, "lang.label", `${I18N_DIR}/${locale.code}.json`, null), { hrefOf }) : "",
     langlinks: translated ? renderLangLinks(i18n, locale, { hrefOf }) : "",
-    weights: translated ? renderWeights(site, locale, used ?? site.usage?.used) : "",
-    packages: translated ? renderPackages(site, locale, used ?? site.usage?.used) : "",
-    checks: translated ? renderChecks(site, locale, used ?? site.usage?.used) : "",
     ...(translated ? levelWeights(site, locale, used ?? site.usage?.used) : {}),
     ...(translated ? levelLists(site, locale, used ?? site.usage?.used) : {}),
   };
@@ -1592,22 +1582,6 @@ function languageValues(site, locale, { home = false, siteUrl = "", page = null,
   const version = sharedVersion(site.repoRoot);
   if (version) values.version = version;
   return values;
-}
-
-/**
- * A row of the home's bar charts: a name, a figure and a bar under them, the
- * bar's length the value against `max` (a native <meter>, hidden from the
- * accessibility tree: the figure is the text). `kind` marks a row: "zero"
- * for a count of none.
- */
-function barRow(name, figure, value, max, kind = "") {
-  return [
-    `  <li class="luz-bar-list__row${kind ? ` luz-bar-list__row--${kind}` : ""}">`,
-    `    <span class="luz-bar-list__name">${escapeHtml(name)}</span>`,
-    `    <span class="luz-bar-list__figure"><strong>${escapeHtml(figure)}</strong></span>`,
-    `    <meter class="luz-bar-list__meter" min="0" max="${max}" value="${value}" aria-hidden="true">${escapeHtml(figure)}</meter>`,
-    "  </li>",
-  ].join("\n");
 }
 
 /**
@@ -1689,155 +1663,6 @@ function packageBytes(root, budgets, name, what) {
     }
   }
   return files.reduce((sum, file) => sum + gzipBytes(resolve(root, file)), 0);
-}
-
-/**
- * What the home's "Light" card shows about weight, measured when the page is
- * built and never typed: a bar per base package (BASE: tokens, core, catalog;
- * the packages for one kind of site are not on the home) with the min+gzip
- * size of everything it publishes (packageBytes), the longest bar the
- * heaviest package, and under them the sum.
- * Fails when a file is missing: run `pnpm build` first.
- */
-function renderWeights(site, locale, used) {
-  const file = `${I18N_DIR}/${locale.code}.json`;
-  const say = (key) => lookup(locale, key, file, used);
-  const budgets = JSON.parse(readFileSync(resolve(site.repoRoot, "budgets.json"), "utf-8")).budgets;
-  const number = new Intl.NumberFormat(`${locale.code}-u-nu-latn`, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
-  const kb = (bytes) => `${number.format(bytes / 1024)} ${say("why.weight.unit")}`;
-  const packages = BASE.map((name) => ({ name, size: packageBytes(site.repoRoot, budgets, name, "the home page's weights") }));
-  const total = packages.reduce((sum, p) => sum + p.size, 0);
-  const max = Math.max(...packages.map((p) => p.size));
-  return [
-    '<figure class="luz-bar-list luz-bar-list--cells">',
-    `  <ul class="luz-bar-list__rows" aria-label="${escapeHtml(say("why.weight.list"))}">`,
-    ...packages.map((p) => barRow(p.name, kb(p.size), p.size, max)),
-    "  </ul>",
-    `  <figcaption class="u-text-muted"><strong>${escapeHtml(say("why.weight.total").replace("{total}", kb(total)))}</strong> ${escapeHtml(say("why.weight.caption"))}</figcaption>`,
-    "</figure>",
-  ].join("\n");
-}
-
-/**
- * The kinds of dependency the home's "Zero-dependency" card counts, each with
- * the package names that would be one (lower-case, matched against the start
- * of a dependency's name, or the whole name for a scoped one). The order is
- * the order of the rows; the words come from the catalog (`why.zero.cat.*`).
- */
-const ZERO_KINDS = [
-  ["css-frameworks", ["bootstrap", "tailwindcss", "bulma", "foundation-sites", "open-props", "uikit", "materialize-css"]],
-  ["css-preprocessors", ["sass", "node-sass", "sass-embedded", "less", "stylus", "postcss"]],
-  ["js-frameworks", ["react", "react-dom", "vue", "svelte", "@angular/", "preact", "solid-js", "lit", "alpinejs", "htmx.org", "jquery"]],
-  ["highlighters", ["prismjs", "highlight.js", "shiki", "@shikijs/", "codemirror", "monaco-editor"]],
-  ["icon-libraries", ["@fortawesome/", "lucide", "@heroicons/", "@tabler/icons", "feather-icons", "@phosphor-icons/", "@mdi/"]],
-  ["utilities", ["lodash", "underscore", "moment", "dayjs", "date-fns", "luxon", "axios", "core-js", "@babel/runtime"]],
-  ["search-and-motion", ["fuse.js", "lunr", "flexsearch", "minisearch", "gsap", "framer-motion", "animejs", "motion"]],
-];
-
-/**
- * What the home's "Zero-dependency" card shows, counted when the page is built
- * and never typed: for each kind of dependency a page usually drags in (CSS
- * frameworks, preprocessors, JS frameworks, highlighters, icon sets, utility
- * libraries, search and motion libraries), how many the CSS libraries
- * (PACKAGES) ask for at run time, in `dependencies` or in `peerDependencies`
- * outside @luz-ds. Every count is read, so the card cannot say zero while a
- * package.json says otherwise; and the build fails outright on any
- * `dependencies` at all, so the claim and the code cannot drift apart.
- */
-function renderPackages(site, locale, used) {
-  const file = `${I18N_DIR}/${locale.code}.json`;
-  const say = (key) => lookup(locale, key, file, used);
-  const number = new Intl.NumberFormat(`${locale.code}-u-nu-latn`);
-  const runtime = [];
-  const withDeps = [];
-  for (const name of PACKAGES) {
-    const manifest = JSON.parse(readFileSync(resolve(site.repoRoot, "packages", name, "package.json"), "utf-8"));
-    const deps = Object.keys(manifest.dependencies ?? {});
-    if (deps.length) withDeps.push(`@luz-ds/${name}`);
-    runtime.push(...deps, ...Object.keys(manifest.peerDependencies ?? {}).filter((peer) => !peer.startsWith("@luz-ds/")));
-  }
-  if (withDeps.length) throw new Error(`the home page says "zero dependencies", but ${withDeps.join(", ")} has dependencies in its package.json`);
-  const matches = (dep, names) => names.some((n) => (n.endsWith("/") ? dep.toLowerCase().startsWith(n) : dep.toLowerCase() === n));
-  const rows = ZERO_KINDS.map(([kind, names]) => ({ name: say(`why.zero.cat.${kind}`), count: runtime.filter((dep) => matches(dep, names)).length }));
-  const max = Math.max(1, ...rows.map((r) => r.count));
-  return [
-    '<figure class="luz-bar-list luz-bar-list--cells">',
-    `  <ul class="luz-bar-list__rows" aria-label="${escapeHtml(say("why.zero.list"))}">`,
-    ...rows.map((r) => barRow(r.name, number.format(r.count), r.count, max, r.count ? "" : "zero")),
-    "  </ul>",
-    `  <figcaption class="u-text-muted"><strong>${escapeHtml(say("why.zero.total").replace("{n}", number.format(runtime.length)))}</strong> ${escapeHtml(say("why.zero.caption"))}</figcaption>`,
-    "</figure>",
-  ].join("\n");
-}
-
-/**
- * What the home's "Usable" card shows, counted when the page is built and
- * never typed: seven shares, each a measure of the repository as it is. The
- * components are the pages of apps/docs/pages/components whose `files` is a
- * stylesheet of components/ (not a `_` file); the tests are tests/*.spec.js
- * and *.test.js; the colour pairs are what scripts/check-contrast.js
- * measures (it fails the build when one does not meet its ratio, so the
- * first share is whole or the page does not build). The words come from
- * the catalog (`why.usable.m.*`).
- */
-const contrastPairs = new Map();
-
-function renderChecks(site, locale, used) {
-  const file = `${I18N_DIR}/${locale.code}.json`;
-  const say = (key) => lookup(locale, key, file, used);
-  const number = new Intl.NumberFormat(`${locale.code}-u-nu-latn`);
-  const percent = new Intl.NumberFormat(`${locale.code}-u-nu-latn`, { style: "percent", maximumFractionDigits: 0 });
-  const root = site.repoRoot;
-  // The components, from their docs pages
-  const pagesDir = resolve(root, "apps/docs/pages/components");
-  const components = readdirSync(pagesDir)
-    .filter((name) => name.endsWith(".html"))
-    .map((name) => ({ route: `/docs/components/${name.slice(0, -5)}/`, source: readFileSync(resolve(pagesDir, name), "utf-8") }))
-    .filter((page) => /^files: components\/[a-z0-9-]+\.css$/m.test(page.source));
-  if (!components.length) throw new Error("apps/docs/pages/components has no component pages to count the home page's shares from");
-  // The pages the right-to-left test skips, from its own source
-  const rtlSpec = readFileSync(resolve(root, "tests/rtl.spec.js"), "utf-8");
-  const skipped = new Set([...(rtlSpec.match(/SKIP_PAGES = new Set\(\[([^\]]*)\]\)/)?.[1] ?? "").matchAll(/'([^']+)'/g)].map((m) => m[1]));
-  // The component stylesheets
-  const cssDir = resolve(root, "packages/core/src/components");
-  const stylesheets = readdirSync(cssDir)
-    .filter((name) => name.endsWith(".css") && name !== "index.css" && !name.startsWith("_"))
-    .map((name) => readFileSync(resolve(cssDir, name), "utf-8"));
-  // The tests
-  const testsDir = resolve(root, "tests");
-  const tests = readdirSync(testsDir)
-    .filter((name) => /\.(spec|test)\.js$/.test(name))
-    .map((name) => readFileSync(resolve(testsDir, name), "utf-8"));
-  // The colour pairs, measured by the script (once per build)
-  if (!contrastPairs.has(root)) {
-    const out = execFileSync(process.execPath, [resolve(root, "scripts/check-contrast.js")], { encoding: "utf-8" });
-    const pairs = Number(out.match(/(\d+) token pairs/)?.[1]);
-    if (!pairs) throw new Error("scripts/check-contrast.js did not say how many token pairs it measured");
-    contrastPairs.set(root, pairs);
-  }
-  const pairs = contrastPairs.get(root);
-  const share = (part, whole) => ({ part, whole, pct: Math.round((100 * part) / whole) });
-  const rows = [
-    ["contrast", share(pairs, pairs)],
-    ["rtl", share(components.filter((p) => p.source.includes("data-docs-specimen") && !skipped.has(p.route)).length, components.length)],
-    ["no-js", share(components.filter((p) => !/^module: /m.test(p.source)).length, components.length)],
-    ["focus", share(stylesheets.filter((css) => css.includes(":focus-visible")).length, stylesheets.length)],
-    ["forced", share(stylesheets.filter((css) => css.includes("forced-colors")).length, stylesheets.length)],
-    ["issues", share(components.filter((p) => p.source.includes("None known")).length, components.length)],
-    ["tests", share(tests.filter((src) => /javaScriptEnabled: false|chromium-nojs|nojs/.test(src)).length, tests.length)],
-  ];
-  const total = say("why.usable.total")
-    .replace("{components}", number.format(components.length))
-    .replace("{tests}", number.format(tests.length))
-    .replace("{pairs}", number.format(pairs));
-  return [
-    '<figure class="luz-bar-list luz-bar-list--cells">',
-    `  <ul class="luz-bar-list__rows" aria-label="${escapeHtml(say("why.usable.list"))}">`,
-    ...rows.map(([kind, s]) => barRow(say(`why.usable.m.${kind}`), percent.format(s.pct / 100), s.pct, 100)),
-    "  </ul>",
-    `  <figcaption class="u-text-muted"><strong>${escapeHtml(total)}</strong> ${escapeHtml(say("why.usable.caption"))}</figcaption>`,
-    "</figure>",
-  ].join("\n");
 }
 
 /**
