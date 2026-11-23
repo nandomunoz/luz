@@ -1,0 +1,93 @@
+/**
+ * The motion of the page of the tokens (owner, 2026-11-23: "some animation and the usual transitions"): the hero
+ * comes in, the sections rise as they scroll into view, the specimens draw themselves, the cards lift under the
+ * pointer and the demo's product answers a new brand.
+ *
+ * The rules every one of them keeps, read from apps/landing/landing.css (the part of the page of the tokens, from its
+ * header comment to the end of the file):
+ *
+ *  - no animation and no transition outside `@media (prefers-reduced-motion: no-preference)`: with less motion the
+ *    page is still, and nothing waits for an animation to be seen;
+ *  - a scroll-driven animation (`animation-timeline: view()`) only inside `@supports (animation-timeline: view())`,
+ *    so a browser without it shows every section at once;
+ *  - every duration and delay is a motion token (`--luz-duration-*`), never a typed number of seconds;
+ *  - the curves of the motion block are drawn by their stroke, so their path says pathLength="1".
+ */
+import { readFileSync } from "node:fs";
+import { dirname, join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+import { describe, expect, it } from "vitest";
+import { buildSite, landingDocuments, levelDocuments, scanSite } from "../scripts/docs-site/site.js";
+import { quoted } from "./helpers/quoted-attributes.js";
+
+const repo = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+const read = (file) => readFileSync(join(repo, file), "utf-8");
+const all = read("apps/landing/landing.css").replace(/\/\*[\s\S]*?\*\//g, (c) => (c.includes("The page of the tokens (apps/landing/levels/tokens.html") ? "@@TOKENS@@" : ""));
+const css = all.slice(all.indexOf("@@TOKENS@@"));
+
+/** The blocks of an at-rule whose prelude matches, by brace counting, and the text with them taken out. */
+function blocks(text, prelude) {
+  const found = [];
+  let rest = "";
+  let at = 0;
+  for (const m of text.matchAll(prelude)) {
+    if (m.index < at) continue;
+    const open = text.indexOf("{", m.index);
+    let depth = 0;
+    let end = open;
+    for (; end < text.length; end++) {
+      if (text[end] === "{") depth++;
+      else if (text[end] === "}" && --depth === 0) break;
+    }
+    rest += text.slice(at, m.index);
+    found.push(text.slice(open + 1, end));
+    at = end + 1;
+  }
+  return { found, rest: rest + text.slice(at) };
+}
+
+const motion = blocks(css, /@media\s*\(prefers-reduced-motion:\s*no-preference\)/g);
+const moving = motion.found.join("\n");
+
+describe("the motion of the page of the tokens", () => {
+  it("has its part of landing.css, with motion in it", () => {
+    expect(css.length).toBeGreaterThan(1000);
+    expect(moving).toMatch(/\banimation\s*:/);
+    expect(moving).toMatch(/\btransition\s*:/);
+  });
+
+  it("animates and transitions nothing outside prefers-reduced-motion: no-preference", () => {
+    expect(motion.rest).not.toMatch(/(^|[;{\s])(animation|animation-name|transition)\s*:/);
+  });
+
+  it("has the hero come in, the sections rise, the specimens draw and the cards lift", () => {
+    for (const name of ["landing-rise", "landing-mark-sweep", "landing-grow-y", "landing-grow-x", "landing-draw"]) expect(css, name).toMatch(new RegExp(`@keyframes ${name}\\b`));
+    expect(moving).toMatch(/\.landing-tokens__head > \*[^{]*\{[^}]*animation/);
+    expect(moving).toMatch(/\.landing-tokens__step:hover/);
+    expect(moving).toMatch(/\.landing-tokens__group-link:hover::after/);
+  });
+
+  it("drives the scroll animations only where the browser has view(): elsewhere every section is simply there", () => {
+    const scroll = blocks(moving, /@supports\s*\(animation-timeline:\s*view\(\)\)/g);
+    expect(scroll.found.join("")).toMatch(/animation-timeline:\s*view\(\)/);
+    expect(scroll.rest).not.toMatch(/animation-timeline/);
+    expect(motion.rest).not.toMatch(/animation-timeline/);
+  });
+
+  it("times everything with the motion tokens, never a typed number of seconds", () => {
+    const times = [...moving.matchAll(/(?:animation|transition)(?:-duration|-delay)?\s*:([^;]*);/g)].map((m) => m[1]);
+    expect(times.length).toBeGreaterThan(0);
+    for (const value of times) expect(value, value).not.toMatch(/(^|[\s,(])\d*\.?\d+m?s\b/);
+  });
+
+  it("draws the easing curves by their stroke: each path has pathLength=1", () => {
+    const site = scanSite(join(repo, "apps/docs"), repo);
+    const home = read("apps/landing/index.html");
+    const levels = ["tokens", "core", "components"].map((name) => ({ name, file: `apps/landing/levels/${name}.html`, html: read(`apps/landing/levels/${name}.html`) }));
+    const built = buildSite(site, { extra: [...landingDocuments(site, "apps/landing/index.html", home), ...levelDocuments(site, { file: "apps/landing/index.html", html: home }, levels)] });
+    const page = quoted(built.rendered.get("/tokens/"));
+    const curves = page.match(/<svg class="landing-tokens__curve"[\s\S]*?<\/svg>/g) ?? [];
+    expect(curves.length).toBe(4);
+    for (const svg of curves) expect(svg).toMatch(/<path pathLength="1" d="M0\.0,44\.0 C/);
+  });
+});
