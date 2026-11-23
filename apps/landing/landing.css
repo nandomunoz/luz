@@ -2423,47 +2423,6 @@ home-light:defined ~ .landing-light__nojs {
   block-size: auto;
 }
 
-.landing-level__list {
-  display: grid;
-  gap: var(--luz-space-xl);
-}
-
-.landing-level__list .landing-names__list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 11rem), 1fr));
-  gap: var(--luz-space-xs);
-  min-block-size: 0;
-}
-
-.landing-level__list .landing-names__list > li {
-  display: block;
-  min-inline-size: 0;
-}
-
-.landing-level__list .landing-names__list a {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--luz-space-xs);
-  min-block-size: 2.75rem;
-  padding: var(--luz-space-xs) var(--luz-space-sm);
-  border-radius: var(--luz-radius-sm);
-  background: color-mix(in oklab, var(--luz-brand-primary) calc(6% + var(--share, 0) * 24%), var(--luz-surface-page));
-  color: var(--luz-text-primary);
-  line-height: 1.25;
-}
-
-.landing-level__list .landing-names__list a:hover {
-  border-color: var(--luz-brand-primary);
-  color: var(--luz-text-primary);
-}
-
-.landing-level__list .landing-names__n {
-  color: inherit;
-  font-family: var(--luz-font-mono);
-  font-size: var(--luz-text-xs);
-}
-
 /* The page of a level has no chapters of the home's size: the gap between the main's children (the column, the icons) is zero,
    and the column keeps its own */
 .landing-wrap:has(> .landing-level) {
@@ -3971,14 +3930,6 @@ home-light:defined ~ .landing-light__nojs {
   }
 }
 
-/* The panel takes the wider side, as in the forms and content blocks, so the
-   buttons keep to two rows */
-@media (min-width: 1024px) {
-  .landing-block--actions {
-    grid-template-columns: minmax(0, 0.6fr) minmax(0, 1.4fr);
-  }
-}
-
 .landing-block--actions .landing-card--dropdown .landing-core__live {
   align-content: start;
 }
@@ -4002,6 +3953,12 @@ home-light:defined ~ .landing-light__nojs {
   color: var(--luz-text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.06em;
+}
+
+/* Capitals and tracking mean nothing in a joined script */
+.landing-core__label:lang(ar) {
+  text-transform: none;
+  letter-spacing: 0;
 }
 
 .landing-core__group > .o-row {
@@ -4087,18 +4044,25 @@ home-light:defined ~ .landing-light__nojs {
   }
 }
 
+/* A block of core or the catalog gives its panel the wider side, whichever
+   side the zigzag puts it on, so the live pieces have room */
+@media (min-width: 1024px) {
+  .landing-block--wide {
+    grid-template-columns: minmax(0, 0.6fr) minmax(0, 1.4fr);
+    align-items: start;
+  }
+
+  .landing-block--wide.landing-inside--flip {
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.6fr);
+  }
+}
+
 /* The layout block: on a wide screen the plan beside the words, as in the
    content block, with its markup under them */
 .landing-block--layout .landing-inside__copy > .luz-code-block {
   margin-block-start: var(--luz-space-md);
 }
 
-@media (min-width: 1024px) {
-  .landing-block--layout {
-    grid-template-columns: minmax(0, 0.6fr) minmax(0, 1.4fr);
-    align-items: start;
-  }
-}
 
 /* The plan of an application made of every object of core: the real objects,
    held to the size of a card (no full height, no sticky bar, no page width),
@@ -4261,21 +4225,10 @@ home-light:defined ~ .landing-light__nojs {
   color: var(--luz-text-secondary);
 }
 
-/* The whole list of core, folded at the end of the page */
-.landing-level__fold > summary {
-  font-family: var(--luz-font-heading);
-  font-size: var(--luz-text-xl);
-  cursor: pointer;
-}
-
-.landing-level__fold > .landing-level__list {
-  margin-block-start: var(--luz-space-lg);
-}
-
 /* The page of the catalog (apps/landing/levels/catalog.html, catalogSections()
    in scripts/docs-site/site.js): a wireframe is a grid of cells, each placed
-   by the generator; a piece is drawn small in its card, and a kind of site
-   large in the demo's window, each region named after the pattern it is */
+   by the generator; a kind of site is drawn in the demo's window, each region
+   named after the pattern it is */
 .landing-wf {
   --gap: var(--luz-space-2xs);
 
@@ -4292,11 +4245,6 @@ home-light:defined ~ .landing-light__nojs {
   border: 1px dashed color-mix(in oklab, var(--luz-brand-primary) 55%, transparent);
   border-radius: var(--luz-radius-sm);
   background: transparent;
-}
-
-.landing-wf__cell--fill {
-  border-style: solid;
-  background: color-mix(in oklab, var(--luz-brand-primary) 18%, var(--luz-surface));
 }
 
 .landing-wf--page {
@@ -4425,11 +4373,6 @@ home-light:defined ~ .landing-light__nojs {
 }
 
 @media (min-width: 1024px) {
-  .landing-block--forms {
-    grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.6fr);
-    align-items: start;
-  }
-
   .landing-form {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     column-gap: var(--luz-space-xl);
@@ -4462,12 +4405,6 @@ home-light:defined ~ .landing-light__nojs {
   margin-block-start: var(--luz-space-md);
 }
 
-@media (min-width: 1024px) {
-  .landing-block--content {
-    grid-template-columns: minmax(0, 0.6fr) minmax(0, 1.4fr);
-    align-items: start;
-  }
-}
 
 /* The page of a project made of every piece of content and navigation: its
    bar (the skip link as it shows on focus, the breadcrumb, the colour mode),
@@ -4643,12 +4580,6 @@ home-light:defined ~ .landing-light__nojs {
   }
 }
 
-@media (min-width: 1024px) {
-  .landing-block--feedback {
-    grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.6fr);
-    align-items: start;
-  }
-}
 
 .landing-core__live .luz-modal {
   position: static;
@@ -4691,4 +4622,667 @@ home-light:defined ~ .landing-light__nojs {
 .landing-core__live .luz-toast {
   position: static;
   max-inline-size: 100%;
+}
+
+/* ==== The page of the catalog: every piece live, a block each (scripts/docs-site/catalog-blocks/) ==== */
+
+/* Structure: three little sites of one bookshop, one card each, one over the other */
+.landing-block--structure .landing-block__panel > .landing-cards {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* The names of the pieces wrap as words */
+.landing-cat-structure__names {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--luz-space-2xs) var(--luz-space-sm);
+}
+
+/* The page runs from edge to edge of its card, between two rules: the card is
+   the window, so the page needs no frame of its own */
+.landing-cat-structure__frame {
+  --landing-cat-structure-edge: var(--luz-space-xl);
+
+  display: block;
+  margin-inline: calc(-1 * var(--luz-space-md));
+  border-block: 1px solid var(--luz-divider);
+  background: var(--luz-surface-page);
+  overflow: clip;
+}
+
+.landing-cat-structure__frame > :is(.luz-hero, .luz-section, .luz-page-header, .luz-article-header) {
+  margin: 0;
+  padding: var(--luz-space-lg) var(--landing-cat-structure-edge) 0;
+}
+
+/* The gutters of core's .o-container, which the landing's own footer drops */
+.landing-cat-structure__frame .luz-site-footer > .o-container {
+  padding-inline: var(--landing-cat-structure-edge);
+}
+
+@media (max-width: 640px) {
+  .landing-cat-structure__frame {
+    --landing-cat-structure-edge: var(--luz-space-md);
+  }
+}
+
+/* The actions at the end of a bar keep their words whole: the date or the
+   empty room gives way first. The small buttons take back core's padding
+   (the landing's is a percentage, which their row cannot measure, so they
+   would wrap one under the other) */
+.landing-cat-structure__frame :is(.luz-masthead__actions, .luz-app-bar__actions, .luz-site-footer .o-actions) {
+  flex-shrink: 0;
+}
+
+.landing-cat-structure__frame :is(.luz-masthead__actions, .luz-app-bar__actions, .luz-site-footer .o-actions) .luz-btn {
+  white-space: nowrap;
+}
+
+.landing-cat-structure__frame .luz-site-footer .luz-btn--sm {
+  padding-inline: var(--luz-space-sm);
+}
+
+/* Where the navbar is a panel (768 px and below), its panel drawn open under
+   the bar, the width of the page, and the language list closed: one open
+   thing at a time. The picture of the hero gives its room to the words */
+@media (max-width: 768px) {
+  .landing-cat-structure__frame .luz-site-header .luz-navbar {
+    order: 1;
+    flex-basis: 100%;
+    padding-block: var(--luz-space-2xs);
+    border-block-start: 1px solid var(--luz-divider);
+  }
+
+  .landing-cat-structure__frame .luz-site-header .luz-navbar__list {
+    flex-flow: column nowrap;
+    gap: 0;
+  }
+
+  .landing-cat-structure__lang .luz-lang-switch__menu {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .landing-cat-structure__frame .luz-hero__media {
+    display: none;
+  }
+}
+
+.landing-cat-structure__frame > .luz-site-footer {
+  margin-block-start: var(--luz-space-lg);
+  padding-block: var(--luz-space-sm);
+}
+
+/* The hero keeps its picture beside its words in the narrow page */
+.landing-cat-structure__frame > .luz-hero {
+  --luz-grid-min: 13rem;
+}
+
+.landing-cat-structure__frame > .luz-article-header {
+  padding-block-end: var(--luz-space-lg);
+}
+
+/* The language list, drawn open under its button, at the end of the row */
+.landing-cat-structure__lang {
+  position: relative;
+}
+
+.landing-cat-structure__lang .luz-lang-switch__menu {
+  position: absolute;
+  inset: 100% 0 auto auto;
+  z-index: 1;
+  inline-size: max-content;
+  min-inline-size: 0;
+  margin-block-start: var(--luz-space-xs);
+}
+
+/* The new books: three covers in a row */
+.landing-cat-structure__shelf {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--luz-space-sm);
+}
+
+/* The back office: the sidebar as a column beside the view, the height of
+   its links, not of the window */
+.landing-cat-structure__shell {
+  display: grid;
+  grid-template-columns: minmax(7rem, 12rem) minmax(0, 1fr);
+}
+
+.landing-cat-structure__shell > .luz-sidebar {
+  position: static;
+  inline-size: auto;
+  min-inline-size: 0;
+  block-size: auto;
+  overflow: visible;
+}
+
+.landing-cat-structure__main {
+  display: grid;
+  align-content: start;
+  min-inline-size: 0;
+}
+
+.landing-cat-structure__main .luz-app-bar > .o-row {
+  padding-inline: var(--luz-space-md);
+}
+
+.landing-cat-structure__view {
+  padding: var(--luz-space-md);
+}
+
+.landing-cat-structure__heading {
+  margin: 0;
+  font-size: var(--luz-text-xl);
+}
+
+/* Content: every piece of the catalog's content group, a card each. On a
+   wide screen two columns, the FAQ beside the embed and the terminal, the
+   timeline beside the posts, the contents beside the figures; the social
+   links across both; on a phone one column */
+@media (min-width: 641px) {
+  .landing-cat-content {
+    grid-template-areas:
+      "faq embed"
+      "faq terminal"
+      "timeline post-list"
+      "toc stat"
+      "social social";
+  }
+
+  .landing-cat-content > .landing-card--faq {
+    grid-area: faq;
+  }
+
+  .landing-cat-content > .landing-card--embed {
+    grid-area: embed;
+  }
+
+  .landing-cat-content > .landing-card--toc {
+    grid-area: toc;
+  }
+
+  .landing-cat-content > .landing-card--timeline {
+    grid-area: timeline;
+  }
+
+  .landing-cat-content > .landing-card--post-list {
+    grid-area: post-list;
+  }
+
+  .landing-cat-content > .landing-card--terminal {
+    grid-area: terminal;
+  }
+
+  .landing-cat-content > .landing-card--stat {
+    grid-area: stat;
+  }
+
+  .landing-cat-content > .landing-card--social {
+    grid-area: social;
+  }
+}
+
+/* The FAQ, the timeline and the contents start at the top of their card */
+.landing-cat-content :is(.landing-card--faq, .landing-card--toc, .landing-card--timeline) > .landing-core__live {
+  align-content: start;
+  justify-items: start;
+}
+
+/* The frame <luz-embed> would give: the poster's ratio, its corners and the
+   colours of the play mark; the link fills it */
+.landing-cat-content__embed {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--luz-radius-md);
+  color: var(--luz-text-on-fill);
+  font-family: var(--luz-font-sans);
+}
+
+.landing-cat-content__embed .luz-embed__poster {
+  color: var(--luz-text-on-fill);
+}
+
+/* The rings of the timeline are drawn on the card's ground */
+.landing-cat-content__timeline {
+  --luz-timeline-paper: var(--luz-surface);
+}
+
+.landing-cat-content__timeline > .luz-timeline__item:last-child {
+  padding-block-end: 0;
+}
+
+/* Three figures in a row, the third in a card, as the stat's page shows them */
+.landing-cat-content__stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
+  gap: var(--luz-space-md);
+  align-items: start;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  /* the figure takes the size of its list (stat.css sets none); the label keeps its own */
+  font-size: var(--luz-text-2xl);
+}
+
+.landing-cat-content__stats > .luz-card {
+  margin: 0;
+}
+
+/* The names, then the icons alone */
+.landing-cat-content__social {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--luz-space-sm) var(--luz-space-lg);
+}
+
+/* Charts: a little analytics dashboard whose tiles are the six other charts of
+   the group, each tile naming its piece in small code text */
+.landing-cat-charts {
+  --luz-grid-min: 15rem;
+  gap: var(--luz-space-md);
+  padding: 0;
+  font-family: var(--luz-font-sans);
+}
+
+.landing-cat-charts > .o-grid {
+  gap: var(--luz-space-sm);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.landing-cat-charts .luz-dashboard__head {
+  row-gap: 0;
+}
+
+.landing-cat-charts .luz-dashboard__title {
+  font-size: var(--luz-text-lg);
+}
+
+.landing-cat-charts__name {
+  display: block;
+  font-family: var(--luz-font-mono);
+  font-size: var(--luz-text-xs);
+  color: var(--luz-brand-primary);
+  white-space: nowrap;
+}
+
+.landing-cat-charts__name > code {
+  font: inherit;
+}
+
+.landing-cat-charts .luz-dashboard__head > .landing-cat-charts__name {
+  flex-basis: 100%;
+}
+
+.landing-cat-charts__tile {
+  display: grid;
+  align-content: start;
+  gap: var(--luz-space-xs);
+  margin: 0;
+  padding: var(--luz-space-sm);
+}
+
+.landing-cat-charts__tile > .luz-card__title {
+  margin: 0;
+  font-family: var(--luz-font-sans);
+  font-size: var(--luz-text-sm);
+  font-weight: 500;
+}
+
+.landing-cat-charts .luz-heat-map caption {
+  padding-inline: 0;
+  color: var(--luz-text-primary);
+  font-size: var(--luz-text-sm);
+  font-weight: 500;
+  text-align: start;
+}
+
+.landing-cat-charts__tile > * {
+  min-inline-size: 0;
+}
+
+.landing-cat-charts__spark {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--luz-space-xs);
+  margin: 0;
+  font-size: var(--luz-text-sm);
+}
+
+.landing-cat-charts .luz-chart__tick:is(:lang(ar), :lang(fa), :lang(ur)) {
+  font-family: var(--luz-font-sans);
+}
+
+.landing-cat-charts__spark > .landing-cat-charts__name {
+  flex-basis: 100%;
+}
+
+.landing-cat-charts__chart .luz-chart__figure {
+  margin: 0;
+}
+
+.landing-cat-charts__chart .luz-chart__plot {
+  min-block-size: 0;
+  aspect-ratio: 320 / 150;
+}
+
+.landing-cat-charts .luz-ring {
+  --luz-ring-size: 12rem;
+}
+
+.landing-cat-charts__note {
+  display: block;
+  color: var(--luz-text-secondary);
+  font-size: var(--luz-text-xs);
+  font-weight: 400;
+}
+
+/* Site-wide and docs: five cards for the pieces that act for the whole site,
+   then one page of a documentation site under them, framed like a card (the
+   panel has the wider side, landing-block--wide, room for its three columns) */
+.landing-block--sitewide .landing-block__panel {
+  display: grid;
+  gap: var(--luz-space-md);
+}
+
+@media (min-width: 641px) {
+  .landing-block--sitewide .landing-block__panel > .landing-cards {
+    grid-template-areas:
+      "announcement announcement"
+      "search transition"
+      "cookie time";
+  }
+
+  .landing-block--sitewide .landing-card--announcement {
+    grid-area: announcement;
+  }
+
+  .landing-block--sitewide .landing-card--search {
+    grid-area: search;
+  }
+
+  .landing-block--sitewide .landing-card--page-transition {
+    grid-area: transition;
+  }
+
+  .landing-block--sitewide .landing-card--cookie-consent {
+    grid-area: cookie;
+  }
+
+  .landing-block--sitewide .landing-card--theme-time {
+    grid-area: time;
+  }
+}
+
+/* The announcement, both tones, in the width of its card */
+.landing-cat-sitewide__bands {
+  display: grid;
+  gap: var(--luz-space-xs);
+}
+
+.landing-cat-sitewide__bands :where(luz-announcement) {
+  border-radius: var(--luz-radius-sm);
+}
+
+.landing-cat-sitewide__bands :where(luz-announcement > section) {
+  padding-inline: var(--luz-space-sm);
+}
+
+.landing-cat-sitewide__bands p {
+  margin: 0;
+}
+
+/* The cookie banner in the flow of its card, not fixed to the window */
+.landing-card--cookie-consent .luz-cookie-consent {
+  position: static;
+  max-block-size: none;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-size: var(--luz-text-sm);
+}
+
+.landing-card--cookie-consent .luz-cookie-consent__title {
+  margin-block-start: 0;
+}
+
+.landing-card--cookie-consent .luz-cookie-consent p {
+  margin-block: 0;
+}
+
+/* The search: the trigger, then the link without JavaScript */
+.landing-card--search .landing-core__live {
+  gap: var(--luz-space-sm);
+}
+
+/* The slider of the day, with the hour, the place and the moments a site
+   asks for with show="time place moments" */
+.landing-cat-sitewide__time {
+  display: grid;
+  gap: var(--luz-space-xs);
+}
+
+.landing-cat-sitewide__time .luz-theme-time__bar {
+  padding-inline: 0;
+}
+
+.landing-cat-sitewide__time :is(.luz-theme-time__hour, .luz-theme-time__where) {
+  display: block;
+}
+
+.landing-cat-sitewide__time .luz-theme-time__moments {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--luz-space-2xs);
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.landing-cat-sitewide__time .luz-theme-time__legend {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* The page transition, held still: the page before, the two crossing, the
+   page after */
+.landing-cat-sitewide__fade {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--luz-space-xs);
+  color: var(--luz-text-secondary);
+}
+
+.landing-cat-sitewide__frame {
+  display: grid;
+  align-content: start;
+  gap: var(--luz-space-3xs);
+  inline-size: var(--luz-space-3xl);
+  aspect-ratio: 3 / 4;
+  padding: var(--luz-space-2xs);
+  border: 1px solid var(--luz-divider);
+  border-radius: var(--luz-radius-sm);
+  background: var(--luz-surface-page);
+}
+
+.landing-cat-sitewide__frame > span {
+  block-size: var(--luz-space-3xs);
+  border-radius: var(--luz-radius-full);
+  background: var(--luz-divider);
+}
+
+.landing-cat-sitewide__frame--a > :first-child {
+  inline-size: 70%;
+  block-size: var(--luz-space-xs);
+  background: var(--luz-text-secondary);
+}
+
+.landing-cat-sitewide__frame--b > :first-child {
+  block-size: var(--luz-space-md);
+  background: var(--luz-brand-fill);
+}
+
+.landing-cat-sitewide__cross {
+  display: grid;
+}
+
+.landing-cat-sitewide__cross > * {
+  grid-area: 1 / 1;
+  opacity: 0.5;
+}
+
+.landing-cat-sitewide__arrow {
+  flex: none;
+  inline-size: var(--luz-space-md);
+  block-size: var(--luz-space-md);
+}
+
+.landing-cat-sitewide__note {
+  margin: var(--luz-space-sm) 0 0;
+  font-family: var(--luz-font-sans);
+  font-size: var(--luz-text-sm);
+  text-align: center;
+  color: var(--luz-text-secondary);
+}
+
+/* One page of a documentation site, framed like a card: the shell's own
+   tracks follow this frame's width, not the window's */
+.landing-cat-sitewide__docs {
+  container-type: inline-size;
+  align-content: start;
+  padding: var(--luz-space-md);
+  border: 1px solid var(--luz-divider);
+  border-radius: var(--luz-radius-md);
+  background: var(--luz-surface);
+}
+
+.landing-cat-sitewide__docs .landing-cat-sitewide__shell {
+  min-block-size: 0;
+  grid-template:
+    "head" auto
+    "rail" auto
+    "main" auto / minmax(0, 1fr);
+}
+
+.landing-cat-sitewide__head {
+  display: flex;
+  align-items: center;
+  gap: var(--luz-space-sm);
+  padding-block-end: var(--luz-space-sm);
+  border-block-end: 1px solid var(--luz-divider);
+}
+
+.landing-cat-sitewide__brand {
+  margin: 0;
+  font-family: var(--luz-font-heading);
+  font-size: var(--luz-text-lg);
+}
+
+.landing-cat-sitewide__docs .landing-cat-sitewide__toggle {
+  display: flex;
+}
+
+/* The links of the sidebar: a drawer on a narrow screen, a column beside the
+   page from 30rem */
+.landing-cat-sitewide__nav {
+  display: none;
+  padding-block: var(--luz-space-sm);
+  background: var(--luz-sidebar-bg);
+  color: var(--luz-sidebar-text);
+  font-family: var(--luz-font-sans);
+}
+
+.landing-cat-sitewide__nav ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.landing-cat-sitewide__nav .luz-sidebar__link {
+  font-size: var(--luz-text-sm);
+}
+
+.landing-cat-sitewide__docs .luz-page-rail {
+  padding: var(--luz-space-md) var(--luz-space-md) 0;
+}
+
+.landing-cat-sitewide__docs .luz-page-rail__inner {
+  position: static;
+  max-block-size: none;
+  overflow: visible;
+  padding-inline-start: 0;
+}
+
+.landing-cat-sitewide__docs .luz-docs-main {
+  container-type: inline-size;
+  padding: var(--luz-space-md);
+}
+
+.landing-cat-sitewide__docs .luz-doc-header > h3 {
+  margin: 0;
+  font-family: var(--luz-font-heading);
+  font-size: var(--luz-text-2xl);
+  font-weight: 400;
+  line-height: 1.1;
+  text-wrap: balance;
+}
+
+.landing-cat-sitewide__docs .luz-doc-header p {
+  margin: 0;
+}
+
+.landing-cat-sitewide__docs .luz-do-dont__stage > h4 {
+  margin: 0;
+}
+
+@container (min-width: 30rem) {
+  .landing-cat-sitewide__docs .landing-cat-sitewide__shell {
+    grid-template:
+      "head head" auto
+      "nav rail" auto
+      "nav main" auto / 9rem minmax(0, 1fr);
+  }
+
+  .landing-cat-sitewide__docs .landing-cat-sitewide__toggle {
+    display: none;
+  }
+
+  .landing-cat-sitewide__nav {
+    display: block;
+    align-self: start;
+    margin-block-start: var(--luz-space-md);
+    border-radius: var(--luz-radius-md);
+  }
+}
+
+@container (min-width: 44rem) {
+  .landing-cat-sitewide__docs .landing-cat-sitewide__shell {
+    grid-template:
+      "head head head" auto
+      "nav main rail" auto / 9rem minmax(0, 1fr) 11rem;
+  }
+
+  .landing-cat-sitewide__docs .luz-page-rail {
+    padding-inline: 0;
+  }
+}
+
+@container (min-width: 24rem) {
+  .landing-cat-sitewide__docs .luz-do-dont {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }

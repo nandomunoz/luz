@@ -40,7 +40,11 @@ import { existsSync, lstatSync, readFileSync, readdirSync, realpathSync, statSyn
 import { gzipSync } from "node:zlib";
 import { dirname, join, relative, resolve, sep } from "node:path";
 import { HtmlError, compactHtml, readHtml, tags } from "./html.js";
-import { FITS_KINDS, fileKinds, fitsKindsOf, isKindFile, kindPatterns } from "./kinds.js";
+import { panel as chartsBlock } from "./catalog-blocks/charts.js";
+import { panel as contentBlock } from "./catalog-blocks/content.js";
+import { panel as sitewideBlock } from "./catalog-blocks/sitewide.js";
+import { panel as structureBlock } from "./catalog-blocks/structure.js";
+import { CASCADE, FITS_KINDS, fileKinds, fitsKindsOf, isKindFile, kindPatterns } from "./kinds.js";
 import { fillAiMarkers } from "./ai.js";
 import { DEBUG_FILE, DEBUG_ROUTE, hasDebugPage, renderDebug } from "./debug.js";
 import { FILES, catalogComponents, catalogFilesIn, renderComponentLinks, renderSnippets, snippetData } from "./snippets.js";
@@ -115,10 +119,10 @@ const PLACEHOLDERS = new Set([
   // What each level of the home brings, as a list of names read from the packages
   "list1", "list2", "list3", "tokendemo", "tokenlooks", "tokenblocks", "ntokens", "nmodes", "ndeps",
   "coredemo", "coreblocks", "ncomponents", "nobjects", "ndepscore",
-  "catalogdemo", "catalogblocks", "ncatalog", "nchunks", "ndepscatalog",
+  "catalogdemo", "catalogblocks", "catalogsheets", "ncatalog", "nchunks", "ndepscatalog",
 ]);
 /** Values inserted as HTML, not escaped. Only the generator produces them. */
-const RAW_VALUES = new Set(["content", "nav", "pagehead", "rail", "endnav", "pagefoot", "generated", "alternates", "langswitch", "langlinks", "endir", "notice", "contentattrs", "list1", "list2", "list3", "tokendemo", "tokenblocks", "coredemo", "coreblocks", "catalogdemo", "catalogblocks"]);
+const RAW_VALUES = new Set(["content", "nav", "pagehead", "rail", "endnav", "pagefoot", "generated", "alternates", "langswitch", "langlinks", "endir", "notice", "contentattrs", "list1", "list2", "list3", "tokendemo", "tokenblocks", "coredemo", "coreblocks", "catalogdemo", "catalogblocks", "catalogsheets"]);
 
 /** Where the home page's languages live, from the repository root. */
 export const I18N_DIR = "apps/landing/i18n";
@@ -1818,15 +1822,16 @@ function levelLists(site, locale, used) {
  * page zigzags. `anchor` is the prefix of its id (`t-color`), `links` are [{ href, label, count }] with `label`
  * already escaped, `panel` is the panel's inside and `aside` what follows the links in the words' column.
  */
-function levelBlock({ i, id, anchor, title, lead, links, panel, aside = "" }) {
+function levelBlock({ i, id, anchor, title, lead, links, panel, aside = "", wide = false }) {
   return [
-    `<section class="landing-inside${i % 2 ? " landing-inside--flip" : ""} landing-block landing-block--${id}" id="${anchor}-${id}" aria-labelledby="${anchor}-${id}-title">`,
+    `<section class="landing-inside${i % 2 ? " landing-inside--flip" : ""} landing-block landing-block--${id}${wide ? " landing-block--wide" : ""}" id="${anchor}-${id}" aria-labelledby="${anchor}-${id}-title">`,
     `  <div class="landing-inside__copy">`,
     `    <h2 class="landing-inside__title" id="${anchor}-${id}-title">${title}</h2>`,
     `    <p class="landing-inside__lead">${lead}</p>`,
     `    <ul class="landing-block__groups">${links.map((l) => `<li><a class="landing-block__link" href="${l.href}">${l.label} <span class="landing-names__n">${l.count}</span></a></li>`).join("")}</ul>${aside}`,
     `  </div>`,
-    `  <div class="landing-panel landing-block__panel" dir="ltr">${panel}</div>`,
+    // the tokens' specimens are drawn left to right; the live pieces of core and the catalog follow the page's direction
+    `  <div class="landing-panel landing-block__panel"${wide ? "" : ' dir="ltr"'}>${panel}</div>`,
     `</section>`,
   ].join("\n");
 }
@@ -2194,6 +2199,7 @@ function coreSections({ say, groups, objects, dependencies }) {
       i,
       id,
       anchor: "c",
+      wide: true,
       title: t(`level.core.${id}.title`),
       lead: t(`level.core.${id}.lead`),
       links: [...covers.flat(), ...(id === "layout" ? ["objects"] : [])].map(linkOf),
@@ -2268,26 +2274,6 @@ const KIND_WIRES = {
   docs: [["1/1/7/2", "sidebar"], ["1/2/2/6", "doc-header"], ["2/2/4/6", "example"], ["4/2/6/6", "do-dont"], ["6/2/7/6", "page-footer"], ["1/6/7/7", "page-rail"]],
 };
 
-/** The pieces drawn in the blocks of the catalog page: a wireframe each, [rows, columns, [row/column/row/column, fill?]…]. */
-const PIECE_WIRES = {
-  navbar: [1, 6, [["1/1/2/2", 1], ["1/3/2/4"], ["1/4/2/5"], ["1/5/2/6"], ["1/6/2/7", 1]]],
-  sidebar: [4, 5, [["1/1/5/2", 1], ["1/2/2/6"], ["2/2/4/6"], ["4/2/5/5"]]],
-  "site-header": [1, 6, [["1/1/2/2", 1], ["1/3/2/5"], ["1/6/2/7", 1]]],
-  "site-footer": [3, 6, [["1/1/4/3"], ["1/3/4/5"], ["1/5/4/7"]]],
-  hero: [4, 6, [["1/1/2/5", 1], ["2/1/3/4"], ["3/1/4/2", 1], ["3/2/4/3"], ["1/5/4/7"]]],
-  faq: [4, 6, [["1/1/2/7"], ["2/1/3/7"], ["3/1/4/7"], ["4/1/5/7"]]],
-  stat: [2, 6, [["1/1/3/3", 1], ["1/3/3/5", 1], ["1/5/3/7", 1]]],
-  timeline: [4, 6, [["1/1/2/2", 1], ["1/2/2/6"], ["2/1/3/2", 1], ["2/2/3/6"], ["3/1/4/2", 1], ["3/2/4/5"], ["4/1/5/2", 1], ["4/2/5/6"]]],
-  "bar-list": [4, 6, [["1/1/2/6", 1], ["2/1/3/5", 1], ["3/1/4/3", 1], ["4/1/5/2", 1]]],
-  "column-chart": [4, 6, [["3/1/5/2", 1], ["2/2/5/3", 1], ["1/3/5/4", 1], ["3/4/5/5", 1], ["2/5/5/6", 1]]],
-  "heat-map": [3, 6, [["1/1/2/2"], ["1/2/2/3", 1], ["1/3/2/4"], ["1/4/2/5", 1], ["1/5/2/6"], ["2/1/3/2", 1], ["2/2/3/3"], ["2/3/3/4", 1], ["2/4/3/5"], ["2/5/3/6", 1], ["3/1/4/2"], ["3/2/4/3", 1], ["3/3/4/4", 1], ["3/4/4/5"], ["3/5/4/6", 1]]],
-  ring: [4, 4, [["1/1/5/3", 1], ["2/3/3/5"], ["3/3/4/5"]]],
-  search: [3, 6, [["1/1/2/7", 1], ["2/1/3/7"], ["3/1/4/6"]]],
-  "cookie-consent": [3, 6, [["1/1/3/7"], ["2/5/3/6", 1], ["2/6/3/7"]]],
-  "lang-switch": [1, 6, [["1/1/2/2", 1], ["1/2/2/3"], ["1/3/2/4"]]],
-  "docs-layout": [4, 6, [["1/1/5/2", 1], ["1/2/5/5"], ["1/5/5/7"]]],
-};
-
 /**
  * The page of the catalog (apps/landing/levels/catalog.html): for a developer who does not yet know that the catalog
  * is a stylesheet per piece, that a page links only what it uses and that the script of a piece loads when the piece
@@ -2302,32 +2288,29 @@ const PIECE_WIRES = {
  */
 function catalogSections({ say, root, groups, sheets, dependencies, chunks }) {
   const t = (key) => escapeHtml(say(key));
-  const wire = ([rows, cols, cells]) =>
-    `<span class="landing-wf" style="--rows:${rows};--cols:${cols}" aria-hidden="true">${cells.map(([area, fill]) => `<span class="landing-wf__cell${fill ? " landing-wf__cell--fill" : ""}" style="grid-area:${area}"></span>`).join("")}</span>`;
   const link = (name) => `<link rel="stylesheet" href="…/components/${name}.min.css">`;
-  const card = (name) => {
-    const drawing = PIECE_WIRES[name];
-    if (!drawing) throw new Error(`the page of the catalog has no wireframe for ${name}: add it to PIECE_WIRES in scripts/docs-site/site.js`);
-    if (!sheets.includes(name)) throw new Error(`the page of the catalog draws ${name}, which is not a stylesheet of packages/catalog/src/components`);
-    return `<div class="landing-card landing-card--${name}"><p class="landing-card__title"><code>${name}</code></p><div class="landing-core__live">${wire(drawing)}</div><pre class="luz-code-block" data-lang="html" dir="ltr" tabindex="0"><code>${escapeHtml(link(name))}</code></pre></div>`;
-  };
+  const html = (code) => `<pre class="luz-code-block" data-lang="html" dir="ltr" tabindex="0"><code>${escapeHtml(code)}</code></pre>`;
+  // Each block shows every piece of the docs' groups it covers, live (scripts/docs-site/catalog-blocks/)
   const BLOCKS = [
-    ["structure", ["navbar", "sidebar", "site-header", "site-footer"], ["navigation", "page-structure"]],
-    ["content", ["hero", "faq", "stat", "timeline"], ["content"]],
-    ["charts", ["bar-list", "column-chart", "heat-map", "ring"], ["charts"]],
-    ["sitewide", ["search", "cookie-consent", "lang-switch", "docs-layout"], ["site-wide", "documentation"]],
+    ["structure", structureBlock, ["navigation", "page-structure"]],
+    ["content", contentBlock, ["content"]],
+    ["charts", chartsBlock, ["charts"]],
+    ["sitewide", sitewideBlock, ["site-wide", "documentation"]],
   ];
-  const blocks = BLOCKS.map(([id, cards, covers], i) =>
-    levelBlock({
+  const blocks = BLOCKS.map(([id, make, covers], i) => {
+    const { panel, aside } = make({ t, html });
+    return levelBlock({
       i,
       id,
       anchor: "k",
+      wide: true,
+      aside,
       title: t(`level.catalog.${id}.title`),
       lead: t(`level.catalog.${id}.lead`),
       links: covers.map((g) => ({ href: `/docs/catalog/#group-${g}`, label: t(`level.catalog.group.${g}`), count: groups.get(g) ?? 0 })),
-      panel: `<div class="landing-cards">${cards.map(card).join("")}</div>`,
-    }),
-  );
+      panel,
+    });
+  });
   const word = (key) => t(`level.catalog.demo.${key}`);
   const kinds = FITS_KINDS.map((kind) => {
     const { files, pages } = kindPatterns(kind, root, null);
@@ -2366,6 +2349,11 @@ function catalogSections({ say, root, groups, sheets, dependencies, chunks }) {
   return {
     catalogdemo: demo,
     catalogblocks: blocks.join("\n"),
+    // every stylesheet of the catalog the home does not link, in the order of the cascade, then the rest by name
+    catalogsheets: [...CASCADE.filter((name) => sheets.includes(name)), ...sheets.filter((name) => !CASCADE.includes(name)).sort()]
+      .filter((name) => !readFileSync(resolve(root, "apps/landing/index.html"), "utf-8").includes(`/packages/catalog/dist/components/${name}.css"`))
+      .map((name) => `<link rel="stylesheet" href="/packages/catalog/dist/components/${name}.css">`)
+      .join("\n  "),
     ncatalog: String(sheets.length),
     nchunks: String(chunks),
     ndepscatalog: String(dependencies),
@@ -2514,7 +2502,11 @@ export function levelTemplate(home, fragment, name, file = "the home's template"
   const open = /<main\b[^>]*>\n/.exec(home);
   const icons = home.indexOf("<!-- Icons used more than once");
   if (!open || icons < open.index) throw new Error(`${file}: a level page needs the <main> and the comment "Icons used more than once" of the home's template`);
-  const before = home.slice(0, open.index + open[0].length);
+  // The page of the catalog shows its pieces live, so it links every stylesheet of the catalog the home does not
+  // (catalogSections() writes them, in the order of the cascade), before the landing's own
+  const landingCss = '<link rel="stylesheet" href="/apps/landing/landing.css">';
+  if (name === "catalog" && !home.includes(landingCss)) throw new Error(`${file}: the page of the catalog links its stylesheets before ${landingCss}, which the home's template lacks`);
+  const before = home.slice(0, open.index + open[0].length).replace(landingCss, name === "catalog" ? `{{catalogsheets}}\n  ${landingCss}` : landingCss);
   const after = home.slice(icons);
   // The links (<a>) to a section of the home, outside the skip link; the icons (<use>) stay the page's own
   const toHome = (html) => html.replace(/<a\b[^>]*>/g, (tag) => tag.replace(/\shref="#(?!main-content")/, ' href="{{home}}#'));
