@@ -6,7 +6,7 @@
  */
 import { afterAll, describe, it, expect } from "vitest";
 import { spawnSync } from "node:child_process";
-import { mkdtempSync, mkdirSync, readdirSync, readFileSync, rmSync, symlinkSync, writeFileSync, existsSync } from "node:fs";
+import { cpSync, mkdtempSync, mkdirSync, readdirSync, readFileSync, rmSync, symlinkSync, writeFileSync, existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -497,7 +497,8 @@ describe("the agents and skills of luz-ai", () => {
 
   it("are the four agents and three skills of the repository luz-ai, kept here and passing the check", () => {
     expect(list("agent").map((a) => a.name)).toEqual(AGENTS);
-    expect(list("skill").map((s) => s.name)).toEqual(SKILLS);
+    // luz-start adds itself too, so it is the fourth the list names
+    expect(list("skill").map((s) => s.name)).toEqual([...SKILLS, "luz-start"]);
     const r = run(["check", "--json", join(assets, "agents"), join(assets, "skills")]);
     expect(JSON.parse(r.out).problems).toEqual([]);
     expect(JSON.parse(r.out).checked.length).toBe(7);
@@ -710,5 +711,91 @@ describe("check: the formats of Gemini CLI and Codex", () => {
 
   it("looks in .codex/agents when no path is given", () => {
     expect(JSON.parse(run(["check", "--json"], codex(GOOD_TOML)).out).checked).toEqual([".codex/agents/demo.toml"]);
+  });
+});
+
+describe("portability", () => {
+  const openai = join(skill, "agents/openai.yaml");
+
+  it("gives Codex its own file for the skill, which every other assistant ignores, and the check reads it", () => {
+    const text = read(openai);
+    expect(text).toMatch(/^interface:/m);
+    expect(text).toMatch(/^policy:\n {2}allow_implicit_invocation: true$/m);
+    expect(run(["check", "--json", skill]).code).toBe(0);
+  });
+
+  it("fails an agents/openai.yaml with a key Codex does not read, a flag that is not true or false, and a value that is a comment", () => {
+    const withOpenai = (yaml) => dir({ ".agents/skills/demo/SKILL.md": GOOD, ".agents/skills/demo/agents/openai.yaml": yaml });
+    const bad = (yaml) => JSON.parse(run(["check", "--json", withOpenai(yaml)]).out).problems;
+    expect(bad("interface:\n  display_name: \"Demo\"\n").length).toBe(0);
+    expect(bad("interface:\n  title: \"Demo\"\n").map((p) => p.rule)).toContain("field/unknown");
+    expect(bad("policy:\n  allow_implicit_invocation: maybe\n").map((p) => p.rule)).toContain("field/type");
+    expect(bad("policy:\n  implicit: true\n").map((p) => p.rule)).toContain("field/unknown");
+    expect(bad("mystery: 1\n").map((p) => p.rule)).toContain("field/unknown");
+    expect(bad("interface:\n  brand_color: #3B82F6\n").map((p) => p.rule)).toContain("yaml/plain-scalar");
+    expect(bad("interface:\n  brand_color: \"#3B82F6\"\n")).toEqual([]);
+    const p = bad("interface:\n  title: x\n")[0];
+    expect(p.file).toMatch(/agents\/openai\.yaml$/);
+    // The line of the map the key is in
+    expect(p.line).toBe(1);
+  });
+
+  it("installs itself, as the same folder in .agents/skills and .claude/skills, with the evals left behind", () => {
+    const d = dir();
+    const r = run(["skill", "add", "luz-start", "--dir", d, "--json"]);
+    expect(r.code, r.err).toBe(0);
+    const tree = (base) => readdirSync(join(d, base, "luz-start"), { recursive: true }).sort();
+    expect(tree(".agents/skills")).toEqual(tree(".claude/skills"));
+    expect(tree(".agents/skills")).toEqual(expect.arrayContaining(["SKILL.md", "agents/openai.yaml", "scripts/luz-start.mjs", "assets/agents/luz-ai-auditor.md", "references/levels.md"]));
+    expect(tree(".agents/skills").some((f) => f.startsWith("evals"))).toBe(false);
+    expect(read(join(d, ".agents/skills/luz-start/SKILL.md"))).toBe(read(join(skill, "SKILL.md")));
+  });
+
+  it("copies only what the skill carries, and no file that starts with a dot, whatever else is in its folder", () => {
+    const copy = join(dir(), "luz-start");
+    cpSync(skill, copy, { recursive: true });
+    for (const [path, text] of Object.entries({ ".env": "SECRET=1", "notes.txt": "x", "node_modules/pkg/index.js": "x", "references/.DS_Store": "x", ".git/config": "x" })) {
+      mkdirSync(dirname(join(copy, path)), { recursive: true });
+      writeFileSync(join(copy, path), text);
+    }
+    const d = dir();
+    const r = spawnSync(process.execPath, [join(copy, "scripts/luz-start.mjs"), "skill", "add", "luz-start", "--dir", d], { encoding: "utf-8" });
+    expect(r.status, r.stderr).toBe(0);
+    const files = readdirSync(join(d, ".claude/skills/luz-start"), { recursive: true });
+    for (const bad of [".env", "notes.txt", "node_modules", ".git", "references/.DS_Store"]) expect(files.some((f) => f === bad || f.startsWith(`${bad}/`)), bad).toBe(false);
+    expect(files).toEqual(expect.arrayContaining(["SKILL.md", "scripts/luz-start.mjs"]));
+  });
+
+  it("works from the copy it installed: from any folder, with nothing of the repository", () => {
+    const d = dir();
+    run(["skill", "add", "luz-start", "--dir", d]);
+    const copy = join(d, ".claude/skills/luz-start/scripts/luz-start.mjs");
+    const go = (args, cwd) => spawnSync(process.execPath, [copy, ...args], { cwd, encoding: "utf-8", stdio: ["ignore", "pipe", "pipe"] });
+    expect(go(["doctor", "--dir", d], tmpdir()).status).toBe(0);
+    const site = join(d, "site");
+    expect(go(["site", "new", "--name", "X", "--kind", "docs", "--stack", "vanilla", "--target", site], tmpdir()).status).toBe(0);
+    expect(existsSync(join(site, "index.html"))).toBe(true);
+    const agent = go(["agent", "add", "luz-ai-auditor", "--for", "claude,codex", "--dir", d], tmpdir());
+    expect(agent.status, agent.stderr).toBe(0);
+    expect(existsSync(join(d, ".codex/agents/luz-ai-auditor.toml"))).toBe(true);
+  });
+
+  it("warns, and does not fail, when the two copies of a skill have drifted apart, and says how to put them right", () => {
+    const d = dir();
+    run(["skill", "add", "luz-readme", "--dir", d]);
+    expect(JSON.parse(run(["doctor", "--json", "--dir", d]).out).warnings).toEqual([]);
+    writeFileSync(join(d, ".claude/skills/luz-readme/SKILL.md"), `${read(join(d, ".claude/skills/luz-readme/SKILL.md"))}\nextra\n`);
+    const r = run(["doctor", "--json", "--dir", d]);
+    expect(r.code).toBe(0);
+    const warning = JSON.parse(r.out).warnings.join(" ");
+    expect(warning).toMatch(/luz-readme is not the same in \.agents\/skills and \.claude\/skills/);
+    expect(warning).toContain("skill add luz-readme --force");
+  });
+
+  it("writes the skill to .claude/skills because Claude Code does not document .agents/skills", () => {
+    const d = dir();
+    run(["skill", "add", "luz-readme", "--dir", d]);
+    expect(existsSync(join(d, ".claude/skills/luz-readme/SKILL.md"))).toBe(true);
+    expect(existsSync(join(d, ".agents/skills/luz-readme/SKILL.md"))).toBe(true);
   });
 });
