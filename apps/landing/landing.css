@@ -3358,12 +3358,13 @@ html[data-native="b"] .landing-typed__modes {
   display: grid;
   gap: var(--luz-space-3xl);
   min-inline-size: 0;
+  /* the home's hero has the room of its first screen; here the header's own */
+  padding-block-start: var(--luz-space-3xl);
 }
 
-.landing-level__hero .landing-inside__points {
-  max-inline-size: 36rem;
-  margin-inline: auto;
-  text-align: start;
+/* The pane of the install is as tall as the two blocks it holds, not the home's tab height */
+.landing-level__hero .landing-panel__pane:not([hidden]) {
+  block-size: auto;
 }
 
 .landing-level__list {
@@ -3407,18 +3408,9 @@ html[data-native="b"] .landing-typed__modes {
   font-size: var(--luz-text-xs);
 }
 
-.landing-level__install {
-  max-inline-size: 60rem;
-  inline-size: 100%;
-  margin-inline: auto;
-}
 
 /* The page of a level has no chapters of the home's size: the gap between the main's children (the column, the icons) is zero,
    and the column keeps its own */
 .landing-wrap:has(> .landing-level) {
   row-gap: 0;
-}
-
-.landing-level__hero .o-actions {
-  margin-block-start: var(--luz-space-lg);
 }

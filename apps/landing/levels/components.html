@@ -1,18 +1,42 @@
-    <!-- The page of a level: the home's template with this <main> (levelTemplate() in scripts/docs-site/site.js) -->
+    <!-- The page of a level: the home's template with this <main> (levelTemplate() in scripts/docs-site/site.js).
+         The hero is a level of the home: the copy beside the panel that installs it -->
     <div class="landing-level">
-      <section class="luz-hero luz-hero--centered o-stack landing-level__hero" id="hero" aria-labelledby="hero-title">
-        <div class="luz-hero__copy">
+      <section class="landing-inside landing-level__hero" id="hero" aria-labelledby="hero-title">
+        <div class="landing-inside__copy">
           <p class="landing-inside__eyebrow"><svg aria-hidden="true"><use href="#i0"/></svg><span>{{t:inside.l3.eyebrow}}</span></p>
-          <h1 class="luz-hero__title" id="hero-title">{{html:inside.l3.title}}</h1>
-          <p class="luz-hero__lead">{{t:inside.l3.lead}}</p>
+          <h1 class="landing-inside__title" id="hero-title">{{html:inside.l3.title}}</h1>
+          <p class="landing-inside__lead">{{t:inside.l3.lead}}</p>
           <ul class="landing-inside__points">
             <li><svg aria-hidden="true"><use href="#i1"/></svg><span><strong>{{t:inside.l3.p1.name}}</strong> {{t:inside.l3.p1.text}}</span></li>
             <li><svg aria-hidden="true"><use href="#i2"/></svg><span><strong>{{t:inside.l3.p2.name}}</strong> {{t:inside.l3.p2.text}}</span></li>
             <li><svg class="ic" aria-hidden="true"><use href="#i3"/></svg><span><strong>{{t:inside.weight}}</strong> {{weight3}} {{t:inside.gzip}}</span></li>
           </ul>
           <div class="o-actions">
-            <a class="luz-btn luz-btn--primary luz-btn--lg" href="/docs/catalog/">{{t:level.components.docs}}</a>
-            <a class="luz-btn luz-btn--outline luz-btn--lg" href="{{home}}">{{t:level.back}}</a>
+            <a class="luz-btn luz-btn--primary" href="/docs/catalog/">{{t:level.components.docs}}</a>
+            <a class="luz-btn luz-btn--outline" href="{{home}}">{{t:level.back}}</a>
+          </div>
+        </div>
+        <div class="landing-panel">
+          <div class="landing-panel__pane" id="install">
+            <div class="landing-install">
+              <div class="landing-install__bar">
+                <span class="landing-install__label">{{t:inside.install.npm}}</span>
+                <button class="luz-copy-btn" type="button" data-copy-from="in3-npm" aria-label="{{t:inside.copy.npm}}" hidden>{{t:see.copy}}</button>
+              </div>
+              <pre class="luz-code-block" data-lang="bash" dir="ltr" tabindex="0" role="region" aria-label="{{t:inside.install.npm}}"><code id="in3-npm">npm install @luz-ds/tokens @luz-ds/core @luz-ds/catalog</code></pre>
+            </div>
+            <div class="landing-install">
+              <div class="landing-install__bar">
+                <span class="landing-install__label">{{t:inside.install.cdn}}</span>
+                <button class="luz-copy-btn" type="button" data-copy-from="in3-cdn" aria-label="{{t:inside.copy.cdn}}" hidden>{{t:see.copy}}</button>
+              </div>
+              <pre class="luz-code-block" data-lang="html" dir="ltr" tabindex="0" role="region" aria-label="{{t:inside.install.cdn}}"><code id="in3-cdn">&lt;link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@luz-ds/tokens@{{version}}/dist/luz-tokens.min.css">
+&lt;link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@luz-ds/core@{{version}}/dist/luz.min.css">
+&lt;!-- One link per catalog component the page uses: here the search -->
+&lt;link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@luz-ds/catalog@{{version}}/dist/components/search.min.css">
+&lt;script type="module" src="https://cdn.jsdelivr.net/npm/@luz-ds/core@{{version}}/dist/luz.min.js">&lt;/script>
+&lt;script type="module" src="https://cdn.jsdelivr.net/npm/@luz-ds/catalog@{{version}}/dist/catalog.min.js">&lt;/script></code></pre>
+            </div>
           </div>
         </div>
       </section>
@@ -21,29 +45,6 @@
         <h2 class="luz-section__title" id="all-title">{{t:level.components.all}}</h2>
         <div class="landing-level__list">
           {{list3}}
-        </div>
-      </section>
-
-      <section class="o-stack luz-section landing-level__install" id="install" aria-labelledby="install-title">
-        <h2 class="luz-section__title" id="install-title">{{t:inside.tab.install}}</h2>
-        <div class="landing-install">
-          <div class="landing-install__bar">
-            <span class="landing-install__label">{{t:inside.install.npm}}</span>
-            <button class="luz-copy-btn" type="button" data-copy-from="in3-npm" aria-label="{{t:inside.copy.npm}}" hidden>{{t:see.copy}}</button>
-          </div>
-          <pre class="luz-code-block" data-lang="bash" dir="ltr" tabindex="0" role="region" aria-label="{{t:inside.install.npm}}"><code id="in3-npm">npm install @luz-ds/tokens @luz-ds/core @luz-ds/catalog</code></pre>
-        </div>
-        <div class="landing-install">
-          <div class="landing-install__bar">
-            <span class="landing-install__label">{{t:inside.install.cdn}}</span>
-            <button class="luz-copy-btn" type="button" data-copy-from="in3-cdn" aria-label="{{t:inside.copy.cdn}}" hidden>{{t:see.copy}}</button>
-          </div>
-          <pre class="luz-code-block" data-lang="html" dir="ltr" tabindex="0" role="region" aria-label="{{t:inside.install.cdn}}"><code id="in3-cdn">&lt;link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@luz-ds/tokens@{{version}}/dist/luz-tokens.min.css">
-&lt;link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@luz-ds/core@{{version}}/dist/luz.min.css">
-&lt;!-- One link per catalog component the page uses: here the search -->
-&lt;link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@luz-ds/catalog@{{version}}/dist/components/search.min.css">
-&lt;script type="module" src="https://cdn.jsdelivr.net/npm/@luz-ds/core@{{version}}/dist/luz.min.js">&lt;/script>
-&lt;script type="module" src="https://cdn.jsdelivr.net/npm/@luz-ds/catalog@{{version}}/dist/catalog.min.js">&lt;/script></code></pre>
         </div>
       </section>
     </div>
