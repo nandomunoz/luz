@@ -1897,8 +1897,18 @@ function tokenSections({ say, tokens, groups, counts, families, read }) {
       `</section>`,
     ].join("\n"),
   );
-  // The preview: a small product drawn with --demo-brand, then the controls: the radios and the one line they change
+  // Top down: the title and the looks, centred; then the product, drawn with the look's tokens, beside the
+  // code in an editor that says them
   const demo = [
+    `<div class="landing-demo__top">`,
+    `<p class="landing-demo__title">${t("level.tokens.demo.title")}</p>`,
+    `<fieldset class="landing-demo__picker">`,
+    `<legend>${t("level.tokens.demo.legend")}</legend>`,
+    `<div class="landing-demo__options">`,
+    DEMO_LOOKS.map((look, i) => `<label class="landing-demo__option" style="--o-brand:var(${need(look.brand)});--o-font:var(${need(look.font)});--o-radius:var(${need(look.radius)})"><input type="radio" name="look" value="${look.id}"${i ? "" : " checked"}><span class="landing-demo__swatch" aria-hidden="true"></span><span>${t(`level.tokens.look.${look.id}`)}</span></label>`).join(""),
+    `</div>`,
+    `</fieldset>`,
+    `</div>`,
     `<div class="landing-demo__product">`,
     `<span class="landing-demo__bar" aria-hidden="true"><span class="landing-demo__logo"></span><span class="landing-demo__nav"></span><span class="landing-demo__nav"></span><span class="landing-demo__avatar"></span></span>`,
     `<p class="landing-demo__badge">${t("level.tokens.demo.badge")}</p>`,
@@ -1907,28 +1917,25 @@ function tokenSections({ say, tokens, groups, counts, families, read }) {
     `<span class="landing-demo__row" aria-hidden="true"><span class="landing-demo__button">${t("level.tokens.demo.button")}</span><span class="landing-demo__link">${t("level.tokens.demo.link")}</span></span>`,
     `<span class="landing-demo__meter" aria-hidden="true"><span></span></span>`,
     `</div>`,
-    `<div class="landing-demo__controls">`,
-    `<p class="landing-demo__title">${t("level.tokens.demo.title")}</p>`,
-    `<fieldset class="landing-demo__picker">`,
-    `<legend>${t("level.tokens.demo.legend")}</legend>`,
-    `<div class="landing-demo__options">`,
-    DEMO_LOOKS.map((look, i) => `<label class="landing-demo__option" style="--o-brand:var(${need(look.brand)});--o-font:var(${need(look.font)});--o-radius:var(${need(look.radius)})"><input type="radio" name="look" value="${look.id}"${i ? "" : " checked"}><span class="landing-demo__swatch" aria-hidden="true"></span><span>${t(`level.tokens.look.${look.id}`)}</span></label>`).join(""),
-    `</div>`,
-    `</fieldset>`,
-    `<p class="landing-demo__caption">${t("level.tokens.demo.code")}</p>`,
-    // plain code, not a highlighted block: the highlighter rewrites a block's markup, and each look's block is shown by CSS
-    `<p class="landing-demo__code" dir="ltr">${DEMO_LOOKS.map(
+    `<div class="landing-demo__editor">`,
+    `<p class="landing-demo__caption"><span class="landing-demo__dots" aria-hidden="true"><span></span><span></span><span></span></span>${t("level.tokens.demo.code")}</p>`,
+    // a <pre> that keeps its indent, but not a .luz-code-block: the highlighter would rewrite its markup, and each
+    // look's block is shown by CSS
+    `<pre class="landing-demo__code" dir="ltr" tabindex="0" aria-label="${t("level.tokens.demo.code")}">${DEMO_LOOKS.map(
       (look) =>
         `<code class="landing-demo__look" data-look="${look.id}">${escapeHtml(
           [
-            `--luz-brand-fill: var(${look.brand});`,
-            `font-family: var(${look.font});`,
-            `border-radius: var(${look.radius});`,
-            `box-shadow: var(${look.shadow});`,
-            `transition: var(${look.duration}) var(${look.ease});`,
+            ".card {",
+            `  --luz-brand-fill: var(${look.brand});`,
+            `  font-family: var(${look.font});`,
+            `  border-radius: var(${look.radius});`,
+            `  box-shadow: var(${look.shadow});`,
+            `  transition: var(${look.duration})`,
+            `    var(${look.ease});`,
+            "}",
           ].join("\n"),
         )}</code>`,
-    ).join("")}</p>`,
+    ).join("")}</pre>`,
     `</div>`,
   ].join("\n");
   const modes = new Set([...read("packages/tokens/src/semantic.css").matchAll(/\[data-theme="([a-z-]+)"\]\s*[,{]/g)].map((m) => m[1]));

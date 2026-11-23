@@ -2560,24 +2560,14 @@ home-light:defined ~ .landing-light__nojs {
   text-align: start;
 }
 
-/* On a narrow screen the radios come first, so the product that changes is
-   under the finger that picks; the tokens it reads come after it */
+/* A narrower lead on a narrow screen */
 @media (max-width: 899px) {
-  .landing-demo__controls {
-    display: contents;
-  }
-
-  .landing-demo__title {
-    order: -3;
-  }
-
-  .landing-demo__picker {
-    order: -2;
-  }
-
-  .landing-demo__caption,
   .landing-demo__code {
-    order: 1;
+    padding: var(--luz-space-md) var(--luz-space-sm);
+  }
+
+  .landing-demo__look {
+    font-size: var(--luz-text-xs);
   }
 
   .landing-tokens__what {
@@ -2587,9 +2577,33 @@ home-light:defined ~ .landing-light__nojs {
 
 @media (min-width: 900px) {
   .landing-tokens__stage {
-    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
-    align-items: center;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: stretch;
   }
+}
+
+/* The title and the looks, centred over the two columns */
+.landing-demo__top {
+  grid-column: 1 / -1;
+  display: grid;
+  justify-items: center;
+  gap: var(--luz-space-md);
+  text-align: center;
+}
+
+.landing-demo__top .landing-demo__options {
+  justify-content: center;
+}
+
+/* The code, in an editor: a title bar, then the rule with room around it */
+.landing-demo__editor {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  min-inline-size: 0;
+  overflow: hidden;
+  border: 1px solid color-mix(in oklab, var(--luz-text-primary) 14%, transparent);
+  border-radius: var(--luz-radius-md);
+  background: var(--luz-surface-strong);
 }
 
 /* The product reads the look: its type, its corners (a card's no rounder
@@ -2710,12 +2724,6 @@ home-light:defined ~ .landing-light__nojs {
   background: var(--demo-brand);
 }
 
-.landing-demo__controls {
-  display: grid;
-  gap: var(--luz-space-md);
-  min-inline-size: 0;
-}
-
 .landing-demo__title {
   margin: 0;
   font-family: var(--luz-font-heading);
@@ -2737,15 +2745,14 @@ home-light:defined ~ .landing-light__nojs {
   gap: var(--luz-space-xs);
 }
 
+/* The legend names the group for a screen reader; the looks say it to the eye */
 .landing-demo__picker legend {
-  margin-block-end: var(--luz-space-xs);
-  padding: 0;
-  font-family: var(--luz-font-sans);
-  font-size: var(--luz-text-sm);
-  font-weight: 600;
-  letter-spacing: normal;
-  text-transform: none;
-  color: var(--luz-text-secondary);
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 .landing-demo__option {
@@ -2795,24 +2802,46 @@ home-light:defined ~ .landing-light__nojs {
 }
 
 .landing-demo__caption {
+  display: flex;
+  align-items: center;
+  gap: var(--luz-space-sm);
   margin: 0;
+  padding: var(--luz-space-xs) var(--luz-space-md);
+  border-block-end: 1px solid color-mix(in oklab, var(--luz-text-primary) 12%, transparent);
   font-family: var(--luz-font-sans);
-  font-size: var(--luz-text-sm);
+  font-size: var(--luz-text-xs);
   font-weight: 600;
   color: var(--luz-text-secondary);
 }
 
+.landing-demo__dots {
+  display: inline-flex;
+  gap: 5px;
+}
+
+.landing-demo__dots > span {
+  inline-size: 9px;
+  block-size: 9px;
+  border-radius: var(--luz-radius-full);
+  background: color-mix(in oklab, var(--luz-text-primary) 22%, transparent);
+}
+
 .landing-demo__code {
+  align-self: center;
   margin: 0;
-  padding: var(--luz-space-sm) var(--luz-space-md);
+  background: none;
+  border-block: 0;
+  border-inline-end: 0;
+  border-radius: 0;
+  padding: var(--luz-space-lg);
+  overflow-x: auto;
   border-inline-start: 3px solid var(--demo-brand);
-  border-radius: var(--luz-radius-sm);
-  background: var(--luz-surface-strong);
 }
 
 .landing-demo__look {
   display: none;
-  white-space: pre-wrap;
+  white-space: pre;
+  line-height: 1.7;
   padding: 0;
   background: none;
   font-family: var(--luz-font-mono);
