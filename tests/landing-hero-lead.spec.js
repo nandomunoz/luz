@@ -59,6 +59,32 @@ for (const [route, code] of ROUTES) {
   });
 }
 
+test.describe('the hero on a phone', () => {
+  for (const [route] of ROUTES) {
+    for (const [width, height] of [[320, 568], [360, 640], [390, 844]]) {
+      test(`${route} at ${width} x ${height}: the lead is short and no smaller than the base text, the title as large as on a tall phone`, async ({ page }) => {
+        await page.setViewportSize({ width, height });
+        await page.goto(route);
+        const sizes = () => page.evaluate(() => {
+          const px = (selector) => parseFloat(getComputedStyle(document.querySelector(selector)).fontSize);
+          const probe = document.createElement('span');
+          probe.style.fontSize = 'var(--luz-text-base)';
+          document.body.append(probe);
+          const base = parseFloat(getComputedStyle(probe).fontSize);
+          probe.remove();
+          return { lead: px('.luz-hero__lead'), title: px('.luz-hero__title'), base, length: document.querySelector('.luz-hero__lead').textContent.trim().length };
+        });
+        const phone = await sizes();
+        expect(phone.lead, 'lead >= base').toBeGreaterThanOrEqual(phone.base);
+        expect(phone.length, 'lead characters').toBeLessThanOrEqual(190);
+        await page.setViewportSize({ width, height: 1000 });
+        const tall = await sizes();
+        expect(phone.title, 'title keeps its size on a short phone').toBe(tall.title);
+      });
+    }
+  }
+});
+
 test.describe('without JavaScript', () => {
   test.use({ javaScriptEnabled: false });
 
