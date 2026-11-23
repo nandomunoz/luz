@@ -133,15 +133,20 @@ describe("the pages of the three levels", () => {
       expect(hero.indexOf("<h1")).toBeLessThan(hero.indexOf("<fieldset"));
     });
 
-    it.each(LANGS)("in %s: the hero's numbers are what a reader gains: the tokens, the modes, the weight and no dependency", (code, prefix) => {
+    it.each(LANGS)("in %s: the hero's numbers are one quiet line under its buttons: the tokens, the modes, the weight and no dependency", (code, prefix) => {
       const hero = sectionOf(rendered.get(`${prefix}tokens/`), "hero");
-      const stats = hero.slice(hero.indexOf('class="landing-level__stats"'));
+      const head = hero.slice(hero.indexOf('class="landing-tokens__head"'), hero.indexOf('class="landing-tokens__stage"'));
+      // in the head, after the buttons: a line of reassurance, not a block of its own at the foot of the band
+      expect(head.indexOf('class="o-actions"')).toBeGreaterThan(0);
+      expect(head.indexOf('class="landing-tokens__facts"')).toBeGreaterThan(head.indexOf('class="o-actions"'));
+      expect(hero).not.toContain("landing-level__stats");
+      const facts = /<ul class="landing-tokens__facts">([\s\S]*?)<\/ul>/.exec(head)?.[1] ?? "";
+      const items = [...facts.matchAll(/<li><strong>([^<]+)<\/strong> ([^<]+)<\/li>/g)].map((m) => [m[1], m[2]]);
       const deps = Object.keys(JSON.parse(read("packages/tokens/package.json")).dependencies ?? {}).length;
-      expect(stats).toContain(`<dd>${tokens.length}</dd>`);
-      expect(stats).toContain("<dd>3</dd>");
-      expect(stats).toContain(`<dd>${deps}</dd>`);
-      for (const key of ["tokens", "modes", "weight", "deps"]) expect(stats).toContain(`<dt>${catalog(code)[`level.tokens.stat.${key}`]}</dt>`);
-      expect(stats).not.toContain("level.tokens.stat.groups");
+      expect(items.map(([n]) => n).filter((n, i) => i !== 2)).toEqual([String(tokens.length), "3", String(deps)]);
+      expect(items.map(([, label]) => label)).toEqual(["tokens", "modes", "weight", "deps"].map((key) => catalog(code)[`level.tokens.stat.${key}`]));
+      // the weight, in the language's unit
+      expect(items[2][0]).toMatch(new RegExp(`^\\d+[.,]\\d ${catalog(code)["why.weight.unit"]}$`));
     });
 
     it.each(LANGS)("in %s: the hero's demo is a set of looks, each a whole look and feel from the tokens of every group (colour, type, corners, depth, motion), by CSS alone", (code, prefix) => {
