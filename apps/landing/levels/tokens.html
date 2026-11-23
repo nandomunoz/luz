@@ -6,17 +6,32 @@
           <p class="landing-inside__eyebrow"><svg aria-hidden="true"><use href="#i0"/></svg><span>{{t:inside.l1.eyebrow}}</span></p>
           <h1 class="landing-inside__title" id="hero-title">{{html:inside.l1.title}}</h1>
           <p class="landing-inside__lead">{{t:inside.l1.lead}}</p>
-          <ul class="landing-inside__points">
-            <li><svg aria-hidden="true"><use href="#i1"/></svg><span><strong>{{t:inside.l1.p1.name}}</strong> {{t:inside.l1.p1.text}}</span></li>
-            <li><svg aria-hidden="true"><use href="#i2"/></svg><span><strong>{{t:inside.l1.p2.name}}</strong> {{t:inside.l1.p2.text}}</span></li>
-            <li><svg class="ic" aria-hidden="true"><use href="#i3"/></svg><span><strong>{{t:inside.weight}}</strong> {{weight1}} {{t:inside.gzip}}</span></li>
-          </ul>
+          <dl class="landing-level__stats">
+            <div><dt>{{t:level.tokens.stat.tokens}}</dt><dd>{{ntokens}}</dd></div>
+            <div><dt>{{t:level.tokens.stat.groups}}</dt><dd>{{ngroups}}</dd></div>
+            <div><dt>{{t:level.tokens.stat.modes}}</dt><dd>{{nmodes}}</dd></div>
+            <div><dt>{{t:level.tokens.stat.weight}}</dt><dd>{{weight1}}</dd></div>
+          </dl>
           <div class="o-actions">
             <a class="luz-btn luz-btn--primary" href="/docs/tokens/">{{t:level.tokens.docs}}</a>
             <a class="luz-btn luz-btn--outline" href="{{home}}">{{t:level.back}}</a>
           </div>
         </div>
         <div class="landing-panel">
+          <div class="landing-level__modes" aria-hidden="true">
+            <figure class="landing-level__mode" data-theme="light">
+              <span class="landing-level__mode-ui"><span class="landing-level__mode-title">Aa</span><span class="landing-level__mode-line"></span><span class="landing-level__mode-line landing-level__mode-line--short"></span><span class="landing-level__mode-button"></span></span>
+              <figcaption>{{t:level.tokens.mode.light}}</figcaption>
+            </figure>
+            <figure class="landing-level__mode" data-theme="dark">
+              <span class="landing-level__mode-ui"><span class="landing-level__mode-title">Aa</span><span class="landing-level__mode-line"></span><span class="landing-level__mode-line landing-level__mode-line--short"></span><span class="landing-level__mode-button"></span></span>
+              <figcaption>{{t:level.tokens.mode.dark}}</figcaption>
+            </figure>
+            <figure class="landing-level__mode" data-theme="high-contrast">
+              <span class="landing-level__mode-ui"><span class="landing-level__mode-title">Aa</span><span class="landing-level__mode-line"></span><span class="landing-level__mode-line landing-level__mode-line--short"></span><span class="landing-level__mode-button"></span></span>
+              <figcaption>{{t:level.tokens.mode.contrast}}</figcaption>
+            </figure>
+          </div>
           <div class="landing-panel__pane" id="install">
             <div class="landing-install">
               <div class="landing-install__bar">
@@ -36,10 +51,11 @@
         </div>
       </section>
 
-      <section class="o-stack luz-section landing-level__all" id="all" aria-labelledby="all-title">
-        <h2 class="luz-section__title" id="all-title">{{t:level.tokens.all}}</h2>
-        <div class="landing-level__list">
-          {{list1}}
-        </div>
-      </section>
+      <nav class="landing-level__nav" id="all" aria-label="{{t:level.tokens.all}}">
+        <ul class="landing-level__jumps">{{tokennav}}</ul>
+      </nav>
+
+      <div class="landing-tokens">
+        {{tokensections}}
+      </div>
     </div>
