@@ -78,7 +78,7 @@ describe("the pages of the three levels", () => {
   it.each(NAMES.flatMap((name) => LANGS.map(([code, prefix]) => [name, code, prefix])))("%s in %s: its links to the home are the language's, and the page links to the docs of its level", (name, code, prefix) => {
     const html = rendered.get(`${prefix}${name}/`);
     // no link to a section the page does not have: they go to the home of the language
-    expect(hrefsOf(html, /<a\b[^>]*\shref="(#[^"]*)"/g).filter((href) => href !== "#main-content" && !href.startsWith("#all") && !href.startsWith("#install") && !href.startsWith("#hero") && !href.startsWith("#t-"))).toEqual([]);
+    expect(hrefsOf(html, /<a\b[^>]*\shref="(#[^"]*)"/g).filter((href) => href !== "#main-content" && !href.startsWith("#all") && !href.startsWith("#install") && !href.startsWith("#hero") && !href.startsWith("#t-") && href !== "#steps")).toEqual([]);
     expect(html).toMatch(new RegExp(`href="${prefix}#inside"`));
     // the icons are the page's own: a <use> keeps pointing at the sprite, never at the home
     const uses = hrefsOf(html, /<use\b[^>]*\shref="([^"]*)"/g);
@@ -99,76 +99,121 @@ describe("the pages of the three levels", () => {
     }
   });
 
-  describe("the page of the tokens: a section of the home's kind for each group, with every token of it shown", () => {
-    const GROUPS = [
-      ["primitives", "/docs/tokens/palette/"],
-      ["semantic", "/docs/tokens/color/"],
-      ["spacing", "/docs/tokens/spacing/"],
-      ["typography", "/docs/tokens/typography/"],
-      ["radius", "/docs/tokens/radius/"],
-      ["shadows", "/docs/tokens/shadows/"],
-      ["motion", "/docs/tokens/motion/"],
-      ["breakpoints", "/docs/tokens/layout/"],
-    ];
+  describe("the page of the tokens: what a token is and how to use it, at a glance (owner, 2026-11-23)", () => {
     const tokens = [...new Set([...read("packages/tokens/dist/luz-tokens.css").matchAll(/^\s*(--luz-[\w-]+):/gm)].map((m) => m[1]))];
-    /** The section of a group, from its opening tag to the next section. */
+    const css = read("apps/landing/landing.css");
+    const BLOCKS = [
+      ["color", ["primitives", "semantic"]],
+      ["scales", ["spacing", "typography", "radius", "shadows"]],
+      ["more", ["motion", "breakpoints"]],
+    ];
+    const DOCS = { primitives: "palette", semantic: "color", spacing: "spacing", typography: "typography", radius: "radius", shadows: "shadows", motion: "motion", breakpoints: "layout" };
+    /** A section by its id, from its opening tag to the next section (or the end of the main). */
     const sectionOf = (html, id) => {
-      const start = html.search(new RegExp(`<section\\b[^>]*\\sid="t-${id}"`));
+      const start = html.search(new RegExp(`<section\\b[^>]*\\sid="${id}"`));
       if (start < 0) return "";
       const next = html.indexOf("<section", start + 1);
       return html.slice(start, next < 0 ? html.indexOf("</main>", start) : next);
     };
+    const codesOf = (html) => [...html.matchAll(/<code\b[^>]*>([\s\S]*?)<\/code>/g)].map((m) => m[1]);
 
-    it.each(LANGS)("in %s: one section per group, in order, each a level of the home with its title, its lead, its panel and its docs", (code, prefix) => {
+    it.each(LANGS)("in %s: the hero says what a token is, before and after, and leads to the three steps", (code, prefix) => {
+      const hero = sectionOf(rendered.get(`${prefix}tokens/`), "hero");
+      expect(hero).toContain('class="landing-tokens__what"');
+      expect(hero).toContain("<code>var(--luz-brand-primary)</code>");
+      const before = /class="landing-tokens__before"[\s\S]*?<code>([^<]*)<\/code>/.exec(hero)?.[1];
+      const after = /class="landing-tokens__after"[\s\S]*?<code>([^<]*)<\/code>/.exec(hero)?.[1];
+      expect(before).toMatch(/#[0-9a-f]{6}/);
+      expect(after).toContain("var(--luz-");
+      for (const key of ["before", "after"]) expect(hero).toContain(catalog(code)[`level.tokens.${key}`]);
+      expect(hero).toMatch(/<a class="luz-btn luz-btn--primary" href="#steps">/);
+    });
+
+    it.each(LANGS)("in %s: the hero's numbers are what a reader gains: the tokens, the modes, the weight and no dependency", (code, prefix) => {
+      const hero = sectionOf(rendered.get(`${prefix}tokens/`), "hero");
+      const stats = hero.slice(hero.indexOf('class="landing-level__stats"'));
+      const deps = Object.keys(JSON.parse(read("packages/tokens/package.json")).dependencies ?? {}).length;
+      expect(stats).toContain(`<dd>${tokens.length}</dd>`);
+      expect(stats).toContain("<dd>3</dd>");
+      expect(stats).toContain(`<dd>${deps}</dd>`);
+      for (const key of ["tokens", "modes", "weight", "deps"]) expect(stats).toContain(`<dt>${catalog(code)[`level.tokens.stat.${key}`]}</dt>`);
+      expect(stats).not.toContain("level.tokens.stat.groups");
+    });
+
+    it.each(LANGS)("in %s: the hero's demo changes the brand with one token, with no script: a radio per family, each drawn by landing.css", (code, prefix) => {
+      const hero = sectionOf(rendered.get(`${prefix}tokens/`), "hero");
+      const demo = hero.slice(hero.indexOf('class="landing-panel landing-demo"'));
+      expect(demo).toMatch(/<fieldset\b/);
+      expect(demo).toContain(`<legend>${catalog(code)["level.tokens.demo.legend"]}</legend>`);
+      const families = [...demo.matchAll(/<input type="radio" name="brand" value="([a-z]+)"/g)].map((m) => m[1]);
+      expect(families.length).toBeGreaterThanOrEqual(4);
+      expect(demo).toMatch(new RegExp(`<input type="radio" name="brand" value="${families[0]}" checked`));
+      for (const family of families) {
+        expect(tokens).toContain(`--luz-${family}-60`);
+        expect(css, family).toContain(`.landing-demo:has(input[value="${family}"]:checked)`);
+        expect(demo, family).toContain(`var(--luz-${family}-60)`);
+      }
+      expect(hero).not.toContain("<script");
+    });
+
+    it.each(LANGS)("in %s: three steps, install, use and make it yours, each with code to copy", (code, prefix) => {
+      const steps = sectionOf(rendered.get(`${prefix}tokens/`), "steps");
+      expect(steps).toMatch(/<h2\b[^>]*>/);
+      const items = steps.match(/<li class="landing-tokens__step"/g) ?? [];
+      expect(items).toHaveLength(3);
+      for (const n of [1, 2, 3]) expect(steps).toContain(catalog(code)[`level.tokens.steps.${n}.title`]);
+      const ids = [...steps.matchAll(/data-copy-from="([^"]+)"/g)].map((m) => m[1]);
+      expect(ids.length).toBeGreaterThanOrEqual(3);
+      for (const id of ids) expect(steps, id).toContain(`<code id="${id}">`);
+      expect(steps).toContain("npm install @luz-ds/tokens");
+      for (const body of codesOf(steps)) for (const m of body.matchAll(/--luz-[\w-]+/g)) expect(tokens, m[0]).toContain(m[0]);
+    });
+
+    it.each(LANGS)("in %s: three blocks, color, scales and the rest, each a level of the home that links every group it holds to its docs", (code, prefix) => {
       const html = rendered.get(`${prefix}tokens/`);
-      const starts = GROUPS.map(([id]) => html.search(new RegExp(`<section\\b[^>]*\\sid="t-${id}"`)));
+      const starts = BLOCKS.map(([id]) => html.search(new RegExp(`<section\\b[^>]*\\sid="t-${id}"`)));
       expect(starts.every((at) => at > 0), starts.join()).toBe(true);
       expect([...starts].sort((a, b) => a - b)).toEqual(starts);
-      for (const [id, docs] of GROUPS) {
-        const section = sectionOf(html, id);
-        expect(section, id).toMatch(/^<section class="landing-inside\b/);
-        expect(section, id).toMatch(new RegExp(`<h2 class="landing-inside__title" id="t-${id}-title">${catalog(code)[`inside.list.${id}`].replace(/&/g, "&amp;")}</h2>`));
-        expect(section, id).toContain(`<p class="landing-inside__lead">${catalog(code)[`level.tokens.${id}.lead`]}</p>`);
-        expect(section, id).toContain('class="landing-panel landing-tokens__panel"');
-        expect(section, id).toMatch(new RegExp(`<a\\b[^>]*href="(/${code})?${docs}"`));
-      }
-      // the sides swap from one group to the next, as the levels of the home do
-      expect(sectionOf(html, "semantic")).toMatch(/^<section class="landing-inside landing-inside--flip\b/);
-      expect(sectionOf(html, "primitives")).not.toMatch(/landing-inside--flip/);
+      expect(html.match(/<section\b[^>]*\sid="t-/g)).toHaveLength(3);
+      let total = 0;
+      BLOCKS.forEach(([id, groups], i) => {
+        const block = sectionOf(html, `t-${id}`);
+        expect(block, id).toMatch(new RegExp(`^<section class="landing-inside${i % 2 ? " landing-inside--flip" : ""}\\b`));
+        expect(block, id).toContain(`<h2 class="landing-inside__title" id="t-${id}-title">${catalog(code)[`level.tokens.${id}.title`]}</h2>`);
+        expect(block, id).toContain(`<p class="landing-inside__lead">${catalog(code)[`level.tokens.${id}.lead`]}</p>`);
+        for (const group of groups) {
+          const link = new RegExp(`<a class="landing-tokens__group-link" href="(/${code})?/docs/tokens/${DOCS[group]}/"(?: hreflang="en")?>${catalog(code)[`inside.list.${group}`].replace(/&/g, "&amp;")} <span class="landing-names__n">(\\d+)</span></a>`).exec(block);
+          expect(link, `${id}: ${group}`).toBeTruthy();
+          total += Number(link[2]);
+        }
+        expect(block, id).toContain('class="landing-panel landing-tokens__panel"');
+        for (const body of codesOf(block)) for (const m of body.matchAll(/--luz-[\w-]+/g)) expect(tokens, `${id}: ${m[0]}`).toContain(m[0]);
+      });
+      expect(total).toBe(tokens.length);
     });
 
-    it.each(LANGS)("in %s: read at a glance: each group says how many tokens it has, draws a few and shows the CSS that uses them, never the whole list", (code, prefix) => {
+    it.each(LANGS)("in %s: color draws the chain primitive, semantic, component and the three modes; scales and the rest read their tokens through --v", (code, prefix) => {
       const html = rendered.get(`${prefix}tokens/`);
-      const counts = GROUPS.map(([id]) => Number(/<span class="landing-tokens__count">(\d+)<\/span>/.exec(sectionOf(html, id))?.[1]));
-      expect(counts.reduce((a, b) => a + b, 0)).toBe(tokens.length);
-      for (const [id] of GROUPS) {
-        const section = sectionOf(html, id);
-        const css = /<pre class="luz-code-block" data-lang="css"[^>]*><code>([\s\S]*?)<\/code><\/pre>/.exec(section)?.[1] ?? "";
-        const named = [...css.matchAll(/--luz-[\w-]+/g)].map((m) => m[0]);
-        expect(named.length, `${id}: its CSS names a token`).toBeGreaterThan(0);
-        for (const name of named) expect(tokens, `${id}: ${name}`).toContain(name);
-        // a specimen, not a list: a handful of tokens drawn, read through --v where CSS can draw the value
-        expect(section, `${id}: a specimen`).toContain('class="landing-tokens__specimen');
-        const drawn = [...section.matchAll(/--v:var\((--luz-[\w-]+)\)/g)].map((m) => m[1]);
-        if (!["motion", "breakpoints"].includes(id)) expect(drawn.length, `${id}: draws its tokens`).toBeGreaterThan(0);
-        for (const name of drawn) expect(tokens).toContain(name);
-      }
-      expect(sectionOf(html, "radius")).toContain('style="--v:var(--luz-radius-md)"');
-      expect(sectionOf(html, "shadows")).toContain('style="--v:var(--luz-shadow-lg)"');
+      const color = sectionOf(html, "t-color");
+      expect(color).toContain('class="landing-tokens__chain"');
+      for (const key of ["primitive", "semantic", "component"]) expect(color).toContain(catalog(code)[`level.tokens.chain.${key}`]);
+      for (const mode of ["light", "dark", "high-contrast"]) expect(color).toContain(`data-theme="${mode}"`);
+      const scales = sectionOf(html, "t-scales");
+      for (const name of ["--luz-space-md", "--luz-text-2xl", "--luz-radius-md", "--luz-shadow-lg"]) expect(scales).toContain(`--v:var(${name})`);
+      expect(sectionOf(html, "t-more")).toContain("landing-tokens__curve");
+    });
+
+    it.each(LANGS)("in %s: the page ends with the next step: core, and the docs", (code, prefix) => {
+      const next = sectionOf(rendered.get(`${prefix}tokens/`), "next");
+      expect(next).toContain(catalog(code)["level.tokens.next.title"]);
+      expect(next).toMatch(new RegExp(`href="${prefix}core/"`));
+      expect(next).toMatch(/href="(\/[a-z]{2})?\/docs\/tokens\/"/);
+    });
+
+    it("has no jump links, no list of every token and no repeated 'Read the docs'", () => {
+      const html = rendered.get("/tokens/");
+      expect(html).not.toContain("landing-level__jump");
       expect(html).not.toContain("landing-tokens__name");
-    });
-
-    it.each(LANGS)("in %s: the hero says how many tokens, groups and modes there are and its weight, and leads to every group", (code, prefix) => {
-      const html = rendered.get(`${prefix}tokens/`);
-      const hero = html.slice(html.indexOf('id="hero"'), html.indexOf('id="t-primitives"'));
-      const stats = hero.slice(hero.indexOf('class="landing-level__stats"'));
-      expect(stats).toContain(`<dd>${tokens.length}</dd>`);
-      expect(stats).toContain(`<dd>${GROUPS.length}</dd>`);
-      expect(stats).toContain("<dd>3</dd>");
-      for (const key of ["tokens", "groups", "modes", "weight"]) expect(stats).toContain(`<dt>${catalog(code)[`level.tokens.stat.${key}`]}</dt>`);
-      const nav = hrefsOf(hero, /<a class="landing-level__jump" href="([^"]*)"/g);
-      expect(nav).toEqual(GROUPS.map(([id]) => `#t-${id}`));
-      // the old list of tags is gone: the sections are the list
       expect(html).not.toContain("landing-level__list");
     });
   });
