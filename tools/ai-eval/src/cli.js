@@ -8,7 +8,7 @@
  *   pnpm ai:eval open [<run folder or id>]
  *   pnpm ai:eval auto [--layer smoke|full|release] [--persona <id>]... [--goal <id>]... [--full] [--no-judge] [--dry-run]   a person played by a model with a persona, graded by the checks and by a judge
  *   pnpm ai:eval play --case <id> [--no-judge]            you are the person, in the sandbox; when you leave, grade + judge + viewer
- *   pnpm ai:eval triggers [--layer ...] [--runs 3] [--dry-run]   does a request wake the skill, with decoys installed
+ *   pnpm ai:eval triggers [--layer ...] [--runs 3] [--match <text>] [--dry-run]   does a request wake the skill, with decoys installed
  *   pnpm ai:eval agents [--agent <name>]... [--layer ...] [--dry-run]   the agents on a page with seeded faults: recall, false positives, tools
  *   pnpm ai:eval baseline <run>                           the green run becomes the baseline the next run is compared with
  *   pnpm ai:eval tested <run>                             a green script run of the release layer is written to packages/ai/tested.json (the release gate reads it)
@@ -194,7 +194,7 @@ const skillVersion = () => /^\s*version: "([^"]+)"/m.exec(readFileSync(SKILL_MD,
 const summaryLines = (state) => Object.entries(state.cases).map(([id, c]) => `${id}: ${c.status} (${c.runs.length} run${c.runs.length === 1 ? "" : "s"})`);
 
 const COMMANDS = ["script", "resume", "open", "freeze", "auto", "play", "triggers", "agents", "baseline", "freeze-case", "tested"];
-const OPTIONS = { layer: { type: "string" }, case: { type: "string", multiple: true }, "dry-run": { type: "boolean" }, budget: { type: "string" }, "max-points": { type: "string" }, "max-tokens": { type: "string" }, out: { type: "string" }, credentials: { type: "string" }, keep: { type: "boolean" }, "max-turns": { type: "string" }, example: { type: "string" }, to: { type: "string" }, "allow-unscripted": { type: "boolean" }, attempt: { type: "string" }, turns: { type: "string" }, persona: { type: "string", multiple: true }, goal: { type: "string", multiple: true }, full: { type: "boolean" }, "no-judge": { type: "boolean" }, runs: { type: "string" }, agent: { type: "string", multiple: true }, id: { type: "string" } };
+const OPTIONS = { layer: { type: "string" }, case: { type: "string", multiple: true }, "dry-run": { type: "boolean" }, budget: { type: "string" }, "max-points": { type: "string" }, "max-tokens": { type: "string" }, out: { type: "string" }, credentials: { type: "string" }, keep: { type: "boolean" }, "max-turns": { type: "string" }, example: { type: "string" }, to: { type: "string" }, "allow-unscripted": { type: "boolean" }, attempt: { type: "string" }, turns: { type: "string" }, persona: { type: "string", multiple: true }, goal: { type: "string", multiple: true }, full: { type: "boolean" }, "no-judge": { type: "boolean" }, runs: { type: "string" }, match: { type: "string" }, agent: { type: "string", multiple: true }, id: { type: "string" } };
 const pick = (list, wanted, what) => (wanted ? wanted.map((id) => list.find((x) => x.id === id) ?? (() => { throw new Error(`${id} is not a ${what} (${list.map((x) => x.id).join(", ")})`); })()) : list);
 
 export async function main(argv) {
@@ -311,7 +311,7 @@ export async function main(argv) {
     const bases = all;
 
     if (command === "triggers" || command === "agents") {
-      const queries = JSON.parse(readFileSync(join(root, "tools/ai-eval/cases/triggers.json"), "utf-8")).queries;
+      const queries = JSON.parse(readFileSync(join(root, "tools/ai-eval/cases/triggers.json"), "utf-8")).queries.filter((q) => !values.match || q.query.includes(values.match));
       const runs = Number(values.runs ?? 3);
       const agentCases = pick(AGENT_CASES.map((c) => ({ ...c, id: c.agent })), values.agent, "agent");
       if (values["dry-run"]) {

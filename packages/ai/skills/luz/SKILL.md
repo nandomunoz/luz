@@ -1,6 +1,6 @@
 ---
 name: luz
-description: "Start a website with LUZ, a design system of plain HTML and CSS: asks what to make, the kind of site (landing page, blog, app or documentation) and the stack, writes a starter page that the LUZ checker reads without a finding, and finishes it with the person. Run it as /luz, or as /luz with one subcommand (new, doctor, check, facts, agents, skills, add, help) to do only that. Use when someone wants to create a site with LUZ, add LUZ to a project, or move a site to LUZ (@luz-ds). Not for changing a component of LUZ itself, and not for sites that do not use LUZ."
+description: "Start a website with LUZ, a design system of plain HTML and CSS: asks what to make, the kind of site (landing page, blog, app or documentation) and the stack, writes a starter page that the LUZ checker reads without a finding, and finishes it with the person. Run it as /luz, or as /luz with one subcommand (new, doctor, check, facts, agents, skills, add, help) to do only that. Use when someone wants to create a site with LUZ, add LUZ to a project, or move a site to LUZ (@luz-ds). Not for changing a component of LUZ itself, not for a question about LUZ or about what a rule of its checker means (answer it directly), and not for sites that do not use LUZ."
 license: MIT
 compatibility: "Node.js 20 or later runs the script, which needs no network access; without a shell the steps are done by hand. The check it prints runs with npx, which downloads the checker once."
 metadata:
