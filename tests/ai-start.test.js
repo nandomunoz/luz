@@ -523,18 +523,18 @@ describe("the skill", () => {
 describe("the agents and skills of luz-ai", () => {
   const assets = join(skill, "assets");
   const AGENTS = ["luz-accessibility-auditor", "luz-ai-auditor", "luz-core-web-vitals-optimizer", "luz-seo-geo-specialist"];
-  const SKILLS = ["luz-create-landing", "luz-create-video", "luz-readme"];
+  const SKILLS = ["luz-create-landing", "luz-readme"];
   const list = (kind) => JSON.parse(run([kind, "list", "--json"]).out);
   const bodyOf = (text) => text.replace(/^---\n[\s\S]*?\n---\n+/, "").trim();
   const add = (d, name, flags = []) => run(["agent", "add", name, "--dir", d, "--json", ...flags]);
 
-  it("are the four agents and three skills of the repository luz-ai, kept here and passing the check", () => {
+  it("are the four agents and two skills of the repository luz-ai, kept here and passing the check", () => {
     expect(list("agent").map((a) => a.name)).toEqual(AGENTS);
-    // luz-start adds itself too, so it is the fourth the list names
+    // luz-start adds itself too, so it is the third the list names
     expect(list("skill").map((s) => s.name)).toEqual([...SKILLS, "luz-start"]);
     const r = run(["check", "--json", join(assets, "agents"), join(assets, "skills")]);
     expect(JSON.parse(r.out).problems).toEqual([]);
-    expect(JSON.parse(r.out).checked.length).toBe(7);
+    expect(JSON.parse(r.out).checked.length).toBe(6);
   });
 
   it("have every agent a startup rule that stops while a field is left, and every field a hint", () => {
