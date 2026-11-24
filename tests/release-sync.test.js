@@ -257,7 +257,7 @@ describe("this repository", () => {
   it("runs the sync between `changeset version` and the README blocks in `pnpm release:version`", () => {
     const script = JSON.parse(readFileSync(`${repo}package.json`, "utf-8")).scripts["release:version"];
 
-    // Then the facts and starters of the luz-start skill, which carry the versions and the CDN links
+    // Then the facts and starters of the luz skill, which carry the versions and the CDN links
     expect(script).toBe("changeset version && node scripts/release-sync.js && node scripts/ai-readme.js --write && node scripts/build-ai-facts.js");
   });
 });

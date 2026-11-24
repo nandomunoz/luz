@@ -39,12 +39,12 @@ describe("the manifest", () => {
   });
 
   it("has one bin, luz-ai, which is the script of the skill, so `npx @luz-ds/ai` runs it", () => {
-    expect(pkg.bin).toEqual({ "luz-ai": "./dist/skills/luz-start/scripts/luz-start.mjs" });
+    expect(pkg.bin).toEqual({ "luz-ai": "./dist/skills/luz/scripts/luz.mjs" });
   });
 
   it("ships dist and the licence, and exports the skill's SKILL.md and its own manifest", () => {
     expect(pkg.files).toEqual(["dist", "LICENSE"]);
-    expect(pkg.exports).toEqual({ "./luz-start/SKILL.md": "./dist/skills/luz-start/SKILL.md", "./package.json": "./package.json" });
+    expect(pkg.exports).toEqual({ "./luz/SKILL.md": "./dist/skills/luz/SKILL.md", "./package.json": "./package.json" });
     expect(read("packages/ai/LICENSE")).toBe(read("packages/check/LICENSE"));
   });
 
@@ -61,7 +61,7 @@ describe("the manifest", () => {
 describe("the build", () => {
   const out = join(root, "packages/ai/dist");
   buildAi({ outdir: out });
-  const files = () => readdirSync(join(out, "skills/luz-start"), { recursive: true, withFileTypes: true }).filter((e) => e.isFile()).map((e) => join(e.parentPath, e.name).slice(join(out, "skills/luz-start").length + 1)).sort();
+  const files = () => readdirSync(join(out, "skills/luz"), { recursive: true, withFileTypes: true }).filter((e) => e.isFile()).map((e) => join(e.parentPath, e.name).slice(join(out, "skills/luz").length + 1)).sort();
 
   it("copies what the skill carries and nothing else: no evals, no hidden file, nothing outside its five entries", () => {
     expect(files()).toEqual(carried(root));
@@ -69,13 +69,13 @@ describe("the build", () => {
       expect(["SKILL.md", "agents", "assets", "references", "scripts"], f).toContain(f.split("/")[0]);
       expect(f.split("/").some((s) => s.startsWith(".")), f).toBe(false);
     }
-    expect(existsSync(join(out, "skills/luz-start/evals"))).toBe(false);
+    expect(existsSync(join(out, "skills/luz/evals"))).toBe(false);
   });
 
   it("gives the bin its executable bit and the same bytes as the source", () => {
-    const bin = join(out, "skills/luz-start/scripts/luz-start.mjs");
+    const bin = join(out, "skills/luz/scripts/luz.mjs");
     expect(statSync(bin).mode & 0o111).not.toBe(0);
-    expect(readFileSync(bin, "utf-8")).toBe(read("packages/ai/skills/luz-start/scripts/luz-start.mjs"));
+    expect(readFileSync(bin, "utf-8")).toBe(read("packages/ai/skills/luz/scripts/luz.mjs"));
     expect(readFileSync(bin, "utf-8").startsWith("#!/usr/bin/env node\n")).toBe(true);
   });
 
@@ -91,7 +91,7 @@ describe("the build", () => {
   it("runs from the copy, through a symbolic link as npm makes for a bin, from any folder", () => {
     const d = scratch();
     const link = join(d, "luz-ai");
-    symlinkSync(join(out, "skills/luz-start/scripts/luz-start.mjs"), link);
+    symlinkSync(join(out, "skills/luz/scripts/luz.mjs"), link);
     const r = spawnSync(process.execPath, [link, "facts", "--json"], { cwd: tmpdir(), encoding: "utf-8" });
     expect(r.status, r.stderr).toBe(0);
     expect(JSON.parse(r.stdout).versions.core).toBe(JSON.parse(read("packages/core/package.json")).version);
@@ -119,7 +119,7 @@ describe("the tarball", () => {
 
   it("holds the licence, the README, the manifest and the skill, and no source, evals, map or hidden file", () => {
     const paths = list();
-    for (const f of ["LICENSE", "README.md", "package.json", "dist/skills/luz-start/SKILL.md", "dist/skills/luz-start/scripts/luz-start.mjs", "dist/skills/luz-start/agents/openai.yaml"]) expect(paths, f).toContain(f);
+    for (const f of ["LICENSE", "README.md", "package.json", "dist/skills/luz/SKILL.md", "dist/skills/luz/scripts/luz.mjs", "dist/skills/luz/agents/openai.yaml"]) expect(paths, f).toContain(f);
     for (const p of paths) {
       expect(p.startsWith("skills/") || p.startsWith("src/"), p).toBe(false);
       expect(p.includes("evals"), p).toBe(false);
@@ -134,11 +134,22 @@ describe("the README", () => {
 
   it("says how to install the skill for each assistant, and where each one reads it", () => {
     expect(readme).toContain("npx @luz-ds/ai init --target claude");
-    for (const row of ["`claude` | `.claude/skills/luz-start`", "`codex` | `.agents/skills/luz-start`", "`gemini` | `.agents/skills/luz-start`", "`cursor` | `.agents/skills/luz-start`"]) expect(readme, row).toContain(row);
+    for (const row of ["`claude` | `.claude/skills/luz`", "`codex` | `.agents/skills/luz`", "`gemini` | `.agents/skills/luz`", "`cursor` | `.agents/skills/luz`"]) expect(readme, row).toContain(row);
+  });
+
+  it("leads with /luz: the commands of the chat, one row for each subcommand of SKILL.md, and the page that shows them", () => {
+    const skillMd = read("packages/ai/skills/luz/SKILL.md");
+    const chat = [...skillMd.matchAll(/^\| `(\/luz[^`]*)` \|/gm)].map((m) => m[1]);
+    expect(chat.length).toBe(9);
+    expect(readme.indexOf("## The commands")).toBeGreaterThan(0);
+    expect(readme.indexOf("## The commands")).toBeLessThan(readme.indexOf("## The script"));
+    for (const c of chat) expect(readme, c).toContain(`| \`${c}\` |`);
+    expect(readme).toContain("/docs/get-started/ai-commands/");
+    expect(readme).toMatch(/Type `\/luz`/);
   });
 
   it("names every command of the script, and its exit codes", () => {
-    const help = spawnSync(process.execPath, [join(root, "packages/ai/skills/luz-start/scripts/luz-start.mjs"), "--help"], { encoding: "utf-8" }).stdout;
+    const help = spawnSync(process.execPath, [join(root, "packages/ai/skills/luz/scripts/luz.mjs"), "--help"], { encoding: "utf-8" }).stdout;
     for (const c of ["init", "site new", "agent", "skill", "doctor", "check"]) expect(help, c).toContain(c);
     for (const c of ["`init`", "`site new`", "`agent list`, `agent add`", "`skill list`, `skill add`", "`doctor`", "`check`"]) expect(readme, c).toContain(c);
     for (const code of ["| 0 |", "| 1 |", "| 2 |"]) expect(readme, code).toContain(code);

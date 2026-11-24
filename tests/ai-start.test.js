@@ -1,6 +1,6 @@
 /**
- * The first phase of the `luz-start` skill (`.claude/plans/luz-ai-skill.md`, B.9): the one executable of the
- * skill, `packages/ai/skills/luz-start/scripts/luz-start.mjs`, with `doctor` and `check`, and the two files of data
+ * The first phase of the `luz` skill (`.claude/plans/luz-ai-skill.md`, B.9): the one executable of the
+ * skill, `packages/ai/skills/luz/scripts/luz.mjs`, with `doctor` and `check`, and the two files of data
  * beside it. It writes nothing, never asks, never reaches the network and works from any folder, because a skill
  * is run by assistants that disagree on where a script runs.
  */
@@ -13,8 +13,8 @@ import { fileURLToPath } from "node:url";
 import { BY_NEED, buildAiFacts, buildAiFiles } from "../scripts/build-ai-facts.js";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const skill = join(root, "packages/ai/skills/luz-start");
-const script = join(skill, "scripts/luz-start.mjs");
+const skill = join(root, "packages/ai/skills/luz");
+const script = join(skill, "scripts/luz.mjs");
 const read = (p) => readFileSync(p, "utf-8");
 const json = (p) => JSON.parse(read(p));
 
@@ -26,7 +26,7 @@ function run(args, cwd = root) {
 
 const tmp = [];
 function dir(files = {}) {
-  const d = mkdtempSync(join(tmpdir(), "luz-start-"));
+  const d = mkdtempSync(join(tmpdir(), "luz-ai-"));
   tmp.push(d);
   for (const [path, text] of Object.entries(files)) {
     mkdirSync(dirname(join(d, path)), { recursive: true });
@@ -126,7 +126,7 @@ describe("help and usage", () => {
   });
 
   it("exits 2 when a path does not exist", () => {
-    const r = run(["check", join(tmpdir(), "luz-start-nothing-here")]);
+    const r = run(["check", join(tmpdir(), "luz-ai-nothing-here")]);
     expect(r.code).toBe(2);
     expect(r.err).toMatch(/not found|does not exist/);
   });
@@ -478,7 +478,7 @@ describe("the skill", () => {
     const front = body.match(/^---\n([\s\S]*?)\n---/)[1];
     expect([...front.matchAll(/^([a-z-]+):/gm)].map((m) => m[1])).toEqual(["name", "description", "license", "compatibility", "metadata"]);
     expect(front).toMatch(/^description: "/m);
-    expect(front).toMatch(/^name: luz-start$/m);
+    expect(front).toMatch(/^name: luz$/m);
   });
 
   it("is short: under 500 lines, and every file of the skill is named from it", () => {
@@ -520,18 +520,195 @@ describe("the skill", () => {
   });
 });
 
+describe("the skill as /luz <subcommand>: the router and the rule IDs (owner, 2026-11-24)", () => {
+  const body = read(join(skill, "SKILL.md"));
+  const section = (title) => {
+    const m = new RegExp(`^## ${title}\\n([\\s\\S]*?)(?=^## |$(?![\\s\\S]))`, "m").exec(body);
+    return m ? m[1] : "";
+  };
+  const rows = () => [...section("Subcommands").matchAll(/^\| `([^`]*)` \| ([^|]*) \| ([^|]*) \| (yes|no)[^|]*\|$/gm)].map((m) => ({ chat: m[1], does: m[2].trim(), cli: m[3].trim(), writes: m[4] }));
+
+  it("puts the Subcommands between the Rules and the Steps, and reads them from $ARGUMENTS", () => {
+    expect(body.indexOf("## Rules")).toBeLessThan(body.indexOf("## Subcommands"));
+    expect(body.indexOf("## Subcommands")).toBeLessThan(body.indexOf("## Steps"));
+    expect(section("Subcommands")).toContain("$ARGUMENTS");
+  });
+
+  it("has a row for each subcommand: none, new, doctor, check, facts, agents, skills, add and help", () => {
+    expect(rows().map((r) => r.chat.replace(/^\/luz ?/, "").split(" ")[0])).toEqual(["", "new", "doctor", "check", "facts", "agents", "skills", "add", "help"]);
+  });
+
+  it("takes the kinds of `new` from the facts, never typed twice", () => {
+    const facts = json(join(skill, "assets/facts.json"));
+    const row = rows().find((r) => r.chat.startsWith("/luz new"));
+    for (const k of facts.kinds) expect(row.chat, k).toContain(k);
+  });
+
+  it("maps every subcommand to a command the script has", () => {
+    const help = run(["--help"]).out;
+    const used = rows().flatMap((r) => [...r.cli.matchAll(/`([a-z]+(?: [a-z]+)?)[^`]*`/g)].map((m) => m[1]));
+    expect(used.length).toBeGreaterThan(6);
+    for (const c of used) expect(help, c).toContain(c.split(" ")[0]);
+  });
+
+  it("writes nothing for doctor, check, facts, agents, skills and help, and writes only after \"go\" for the rest", () => {
+    const by = Object.fromEntries(rows().map((r) => [r.chat.replace(/^\/luz ?/, "").split(" ")[0], r.writes]));
+    for (const c of ["doctor", "check", "facts", "agents", "skills", "help"]) expect(by[c], c).toBe("no");
+    for (const c of ["", "new", "add"]) expect(by[c], c).toBe("yes");
+    expect(section("Subcommands")).toMatch(/"go"/);
+  });
+
+  it("answers an unknown subcommand with the help, and never guesses one", () => {
+    expect(section("Subcommands")).toMatch(/unknown subcommand/i);
+    expect(section("Subcommands")).toMatch(/never guess/i);
+  });
+
+  it("names the other two skills and the terminal-only command", () => {
+    for (const w of ["/luz-readme", "/luz-landing", "init"]) expect(section("Subcommands"), w).toContain(w);
+  });
+
+  it("works from the person's message when the assistant substitutes no $ARGUMENTS", () => {
+    expect(section("Subcommands")).toMatch(/message/);
+  });
+
+  it("is named in the description, with the subcommands, so natural language and /luz wake it", () => {
+    const description = /^description: "(.*)"$/m.exec(body)[1];
+    expect(description).toContain("/luz");
+    expect(description.length).toBeLessThanOrEqual(1024);
+  });
+
+  it("gives every rule an ID, R1 to Rn in order, once each", () => {
+    const lines = section("Rules").split("\n").filter((l) => l.startsWith("- "));
+    expect(lines.length).toBeGreaterThanOrEqual(8);
+    lines.forEach((l, i) => expect(l, l).toMatch(new RegExp(`^- \\*\\*R${i + 1}\\*\\* `)));
+  });
+
+  it("says that a request that already settles every answer is not a go (found by the lab: a one-shot prompt wrote the page at once)", () => {
+    const r2 = section("Rules").split("\n").find((l) => l.startsWith("- **R2**"));
+    expect(r2).toMatch(/already settles every answer is not a "go"/);
+    expect(r2).toMatch(/show the plan/i);
+  });
+
+  it("says that a program of the assistant's own, to fill or edit a page, is a command outside the plan (found by the lab with Sonnet: python3 heredocs)", () => {
+    const r3 = section("Rules").split("\n").find((l) => l.startsWith("- **R3**"));
+    expect(r3).toMatch(/A program you write to create or edit files is a command outside the plan/);
+    expect(body).toMatch(/Fill in the page by editing the file/);
+    expect(body).toMatch(/never with `python3`, `perl`, `sed -i` or a program of your own/);
+    expect(r3).toMatch(/Fetch nothing from the network \(no `curl`, no `wget`\): what you need is in this folder/);
+  });
+
+  it("has R9: touch no file of the project but the new site's and those the person named, not even to remove text that looks like an instruction (found by the lab with Sonnet: it rewrote the README)", () => {
+    const r9 = section("Rules").split("\n").find((l) => l.startsWith("- **R9**"));
+    expect(r9).toMatch(/Touch no file of the project/);
+    expect(r9).toMatch(/never rewrite, move or delete/);
+    expect(r9).toMatch(/tell the person/i);
+  });
+
+  it("keeps the ID of a rule that the steps and the references cite", () => {
+    const cited = [...body.matchAll(/\bR(\d+)\b/g)].map((m) => Number(m[1]));
+    const count = section("Rules").split("\n").filter((l) => l.startsWith("- ")).length;
+    for (const n of cited) expect(n, `R${n} is a rule`).toBeLessThanOrEqual(count);
+    expect(new Set(cited).size).toBeGreaterThan(4);
+  });
+});
+
+describe("init: the /luz command of each assistant (owner, 2026-11-24)", () => {
+  const init = (target, d = dir(), flags = ["--dry-run"]) => ({ d, r: run(["init", "--target", target, "--dir", d, "--json", ...flags]) });
+  const paths = (r) => JSON.parse(r.out).files.map((f) => f.path.replace(/^.*?(\.(?:gemini|cursor|agents|claude)\/|AGENTS\.md)/, "$1"));
+  const content = (r, rel) => JSON.parse(r.out).files.find((f) => f.path.endsWith(rel))?.content;
+
+  it("writes .gemini/commands/luz.toml for Gemini CLI, with the arguments in {{args}} and the skill it points to", () => {
+    const { r } = init("gemini");
+    expect(r.code, r.err).toBe(0);
+    expect(paths(r)).toContain(".gemini/commands/luz.toml");
+    const toml = content(r, ".gemini/commands/luz.toml");
+    expect(toml).toMatch(/^description = ".+"$/m);
+    expect(toml).toMatch(/^prompt = """\n[\s\S]+\n"""\n?$/m);
+    expect(toml.match(/\{\{args\}\}/g)).toHaveLength(1);
+    expect(toml).toContain(".agents/skills/luz/SKILL.md");
+  });
+
+  it("writes .cursor/commands/luz.md for Cursor, which points to the skill and takes what follows /luz as the subcommand", () => {
+    const { r } = init("cursor");
+    expect(paths(r)).toContain(".cursor/commands/luz.md");
+    const md = content(r, ".cursor/commands/luz.md");
+    expect(md).toContain(".agents/skills/luz/SKILL.md");
+    expect(md).toMatch(/subcommand/);
+    expect(md).not.toMatch(/^---/);
+  });
+
+  it("writes no command for Claude Code (the skill is /luz), for Codex ($luz) or for AGENTS.md", () => {
+    for (const t of ["claude", "codex", "agents-md"]) expect(paths(init(t).r).filter((p) => /commands\//.test(p)), t).toEqual([]);
+  });
+
+  it("writes both when asked for both, and the files to disk when it is not a dry run", () => {
+    const { d, r } = init("gemini,cursor", dir(), []);
+    expect(r.code, r.err).toBe(0);
+    expect(existsSync(join(d, ".gemini/commands/luz.toml"))).toBe(true);
+    expect(existsSync(join(d, ".cursor/commands/luz.md"))).toBe(true);
+    expect(existsSync(join(d, ".agents/skills/luz/SKILL.md"))).toBe(true);
+  });
+
+  it("never overwrites a command the person has: nothing is written, and --force replaces it", () => {
+    const d = dir({ ".gemini/commands/luz.toml": 'prompt = "mine"\n' });
+    const a = run(["init", "--target", "gemini", "--dir", d]);
+    expect(a.code).toBe(2);
+    expect(a.err).toContain("--force");
+    expect(read(join(d, ".gemini/commands/luz.toml"))).toBe('prompt = "mine"\n');
+    expect(existsSync(join(d, ".agents/skills/luz"))).toBe(false);
+    const b = run(["init", "--target", "gemini", "--dir", d, "--force"]);
+    expect(b.code, b.err).toBe(0);
+    expect(read(join(d, ".gemini/commands/luz.toml"))).toContain("{{args}}");
+  });
+
+  it("says in `next` how to call it in each assistant: /luz, or $luz for Codex, or plain words for AGENTS.md", () => {
+    const next = (t) => JSON.parse(init(t).r.out).next.join(" ");
+    for (const t of ["claude", "gemini", "cursor"]) expect(next(t), t).toContain("/luz");
+    expect(next("codex")).toContain("$luz");
+    expect(next("agents-md")).not.toMatch(/\/luz|\$luz/);
+  });
+
+  it("has command files of plain text: no hidden character, no address, no version", () => {
+    const { r } = init("gemini,cursor");
+    for (const f of JSON.parse(r.out).files.filter((x) => /commands\//.test(x.path))) {
+      expect(f.content, f.path).not.toMatch(/[\u200B-\u200F\u202A-\u202E\u2060-\u206F\uFEFF]|https?:\/\/|\d+\.\d+\.\d+/);
+    }
+  });
+
+  it("lists them in init --help", () => {
+    const help = run(["init", "--help"]).out;
+    expect(help).toContain(".gemini/commands/luz.toml");
+    expect(help).toContain(".cursor/commands/luz.md");
+  });
+});
+
+describe("luz-readme: ai-tells.md is the project's own text (F-1, owner, 2026-11-24)", () => {
+  const file = join(skill, "assets/skills/luz-readme/references/ai-tells.md");
+
+  it("names no work it adapts: no humanizer, no Wikipedia guide, no other skill, no licence it would need", () => {
+    const text = read(file);
+    expect(text).not.toMatch(/blader|humanizer|wikipedia|wikiproject|write-readme|good-readme|CC BY|Creative Commons|prior art/i);
+  });
+
+  it("is still named by the skill and keeps its link to anatomy.md", () => {
+    expect(read(join(skill, "assets/skills/luz-readme/SKILL.md"))).toContain("references/ai-tells.md");
+    expect(read(file)).toContain("(anatomy.md)");
+    expect(existsSync(join(dirname(file), "anatomy.md"))).toBe(true);
+  });
+});
+
 describe("the agents and skills of luz-ai", () => {
   const assets = join(skill, "assets");
   const AGENTS = ["luz-accessibility-auditor", "luz-ai-auditor", "luz-core-web-vitals-optimizer", "luz-seo-geo-specialist"];
-  const SKILLS = ["luz-create-landing", "luz-readme"];
+  const SKILLS = ["luz-landing", "luz-readme"];
   const list = (kind) => JSON.parse(run([kind, "list", "--json"]).out);
   const bodyOf = (text) => text.replace(/^---\n[\s\S]*?\n---\n+/, "").trim();
   const add = (d, name, flags = []) => run(["agent", "add", name, "--dir", d, "--json", ...flags]);
 
   it("are the four agents and two skills of the repository luz-ai, kept here and passing the check", () => {
     expect(list("agent").map((a) => a.name)).toEqual(AGENTS);
-    // luz-start adds itself too, so it is the third the list names
-    expect(list("skill").map((s) => s.name)).toEqual([...SKILLS, "luz-start"]);
+    // luz adds itself too, so it is the first the list names
+    expect(list("skill").map((s) => s.name)).toEqual(["luz", ...SKILLS]);
     const r = run(["check", "--json", join(assets, "agents"), join(assets, "skills")]);
     expect(JSON.parse(r.out).problems).toEqual([]);
     expect(JSON.parse(r.out).checked.length).toBe(6);
@@ -775,34 +952,34 @@ describe("portability", () => {
 
   it("installs itself, as the same folder in .agents/skills and .claude/skills, with the evals left behind", () => {
     const d = dir();
-    const r = run(["skill", "add", "luz-start", "--dir", d, "--json"]);
+    const r = run(["skill", "add", "luz", "--dir", d, "--json"]);
     expect(r.code, r.err).toBe(0);
-    const tree = (base) => readdirSync(join(d, base, "luz-start"), { recursive: true }).sort();
+    const tree = (base) => readdirSync(join(d, base, "luz"), { recursive: true }).sort();
     expect(tree(".agents/skills")).toEqual(tree(".claude/skills"));
-    expect(tree(".agents/skills")).toEqual(expect.arrayContaining(["SKILL.md", "agents/openai.yaml", "scripts/luz-start.mjs", "assets/agents/luz-ai-auditor.md", "references/levels.md"]));
+    expect(tree(".agents/skills")).toEqual(expect.arrayContaining(["SKILL.md", "agents/openai.yaml", "scripts/luz.mjs", "assets/agents/luz-ai-auditor.md", "references/levels.md"]));
     expect(tree(".agents/skills").some((f) => f.startsWith("evals"))).toBe(false);
-    expect(read(join(d, ".agents/skills/luz-start/SKILL.md"))).toBe(read(join(skill, "SKILL.md")));
+    expect(read(join(d, ".agents/skills/luz/SKILL.md"))).toBe(read(join(skill, "SKILL.md")));
   });
 
   it("copies only what the skill carries, and no file that starts with a dot, whatever else is in its folder", () => {
-    const copy = join(dir(), "luz-start");
+    const copy = join(dir(), "luz");
     cpSync(skill, copy, { recursive: true });
     for (const [path, text] of Object.entries({ ".env": "SECRET=1", "notes.txt": "x", "node_modules/pkg/index.js": "x", "references/.DS_Store": "x", ".git/config": "x" })) {
       mkdirSync(dirname(join(copy, path)), { recursive: true });
       writeFileSync(join(copy, path), text);
     }
     const d = dir();
-    const r = spawnSync(process.execPath, [join(copy, "scripts/luz-start.mjs"), "skill", "add", "luz-start", "--dir", d], { encoding: "utf-8" });
+    const r = spawnSync(process.execPath, [join(copy, "scripts/luz.mjs"), "skill", "add", "luz", "--dir", d], { encoding: "utf-8" });
     expect(r.status, r.stderr).toBe(0);
-    const files = readdirSync(join(d, ".claude/skills/luz-start"), { recursive: true });
+    const files = readdirSync(join(d, ".claude/skills/luz"), { recursive: true });
     for (const bad of [".env", "notes.txt", "node_modules", ".git", "references/.DS_Store"]) expect(files.some((f) => f === bad || f.startsWith(`${bad}/`)), bad).toBe(false);
-    expect(files).toEqual(expect.arrayContaining(["SKILL.md", "scripts/luz-start.mjs"]));
+    expect(files).toEqual(expect.arrayContaining(["SKILL.md", "scripts/luz.mjs"]));
   });
 
   it("works from the copy it installed: from any folder, with nothing of the repository", () => {
     const d = dir();
-    run(["skill", "add", "luz-start", "--dir", d]);
-    const copy = join(d, ".claude/skills/luz-start/scripts/luz-start.mjs");
+    run(["skill", "add", "luz", "--dir", d]);
+    const copy = join(d, ".claude/skills/luz/scripts/luz.mjs");
     const go = (args, cwd) => spawnSync(process.execPath, [copy, ...args], { cwd, encoding: "utf-8", stdio: ["ignore", "pipe", "pipe"] });
     expect(go(["doctor", "--dir", d], tmpdir()).status).toBe(0);
     const site = join(d, "site");
@@ -833,8 +1010,8 @@ describe("portability", () => {
   });
 });
 
-describe("the title of luz-start: the prism of the mark and the word LUZ, as text, at one height (owner, 2026-11-24)", () => {
-  const SCRIPT_FILE = join(root, "packages/ai/skills/luz-start/scripts/luz-start.mjs");
+describe("the title of luz-ai: the prism of the mark and the word LUZ, as text, at one height (owner, 2026-11-24)", () => {
+  const SCRIPT_FILE = join(root, "packages/ai/skills/luz/scripts/luz.mjs");
   const source = readFileSync(SCRIPT_FILE, "utf-8");
   const banner = JSON.parse(/^const BANNER = (\[[\s\S]*?\]);$/m.exec(source)?.[1] ?? "[]");
   /** What main() writes to stdout, as if stdout were a terminal or not. */
@@ -872,7 +1049,7 @@ describe("the title of luz-start: the prism of the mark and the word LUZ, as tex
   it("is printed by --help and by init in a terminal, first", async () => {
     const dir = mkdtempSync(join(tmpdir(), "luz-banner-"));
     try {
-      expect(await say(["--help"], true)).toMatch(new RegExp(`^${banner.join("\n").replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\n\nluz-start: `));
+      expect(await say(["--help"], true)).toMatch(new RegExp(`^${banner.join("\n").replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\n\nluz-ai: `));
       expect((await say(["init", "--target", "claude", "--dir", dir, "--dry-run"], true)).startsWith(`${banner.join("\n")}\n\ninit: would write `)).toBe(true);
     } finally {
       rmSync(dir, { recursive: true, force: true });
@@ -882,11 +1059,11 @@ describe("the title of luz-start: the prism of the mark and the word LUZ, as tex
   it("is never printed to a pipe or in JSON, so an assistant reads the report first", async () => {
     const dir = mkdtempSync(join(tmpdir(), "luz-banner-"));
     try {
-      expect(await say(["--help"], false)).toMatch(/^luz-start: /);
+      expect(await say(["--help"], false)).toMatch(/^luz-ai: /);
       expect(await say(["init", "--target", "claude", "--dir", dir, "--dry-run"], false)).toMatch(/^init: would write /);
       expect(await say(["init", "--target", "claude", "--dir", dir, "--dry-run", "--json"], true)).toMatch(/^\{/);
       const piped = spawnSync(process.execPath, [SCRIPT_FILE, "--help"], { encoding: "utf-8" });
-      expect(piped.stdout).toMatch(/^luz-start: /);
+      expect(piped.stdout).toMatch(/^luz-ai: /);
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }

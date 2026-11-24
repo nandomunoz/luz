@@ -617,7 +617,7 @@ describe("the script's capabilities (security-auditor Q1, condition a)", () => {
 describe("the release flow runs ai-readme in the version step, without lifecycle hooks", () => {
   const pkg = JSON.parse(read("package.json"));
 
-  it("the root package.json has a release:version script: changeset version, the versions of the install pages, ai-readme --write, then the facts and starters of the luz-start skill", () => {
+  it("the root package.json has a release:version script: changeset version, the versions of the install pages, ai-readme --write, then the facts and starters of the luz skill", () => {
     expect(pkg.scripts["release:version"]).toBe("changeset version && node scripts/release-sync.js && node scripts/ai-readme.js --write && node scripts/build-ai-facts.js");
   });
 
