@@ -1,6 +1,6 @@
 // @ts-check
 /**
- * The tabs of the three level panels of the home (.landing-panel in #inside, #inside-2 and #inside-3) turn by
+ * The tabs of the three level panels of the home (.landing-panel in #tokens, #core and #catalog) turn by
  * themselves, one after another: Install, List, Code example, then Install again.
  *
  * - While the panel is at least half on screen and nothing holds it, `data-cycle="run"` is on the panel and a line
@@ -20,7 +20,7 @@
  */
 import { test, expect } from '@playwright/test';
 
-const PANELS = ['#inside', '#inside-2', '#inside-3'];
+const PANELS = ['#tokens', '#core', '#catalog'];
 const TURN = 8000; // a turn takes 3.2 s; the wait is a ceiling, not a delay
 
 /** @param {import('@playwright/test').Page} page @param {number} n */
@@ -167,7 +167,7 @@ test.describe('a choice ends it for good, in that panel only', () => {
     await page.evaluate(() => {
       const link = document.createElement('a');
       link.id = 'to-pane';
-      link.href = '#in1-code';
+      link.href = '#tokens-code';
       link.textContent = 'to the code';
       link.style.cssText = 'position:fixed;inset-block-start:0;inset-inline-start:0;z-index:99999;background:white;color:black;padding:8px';
       document.body.append(link);

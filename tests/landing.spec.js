@@ -27,9 +27,9 @@ test.use({ timezoneId: TIMEZONE, storageState: NO_CHOICE });
 
 const MODES = ['light', 'dark', 'high-contrast'];
 /** The ids of the sections of the home, in the order of the page: the four levels are four sections. */
-const SECTIONS = ['hero', 'light', 'inside', 'inside-2', 'inside-3', 'inside-4', 'faq'];
+const SECTIONS = ['hero', 'light', 'tokens', 'core', 'catalog', 'ai', 'faq'];
 /** The sections of the drawer's "On this page", in the order of the page. */
-const DRAWER = ['inside', 'faq'];
+const DRAWER = ['tokens', 'faq'];
 const ROUTES = [
   ['/', 'en'],
   ['/es/', 'es'],
@@ -45,11 +45,14 @@ const version = (pkg) => JSON.parse(readFileSync(fromRepo(`packages/${pkg}/packa
 // once released, and catalog is at 0.0.0 until its first release, so it is read from core too
 const cdn = (pkg, file) => `@luz-ds/${pkg}@${version(pkg === 'catalog' ? 'core' : pkg)}/dist/${file}`;
 
+/** The id of each level's section, by its number. */
+const LEVEL_ID = { 1: 'tokens', 2: 'core', 3: 'catalog', 4: 'ai' };
+
 /** The levels of adoption of the first three sections of "What's inside". */
 const LEVELS = [
-  { id: 'inside', n: 1, npm: 'npm install @luz-ds/tokens', files: [cdn('tokens', 'luz-tokens.min.css')], absent: ['@luz-ds/core', '@luz-ds/catalog'], list: ['inside.list.tokens'] },
+  { id: 'tokens', n: 1, npm: 'npm install @luz-ds/tokens', files: [cdn('tokens', 'luz-tokens.min.css')], absent: ['@luz-ds/core', '@luz-ds/catalog'], list: ['inside.list.tokens'] },
   {
-    id: 'inside-2',
+    id: 'core',
     n: 2,
     npm: 'npm install @luz-ds/tokens @luz-ds/core',
     files: [cdn('tokens', 'luz-tokens.min.css'), cdn('core', 'luz.min.css'), cdn('core', 'luz.min.js')],
@@ -57,7 +60,7 @@ const LEVELS = [
     list: ['inside.list.components', 'inside.list.objects'],
   },
   {
-    id: 'inside-3',
+    id: 'catalog',
     n: 3,
     npm: 'npm install @luz-ds/tokens @luz-ds/core @luz-ds/catalog',
     files: [cdn('tokens', 'luz-tokens.min.css'), cdn('core', 'luz.min.css'), cdn('catalog', 'components/search.min.css'), cdn('core', 'luz.min.js'), cdn('catalog', 'catalog.min.js')],
@@ -233,10 +236,10 @@ test.describe('Landing page', () => {
 
         // The other sections are headed by the home's own: an eyebrow with its icon, a title with one marked word, a lead
         const heads = [
-          ['inside', 'inside.l1'],
-          ['inside-2', 'inside.l2'],
-          ['inside-3', 'inside.l3'],
-          ['inside-4', 'inside.l4'],
+          ['tokens', 'inside.l1'],
+          ['core', 'inside.l2'],
+          ['catalog', 'inside.l3'],
+          ['ai', 'inside.l4'],
           ['faq', 'faq'],
         ];
         for (const [id, key] of heads) {
@@ -468,11 +471,11 @@ test.describe('Landing page', () => {
       await expect(hero.locator('.luz-btn--primary')).toHaveCount(1);
       const primary = hero.locator('a.luz-btn--primary');
       await expect(primary).toHaveText('Get started with AI');
-      await expect(primary).toHaveAttribute('href', '#inside-4');
+      await expect(primary).toHaveAttribute('href', '#ai');
       await expect(primary).toBeInViewport();
       const outline = hero.locator('a.luz-btn--outline');
       await expect(outline).toHaveText(['Get started', 'Read the docs']);
-      await expect(outline.nth(0)).toHaveAttribute('href', '#inside');
+      await expect(outline.nth(0)).toHaveAttribute('href', '#tokens');
       await expect(outline.nth(1)).toHaveAttribute('href', '/docs/');
       await expect(outline.nth(0)).toBeInViewport();
       await expect(outline.nth(1)).toBeInViewport();
@@ -483,8 +486,8 @@ test.describe('Landing page', () => {
       await open(page);
 
       await page.locator('#hero a.luz-btn--outline').first().click();
-      await expect(page).toHaveURL(/#inside$/);
-      await expect(page.locator('#inside h2')).toBeInViewport();
+      await expect(page).toHaveURL(/#tokens$/);
+      await expect(page.locator('#tokens h2')).toBeInViewport();
     });
 
     for (const [route, lang] of ROUTES) {
@@ -546,7 +549,7 @@ test.describe('Landing page', () => {
         await expect(page.locator('#hero h1')).toBeInViewport();
         await expect(page.locator('#hero a.luz-btn--primary')).toBeInViewport();
         // The levels start below the fold
-        expect((await box('#inside')).top).toBeGreaterThanOrEqual(height - 1);
+        expect((await box('#tokens')).top).toBeGreaterThanOrEqual(height - 1);
       });
     }
 
@@ -569,8 +572,8 @@ test.describe('Landing page', () => {
 
   /* ---- 3. inside: one section per level of adoption ---------------------- */
 
-  test.describe('inside', () => {
-    for (const [index, id] of ['inside', 'inside-2', 'inside-3'].entries()) {
+  test.describe('tokens', () => {
+    for (const [index, id] of ['tokens', 'core', 'catalog'].entries()) {
       test(`#${id}: level ${index + 1} has an eyebrow, a title, a lead and three points, the last of them its weight`, async ({ page }) => {
         await open(page);
 
@@ -591,10 +594,10 @@ test.describe('Landing page', () => {
       });
     }
 
-    test('#inside-4: level 4 has an eyebrow, a title, a lead and three points, none of them a weight: a skill adds nothing to the page', async ({ page }) => {
+    test('#ai: level 4 has an eyebrow, a title, a lead and three points, none of them a weight: a skill adds nothing to the page', async ({ page }) => {
       await open(page);
 
-      const section = page.locator('section#inside-4');
+      const section = page.locator('section#ai');
       await expect(section.locator('.landing-inside__eyebrow')).toHaveText(EN['inside.l4.eyebrow']);
       await expect(section.locator('h2.landing-inside__title')).toHaveText(plain(EN['inside.l4.title']));
       await expect(section.locator('.landing-inside__lead')).toHaveText(EN['inside.l4.lead']);
@@ -614,7 +617,7 @@ test.describe('Landing page', () => {
       await open(page);
 
       const weights = [];
-      for (const id of ['inside', 'inside-2', 'inside-3']) weights.push(kb(await page.locator(`#${id} .landing-inside__points > li`).nth(2).innerText()));
+      for (const id of ['tokens', 'core', 'catalog']) weights.push(kb(await page.locator(`#${id} .landing-inside__points > li`).nth(2).innerText()));
       for (let i = 1; i < weights.length; i += 1) expect(weights[i], `level ${i + 1} against level ${i}`).toBeGreaterThanOrEqual(weights[i - 1]);
     });
 
@@ -623,8 +626,8 @@ test.describe('Landing page', () => {
         await open(page);
 
         const section = page.locator(`#${level.id}`);
-        await expect(section.locator(`#in${level.n}-npm`)).toHaveText(level.npm);
-        const snippet = (await section.locator(`#in${level.n}-cdn`).textContent()) ?? '';
+        await expect(section.locator(`#${level.id}-npm`)).toHaveText(level.npm);
+        const snippet = (await section.locator(`#${level.id}-cdn`).textContent()) ?? '';
         let position = -1;
         for (const file of level.files) {
           const found = snippet.indexOf(file);
@@ -642,7 +645,7 @@ test.describe('Landing page', () => {
           await expect(block).toHaveAttribute('aria-label', /\S/);
         }
         for (const [kind, label] of [['npm', EN['inside.copy.npm']], ['cdn', EN['inside.copy.cdn']]]) {
-          const button = section.locator(`[data-copy-from="in${level.n}-${kind}"]`);
+          const button = section.locator(`[data-copy-from="${level.id}-${kind}"]`);
           await expect(button).toHaveCount(1);
           await expect(button).toHaveAttribute('aria-label', label);
         }
@@ -651,22 +654,22 @@ test.describe('Landing page', () => {
 
     test('the panel is tabs: Install first, then List and Code example; a click or the arrow keys change the tab', async ({ page }) => {
       await open(page);
-      await expect.poll(() => page.locator('#inside .luz-tabs--pill').getAttribute('role')).toBe('tablist');
+      await expect.poll(() => page.locator('#tokens .luz-tabs--pill').getAttribute('role')).toBe('tablist');
 
-      const tabs = page.locator('#inside').getByRole('tab');
+      const tabs = page.locator('#tokens').getByRole('tab');
       await expect(tabs).toHaveText([EN['inside.tab.install'], EN['inside.tab.list'], EN['inside.tab.code']]);
-      await expect(page.locator('#inside .luz-tabs--pill')).toHaveAccessibleName(EN['inside.l1.panel']);
+      await expect(page.locator('#tokens .luz-tabs--pill')).toHaveAccessibleName(EN['inside.l1.panel']);
       await expect(tabs.nth(0)).toHaveAttribute('aria-selected', 'true');
-      expect([await shown(page, 'in1-install'), await shown(page, 'in1-list'), await shown(page, 'in1-code')]).toEqual([true, false, false]);
+      expect([await shown(page, 'tokens-install'), await shown(page, 'tokens-list'), await shown(page, 'tokens-code')]).toEqual([true, false, false]);
 
       await tabs.nth(1).click();
       await expect(tabs.nth(1)).toHaveAttribute('aria-selected', 'true');
-      await expect.poll(() => shown(page, 'in1-list')).toBe(true);
-      expect(await shown(page, 'in1-install')).toBe(false);
-      await expect(page.locator('#in1-list')).toBeVisible();
+      await expect.poll(() => shown(page, 'tokens-list')).toBe(true);
+      expect(await shown(page, 'tokens-install')).toBe(false);
+      await expect(page.locator('#tokens-list')).toBeVisible();
       // The list names what the level brings and links each name to its page
-      await expect(page.locator('#in1-list h3').first()).toContainText(EN['inside.list.tokens']);
-      const links = await page.locator('#in1-list a').evaluateAll((all) => all.map((a) => new URL(a.href).pathname));
+      await expect(page.locator('#tokens-list h3').first()).toContainText(EN['inside.list.tokens']);
+      const links = await page.locator('#tokens-list a').evaluateAll((all) => all.map((a) => new URL(a.href).pathname));
       expect(links.length).toBeGreaterThan(3);
       for (const path of links) expect(path).toMatch(/^\/docs\/tokens\//);
 
@@ -675,21 +678,21 @@ test.describe('Landing page', () => {
       await expect(tabs.nth(2)).toBeFocused();
       await page.keyboard.press('Enter');
       await expect(tabs.nth(2)).toHaveAttribute('aria-selected', 'true');
-      await expect.poll(() => shown(page, 'in1-code')).toBe(true);
-      expect(await shown(page, 'in1-list')).toBe(false);
-      await expect(page.locator('#in1-code')).toContainText('var(--luz-brand-fill)');
+      await expect.poll(() => shown(page, 'tokens-code')).toBe(true);
+      expect(await shown(page, 'tokens-list')).toBe(false);
+      await expect(page.locator('#tokens-code')).toContainText('var(--luz-brand-fill)');
     });
 
     for (const level of LEVELS) {
       test(`#${level.id}: the List tab names ${level.list.map((key) => EN[key]).join(' and ')}`, async ({ page }) => {
         await open(page);
 
-        const headings = await page.locator(`#in${level.n}-list h3`).evaluateAll((all) => all.map((h) => h.textContent.trim()));
+        const headings = await page.locator(`#${level.id}-list h3`).evaluateAll((all) => all.map((h) => h.textContent.trim()));
         expect(headings).toHaveLength(level.list.length);
         for (const [i, key] of level.list.entries()) expect(headings[i]).toContain(EN[key]);
         // Every list carries its count in its title, and every name is a link into the documentation
-        for (const count of await page.locator(`#in${level.n}-list h3 .landing-names__n`).all()) await expect(count).toHaveText(/^\d+$/);
-        const hrefs = await page.locator(`#in${level.n}-list li a`).evaluateAll((all) => all.map((a) => new URL(a.href).pathname));
+        for (const count of await page.locator(`#${level.id}-list h3 .landing-names__n`).all()) await expect(count).toHaveText(/^\d+$/);
+        const hrefs = await page.locator(`#${level.id}-list li a`).evaluateAll((all) => all.map((a) => new URL(a.href).pathname));
         expect(hrefs.length).toBeGreaterThan(3);
         for (const path of hrefs) expect(path).toMatch(/^\/docs\//);
       });
@@ -701,7 +704,7 @@ test.describe('Landing page', () => {
       await recordCopies(page);
       await open(page);
 
-      for (const [id, code] of [['in1', 'in1-npm'], ['in1', 'in1-cdn']]) {
+      for (const [id, code] of [['tokens', 'tokens-npm'], ['tokens', 'tokens-cdn']]) {
         const button = page.locator(`#${id}-install [data-copy-from="${code}"]`);
         await expect(button).toBeVisible();
         await button.click();
@@ -716,13 +719,13 @@ test.describe('Landing page', () => {
         const words = catalog(lang);
         await open(page, route);
 
-        const cli = page.locator('#inside-4 figure.landing-cli');
+        const cli = page.locator('#ai figure.landing-cli');
         await expect(cli).toHaveAccessibleName(words['inside.l4.panel']);
         await expect(cli).toContainText('npx @luz-ds/ai');
-        await expect(page.locator('#inside-4 .landing-kind, #inside-4 [data-prompt-open], #inside-4 a[href^="/prompts/"]')).toHaveCount(0);
-        await expect(page.locator('#inside-4 .landing-cli__note')).toContainText(words['inside.l4.soon']);
+        await expect(page.locator('#ai .landing-kind, #ai [data-prompt-open], #ai a[href^="/prompts/"]')).toHaveCount(0);
+        await expect(page.locator('#ai .landing-cli__note')).toContainText(words['inside.l4.soon']);
         // The way to the prompts until the skill is out: the kinds of site in the docs of the language; Arabic has none yet, so it says it is English
-        const meanwhile = page.locator('#inside-4').getByRole('link', { name: words['inside.l4.meanwhile'], exact: true });
+        const meanwhile = page.locator('#ai').getByRole('link', { name: words['inside.l4.meanwhile'], exact: true });
         await expect(meanwhile).toHaveAttribute('href', `${lang === 'es' ? '/es' : ''}/docs/kinds/`);
         if (lang === 'ar') await expect(meanwhile).toHaveAttribute('hreflang', 'en');
         else await expect(meanwhile).not.toHaveAttribute('hreflang', /./);
@@ -732,7 +735,7 @@ test.describe('Landing page', () => {
     test('level 4 has one heading, its h2: the terminal is a figure, not a list of headed cards', async ({ page }) => {
       await open(page);
 
-      expect(await page.locator('#inside-4 :is(h2, h3, h4)').evaluateAll((all) => all.map((h) => h.tagName))).toEqual(['H2']);
+      expect(await page.locator('#ai :is(h2, h3, h4)').evaluateAll((all) => all.map((h) => h.tagName))).toEqual(['H2']);
     });
 
     test('from 1024px the text and the panel sit side by side, and every other section is flipped; below, they stack', async ({ page }) => {
@@ -745,13 +748,13 @@ test.describe('Landing page', () => {
           const other = section.querySelector(selector).getBoundingClientRect();
           return { copyFirst: copy.left < other.left, sameRow: Math.abs(copy.top - other.top) < Math.max(copy.height, other.height) };
         }, second);
-      expect(await sides('inside', '.landing-panel')).toEqual({ copyFirst: true, sameRow: true });
-      expect(await sides('inside-2', '.landing-panel')).toEqual({ copyFirst: false, sameRow: true });
-      expect(await sides('inside-3', '.landing-panel')).toEqual({ copyFirst: true, sameRow: true });
-      expect(await sides('inside-4', '.landing-cli')).toEqual({ copyFirst: false, sameRow: true });
+      expect(await sides('tokens', '.landing-panel')).toEqual({ copyFirst: true, sameRow: true });
+      expect(await sides('core', '.landing-panel')).toEqual({ copyFirst: false, sameRow: true });
+      expect(await sides('catalog', '.landing-panel')).toEqual({ copyFirst: true, sameRow: true });
+      expect(await sides('ai', '.landing-cli')).toEqual({ copyFirst: false, sameRow: true });
 
       await page.setViewportSize({ width: 600, height: 900 });
-      for (const id of ['inside', 'inside-2']) {
+      for (const id of ['tokens', 'core']) {
         const stacked = await page.locator(`#${id}`).evaluate((section) => {
           const copy = section.querySelector('.landing-inside__copy').getBoundingClientRect();
           const panel = section.querySelector('.landing-panel').getBoundingClientRect();
@@ -905,9 +908,9 @@ test.describe('Landing page', () => {
       await open(page, '/ar/');
 
       await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
-      for (const block of await page.locator('#inside pre.luz-code-block').all()) expect(await block.evaluate((el) => getComputedStyle(el).direction)).toBe('ltr');
+      for (const block of await page.locator('#tokens pre.luz-code-block').all()) expect(await block.evaluate((el) => getComputedStyle(el).direction)).toBe('ltr');
       // In English the text of the first level is at the start (left) and the panel after it; in Arabic, the other way round
-      const copyFirst = await page.locator('#inside').evaluate((section) => section.querySelector('.landing-inside__copy').getBoundingClientRect().left < section.querySelector('.landing-panel').getBoundingClientRect().left);
+      const copyFirst = await page.locator('#tokens').evaluate((section) => section.querySelector('.landing-inside__copy').getBoundingClientRect().left < section.querySelector('.landing-panel').getBoundingClientRect().left);
       expect(copyFirst).toBe(false);
     });
 
@@ -943,7 +946,7 @@ test.describe('Landing page', () => {
           expect((await section.innerText()).trim().length, id).toBeGreaterThan(20);
         }
         await expect(page.locator('h1')).toBeVisible();
-        for (const id of ['inside', 'inside-2', 'inside-3', 'inside-4', 'faq']) {
+        for (const id of ['tokens', 'core', 'catalog', 'ai', 'faq']) {
           for (const element of await page.locator(`#${id} h2, #${id} h3`).all()) await expect(element).toBeVisible();
         }
         expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBe(0);
@@ -963,22 +966,23 @@ test.describe('Landing page', () => {
       await page.goto('/');
 
       for (const { n } of LEVELS) {
-        for (const pane of ['install', 'list', 'code']) await expect(page.locator(`#in${n}-${pane}`), `level ${n} ${pane}`).toBeVisible();
+        for (const pane of ['install', 'list', 'code']) await expect(page.locator(`#${LEVEL_ID[n]}-${pane}`), `level ${n} ${pane}`).toBeVisible();
       }
-      // Level 4 has no install panes: its terminal shows the whole conversation, still, and the way to the prompts is a link
-      const lines = page.locator('#inside-4 .landing-cli__line');
-      expect(await lines.count()).toBeGreaterThanOrEqual(12);
-      await expect(page.locator('#inside-4 .landing-cli__line:visible')).toHaveCount(await lines.count());
-      await expect(page.locator('#inside-4 a[href="/docs/kinds/"]')).toBeVisible();
+      // Level 4 has no install panes: its terminal shows the session of the default answers, still (the other
+      // answers stay hidden: tests/home-cli.spec.js), and the way to the prompts is a link
+      const lines = page.locator('#ai .landing-cli__line:not([hidden])');
+      expect(await lines.count()).toBeGreaterThanOrEqual(25);
+      await expect(page.locator('#ai .landing-cli__line:visible')).toHaveCount(await lines.count());
+      await expect(page.locator('#ai a[href="/docs/kinds/"]')).toBeVisible();
     });
 
     test('the controls that need a script are not shown: the Copy buttons', async ({ page }) => {
       await page.goto('/');
 
       // Levels 1 to 3 have two each (npm, CDN); level 4 is a prompt, with nothing to copy from the page
-      const copy = page.locator('#inside [data-copy-from], #inside-2 [data-copy-from], #inside-3 [data-copy-from]');
+      const copy = page.locator('#tokens [data-copy-from], #core [data-copy-from], #catalog [data-copy-from]');
       expect(await copy.count()).toBeGreaterThanOrEqual(6);
-      await expect(page.locator('#inside-4 [data-copy-from]')).toHaveCount(0);
+      await expect(page.locator('#ai [data-copy-from]')).toHaveCount(0);
       for (const control of await copy.all()) await expect(control).toBeHidden();
     });
 
@@ -988,7 +992,8 @@ test.describe('Landing page', () => {
       const blocks = page.locator('main pre.luz-code-block, main pre.luz-terminal__code'); // the terminal's code is not a .luz-code-block
       // Three for each of the three levels: npm, CDN and the code example
       expect(await blocks.count()).toBeGreaterThanOrEqual(9);
-      await expect(page.locator('#inside-4 pre')).toHaveCount(0);
+      // the one pre of level 4 is the title the skill prints, a picture hidden from a screen reader (tests/home-cli.test.js)
+      await expect(page.locator('#ai pre:not(.landing-cli__art[aria-hidden="true"])')).toHaveCount(0);
       for (const block of await blocks.all()) {
         await expect(block).toHaveAttribute('tabindex', '0');
         await expect(block).toHaveAttribute('role', 'region');
@@ -1140,7 +1145,7 @@ test.describe('Landing page', () => {
       await open(page);
 
       const heights = await page
-        .locator('.site-header__nav a, #inside a, .luz-site-footer a')
+        .locator('.site-header__nav a, #tokens a, .luz-site-footer a')
         .evaluateAll((links) => links.map((el) => el.getBoundingClientRect().height));
       expect(heights.length).toBeGreaterThan(14);
       for (const height of heights) expect(height).toBeGreaterThanOrEqual(24);
@@ -1254,8 +1259,8 @@ test.describe('Landing page', () => {
           expect(await theme(page)).toBe(mode);
           // The List and Code example tabs open too, so axe reads their panels
           for (const n of [1, 2, 3]) {
-            await page.locator(`#in${n}-install`).scrollIntoViewIfNeeded();
-            await page.locator(`#inside${n === 1 ? '' : `-${n}`}`).getByRole('tab').nth(1).click();
+            await page.locator(`#${LEVEL_ID[n]}-install`).scrollIntoViewIfNeeded();
+            await page.locator(`#${LEVEL_ID[n]}`).getByRole('tab').nth(1).click();
           }
           await faded(page);
           expect(await violations(page), 'serious/critical axe violations').toEqual([]);

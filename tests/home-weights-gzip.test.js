@@ -119,7 +119,7 @@ describe.skipIf(!built || !hasGzip() || !existsSync(join(repo, "docs/index.html"
     };
     const bytes = (name) => files(name).reduce((sum, f) => sum + gz(f), 0);
     const kb = (n) => (n / 1024).toFixed(1);
-    expect([weightOf("inside"), weightOf("inside-2"), weightOf("inside-3")]).toEqual([
+    expect([weightOf("tokens"), weightOf("core"), weightOf("catalog")]).toEqual([
       kb(bytes("tokens")),
       kb(bytes("tokens") + bytes("core")),
       kb(bytes("tokens") + bytes("core") + bytes("catalog")),

@@ -832,3 +832,56 @@ describe("portability", () => {
     expect(existsSync(join(d, ".agents/skills/luz-readme/SKILL.md"))).toBe(true);
   });
 });
+
+describe("the title of luz-start: the mark and the word LUZ in ASCII (owner, 2026-11-24)", () => {
+  const SCRIPT_FILE = join(root, "packages/ai/skills/luz-start/scripts/luz-start.mjs");
+  const source = readFileSync(SCRIPT_FILE, "utf-8");
+  const banner = JSON.parse(/^const BANNER = (\[[\s\S]*?\]);$/m.exec(source)?.[1] ?? "[]");
+  /** What main() writes to stdout, as if stdout were a terminal or not. */
+  const say = async (argv, tty) => {
+    const { main } = await import(SCRIPT_FILE);
+    const chunks = [];
+    const write = process.stdout.write;
+    process.stdout.write = (chunk) => chunks.push(String(chunk)) > 0;
+    try {
+      main(argv, { tty });
+    } finally {
+      process.stdout.write = write;
+    }
+    return chunks.join("");
+  };
+
+  it("is plain JSON in the script, seven lines of ASCII, none past 80 columns, and spells LUZ in capitals with serifs", () => {
+    expect(banner).toHaveLength(7);
+    for (const line of banner) {
+      expect(line).toMatch(/^[\x20-\x7e]*$/);
+      expect(line.length).toBeLessThanOrEqual(80);
+    }
+    // the serifs of L and U: a foot under the L, the ticks on top of each stem
+    expect(banner[1]).toMatch(/`\| \|'.*`\| \|'.*`\| \|'/);
+    expect(banner[6]).toMatch(/_\|_+\|/);
+  });
+
+  it("is printed by --help and by init in a terminal, first", async () => {
+    const dir = mkdtempSync(join(tmpdir(), "luz-banner-"));
+    try {
+      expect(await say(["--help"], true)).toMatch(new RegExp(`^${banner.join("\n").replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\n\nluz-start: `));
+      expect((await say(["init", "--target", "claude", "--dir", dir, "--dry-run"], true)).startsWith(`${banner.join("\n")}\n\ninit: would write `)).toBe(true);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("is never printed to a pipe or in JSON, so an assistant reads the report first", async () => {
+    const dir = mkdtempSync(join(tmpdir(), "luz-banner-"));
+    try {
+      expect(await say(["--help"], false)).toMatch(/^luz-start: /);
+      expect(await say(["init", "--target", "claude", "--dir", dir, "--dry-run"], false)).toMatch(/^init: would write /);
+      expect(await say(["init", "--target", "claude", "--dir", dir, "--dry-run", "--json"], true)).toMatch(/^\{/);
+      const piped = spawnSync(process.execPath, [SCRIPT_FILE, "--help"], { encoding: "utf-8" });
+      expect(piped.stdout).toMatch(/^luz-start: /);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+});

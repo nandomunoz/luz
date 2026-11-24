@@ -126,7 +126,7 @@ describe("the page of the luz-start skill, /ai/", () => {
   });
 
   it.each(LANGS)("in %s: the home's fourth level has a button to the page, in the language of the home", (code, prefix) => {
-    const section = sectionOf(rendered.get(prefix), "inside-4");
+    const section = sectionOf(rendered.get(prefix), "ai");
     expect(section).toMatch(new RegExp(`<a class="luz-btn[^"]*" href="${prefix}ai/">`));
   });
 });

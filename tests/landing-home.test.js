@@ -149,7 +149,7 @@ describe("apps/landing/index.html: the template of the home", () => {
   it("writes the sections of the home in order: the hero and the light first, then the four levels and the FAQ", () => {
     const main = html.slice(html.indexOf("<main"), html.indexOf("</main>"));
     const ids = [...main.matchAll(/<section\b[^>]*\sid="([^"]+)"/g)].map((m) => m[1]);
-    expect(ids).toEqual(["hero", "light", "inside", "inside-2", "inside-3", "inside-4", "faq"]);
+    expect(ids).toEqual(["hero", "light", "tokens", "core", "catalog", "ai", "faq"]);
     expect(main.match(/<h1\b/g)).toHaveLength(1);
     expect(html, "no link to a section that went").not.toMatch(/href="#(?:fit|type|start|why|native|modes)"/);
   });
@@ -164,13 +164,13 @@ describe("apps/landing/index.html: the template of the home", () => {
     expect(first.indexOf('class="landing-first"')).toBe(0);
     const heroAt = first.search(/<section\b[^>]*\sid="hero"/);
     const lightAt = first.search(/<section\b[^>]*\sid="light"/);
-    const insideAt = first.search(/<section\b[^>]*\sid="inside"/);
+    const insideAt = first.search(/<section\b[^>]*\sid="tokens"/);
     expect(heroAt).toBeGreaterThan(-1);
     expect(lightAt).toBeGreaterThan(heroAt);
     const closes = first.indexOf("</div>", first.indexOf("</section>", lightAt));
     expect(closes, "the wrapper closes after the light and before the levels").toBeGreaterThan(lightAt);
     expect(closes).toBeLessThan(insideAt);
-    expect(first.slice(heroAt, lightAt)).toContain('href="#inside"');
+    expect(first.slice(heroAt, lightAt)).toContain('href="#tokens"');
   });
 
   it("the type section went with its quote and its scale: nothing is left of it", () => {

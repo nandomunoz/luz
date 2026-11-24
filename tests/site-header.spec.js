@@ -499,7 +499,7 @@ test.describe('the header on a phone', () => {
     const links = await drawer.locator('a').evaluateAll((els) => els.map((a) => ({ href: a.getAttribute('href'), top: a.getBoundingClientRect().top, text: (a.textContent ?? '').trim() })));
     const hrefs = links.map((l) => l.href);
     const sections = hrefs.filter((h) => h?.startsWith('#'));
-    expect(sections, 'the page\'s sections').toEqual(['#inside', '#faq']);
+    expect(sections, 'the page\'s sections').toEqual(['#tokens', '#faq']);
     expect(hrefs).toEqual([...sections, '/docs/', GITHUB, '/', '/es/', '/ar/']);
     expect(links.find((l) => l.href === '/docs/')?.text).toBe('Documentation');
     const tops = links.map((l) => l.top);

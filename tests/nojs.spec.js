@@ -316,9 +316,9 @@ for (const home of ['/', '/es/', '/ar/']) {
   });
 }
 
-// The home: seven sections in a fixed order (the hero, the light, the four levels of "inside" and the FAQ), all of them
+// The home: seven sections in a fixed order (the hero, the light, the four levels of "tokens" and the FAQ), all of them
 // words and native elements; what needs a script (the copy buttons) is not shown dead
-const SECTIONS = ['hero', 'light', 'inside', 'inside-2', 'inside-3', 'inside-4', 'faq'];
+const SECTIONS = ['hero', 'light', 'tokens', 'core', 'catalog', 'ai', 'faq'];
 const HOME_CATALOG = { '/': 'en', '/es/': 'es', '/ar/': 'ar' };
 const homeCatalog = (home) => JSON.parse(readFileSync(fileURLToPath(new URL(`../apps/landing/i18n/${HOME_CATALOG[home]}.json`, import.meta.url)), 'utf-8'));
 

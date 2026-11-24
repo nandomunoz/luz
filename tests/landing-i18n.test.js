@@ -398,7 +398,7 @@ describe("the new home page: catalogs and rendered pages (F5)", () => {
   const { rendered: written, problems } = buildSite(site, { extra: [...docs, ...levelPagesOf(site, template)] });
   // What the build wrote (its size is what the ceiling weighs) and the same page with the quotes of its values restored
   const rendered = new Map([...written].map(([route, page]) => [route, quoted(page)]));
-  const SECTIONS = ["hero", "light", "inside", "inside-2", "inside-3", "inside-4", "faq"];
+  const SECTIONS = ["hero", "light", "tokens", "core", "catalog", "ai", "faq"];
   /** Sections the home no longer has (owner, 2026-11-23): the home is the hero, the four levels and the FAQ. */
   const GONE = ["why", "native", "modes"];
   const placeholders = (value) => [...value.matchAll(/\{[a-z]+(?::[a-z]+)?\}/g)].map((m) => m[0]).sort();

@@ -1,54 +1,122 @@
 /**
  * The sources of the home's fourth level, "Your whole site, from a conversation" (.claude/plans/luz-ai-skill.md,
- * part A): a fake terminal that plays the conversation of the LUZ skill to come (@luz-ds/ai). The rendered page is
- * tests/home-cli.spec.js; here the template, the script, the stylesheet and the catalogs:
+ * part A, and the owner on 2026-11-24): the terminal of the luz-start skill, an emulation of a real session in which
+ * the visitor answers. The rendered page is tests/home-cli.spec.js; here the template, the generator
+ * (scripts/docs-site/cli-demo.js), the script, the stylesheet and the catalogs:
  *
- *  - the template has the terminal with the whole conversation in it, left to right, each translated phrase a <bdi>,
- *    the button that brings the next line hidden until the script shows it, and the screen a polite live region;
- *  - the home has no prompt left: no opener, no dialog, no prompt-dialog stylesheet, no initPromptDialogs; the
- *    prompts themselves (/prompts/*.txt) and /docs/kinds/ stay, and the words say the skill is not published yet,
- *    with the way to the prompts until it is;
- *  - landing.js starts cli.js; its animation is finite and only when motion is welcome;
+ *  - the template says {{cli}}, and the generator writes the terminal: left to right, named, its screen a polite
+ *    live region, the button that brings the next line hidden until the script shows it;
+ *  - the session is the skill's: init, the assistant, three questions whose answers are buttons (the kind of site,
+ *    the stack, what matters, which picks the agents), the plan, go, site new, the check and agent add; every line
+ *    the script prints is what `luz-start.mjs` prints, and the check's is what luz-check says of that page;
+ *  - without JavaScript the session of the default answers shows: every other variant and every question's buttons
+ *    are `hidden`;
+ *  - the home has no prompt left; landing.js starts cli.js; its animation is finite and only when motion is welcome;
  *  - the three catalogs have the same keys for it, and none of the old kinds of site.
  */
-import { existsSync, readFileSync } from "node:fs";
+import { execFileSync } from "node:child_process";
+import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
+import { CLI_AGENTS, CLI_DEFAULTS, CLI_KINDS, CLI_STACKS, cliDemo, matchesDefaults } from "../scripts/docs-site/cli-demo.js";
+import { escapeHtml } from "../scripts/docs-site/site.js";
 
 const repo = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (path) => readFileSync(join(repo, path), "utf-8");
 const LANGS = ["en", "es", "ar"];
 const catalogs = Object.fromEntries(LANGS.map((lang) => [lang, JSON.parse(read(`apps/landing/i18n/${lang}.json`))]));
 const home = read("apps/landing/index.html");
-const level4 = home.slice(home.indexOf('id="inside-4"'), home.indexOf("</section>", home.indexOf('id="inside-4"')));
+const level4 = home.slice(home.indexOf('id="ai"'), home.indexOf("</section>", home.indexOf('id="ai"')));
 const css = read("apps/landing/landing.css");
+const SCRIPT = join(repo, "packages/ai/skills/luz-start/scripts/luz-start.mjs");
+/** The terminal as the generator writes it, in English. */
+const terminal = cliDemo({ say: (key) => catalogs.en[key], root: repo, escapeHtml }).cli;
+const unescape = (text) => text.replace(/&quot;/g, '"').replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&#39;/g, "'").replace(/&amp;/g, "&");
+/** Every element of the screen with its `data-when` and whether it is `hidden` in the markup. */
+const conditioned = [...terminal.matchAll(/<[a-z]+\b[^>]*\sdata-when="([^"]*)"[^>]*>/g)].map((m) => ({ when: m[1], hidden: /\shidden\b/.test(m[0]) }));
 
-/** The agents of luz-ai the terminal suggests, and its skills, by their names. */
-const AGENTS = ["luz-seo-geo-specialist", "luz-accessibility-auditor", "luz-core-web-vitals-optimizer", "luz-ai-auditor"];
-const SKILLS = ["luz-create-landing", "luz-readme"];
-
-describe("the template of level 4", () => {
-  it("is a terminal, left to right, named, with its screen a polite live region", () => {
-    expect(level4).toMatch(/<figure class="landing-cli" dir="ltr" aria-label="\{\{t:inside\.l4\.panel\}\}" data-landing-cli>/);
-    expect(level4).toMatch(/<div class="landing-cli__screen" aria-live="polite">/);
-    expect(level4).toMatch(/<div class="landing-cli__bar" aria-hidden="true">/);
+describe("the template of level 4 and the terminal the generator writes", () => {
+  it("the template leaves the terminal to the generator: {{cli}}, once", () => {
+    expect(level4.match(/\{\{cli\}\}/g)).toHaveLength(1);
+    expect(level4).not.toContain("landing-cli__line");
   });
 
-  it("has the whole conversation in its markup: the command, the questions, the agents and skills, the build", () => {
-    const lines = level4.match(/<p class="landing-cli__line[^"]*">/g) ?? [];
-    expect(lines.length).toBeGreaterThanOrEqual(12);
-    expect(level4).toContain("<code>npx @luz-ds/ai</code>");
-    for (const name of [...AGENTS, ...SKILLS]) expect(level4, name).toContain(`<code>${name}</code>`);
-    for (const key of ["ask", "answer", "kind", "stack", "agents", "seo", "a11y", "speed", "noai", "skills", "adapt", "done", "build"]) {
-      expect(level4, key).toMatch(new RegExp(`<bdi[^>]*>\\{\\{t:inside\\.cli\\.${key}\\}\\}</bdi>`));
-    }
-    // The agent it does not suggest is told by its box and its colour, not by its colour alone
-    expect(level4).toMatch(/landing-cli__line--off"><span class="landing-cli__box">\[ \]<\/span> <code>luz-ai-auditor<\/code>/);
+  it("is a terminal, left to right, named, with its screen a polite live region", () => {
+    expect(terminal).toMatch(new RegExp(`^<figure class="landing-cli" dir="ltr" aria-label="${escapeHtml(catalogs.en["inside.l4.panel"])}" data-landing-cli>`));
+    expect(terminal).toMatch(/<div class="landing-cli__screen" aria-live="polite">/);
+    expect(terminal).toMatch(/<div class="landing-cli__bar" aria-hidden="true">/);
   });
 
   it("has the button that brings the next line, hidden until the script shows it, with the key that presses it", () => {
-    expect(level4).toMatch(/<button class="[^"]*\blanding-cli__next\b[^"]*" type="button" hidden><kbd>Enter<\/kbd> <span data-cli-next>\{\{t:inside\.l4\.next\}\}<\/span><span data-cli-replay hidden>\{\{t:inside\.l4\.replay\}\}<\/span><\/button>/);
+    expect(terminal).toContain(`<button class="luz-btn luz-btn--ghost luz-btn--sm landing-cli__next" type="button" hidden><kbd>Enter</kbd> <span data-cli-next>${catalogs.en["inside.l4.next"]}</span><span data-cli-replay hidden>${catalogs.en["inside.l4.replay"]}</span></button>`);
+  });
+
+  it("asks three questions and waits for go, each a group of buttons hidden until the script shows it, the default answers pressed", () => {
+    const groups = [...terminal.matchAll(/<div class="landing-cli__choices" role="group" aria-label="[^"]+" data-ask="([a-z]+)"( data-multi)? hidden>([\s\S]*?)<\/div>/g)];
+    expect(groups.map((m) => m[1])).toEqual(["kind", "stack", "agent", "go"]);
+    const values = (body) => [...body.matchAll(/data-value="([^"]+)" aria-pressed="(true|false)"/g)].map((m) => [m[1], m[2] === "true"]);
+    expect(values(groups[0][3])).toEqual(CLI_KINDS.map((k) => [k, k === CLI_DEFAULTS.kind]));
+    expect(values(groups[1][3])).toEqual(CLI_STACKS.map((s) => [s, s === CLI_DEFAULTS.stack]));
+    expect(groups[2][2], "what matters takes any number of answers").toBe(" data-multi");
+    expect(values(groups[2][3])).toEqual(CLI_AGENTS.map(([, name]) => [name, CLI_DEFAULTS.agents.includes(name)]));
+    expect(groups[2][3]).toContain(`data-done>${catalogs.en["inside.cli.continue"]}</button>`);
+    // the recommended answer says so in words, not by its place alone
+    expect(groups[0][3]).toContain(`data-value="landing" aria-pressed="true">${catalogs.en["level.catalog.kind.landing"]} <span class="landing-cli__rec">${escapeHtml(catalogs.en["inside.cli.recommended"])}</span>`);
+  });
+
+  it("without JavaScript shows the session of the default answers: every other variant is hidden, every one of them is not", () => {
+    expect(conditioned.length).toBeGreaterThan(20);
+    for (const { when, hidden } of conditioned) expect(hidden, when).toBe(!matchesDefaults(when));
+    expect(conditioned.some(({ when }) => when.includes("kind=blog"))).toBe(true);
+    expect(conditioned.some(({ when }) => when.includes("stack=astro"))).toBe(true);
+    expect(conditioned.some(({ when }) => when === "agent=luz-ai-auditor")).toBe(true);
+  });
+
+  it("prints what the script prints: each output line is a line of its dry run, said as written", () => {
+    const run = (...args) => execFileSync(process.execPath, [SCRIPT, ...args, "--dry-run"], { cwd: repo, encoding: "utf-8" }).replace(/\bwould write\b/g, "wrote");
+    const real = [
+      run("init", "--target", "claude"),
+      ...CLI_KINDS.flatMap((k) => ["vanilla", "astro"].map((s) => run("site", "new", "--name", "Vejer Books", "--kind", k, "--stack", s, "--target", ".").replace(/^--- /m, "  "))),
+      ...CLI_AGENTS.map(([, name]) => run("agent", "add", name, "--for", "claude")),
+      run("skill", "add", "luz-create-landing"),
+    ].join("\n");
+    const outs = [...terminal.matchAll(/<p class="landing-cli__line landing-cli__line--out"[^>]*><samp>([^<]*)<\/samp><\/p>/g)].map((m) => unescape(m[1]));
+    expect(outs.length).toBeGreaterThan(20);
+    for (const line of outs.filter((l) => !l.startsWith("✓"))) expect(real.split("\n"), line).toContain(line);
+  });
+
+  it("runs only the commands the skill has: init, the assistant, luz-start's own and the check it prints", () => {
+    const help = execFileSync(process.execPath, [SCRIPT, "--help"], { encoding: "utf-8" });
+    const cmds = [...terminal.matchAll(/<span class="landing-cli__mark" aria-hidden="true">\$<\/span> <code>([^<]*)<\/code>/g)].map((m) => unescape(m[1]));
+    expect(cmds[0]).toBe("npx @luz-ds/ai init --target claude");
+    expect(cmds[1]).toBe("claude");
+    for (const cmd of cmds.slice(2)) {
+      if (cmd.startsWith("luz-start ")) expect(help, cmd).toMatch(new RegExp(`^  ${cmd.split(" ")[1]}\\b`, "m"));
+      else expect(cmd).toMatch(/^npx @luz-ds\/check@\d+\.\d+\.\d+ \.( --ext \.astro)?$/);
+    }
+  });
+
+  it("says of the starter page what luz-check says of it", () => {
+    const dir = mkdtempSync(join(tmpdir(), "luz-cli-"));
+    try {
+      execFileSync(process.execPath, [SCRIPT, "site", "new", "--name", "Vejer Books", "--kind", CLI_DEFAULTS.kind, "--stack", CLI_DEFAULTS.stack, "--target", dir], { encoding: "utf-8" });
+      const said = execFileSync(process.execPath, [join(repo, "packages/check/dist/luz-check.js"), dir], { encoding: "utf-8" });
+      const line = /<samp>(✓[^<]*)<\/samp>/.exec(terminal)[1];
+      expect(said.startsWith(line), said).toBe(true);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("shows, after init, the title the script prints in a terminal: its own lines, the word read out as LUZ", () => {
+    const banner = JSON.parse(/^const BANNER = (\[[\s\S]*?\]);$/m.exec(read("packages/ai/skills/luz-start/scripts/luz-start.mjs"))[1]);
+    const art = /<div class="landing-cli__line landing-cli__line--banner"><pre class="landing-cli__art" aria-hidden="true">([\s\S]*?)<\/pre><span class="u-sr-only">LUZ<\/span><\/div>/.exec(terminal);
+    expect(art, "the title, hidden from a screen reader, with the word for it").not.toBeNull();
+    expect(unescape(art[1])).toBe(banner.join("\n"));
+    expect(terminal.indexOf("landing-cli__line--banner")).toBeGreaterThan(terminal.indexOf("npx @luz-ds/ai init --target claude"));
+    expect(terminal.indexOf("landing-cli__line--banner")).toBeLessThan(terminal.indexOf("init: wrote"));
   });
 
   it("says the skill is not published yet, with the way to the prompts until it is", () => {
@@ -63,7 +131,7 @@ describe("the template of level 4", () => {
 
   it("keeps the footer's link to the level, under its new words", () => {
     const footer = home.slice(home.indexOf("<footer"), home.indexOf("</footer>"));
-    expect(footer).toContain('<a href="#inside-4">{{t:footer.ai}}</a>');
+    expect(footer).toContain('<a href="#ai">{{t:footer.ai}}</a>');
     expect(home).not.toContain("footer.prompts");
   });
 });
@@ -79,11 +147,17 @@ describe("apps/landing/landing.js and cli.js", () => {
     expect(js).not.toContain("initPromptDialogs");
   });
 
-  it("brings one line at a time, on its button or a click in the terminal, hides the rest with `hidden`, and plays again from the start", () => {
-    expect(cli).toMatch(/line\.hidden = index >= count/);
+  it("brings one line at a time, on its button or a click in the terminal, waits on a question, hides the rest with `hidden`, and plays again from the start", () => {
+    expect(cli).toMatch(/item\.hidden = /);
     expect(cli).toMatch(/next\.addEventListener\("click", step\)/);
     expect(cli).toMatch(/cli\.addEventListener\("click"/);
-    expect(cli).toMatch(/shown === lines\.length \? 1 : shown \+ 1/);
+    expect(cli).toMatch(/aria-pressed/);
+    expect(cli).toMatch(/const restart = /);
+  });
+
+  it("keeps one height and scrolls to the last line, so the page never moves", () => {
+    expect(cli).toMatch(/screen\.scrollTop = screen\.scrollHeight/);
+    expect(css).toMatch(/\.landing-cli\[data-cli="step"\] \.landing-cli__screen \{[^}]*block-size:[^}]*overflow-y: auto/);
   });
 
   it("animates a new line only when motion is welcome, a finite number of times", () => {
@@ -102,7 +176,7 @@ describe("the catalogs, in en, es and ar", () => {
   it("have the same keys for level 4", () => {
     expect(level("es")).toEqual(level("en"));
     expect(level("ar")).toEqual(level("en"));
-    expect(level("en")).toEqual(expect.arrayContaining(["inside.l4.next", "inside.l4.replay", "inside.l4.soon", "inside.l4.meanwhile", "inside.cli.ask", "inside.cli.build"]));
+    expect(level("en")).toEqual(expect.arrayContaining(["inside.l4.next", "inside.l4.replay", "inside.l4.soon", "inside.l4.meanwhile", "inside.cli.ask", "inside.cli.kind", "inside.cli.stack", "inside.cli.agents", "inside.cli.go", "inside.cli.build"]));
   });
 
   it("have no key of the old prompts of the home", () => {

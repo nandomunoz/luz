@@ -67,7 +67,7 @@ describe("the pages of the three levels", () => {
     const html = rendered.get(`${prefix}${name}/`);
     // no link to a section the page does not have: they go to the home of the language
     expect(hrefsOf(html, /<a\b[^>]*\shref="(#[^"]*)"/g).filter((href) => href !== "#main-content" && !href.startsWith("#all") && !href.startsWith("#install") && !href.startsWith("#hero") && !href.startsWith("#t-") && href !== "#steps")).toEqual([]);
-    expect(html).toMatch(new RegExp(`href="${prefix}#inside"`));
+    expect(html).toMatch(new RegExp(`href="${prefix}#tokens"`));
     // the icons are the page's own: a <use> keeps pointing at the sprite, never at the home
     const uses = hrefsOf(html, /<use\b[^>]*\shref="([^"]*)"/g);
     expect(uses.length).toBeGreaterThan(0);
@@ -79,7 +79,7 @@ describe("the pages of the three levels", () => {
     for (const [, prefix] of LANGS) {
       const html = rendered.get(prefix);
       for (const name of NAMES) {
-        const id = { tokens: "inside", core: "inside-2", catalog: "inside-3" }[name];
+        const id = { tokens: "tokens", core: "core", catalog: "catalog" }[name];
         const start = html.search(new RegExp(`<section\\b[^>]*\\sid="${id}"`));
         const section = html.slice(start, html.indexOf("<section", start + 1));
         expect(section, `${prefix} #${id}`).toMatch(new RegExp(`<a\\b[^>]*class="luz-btn[^"]*"[^>]*href="${prefix}${name}/"`));

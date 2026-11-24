@@ -1,7 +1,7 @@
 // @ts-check
 /**
  * The three buttons of the home's hero, in `.o-actions`, in this order of the SOURCE: "Get started" (outline, to the
- * levels, #inside), "Get started with AI" (primary, `.landing-hero__ai`, to the prompts, #inside-4, with a robot icon
+ * levels, #tokens), "Get started with AI" (primary, `.landing-hero__ai`, to the prompts, #ai, with a robot icon
  * that adds no name) and "Read the docs" (outline, to /docs/). They are anchors: they work with no script.
  *
  * The source order is not the visual order on a phone, on purpose (owner, 2026-10-30): at 640 px and below the AI
@@ -40,11 +40,11 @@ test.describe('the hero buttons', () => {
 
     test(`${route}: they go to the levels, to the prompts and to the docs, and the prompts are on the page`, async ({ page }) => {
       await page.goto(route);
-      await expect(buttons(page).nth(0)).toHaveAttribute('href', '#inside');
-      await expect(buttons(page).nth(1)).toHaveAttribute('href', '#inside-4');
+      await expect(buttons(page).nth(0)).toHaveAttribute('href', '#tokens');
+      await expect(buttons(page).nth(1)).toHaveAttribute('href', '#ai');
       await expect(buttons(page).nth(2)).toHaveAttribute('href', /\/docs\/$/);
-      await expect(page.locator('#inside')).toHaveCount(1);
-      await expect(page.locator('#inside-4')).toHaveCount(1);
+      await expect(page.locator('#tokens')).toHaveCount(1);
+      await expect(page.locator('#ai')).toHaveCount(1);
     });
 
     test(`${route}: the AI button has a robot icon from the page's sprite that adds no name`, async ({ page }) => {
@@ -69,8 +69,8 @@ test.describe('the hero buttons', () => {
       await page.goto(route);
       await buttons(page).nth(1).focus();
       await page.keyboard.press('Enter');
-      await expect(page).toHaveURL(/#inside-4$/);
-      await expect(page.locator('#inside-4')).toBeInViewport();
+      await expect(page).toHaveURL(/#ai$/);
+      await expect(page.locator('#ai')).toBeInViewport();
     });
 
     test(`${route}: Tab goes through the buttons in the order of the DOM, at any width`, async ({ page }) => {
