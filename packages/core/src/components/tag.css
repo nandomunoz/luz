@@ -72,6 +72,23 @@
   font-family: var(--luz-font-mono);
 }
 
+/* The mono face leaves its room under the baseline, so the padding hack above
+   only fits one face. Where the browser can trim the text box to the height of
+   the capitals and figures, the badge is a block of its own and the padding is
+   the same above and below: centred whatever the face. */
+@supports (text-box: trim-both cap alphabetic) {
+  .luz-badge {
+    display: inline-block;
+    min-width: 20px;
+    min-height: 0;
+    padding-block: calc((var(--luz-space-md) + var(--luz-space-2xs) - 1cap) / 2);
+    padding-inline: var(--luz-space-2xs);
+    text-align: center;
+    text-box: trim-both cap alphabetic;
+    white-space: nowrap;
+  }
+}
+
 .luz-badge--primary {
   background: var(--luz-brand-fill);
   color: var(--luz-text-on-fill);
