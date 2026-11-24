@@ -1,5 +1,5 @@
 /**
- * The mechanical checks of a transcript, each tied to a rule of SKILL.md (R1…R8) so a failure names the rule and the
+ * The mechanical checks of a transcript, each tied to a rule of SKILL.md (R1…R9) so a failure names the rule and the
  * line. The folder a run leaves is graded by grade.js; these read what the assistant did and when.
  */
 const WRITE_TOOLS = new Set(["Write", "Edit", "MultiEdit", "NotebookEdit"]);
@@ -127,6 +127,10 @@ export const CHECKS = {
       }
     }
     return { ok: true, detail: "only the script, the checker and @luz-ds installs" };
+  },
+  "skill-invoked": (convo) => {
+    const used = convo.turns.some((t) => t.toolUses.some((u) => u.name === "Skill" && /^luz$/.test(String(u.input?.skill ?? ""))));
+    return used ? { ok: true, detail: "the luz skill was invoked" } : { ok: false, detail: "the luz skill was never invoked: the request did not wake it" };
   },
   says: (convo, caseDef) => {
     const text = convo.turns.map((t) => t.assistant).join("\n");

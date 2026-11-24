@@ -3,6 +3,7 @@
  * the assistant's question is about, and the reply is the map's text. A question outside the map is answered "Whatever you
  * recommend." (in English: a Spanish phrase would switch the assistant's language) and flagged `unscripted`, so a case that drifts is seen rather than hidden.
  */
+import { inScratch } from "./scratch.js";
 import { parseStream } from "./stream.js";
 import { claudeArgs } from "./sandbox.js";
 
@@ -44,10 +45,15 @@ export function parseSimulation(text, answers) {
 
 /** The simulator that asks a model through `claude` (an injectable function, as in conversation.js). */
 export function makeSimulator({ claude, model = "haiku", sandbox }) {
-  return async ({ assistantText, caseDef }) => {
+  return async ({ assistantText, caseDef, turn = 0 }) => {
+    // A frozen conversation: the replies of the person, in order, with no model
+    if (Array.isArray(caseDef.script)) {
+      const zero = { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, total: 0 };
+      return turn < caseDef.script.length ? { reply: caseDef.script[turn], topic: null, unscripted: false, tokens: zero } : { done: true, tokens: zero };
+    }
     const prompt = buildSimulatorPrompt({ assistantText, answers: caseDef.answers ?? {} });
-    const args = claudeArgs({ prompt, model }).map((a, i, all) => (all[i - 1] === "--tools" ? "" : a));
-    const r = await claude(args, { cwd: sandbox.configDir, env: { ...sandbox.env, PATH: process.env.PATH } });
+    const args = claudeArgs({ prompt, model, tools: "", maxTurns: 1 });
+    const r = await inScratch(sandbox, (where) => claude(args, where));
     const s = parseStream(r.stdout ?? "");
     return { ...parseSimulation(s.text, caseDef.answers ?? {}), tokens: s.tokens, rate: s.rate };
   };

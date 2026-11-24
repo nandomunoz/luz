@@ -22,6 +22,7 @@ import { spawnSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { HIDDEN } from "./freeze.js";
 
 const repo = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
 const EVALS = "tools/ai-eval/cases/evals.json";
@@ -33,8 +34,19 @@ const walk = (dir, base = dir) =>
     return [relative(base, full).split("\\").join("/")];
   });
 
+// A frozen file is words a model wrote, played back as the person: its id is a folder name and its replies are plain text
+function frozenCase(c, file) {
+  const ok = c && typeof c.id === "string" && /^[a-z0-9-]+$/.test(c.id) && typeof c.prompt !== "number" && Array.isArray(c.script ?? []) && (c.script ?? []).every((t) => typeof t === "string" && t && !t.startsWith("-") && !HIDDEN.test(t) && t.length <= 600);
+  if (!ok) throw new Error(`frozen/${file}: the case has an id that is not lower-case letters, digits and dashes, or a reply that is not plain text`);
+  return c;
+}
+
 export function loadCases(root = repo) {
-  return JSON.parse(readFileSync(join(root, EVALS), "utf-8")).cases;
+  const cases = JSON.parse(readFileSync(join(root, EVALS), "utf-8")).cases;
+  // Conversations frozen from an automatic run: one file each, `{ "case": {...} }`
+  const frozen = join(root, dirname(EVALS), "frozen");
+  if (existsSync(frozen)) for (const f of readdirSync(frozen).filter((n) => n.endsWith(".json")).sort()) cases.push(frozenCase(JSON.parse(readFileSync(join(frozen, f), "utf-8")).case, f));
+  return cases;
 }
 
 /** Grades the folder of a run: { case, passed, checks: [{ id, ok, detail }] }. */

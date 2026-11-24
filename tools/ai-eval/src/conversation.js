@@ -52,7 +52,7 @@ export async function runConversation({ caseDef, sandbox, model, claude = spawnC
       convo.ended = "max-turns";
       return convo;
     }
-    const sim = await simulate({ assistantText: s.text, caseDef });
+    const sim = await simulate({ assistantText: s.text, caseDef, turn: n, user });
     convo.tokens = add(convo.tokens, sim.tokens);
     convo.rate = sim.rate ?? convo.rate;
     if (sim.done) {

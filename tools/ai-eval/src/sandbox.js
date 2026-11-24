@@ -12,9 +12,15 @@ import { dirname, join, resolve, sep } from "node:path";
 const TOOLS = "Read,Write,Edit,Glob,Grep,Skill,Bash";
 const ALLOWED = "Read,Write,Edit,Glob,Grep,Skill,Bash(node *luz.mjs*),Bash(node *luz-check.js*),Bash(npx luz-check *),Bash(npx @luz-ds/check@* *),Bash(npx --yes @luz-ds/check@* *),Bash(luz-check *),Bash(ls *),Bash(cat *),Bash(head *),Bash(tail *),Bash(grep *),Bash(echo *),Bash(wc *),Bash(sed -n *),Bash(mkdir -p *),Bash(which *),Bash(cd *),Bash(git status *)";
 
-export function claudeArgs({ prompt, model, resume }) {
+/** `tools` narrows the closed list (a trigger or an agent run needs fewer); `maxTurns` bounds the assistant's own turns. */
+export function claudeArgs({ prompt, model, resume, tools, maxTurns }) {
   if (typeof prompt !== "string" || !prompt || prompt.startsWith("-")) throw new Error(`the prompt is a text that does not start with "-" (${JSON.stringify(prompt)})`);
   const args = ["-p", prompt, "--model", model, "--output-format", "stream-json", "--verbose", "--permission-mode", "dontAsk", "--setting-sources", "project", "--tools", TOOLS, "--allowedTools", ALLOWED];
+  if (tools !== undefined) {
+    args.splice(args.indexOf("--tools") + 1, 1, tools);
+    if (tools) args.splice(args.indexOf("--allowedTools") + 1, 1, tools);
+  }
+  if (maxTurns) args.push("--max-turns", String(maxTurns));
   if (resume) args.push("--resume", resume);
   return args;
 }

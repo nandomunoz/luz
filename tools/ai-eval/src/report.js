@@ -29,8 +29,8 @@ export function caseReport({ caseDef, convo, checks, skillMd }) {
   return `${out.join("\n")}\n`;
 }
 
-export function runReport(state) {
+export function runReport(state, extra = []) {
   const rows = Object.entries(state.cases).map(([id, c]) => `| ${id} | ${c.status} | ${c.runs.length} | ${c.runs.map((r) => (r.passed ? "pass" : "fail")).join(", ")} |`);
   const tokens = Object.values(state.cases).flatMap((c) => c.runs).reduce((n, r) => n + (r.tokens?.total ?? 0), 0);
-  return [`# Run ${state.runId}`, "", `Layer: ${state.meta?.layer ?? "?"} · model: ${state.meta?.model ?? "?"} · tokens: ${tokens}`, "", "| case | status | runs | results |", "| --- | --- | --- | --- |", ...rows, "", `Fix one: \`/skill-fix ${state.runId} <case>\``, ""].join("\n");
+  return [`# Run ${state.runId}`, "", `Layer: ${state.meta?.layer ?? "?"} · model: ${state.meta?.model ?? "?"} · tokens: ${tokens}`, "", "| case | status | runs | results |", "| --- | --- | --- | --- |", ...rows, "", ...(extra.length ? [...extra, ""] : []), `Fix one: \`/skill-fix ${state.runId} <case>\``, ""].join("\n");
 }
