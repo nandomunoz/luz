@@ -4,8 +4,10 @@
  * the visitor answers. The rendered page is tests/home-cli.spec.js; here the template, the generator
  * (scripts/docs-site/cli-demo.js), the script, the stylesheet and the catalogs:
  *
- *  - the template says {{cli}}, and the generator writes the terminal: left to right, named, its screen a polite
- *    live region, the button that brings the next line hidden until the script shows it;
+ *  - the home's template says {{cliloop}} and the page of the skill's {{cli}}; the generator writes the terminal: left
+ *    to right, named, its screen a polite live region. The page of the skill's has the button that brings the next
+ *    line, hidden until the script shows it; the home's is an animation that plays the same session again and
+ *    again (owner, 2026-11-24), with a button to pause it (WCAG 2.2.2) and nothing to answer;
  *  - the session is the skill's: init, the assistant, three questions whose answers are buttons (the kind of site,
  *    the stack, what matters, which picks the agents), the plan, go, site new, the check and agent add; every line
  *    the script prints is what `luz-start.mjs` prints, and the check's is what luz-check says of that page;
@@ -32,14 +34,22 @@ const level4 = home.slice(home.indexOf('id="ai"'), home.indexOf("</section>", ho
 const css = read("apps/landing/landing.css");
 const SCRIPT = join(repo, "packages/ai/skills/luz-start/scripts/luz-start.mjs");
 /** The terminal as the generator writes it, in English. */
-const terminal = cliDemo({ say: (key) => catalogs.en[key], root: repo, escapeHtml }).cli;
+const written = cliDemo({ say: (key) => catalogs.en[key], root: repo, escapeHtml });
+const terminal = written.cli;
+/** The same terminal as the home has it: the animation. */
+const loop = written.cliloop;
+const aiPage = read("apps/landing/levels/ai.html");
+const screenOf = (html) => /<div class="landing-cli__screen"[^>]*>([\s\S]*)<\/div>\n<button/.exec(html)?.[1] ?? "";
 const unescape = (text) => text.replace(/&quot;/g, '"').replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&#39;/g, "'").replace(/&amp;/g, "&");
 /** Every element of the screen with its `data-when` and whether it is `hidden` in the markup. */
 const conditioned = [...terminal.matchAll(/<[a-z]+\b[^>]*\sdata-when="([^"]*)"[^>]*>/g)].map((m) => ({ when: m[1], hidden: /\shidden\b/.test(m[0]) }));
 
 describe("the template of level 4 and the terminal the generator writes", () => {
-  it("the template leaves the terminal to the generator: {{cli}}, once", () => {
-    expect(level4.match(/\{\{cli\}\}/g)).toHaveLength(1);
+  it("the templates leave the terminal to the generator: the home's {{cliloop}} and the skill's page {{cli}}, once each", () => {
+    expect(level4.match(/\{\{cliloop\}\}/g)).toHaveLength(1);
+    expect(level4).not.toMatch(/\{\{cli\}\}/);
+    expect(aiPage.match(/\{\{cli\}\}/g)).toHaveLength(1);
+    expect(aiPage).not.toMatch(/\{\{cliloop\}\}/);
     expect(level4).not.toContain("landing-cli__line");
   });
 
@@ -136,6 +146,34 @@ describe("the template of level 4 and the terminal the generator writes", () => 
   });
 });
 
+describe("the terminal of the home: an animation that plays the session again and again, with nothing to answer", () => {
+  it("is the same terminal, marked as a loop, with the same screen line by line", () => {
+    expect(loop).toMatch(new RegExp(`^<figure class="landing-cli" dir="ltr" aria-label="${escapeHtml(catalogs.en["inside.l4.panel"])}" data-landing-cli="loop">`));
+    expect(screenOf(loop)).not.toBe("");
+    expect(screenOf(loop)).toBe(screenOf(terminal));
+  });
+
+  it("has no Enter and no key to press, and a button to pause it, hidden until the script shows it (WCAG 2.2.2)", () => {
+    expect(loop).not.toContain("landing-cli__next");
+    expect(loop).not.toContain("<kbd>");
+    expect(loop).toContain(`<button class="luz-btn luz-btn--ghost luz-btn--sm landing-cli__pause" type="button" hidden><span data-cli-pause>${catalogs.en["inside.l4.pause"]}</span><span data-cli-play hidden>${catalogs.en["inside.l4.play"]}</span></button>`);
+    expect(loop.match(/<button\b[^>]*landing-cli__pause/g)).toHaveLength(1);
+  });
+
+  it("leaves the interactive terminal as it was: Enter, no pause", () => {
+    expect(terminal).toMatch(/^<figure class="landing-cli" dir="ltr" [^>]*data-landing-cli>/);
+    expect(terminal).toContain("landing-cli__next");
+    expect(terminal).not.toContain("landing-cli__pause");
+  });
+
+  it("is written in every language with the words of its button", () => {
+    for (const lang of LANGS) {
+      const said = cliDemo({ say: (key) => catalogs[lang][key], root: repo, escapeHtml }).cliloop;
+      expect(said, lang).toContain(`<span data-cli-pause>${escapeHtml(catalogs[lang]["inside.l4.pause"])}</span><span data-cli-play hidden>${escapeHtml(catalogs[lang]["inside.l4.play"])}</span>`);
+    }
+  });
+});
+
 describe("apps/landing/landing.js and cli.js", () => {
   const js = read("apps/landing/landing.js");
   // Read only when it is there, so a missing module fails its tests one by one, not the file
@@ -160,6 +198,19 @@ describe("apps/landing/landing.js and cli.js", () => {
     expect(css).toMatch(/\.landing-cli\[data-cli="step"\] \.landing-cli__screen \{[^}]*block-size:[^}]*overflow-y: auto/);
   });
 
+  it("plays the loop only when motion is welcome, in view and not paused, and takes it out of the reach of the keyboard and of a reader", () => {
+    expect(cli).toMatch(/prefers-reduced-motion: reduce/);
+    expect(cli).toMatch(/IntersectionObserver/);
+    expect(cli).toMatch(/inert = true/);
+    expect(cli).toMatch(/setAttribute\("aria-hidden", "true"\)/);
+    expect(cli).toMatch(/landing-cli__pause/);
+    expect(cli).toMatch(/clearTimeout/);
+  });
+
+  it("keeps the loop at one height too, so the page never moves", () => {
+    expect(css).toMatch(/\.landing-cli\[data-cli="loop"\] \.landing-cli__screen/);
+  });
+
   it("animates a new line only when motion is welcome, a finite number of times", () => {
     const motion = css.slice(css.indexOf("@media (prefers-reduced-motion: no-preference) {\n  .landing-cli__line.is-new"));
     expect(motion).toMatch(/^@media \(prefers-reduced-motion: no-preference\) \{\n {2}\.landing-cli__line\.is-new \{\n {4}animation: luz-fade-in/);
@@ -176,7 +227,7 @@ describe("the catalogs, in en, es and ar", () => {
   it("have the same keys for level 4", () => {
     expect(level("es")).toEqual(level("en"));
     expect(level("ar")).toEqual(level("en"));
-    expect(level("en")).toEqual(expect.arrayContaining(["inside.l4.next", "inside.l4.replay", "inside.l4.soon", "inside.l4.meanwhile", "inside.cli.ask", "inside.cli.kind", "inside.cli.stack", "inside.cli.agents", "inside.cli.go", "inside.cli.build"]));
+    expect(level("en")).toEqual(expect.arrayContaining(["inside.l4.next", "inside.l4.replay", "inside.l4.pause", "inside.l4.play", "inside.l4.soon", "inside.l4.meanwhile", "inside.cli.ask", "inside.cli.kind", "inside.cli.stack", "inside.cli.agents", "inside.cli.go", "inside.cli.build"]));
   });
 
   it("have no key of the old prompts of the home", () => {

@@ -833,7 +833,7 @@ describe("portability", () => {
   });
 });
 
-describe("the title of luz-start: the mark and the word LUZ in ASCII (owner, 2026-11-24)", () => {
+describe("the title of luz-start: the prism of the mark and the word LUZ, as text, at one height (owner, 2026-11-24)", () => {
   const SCRIPT_FILE = join(root, "packages/ai/skills/luz-start/scripts/luz-start.mjs");
   const source = readFileSync(SCRIPT_FILE, "utf-8");
   const banner = JSON.parse(/^const BANNER = (\[[\s\S]*?\]);$/m.exec(source)?.[1] ?? "[]");
@@ -851,15 +851,22 @@ describe("the title of luz-start: the mark and the word LUZ in ASCII (owner, 202
     return chunks.join("");
   };
 
-  it("is plain JSON in the script, seven lines of ASCII, none past 80 columns, and spells LUZ in capitals with serifs", () => {
-    expect(banner).toHaveLength(7);
+  it("is plain JSON in the script, six lines, none past 80 columns, the prism of the mark and the word LUZ side by side at the same height", () => {
+    expect(banner).toHaveLength(6);
     for (const line of banner) {
-      expect(line).toMatch(/^[\x20-\x7e]*$/);
+      expect(line).toMatch(/^[ ░▒▓█╔╗╚╝═║]*$/);
       expect(line.length).toBeLessThanOrEqual(80);
+      expect(line).toBe(line.trimEnd());
+      // the prism fills the left of every line and the word the right of every line: neither is shorter
+      expect(line.slice(0, 16), line).toMatch(/[░▒▓█]/);
+      expect(line.slice(18), line).toMatch(/[█╔╗╚╝═║]/);
     }
-    // the serifs of L and U: a foot under the L, the ticks on top of each stem
-    expect(banner[1]).toMatch(/`\| \|'.*`\| \|'.*`\| \|'/);
-    expect(banner[6]).toMatch(/_\|_+\|/);
+    // the word is LUZ: two stems and the Z's top bar and diagonal, over its foot
+    expect(banner[0]).toMatch(/██╗ +██╗ +██╗███████╗$/);
+    expect(banner[4]).toMatch(/███████╗╚██████╔╝███████╗$/);
+    expect(banner[5]).toMatch(/╚══════╝ ╚═════╝ ╚══════╝$/);
+    // the prism rises to a point and has a wide base
+    expect(banner[0].slice(0, 16).trim().length).toBeLessThan(banner[5].slice(0, 16).trim().length);
   });
 
   it("is printed by --help and by init in a terminal, first", async () => {
