@@ -1075,4 +1075,11 @@ describe("the title of luz-ai: the prism of the mark and the word LUZ, as text, 
     expect(description).toMatch(/Not for[^.]*question[^.]*(LUZ|checker)[^.]*rule/i);
     expect(description.length).toBeLessThanOrEqual(1024);
   });
+
+  it("R3 also forbids looking for tools or files outside the project and the skill's folder", () => {
+    const md = readFileSync(join(root, "packages/ai/skills/luz/SKILL.md"), "utf-8");
+    const r3 = /^- \*\*R3\*\* (.+)$/m.exec(md)[1];
+    expect(r3).toMatch(/Do not search outside the project and this folder/);
+    expect(r3).toMatch(/npm cache/);
+  });
 });
