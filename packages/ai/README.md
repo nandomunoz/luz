@@ -28,6 +28,8 @@ The folders are the ones each assistant documents. Claude Code reads `.claude/sk
 
 Type `/luz` in your assistant, with a subcommand or without. A word that is not in the table gets the table, never a guess.
 
+The skill is tested only in Claude Code. The other assistants get it written from their own documentation; if one of them fails, [tell us](https://github.com/nandovejer/luz/issues/new?template=ai-target.yml).
+
 | In the chat | What it does | Writes |
 | --- | --- | --- |
 | `/luz` | Asks what you want to make, shows the plan, waits for your go, writes the starter page and finishes it with you. | yes, after "go" |

@@ -757,7 +757,7 @@
   "level.catalog.sitewide.docs.updated": "Last updated",
   "level.catalog.sitewide.docs.date": "17 October 2026",
   "level.ai.commands.title": "The commands of /luz",
-  "level.ai.commands.lead": "Type /luz in your assistant, with a subcommand or without. A word that is not in the table gets the table, never a guess.",
+  "level.ai.commands.lead": "Type /luz in your assistant, with a subcommand or without. A word that is not in the table gets the table, never a guess. The skill is tested only in Claude Code; the other assistants follow their documentation.",
   "level.ai.commands.writes": "Writes files",
   "level.ai.commands.yes": "Yes, after your go",
   "level.ai.commands.no": "No, it only reads",

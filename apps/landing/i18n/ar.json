@@ -757,7 +757,7 @@
   "level.catalog.sitewide.docs.updated": "آخر تحديث",
   "level.catalog.sitewide.docs.date": "17 أكتوبر 2026",
   "level.ai.commands.title": "أوامر /luz",
-  "level.ai.commands.lead": "اكتب /luz في مساعدك، مع أمر فرعي أو من دونه. الكلمة التي ليست في الجدول تحصل على الجدول، ولا يخمّن المساعد ما قصدته.",
+  "level.ai.commands.lead": "اكتب /luz في مساعدك، مع أمر فرعي أو من دونه. الكلمة التي ليست في الجدول تحصل على الجدول، ولا يخمّن المساعد ما قصدته. تُختبر المهارة في Claude Code فقط؛ أما بقية المساعدات فتتبع وثائقها.",
   "level.ai.commands.writes": "يكتب ملفات",
   "level.ai.commands.yes": "نعم، بعد موافقتك",
   "level.ai.commands.no": "لا، يقرأ فقط",

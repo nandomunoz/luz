@@ -757,7 +757,7 @@
   "level.catalog.sitewide.docs.updated": "Última actualización",
   "level.catalog.sitewide.docs.date": "17 de octubre de 2026",
   "level.ai.commands.title": "Los comandos de /luz",
-  "level.ai.commands.lead": "Escribe /luz en tu asistente, con un subcomando o sin él. Una palabra que no está en la tabla recibe la tabla, nunca una suposición.",
+  "level.ai.commands.lead": "Escribe /luz en tu asistente, con un subcomando o sin él. Una palabra que no está en la tabla recibe la tabla, nunca una suposición. La skill se prueba solo en Claude Code; los demás asistentes siguen su documentación.",
   "level.ai.commands.writes": "Escribe archivos",
   "level.ai.commands.yes": "Sí, tras tu go",
   "level.ai.commands.no": "No, solo lee",
