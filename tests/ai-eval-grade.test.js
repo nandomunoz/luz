@@ -1,6 +1,6 @@
 /**
- * The evals of the `luz-start` skill (`.claude/plans/luz-ai-skill.md`, B.8): two files inside the skill, `triggers.json`
- * for activation and `evals.json` for the outcome, and `scripts/ai-eval-grade.js`, which grades the folder a run
+ * The evals of the `luz` skill (`.claude/plans/luz-ai-skill.md`, B.8): two files inside the skill, `triggers.json`
+ * for activation and `evals.json` for the outcome, and `tools/ai-eval/src/grade.js`, which grades the folder a run
  * leaves behind with checks that need no model. The graders are tested here on folders made by the skill's own
  * script, so a run that does the work passes and each way of doing it badly fails the check that names it.
  */
@@ -10,12 +10,12 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "nod
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { grade, loadCases } from "../scripts/ai-eval-grade.js";
+import { grade, loadCases } from "../tools/ai-eval/src/grade.js";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const skill = join(root, "packages/ai/skills/luz-start");
-const script = join(skill, "scripts/luz-start.mjs");
-const triggers = JSON.parse(readFileSync(join(skill, "evals/triggers.json"), "utf-8")).queries;
+const skill = join(root, "packages/ai/skills/luz");
+const script = join(skill, "scripts/luz.mjs");
+const triggers = JSON.parse(readFileSync(join(root, "tools/ai-eval/cases/triggers.json"), "utf-8")).queries;
 
 const tmp = [];
 afterAll(() => tmp.forEach((d) => rmSync(d, { recursive: true, force: true })));
@@ -46,13 +46,14 @@ const ids = (report) => report.checks.filter((c) => !c.ok).map((c) => c.id);
 describe("the cases", () => {
   const cases = loadCases(root);
 
-  it("are three, with their own prompt, a target and checks that exist", () => {
-    expect(cases.map((c) => c.id)).toEqual(["landing-vanilla", "blog-astro", "hostile-readme"]);
-    for (const c of cases) {
-      expect(c.prompt.length, c.id).toBeGreaterThan(20);
+  it("are the ones that write a site and the ones of subcommands, each with its own prompt and a target", () => {
+    expect(cases.map((c) => c.id)).toEqual(["landing-vanilla", "blog-astro", "hostile-readme", "doctor", "facts", "agents", "unknown-subcommand", "luz-start", "new-blog", "check", "skills", "add", "help"]);
+    for (const c of cases.filter((x) => x.checks.length)) {
+      expect(c.prompt.length, c.id).toBeGreaterThan(2);
       expect(c.target, c.id).toBeTruthy();
       expect(c.checks, c.id).toContain("luz-check");
     }
+    for (const c of cases.filter((x) => x.readOnly)) expect(c.prompt, c.id).toMatch(/^\/luz /);
   });
 
   it("include one that is hostile: a file of the project tells the model to do harm, and the harm is named", () => {
@@ -62,16 +63,17 @@ describe("the cases", () => {
     expect(hostile.checks).toEqual(expect.arrayContaining(["fixture-unchanged", "forbidden-absent", "only-target"]));
   });
 
-  it("leave to a person only what a folder cannot say: that a question came before the first write", () => {
-    for (const c of cases) expect(c.transcript).toEqual(["asked-before-write"]);
+  it("check in the transcript what a folder cannot say (a question before the first write, the commands run), mechanically", () => {
+    for (const c of cases.filter((x) => !x.readOnly)) expect(c.transcript, c.id).toEqual(expect.arrayContaining(["asked-before-write", "commands-in-plan"]));
   });
 });
 
 describe("the triggers", () => {
-  it("are twenty queries, half that should wake the skill and half that should not", () => {
-    expect(triggers).toHaveLength(20);
-    expect(triggers.filter((t) => t.should_trigger)).toHaveLength(10);
-    expect(new Set(triggers.map((t) => t.query)).size).toBe(20);
+  it("are twenty-six queries, half that should wake the skill (three of them as /luz and a subcommand) and half that should not", () => {
+    expect(triggers).toHaveLength(26);
+    expect(triggers.filter((t) => t.should_trigger)).toHaveLength(13);
+    expect(new Set(triggers.map((t) => t.query)).size).toBe(26);
+    expect(triggers.filter((t) => t.should_trigger && /^\/luz\b/.test(t.query))).toHaveLength(3);
     for (const t of triggers) expect(typeof t.should_trigger, t.query).toBe("boolean");
   });
 
@@ -147,8 +149,8 @@ describe("grade", () => {
   });
 });
 
-describe("node scripts/ai-eval-grade.js", () => {
-  const cli = (...args) => spawnSync(process.execPath, [join(root, "scripts/ai-eval-grade.js"), ...args], { encoding: "utf-8" });
+describe("node tools/ai-eval/src/grade.js", () => {
+  const cli = (...args) => spawnSync(process.execPath, [join(root, "tools/ai-eval/src/grade.js"), ...args], { encoding: "utf-8" });
 
   it("exits 0 when the run passes and prints the checks, 1 when one fails, 2 when it is used wrongly", () => {
     const good = cli("landing-vanilla", run("landing-vanilla"));
