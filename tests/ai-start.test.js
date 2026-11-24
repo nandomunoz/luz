@@ -1082,4 +1082,11 @@ describe("the title of luz-ai: the prism of the mark and the word LUZ, as text, 
     expect(r3).toMatch(/Do not search outside the project and this folder/);
     expect(r3).toMatch(/npm cache/);
   });
+
+  it("step 5 writes the site into the folder the person named, with --target, never the script's default", () => {
+    const md = readFileSync(join(root, "packages/ai/skills/luz/SKILL.md"), "utf-8");
+    const step = /^5\. \*\*Write the starter page\*\*(.+)$/m.exec(md)[1];
+    expect(step).toMatch(/--target/);
+    expect(step).toMatch(/folder the person named/);
+  });
 });
