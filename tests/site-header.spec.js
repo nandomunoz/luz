@@ -4,9 +4,10 @@
  * apps/site/header.css, apps/site/header.js), as a browser lays it out and as a keyboard drives it.
  * The markup, the words in each language and the catalogs are in tests/site-header.test.js.
  *
- * Above 768px, one row: the logo (a link to the home, named "LUZ", no visible text; the version is
- * the footer's, not the header's), and at the end Documentation, GitHub, Search and Language (the home and the docs have
- * the switch). Those four are as tall as the header, have no underline, and the current
+ * Above 768px, one row in two groups (owner, 2026-11-24): the logo, then where to go, in words (Tokens, Core,
+ * Catalog, AI, Documentation); at the end what to use: GitHub (its mark, named for a reader), Search and Language
+ * (the home and the docs have the switch). The row fits from 769px up, in every language, with nothing over anything
+ * and nothing outside the window; below 1100px the tools keep only their icons and the badge of the version leaves. Those four are as tall as the header, have no underline, and the current
  * one (the docs page, the open search dialog, the open language list) has a 2px bar at the bottom in
  * a darker colour. The colour mode is not in the header: with scripting on, the footer's cycle
  * button is fixed at the bottom right of the window. At 768px and below the row is the logo, Search
@@ -152,37 +153,40 @@ test.describe('the header at the top of a wide screen', () => {
   }
 
   for (const path of [HOME, DOCS]) {
-    test(`${path}: ends with Documentation, GitHub, Search and Language, each with an icon and a word`, async ({ page, javaScriptEnabled }) => {
+    test(`${path}: where to go after the logo, in words; what to use at the end: GitHub as its mark, Search with its word, Language`, async ({ page, javaScriptEnabled }) => {
       await open(page, path, javaScriptEnabled);
       const c = controls(page, javaScriptEnabled);
-      const row = [c.docs, c.github, c.search, c.lang];
       await expect(page.locator('#site-header luz-lang-switch'), 'the language switch is on the home and on the docs').toHaveCount(1);
+      const nav = page.locator('#site-header .site-header__nav');
+      const brand = await box(c.brand);
+      const navBox = await box(nav);
+      const tools = [c.github, c.search, c.lang];
       const boxes = [];
-      for (const control of row) {
+      for (const control of tools) {
         await expect(control).toBeVisible();
         boxes.push(await box(control));
       }
-      for (let i = 1; i < boxes.length; i++) expect(boxes[i].left, `control ${i} after control ${i - 1}`).toBeGreaterThanOrEqual(boxes[i - 1].right - 1);
-      // At the end of the row: after the logo
-      expect(boxes[0].left, 'after the logo').toBeGreaterThan((await box(c.brand)).right);
-      // One line: the same vertical centre
-      const middles = boxes.map((b) => b.top + b.height / 2);
+      // The nav sits by the logo, the tools at the end, the free space between them
+      expect(navBox.left - brand.right, 'the nav by the logo').toBeLessThanOrEqual(await px(page, 'calc(var(--luz-space-lg) + var(--luz-space-md))'));
+      expect(boxes[0].left - navBox.right, 'the free space between where to go and what to use').toBeGreaterThan(100);
+      for (let i = 1; i < boxes.length; i++) expect(boxes[i].left, `tool ${i} after tool ${i - 1}`).toBeGreaterThanOrEqual(boxes[i - 1].right - 1);
+      const middles = [navBox, ...boxes].map((b) => b.top + b.height / 2);
       expect(Math.max(...middles) - Math.min(...middles), 'one row').toBeLessThanOrEqual(2);
-      // An icon and a visible word on the first three (the language button keeps its own icon)
-      for (const control of row.slice(0, 3)) {
-        const icon = control.locator('svg').first();
-        await expect(icon).toBeVisible();
-        const size = await box(icon);
-        expect(Math.min(size.width, size.height), 'an icon').toBeGreaterThanOrEqual(16);
-        expect((await visibleText(control)).length, 'a word').toBeGreaterThan(0);
-      }
+      // The nav: words, no icons
+      await expect(nav.locator('svg')).toHaveCount(0);
       expect(await visibleText(c.docs)).toBe('Documentation');
-      expect(await visibleText(c.github)).toBe('GitHub');
+      // GitHub: its mark, its name for a reader and on hover
+      const icon = c.github.locator('svg').first();
+      await expect(icon).toBeVisible();
+      expect(Math.min((await box(icon)).width, (await box(icon)).height), 'an icon').toBeGreaterThanOrEqual(16);
+      await expect(c.github).toHaveAccessibleName('GitHub');
+      expect(await visibleText(c.github), 'no word beside the mark').toBe('');
       if (javaScriptEnabled) {
         await expect(c.search).toHaveAccessibleName('Search');
         expect(await visibleText(c.search), 'just "Search": no "docs", no ellipsis, no Ctrl K key').toBe('Search');
       }
     });
+
   }
 
   for (const path of [HOME, DOCS]) {
@@ -271,6 +275,46 @@ test.describe('the header at the top of a wide screen', () => {
     expect(await style(github, 'textDecorationLine')).toBe('none');
   });
 
+});
+
+test.describe('the four sections of the site in the row', () => {
+  for (const width of [769, 900, 1024, 1280]) {
+    for (const path of ['/', '/es/', '/ar/', '/docs/', '/catalog/', '/es/ai/']) {
+      test(`${path} at ${width}px: Tokens, Core, Catalog and AI come after the logo and before Documentation, in one row, with nothing over anything`, async ({ page, javaScriptEnabled }) => {
+        await page.setViewportSize({ width, height: 700 });
+        await open(page, path, javaScriptEnabled);
+        const nav = page.locator('#site-header .site-header__nav a');
+        await expect(nav).toHaveCount(5);
+        const home = path.startsWith('/docs/') ? '/' : path.match(/^\/(?:es\/|ar\/)?/)[0];
+        expect(await nav.evaluateAll((all) => all.map((a) => a.getAttribute('href')).slice(0, 4))).toEqual(['tokens/', 'core/', 'catalog/', 'ai/'].map((p) => home + p));
+        for (let i = 0; i < 5; i++) await expect(nav.nth(i)).toBeVisible();
+        const shown = await drawnControls(page);
+        for (const s of shown) {
+          expect(s.left, `${s.name} inside the window`).toBeGreaterThanOrEqual(0);
+          expect(s.right, `${s.name} inside the window`).toBeLessThanOrEqual(width);
+        }
+        const rtl = path.startsWith('/ar/');
+        const ordered = rtl ? [...shown].sort((a, b) => b.right - a.right) : [...shown].sort((a, b) => a.left - b.left);
+        for (let i = 1; i < ordered.length; i++) {
+          const [prev, cur] = [ordered[i - 1], ordered[i]];
+          if (rtl) expect(cur.right, `${cur.name} does not cover ${prev.name}`).toBeLessThanOrEqual(prev.left + 1);
+          else expect(cur.left, `${cur.name} does not cover ${prev.name}`).toBeGreaterThanOrEqual(prev.right - 1);
+        }
+        expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth), 'no horizontal scroll').toBe(0);
+        const expected = (await px(page, 'var(--luz-control-lg)')) + 2 * (await px(page, 'var(--luz-space-2xs)')) + 1;
+        expect((await box(page.locator('#site-header'))).height, 'one row').toBeCloseTo(expected, 0);
+      });
+    }
+  }
+
+  test('on a level page its section is current: the 2px bar, as Documentation has on the docs', async ({ page, javaScriptEnabled }) => {
+    await page.setViewportSize({ width: 1280, height: 700 });
+    await open(page, '/catalog/', javaScriptEnabled);
+    const current = page.locator('#site-header .site-header__nav a[aria-current="page"]');
+    await expect(current).toHaveCount(1);
+    await expect(current).toHaveAttribute('href', '/catalog/');
+    expect(await style(current, 'borderBottomWidth')).toBe('2px');
+  });
 });
 
 test.describe('the colour mode is in the corner, not in the header', () => {
@@ -490,7 +534,7 @@ test.describe('the header on a phone', () => {
     });
   }
 
-  test('the home drawer lists the sections, then Documentation and GitHub, then the languages, top to bottom', async ({ page, javaScriptEnabled }) => {
+  test('the home drawer lists the sections, then the four sections of the site, Documentation and GitHub, then the languages, top to bottom', async ({ page, javaScriptEnabled }) => {
     await page.setViewportSize({ width: 375, height: 900 });
     await open(page, HOME, javaScriptEnabled);
     await controls(page, javaScriptEnabled).menu.click();
@@ -500,7 +544,7 @@ test.describe('the header on a phone', () => {
     const hrefs = links.map((l) => l.href);
     const sections = hrefs.filter((h) => h?.startsWith('#'));
     expect(sections, 'the page\'s sections').toEqual(['#tokens', '#faq']);
-    expect(hrefs).toEqual([...sections, '/docs/', GITHUB, '/', '/es/', '/ar/']);
+    expect(hrefs).toEqual([...sections, '/tokens/', '/core/', '/catalog/', '/ai/', '/docs/', GITHUB, '/', '/es/', '/ar/']);
     expect(links.find((l) => l.href === '/docs/')?.text).toBe('Documentation');
     const tops = links.map((l) => l.top);
     for (let i = 1; i < tops.length; i++) expect(tops[i], `${links[i].href} is not above ${links[i - 1].href}`).toBeGreaterThanOrEqual(tops[i - 1] - 1);

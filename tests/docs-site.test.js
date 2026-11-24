@@ -1235,7 +1235,7 @@ describe("the LUZ docs site", () => {
     expect(rendered.get("/404.html")).not.toContain("theme-light.css");
   });
 
-  it("the not-found page keeps the drawer the header's menu button opens, with the site links only", () => {
+  it("the not-found page keeps the drawer the header's menu button opens, with the site links only: the four sections, Documentation and GitHub", () => {
     const dom = parse(rendered.get("/404.html"), "/404.html");
     const drawer = query(dom, "nav.luz-sidebar.page-nav.page-nav--drawer");
     expect(drawer, "nav.page-nav--drawer").not.toBeNull();
@@ -1243,7 +1243,7 @@ describe("the LUZ docs site", () => {
     expect(drawer.attrs.has("popover")).toBe(true);
     expect(query(dom, "button.luz-nav-toggle").attrs.get("popovertarget")).toBe("page-nav");
     const hrefs = findAll(drawer, (n) => n.name === "a").map((a) => a.attrs.get("href"));
-    expect(hrefs).toEqual(["/docs/", "https://github.com/nandovejer/luz"]);
+    expect(hrefs).toEqual(["/tokens/", "/core/", "/catalog/", "/ai/", "/docs/", "https://github.com/nandovejer/luz"]);
   });
 
   it("the not-found page has a decorative \"SYSTEM FAILURE\" first in the main, and its one h1 in a visually hidden wrapper", () => {

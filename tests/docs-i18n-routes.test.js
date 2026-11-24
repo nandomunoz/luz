@@ -232,7 +232,8 @@ describe("the localized site", () => {
               continue;
             }
             if (!path.startsWith(own)) problems.push(`${code} ${route}: ${href} leaves the language`);
-            else if (path !== own && !path.endsWith("index.md") && !built.rendered.has(path)) problems.push(`${code} ${route}: ${href} is not a page`);
+            // The header's sections of the site (/es/tokens/…) are pages of the home's build, not of the docs'
+            else if (path !== own && !path.endsWith("index.md") && !built.rendered.has(path) && !/^\/[a-z]{2}\/(?:tokens|core|catalog|ai)\/$/.test(path)) problems.push(`${code} ${route}: ${href} is not a page`);
           }
         }
       }

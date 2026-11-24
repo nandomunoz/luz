@@ -440,12 +440,17 @@ describe("the page of core: the HTML you write comes styled, a class adds a comp
       expect(links.map((m) => Number(m[2])), id).toEqual(covered.map((g) => (g === "objects" ? numbers.objects : groups.get(g))));
       if (id === "forms") {
         // not cards: one real form with every kind of control, inert so the keyboard stays out of it, and the markup of a field beside it
-        expect(block).toContain('<div class="landing-core__live" inert><form class="landing-form" action="#">');
+        expect(block).toContain('<div class="landing-core__live" inert><form class="landing-form" action="#" autocomplete="off">');
         for (const type of ["text", "email", "password", "date", "tel", "range", "radio", "checkbox"]) expect(block, type).toContain(`type="${type}"`);
         for (const part of ["<select class=\"luz-select\"", "<textarea class=\"luz-input luz-input--textarea\"", 'role="switch"', "<output class=\"luz-output\"", "luz-check-group", "disabled", 'type="submit"']) expect(block, part).toContain(part);
         expect(block.match(/<fieldset class="luz-fieldset">/g)).toHaveLength(2);
         // a field in error says so, to the eye and to the machine
-        expect(block).toMatch(/luz-input luz-input--error" id="core-f-password" type="password" value="1234" aria-invalid="true"/);
+        // its password field holds no value, so no browser offers to save "1234" as a password when the visitor leaves the
+        // page (owner, 2026-11-24: Chrome asked on the next page): the dots are its placeholder, and the form says
+        // autocomplete off
+        expect(block).toMatch(/luz-input luz-input--error" id="core-f-password" type="password" autocomplete="off" placeholder="••••" aria-invalid="true">/);
+        expect(block).not.toMatch(/<input[^>]*type="password"[^>]*\svalue=/);
+        expect(block).toContain('<form class="landing-form" action="#" autocomplete="off">');
         expect(block).toContain("luz-field__error");
         // every label names a control of the form
         for (const [, target] of block.matchAll(/<label[^>]* for="([^"]+)"/g)) expect(block, target).toContain(`id="${target}"`);
