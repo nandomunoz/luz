@@ -34,5 +34,8 @@ export function installDecoys(dir) {
 export async function runTrigger({ query, claude, sandbox, model }) {
   const r = await claude(claudeArgs({ prompt: query.query, model, tools: "Skill", maxTurns: 2 }), { cwd: sandbox.dir, env: sandbox.env });
   const s = parseStream(r.stdout ?? "");
-  return { ...scoreTrigger(query, invokedSkills(s)), tokens: s.tokens, rate: s.rate, costUsd: s.costUsd };
+  // A request typed as a command (/luz doctor) runs the skill directly, with no Skill tool use in the stream
+  const typed = /^\/([a-z][a-z0-9-]*)/.exec(query.query)?.[1];
+  const skills = typed ? [typed, ...invokedSkills(s)] : invokedSkills(s);
+  return { ...scoreTrigger(query, skills), tokens: s.tokens, rate: s.rate, costUsd: s.costUsd };
 }

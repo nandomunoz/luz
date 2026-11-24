@@ -260,6 +260,15 @@ describe("triggers with decoys", () => {
     expect(scoreTrigger({ should_trigger: false }, ["luz"])).toMatchObject({ ok: false });
   });
 
+  it("a request that starts with /luz is the skill typed as a command: it counts as invoked with no Skill tool use", async () => {
+    const { runTrigger } = await lab("triggers.js");
+    const claude = () => stream("ok");
+    const r = await runTrigger({ query: { query: "/luz doctor", should_trigger: true }, claude, sandbox: { dir: "/x", env: {} }, model: "haiku" });
+    expect(r).toMatchObject({ skills: ["luz"], ok: true });
+    const n = await runTrigger({ query: { query: "/changelog now", should_trigger: false }, claude, sandbox: { dir: "/x", env: {} }, model: "haiku" });
+    expect(n.skills).toEqual(["changelog"]);
+  });
+
   it("a trigger is run once with one turn of the assistant, no web, and the verdict is the rate over runs against the 0.5 threshold", async () => {
     const { runTrigger, triggerRate } = await lab("triggers.js");
     const seen = [];
