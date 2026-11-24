@@ -1068,4 +1068,11 @@ describe("the title of luz-ai: the prism of the mark and the word LUZ, as text, 
       rmSync(dir, { recursive: true, force: true });
     }
   });
+
+  it("the description keeps the skill asleep for a question about LUZ or about what a rule of its checker means, and stays within the limit", () => {
+    const md = readFileSync(join(root, "packages/ai/skills/luz/SKILL.md"), "utf-8");
+    const description = /^description: "(.*)"$/m.exec(md)[1];
+    expect(description).toMatch(/Not for[^.]*question[^.]*(LUZ|checker)[^.]*rule/i);
+    expect(description.length).toBeLessThanOrEqual(1024);
+  });
 });

@@ -320,6 +320,7 @@ describe("the command", () => {
     expect(r.stdout).toMatch(/vague-novice/);
     expect(r.stdout).toMatch(/nothing was run/);
     expect(sh(["triggers", "--dry-run"]).stdout).toMatch(/queries/);
+    expect(sh(["triggers", "--dry-run", "--match", "luz-check rule"]).stdout).toMatch(/plan: 1 queries/);
     expect(sh(["agents", "--dry-run"]).stdout).toMatch(/luz-accessibility-auditor/);
     expect(sh(["nope"]).status).toBe(2);
   });
