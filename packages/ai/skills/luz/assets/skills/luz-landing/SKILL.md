@@ -1,9 +1,9 @@
 ---
-name: luz-create-landing
+name: luz-landing
 description: Plans, builds or reviews a landing page. First decides which of two types it is, a standard landing (it leads to a later step such as buying, booking or signing up) or a landing with an integrated service (the product is used inside the page itself), asking the user with interactive questions when the project does not make it clear. Then applies the section-by-section anatomy of that type and the SEO and GEO rules for it. Use it when the user asks to create, restructure, review or audit a landing page or homepage, or to decide how a landing should be laid out.
 ---
 
-# luz-create-landing
+# luz-landing
 
 Build the landing that fits what is being offered. A page that sells shoes and a page that converts PDFs do different jobs: the first leads to a step that happens later, the second is the product. Picking the wrong shape is the most expensive mistake, so the type is decided before anything is written.
 

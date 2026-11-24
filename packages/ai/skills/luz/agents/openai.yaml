@@ -1,7 +1,7 @@
 interface:
   display_name: "LUZ start"
   short_description: "Start a website with LUZ: asks what to make, writes a starter page that the LUZ checker reads without a finding, and finishes it with you."
-  default_prompt: "Use luz-start to help me start a site with LUZ."
+  default_prompt: "Use $luz to help me start a site with LUZ."
 
 policy:
   allow_implicit_invocation: true

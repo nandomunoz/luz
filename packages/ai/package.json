@@ -1,14 +1,14 @@
 {
   "name": "@luz-ds/ai",
   "version": "0.0.0",
-  "description": "LUZ Design System — the luz-start skill for AI assistants (Claude Code, Codex, Gemini CLI, Cursor): it asks what you want to make, writes a starter page that @luz-ds/check reads without a finding, and adds the agents and skills of luz-ai",
+  "description": "LUZ Design System — the luz skill for AI assistants (Claude Code, Codex, Gemini CLI, Cursor): it asks what you want to make, writes a starter page that @luz-ds/check reads without a finding, and adds the agents and skills of luz-ai",
   "license": "MIT",
   "type": "module",
   "bin": {
-    "luz-ai": "./dist/skills/luz-start/scripts/luz-start.mjs"
+    "luz-ai": "./dist/skills/luz/scripts/luz.mjs"
   },
   "exports": {
-    "./luz-start/SKILL.md": "./dist/skills/luz-start/SKILL.md",
+    "./luz/SKILL.md": "./dist/skills/luz/SKILL.md",
     "./package.json": "./package.json"
   },
   "files": [

@@ -1,8 +1,8 @@
 /**
- * LUZ — the facts and the starters of the `luz-start` skill (`.claude/plans/luz-ai-skill.md`, B.3).
+ * LUZ — the facts and the starters of the `luz` skill (`.claude/plans/luz-ai-skill.md`, B.3).
  *
  * What the skill knows about this release is read from the repository and never typed. Under
- * `packages/ai/skills/luz-start/`:
+ * `packages/ai/skills/luz/`:
  *
  *   assets/facts.json              the versions of the packages, the kinds of site and the stacks the prompts offer
  *   assets/templates/<kind>.html.tpl a starter page per kind of site: the head (the stylesheets and scripts the prompt of
@@ -27,7 +27,7 @@ import { FITS_KINDS } from "./docs-site/kinds.js";
 import { assemblePrompt } from "./docs-site/prompts.js";
 
 const repo = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const SKILL = "packages/ai/skills/luz-start";
+const SKILL = "packages/ai/skills/luz";
 export { BY_NEED };
 export const FACTS_FILE = `${SKILL}/assets/facts.json`;
 
