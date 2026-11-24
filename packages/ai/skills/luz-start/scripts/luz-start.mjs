@@ -32,19 +32,18 @@ const MAX_LINES = 40;
 const GENERATED = ["vanilla", "astro"];
 
 /**
- * The title a person sees when they run init or --help in a terminal: the mark of LUZ (the prism, light coming in
- * and leaving as bands) and the word in serif capitals, ASCII only, at most 69 columns. Only when stdout is a
- * terminal: a pipe, an assistant or --json gets none, so what they read starts with the report. The home's terminal
- * (scripts/docs-site/cli-demo.js) reads these lines from this file, so the array stays plain JSON.
+ * The title a person sees when they run init or --help in a terminal: the prism of the mark of LUZ (light coming in
+ * and leaving as bands, in shades) beside the word LUZ in block capitals, both six lines high, 42 columns. Only
+ * when stdout is a terminal: a pipe, an assistant or --json gets none, so what they read starts with the report.
+ * The home's terminal (scripts/docs-site/cli-demo.js) reads these lines from this file, so the array stays plain JSON.
  */
 const BANNER = [
-  "            /\\              _____         _____   _____   __________",
-  "           /  \\             `| |'         `| |'   `| |'   | ____  /",
-  "          /    \\             | |           | |     | |    |/   / /",
-  "  -------/--.   \\.------     | |           | |     | |        / /",
-  "        /    `-. \\=======    | |      _    | |     | |       / /   _",
-  "       /        `\\#######    | |_____| |   \\ \\_____/ /      / /___| |",
-  "      /__________\\          _|_________|    `._____.'      /________|"
+  "      ▒▒         ██╗     ██╗   ██╗███████╗",
+  "     ▓██▓        ██║     ██║   ██║╚══███╔╝",
+  "    ▓█▓▒░░       ██║     ██║   ██║  ███╔╝",
+  "  ░█▓▓▓▒▒▒▒      ██║     ██║   ██║ ███╔╝",
+  " ░██████████░    ███████╗╚██████╔╝███████╗",
+  "▒████████████▒   ╚══════╝ ╚═════╝ ╚══════╝"
 ];
 
 /** The banner and a blank line, or nothing when stdout is not a terminal. */

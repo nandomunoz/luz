@@ -175,6 +175,8 @@
   "inside.l4.meanwhile": "حتى ذلك الحين، موجّهات كل نوع من المواقع",
   "inside.l4.next": "السطر التالي",
   "inside.l4.replay": "أعد التشغيل",
+  "inside.l4.pause": "أوقف الرسوم المتحركة مؤقتًا",
+  "inside.l4.play": "شغّل الرسوم المتحركة",
   "inside.cli.ask": "استخدم luz-start لإنشاء موقع مكتبتي",
   "inside.cli.read": "أقرأ المشروع: مجلد فارغ، بلا إطار عمل بعد.",
   "inside.cli.kind": "ما نوع الموقع؟",

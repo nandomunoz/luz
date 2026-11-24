@@ -175,6 +175,8 @@
   "inside.l4.meanwhile": "Until then, the prompts for each kind of site",
   "inside.l4.next": "Next line",
   "inside.l4.replay": "Play again",
+  "inside.l4.pause": "Pause the animation",
+  "inside.l4.play": "Play the animation",
   "inside.cli.ask": "Use luz-start to make the website of my bookshop",
   "inside.cli.read": "Reading the project: an empty folder, no framework yet.",
   "inside.cli.kind": "What kind of site is it?",

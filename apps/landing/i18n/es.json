@@ -175,6 +175,8 @@
   "inside.l4.meanwhile": "Mientras tanto, los prompts de cada tipo de sitio",
   "inside.l4.next": "Siguiente línea",
   "inside.l4.replay": "Volver a reproducir",
+  "inside.l4.pause": "Pausar la animación",
+  "inside.l4.play": "Reanudar la animación",
   "inside.cli.ask": "Usa luz-start para hacer la web de mi librería",
   "inside.cli.read": "Leo el proyecto: una carpeta vacía, todavía sin framework.",
   "inside.cli.kind": "¿Qué tipo de sitio es?",

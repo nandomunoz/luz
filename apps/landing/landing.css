@@ -4924,7 +4924,7 @@ home-light:defined ~ .landing-light__nojs {
   line-height: 1.55;
 }
 
-/* The title init prints: 69 columns of ASCII, scaled to the width of the screen so it never wraps or scrolls */
+/* The title init prints: 42 columns of shades and block letters, scaled to the width of the screen so it never wraps or scrolls */
 .landing-cli__screen {
   container-type: inline-size;
 }
@@ -4934,8 +4934,8 @@ home-light:defined ~ .landing-light__nojs {
   padding-inline-start: 0;
   text-indent: 0;
   color: var(--luz-brand-primary);
-  font-size: min(1em, 2.2cqi);
-  line-height: 1.2;
+  font-size: min(2em, 3.4cqi);
+  line-height: 1;
   white-space: pre;
   overflow-wrap: normal;
 }
@@ -5010,7 +5010,8 @@ home-light:defined ~ .landing-light__nojs {
 }
 
 /* The button that brings the next line, with the key that presses it */
-.landing-cli__next {
+.landing-cli__next,
+.landing-cli__pause {
   justify-self: end;
   gap: var(--luz-space-xs);
   margin: 0 var(--luz-space-sm) var(--luz-space-sm);
@@ -5044,6 +5045,14 @@ home-light:defined ~ .landing-light__nojs {
   overflow-y: auto;
   overscroll-behavior: contain;
   cursor: pointer;
+}
+
+/* The home's terminal plays by itself: the same height, nothing to scroll or to click */
+.landing-cli[data-cli="loop"] .landing-cli__screen {
+  block-size: min(26rem, 70vh);
+  align-content: start;
+  overflow: hidden;
+  user-select: none;
 }
 
 /* What the script prints: quieter than what is typed */
@@ -5170,6 +5179,14 @@ home-light:defined ~ .landing-light__nojs {
   text-transform: uppercase;
 }
 
+/* core's badge is centred by trimming the text box: the label keeps that, and
+   its height is the capitals plus an even room above and below */
+@supports (text-box: trim-both cap alphabetic) {
+  .landing-cli__note .luz-badge {
+    padding-block: calc((1.5rem - 1cap) / 2);
+  }
+}
+
 /* Arabic has no capitals, and spacing its letters would unjoin them */
 .landing-cli__note .luz-badge:lang(ar) {
   letter-spacing: normal;
@@ -5206,7 +5223,8 @@ home-light:defined ~ .landing-light__nojs {
     text-indent: 0;
   }
 
-  .landing-cli__next {
+  .landing-cli__next,
+  .landing-cli__pause {
     justify-self: stretch;
     margin: 0 4% 4%;
     white-space: normal;

@@ -110,7 +110,7 @@ export function matchesDefaults(when) {
   });
 }
 
-/** {{cli}}: the terminal, in the language of `say`. */
+/** {{cli}}: the terminal the visitor answers (the page of the skill); {{cliloop}}: the same session as an animation that plays again and again (the home). In the language of `say`. */
 export function cliDemo({ say, root, escapeHtml }) {
   const t = (key) => escapeHtml(say(key));
   const { banner, init, site, agents, skills } = cliFacts(root);
@@ -187,15 +187,18 @@ export function cliDemo({ say, root, escapeHtml }) {
       )}<span class="landing-cli__caret" aria-hidden="true"></span>`,
     ),
   ];
-  return {
-    cli: [
-      `<figure class="landing-cli" dir="ltr" aria-label="${t("inside.l4.panel")}" data-landing-cli>`,
+  const figure = (loop) =>
+    [
+      `<figure class="landing-cli" dir="ltr" aria-label="${t("inside.l4.panel")}" ${loop ? 'data-landing-cli="loop"' : "data-landing-cli"}>`,
       `<div class="landing-cli__bar" aria-hidden="true"><span class="landing-cli__dots"><span></span><span></span><span></span></span><code class="landing-cli__title">~/vejer-books</code></div>`,
       `<div class="landing-cli__screen" aria-live="polite">`,
       lines.join("\n"),
       `</div>`,
-      `<button class="luz-btn luz-btn--ghost luz-btn--sm landing-cli__next" type="button" hidden><kbd>Enter</kbd> <span data-cli-next>${t("inside.l4.next")}</span><span data-cli-replay hidden>${t("inside.l4.replay")}</span></button>`,
+      loop
+        ? // The home's terminal plays the session again and again: a button pauses it (WCAG 2.2.2), nothing is answered
+          `<button class="luz-btn luz-btn--ghost luz-btn--sm landing-cli__pause" type="button" hidden><span data-cli-pause>${t("inside.l4.pause")}</span><span data-cli-play hidden>${t("inside.l4.play")}</span></button>`
+        : `<button class="luz-btn luz-btn--ghost luz-btn--sm landing-cli__next" type="button" hidden><kbd>Enter</kbd> <span data-cli-next>${t("inside.l4.next")}</span><span data-cli-replay hidden>${t("inside.l4.replay")}</span></button>`,
       `</figure>`,
-    ].join("\n"),
-  };
+    ].join("\n");
+  return { cli: figure(false), cliloop: figure(true) };
 }
