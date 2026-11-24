@@ -246,6 +246,10 @@ export function makeScriptRepo() {
     ...tracked("scripts"),
     // ai.js imports it (the prompts for AI); a new file is not tracked until it is committed
     "scripts/docs-site/prompts.js",
+    // the commands page (get-started/ai-commands) runs the script of the luz skill and reads SKILL.md and the frozen examples
+    "scripts/docs-site/ai-commands.js",
+    ...tracked("packages/ai/skills/luz"),
+    ...readdirSync(join(REAL_REPO, "tools/ai-eval/cases/examples")).map((f) => `tools/ai-eval/cases/examples/${f}`),
     ...tracked("packages/check/src"),
     ...tracked("packages/core/src/i18n"),
     ...tracked("packages/core/src/components"),

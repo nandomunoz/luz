@@ -12,11 +12,11 @@
  */
 import { test, expect } from '@playwright/test';
 
-const PAGE = '/docs/get-started/ai/';
+const PAGES = ['/docs/get-started/ai/', '/docs/get-started/ai-commands/'];
 
 const sideways = (page) => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
 
-for (const scale of ['100%', '200%', '400%']) {
+for (const PAGE of PAGES) for (const scale of ['100%', '200%', '400%']) {
   test.describe(`${PAGE} at 320 px with the root font size at ${scale}`, () => {
     test.beforeEach(async ({ page }) => {
       await page.setViewportSize({ width: 320, height: 800 });

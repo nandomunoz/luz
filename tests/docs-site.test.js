@@ -821,7 +821,7 @@ describe("the LUZ docs site", () => {
     // F4 (D7) and F5 (f5-ai-ready.md 6): Install, Choose your snippet, organised, how to read,
     // Make it yours, bundler, JavaScript, layers, print, Working with AI, Migrate a project to LUZ, then (F7 step 7,
     // f7-open-source.md) How LUZ is built, then More questions (the FAQ the home sends the rest of its questions to), then the area Kinds of site (the plan ai-and-catalog-only, F3), which follows Get started
-    expect(order.slice(0, 18)).toEqual([
+    expect(order.slice(0, 19)).toEqual([
       "/docs/get-started/",
       "/docs/get-started/snippet/",
       "/docs/get-started/structure/",
@@ -832,6 +832,7 @@ describe("the LUZ docs site", () => {
       "/docs/get-started/layers/",
       "/docs/get-started/print/",
       "/docs/get-started/ai/",
+      "/docs/get-started/ai-commands/",
       "/docs/get-started/migrate/",
       "/docs/get-started/how-luz-is-built/",
       "/docs/get-started/faq/",
@@ -841,11 +842,11 @@ describe("the LUZ docs site", () => {
       "/docs/kinds/app/",
       "/docs/kinds/docs/",
     ]);
-    expect(order.slice(18, 19)).toEqual(["/docs/tokens/"]);
+    expect(order.slice(19, 20)).toEqual(["/docs/tokens/"]);
     expect(order.at(-1)).toBe("/docs/accessibility/");
   });
 
-  it("numbers the Get started pages 1 to 13 (12 pages: 11 is Migrate a project to LUZ, 12 is How LUZ is built, 13 is More questions) in the reading order, with these titles", () => {
+  it("numbers the Get started pages 1 to 14 (13 pages: 11 is The commands of /luz, 12 is Migrate a project to LUZ, 13 is How LUZ is built, 14 is More questions) in the reading order, with these titles", () => {
     const pages = readingOrder(site).filter((p) => p.meta.area === "get-started" && p.route !== "/docs/get-started/");
     const all = [site.byRoute.get("/docs/get-started/"), ...pages];
     expect(all.map((p) => [p.meta.order, p.meta.title])).toEqual([
@@ -859,9 +860,10 @@ describe("the LUZ docs site", () => {
       ["8", "Cascade layers"],
       ["9", "Print styles"],
       ["10", "Working with AI"],
-      ["11", "Migrate a project to LUZ"],
-      ["12", "How LUZ is built"],
-      ["13", "More questions"],
+      ["11", "The commands of /luz"],
+      ["12", "Migrate a project to LUZ"],
+      ["13", "How LUZ is built"],
+      ["14", "More questions"],
     ]);
   });
 
@@ -912,8 +914,10 @@ describe("the LUZ docs site", () => {
     expect(endOf(rendered.get("/docs/tokens/")).prev?.[0]).toBe("/docs/kinds/docs/");
     expect(endOf(rendered.get("/docs/kinds/")).prev?.[0]).toBe("/docs/get-started/faq/");
     expect(endOf(rendered.get("/docs/tokens/")).next?.[0]).toBe("/docs/tokens/color/");
-    expect(endOf(rendered.get("/docs/get-started/ai/")).next?.[0]).toBe("/docs/get-started/migrate/");
-    expect(endOf(rendered.get("/docs/get-started/migrate/")).prev?.[0]).toBe("/docs/get-started/ai/");
+    expect(endOf(rendered.get("/docs/get-started/ai/")).next?.[0]).toBe("/docs/get-started/ai-commands/");
+    expect(endOf(rendered.get("/docs/get-started/ai-commands/")).prev?.[0]).toBe("/docs/get-started/ai/");
+    expect(endOf(rendered.get("/docs/get-started/ai-commands/")).next?.[0]).toBe("/docs/get-started/migrate/");
+    expect(endOf(rendered.get("/docs/get-started/migrate/")).prev?.[0]).toBe("/docs/get-started/ai-commands/");
     expect(endOf(rendered.get("/docs/get-started/migrate/")).next?.[0]).toBe("/docs/get-started/how-luz-is-built/");
     expect(endOf(rendered.get("/docs/get-started/how-luz-is-built/")).prev?.[0]).toBe("/docs/get-started/migrate/");
     expect(endOf(rendered.get("/docs/get-started/how-luz-is-built/")).next?.[0]).toBe("/docs/get-started/faq/");

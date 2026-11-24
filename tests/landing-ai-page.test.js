@@ -1,9 +1,9 @@
 /**
- * The page of the luz-start skill, /ai/ (owner, 2026-11-23): a page like the catalog's, with a hero whose live part is
+ * The page of the luz skill, /ai/ (owner, 2026-11-23): a page like the catalog's, with a hero whose live part is
  * the home's terminal, how to install and use the skill, and blocks that say what it does, the agents and skills it
  * adds, the assistants it works with and what it never does. The home's fourth level has a button to it.
  *
- * Every fact of the package is read from packages/ai/skills/luz-start/ and never typed (scripts/docs-site/ai-page.js):
+ * Every fact of the package is read from packages/ai/skills/luz/ and never typed (scripts/docs-site/ai-page.js):
  * a new agent or skill needs its words in the catalogs, and the page names exactly what the skill carries.
  */
 import { execFileSync } from "node:child_process";
@@ -19,7 +19,7 @@ import { quoted } from "./helpers/quoted-attributes.js";
 const repo = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (file) => readFileSync(join(repo, file), "utf-8");
 const HOME = "apps/landing/index.html";
-const SKILL = "packages/ai/skills/luz-start";
+const SKILL = "packages/ai/skills/luz";
 const LANGS = [["en", "/"], ["es", "/es/"], ["ar", "/ar/"]];
 
 const site = scanSite(join(repo, "apps/docs"), repo);
@@ -43,7 +43,7 @@ const screenOf = (html) => /<div class="landing-cli__screen"[^>]*>([\s\S]*)<\/di
 const agents = readdirSync(join(repo, SKILL, "assets/agents")).filter((n) => n.endsWith(".md")).map((n) => n.slice(0, -3)).sort();
 const skills = readdirSync(join(repo, SKILL, "assets/skills"), { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name).sort();
 
-describe("the page of the luz-start skill, /ai/", () => {
+describe("the page of the luz skill, /ai/", () => {
   it("is a route of the site in every language, with no broken link and no catalog key left over", () => {
     for (const [, prefix] of LANGS) expect(rendered.has(`${prefix}ai/`), `${prefix}ai/`).toBe(true);
     expect(built.problems).toEqual([]);
@@ -80,15 +80,26 @@ describe("the page of the luz-start skill, /ai/", () => {
     const steps = sectionOf(rendered.get("/ai/"), "steps");
     expect(steps.match(/class="landing-path__step landing-path__step--\d"/g)).toHaveLength(3);
     expect(steps).toContain("npx @luz-ds/ai init --target claude");
-    const help = execFileSync(process.execPath, [join(repo, SKILL, "scripts/luz-start.mjs"), "--help"], { encoding: "utf-8" });
+    const help = execFileSync(process.execPath, [join(repo, SKILL, "scripts/luz.mjs"), "--help"], { encoding: "utf-8" });
     for (const [, command] of steps.matchAll(/npx @luz-ds\/ai ([a-z]+)/g)) expect(help, command).toMatch(new RegExp(`^  ${command}\\b`, "m"));
     for (const command of AI_COMMANDS) expect(help, command).toMatch(new RegExp(`^  ${command.split(" ")[0]}\\b`, "m"));
   });
 
-  it("has the blocks what it does, agents, skills, assistants and limits, in that order", () => {
+  it("has the blocks the commands of the chat, what it does, agents, skills, assistants and limits, in that order", () => {
     const html = rendered.get("/ai/");
     const ids = [...html.matchAll(/<section\b[^>]*\sid="(a-[a-z]+)"/g)].map((m) => m[1]);
-    expect(ids).toEqual(["a-does", "a-agents", "a-skills", "a-assistants", "a-limits"]);
+    expect(ids).toEqual(["a-commands", "a-does", "a-agents", "a-skills", "a-assistants", "a-limits"]);
+  });
+
+  it.each(LANGS)("in %s: lists every command of /luz, from the Subcommands table of SKILL.md, in the language, with its page", (code, prefix) => {
+    const block = sectionOf(rendered.get(`${prefix}ai/`), "a-commands");
+    const skillMd = read(`${SKILL}/SKILL.md`);
+    const chat = [...skillMd.matchAll(/^\| `(\/luz[^`]*)` \|/gm)].map((m) => m[1]);
+    expect(chat).toHaveLength(9);
+    for (const c of chat) expect(block, c).toContain(`<code>${escape(c)}</code>`);
+    expect(block.match(/<tr>/g)).toHaveLength(chat.length + 1);
+    for (const key of ["level.ai.chat.start", "level.ai.chat.doctor", "level.ai.chat.help"]) expect(block, key).toContain(escape(catalog(code)[key]));
+    expect(block).toContain("docs/get-started/ai-commands/");
   });
 
   it.each(LANGS)("in %s: names every agent the skill carries, once, with what it does in the language and whether it changes code", (code, prefix) => {
@@ -122,7 +133,7 @@ describe("the page of the luz-start skill, /ai/", () => {
 
   it("lists every target of init with the folder it writes, as init --help says", () => {
     const block = sectionOf(rendered.get("/ai/"), "a-assistants");
-    const help = execFileSync(process.execPath, [join(repo, SKILL, "scripts/luz-start.mjs"), "init", "--help"], { encoding: "utf-8" });
+    const help = execFileSync(process.execPath, [join(repo, SKILL, "scripts/luz.mjs"), "init", "--help"], { encoding: "utf-8" });
     const rows = [...block.matchAll(/<tr><th scope="row"><code>([a-z-]+)<\/code><\/th><td>[\s\S]*?<\/td><td><code>([^<]+)<\/code><\/td><\/tr>/g)].map((m) => [m[1], m[2]]);
     expect(rows.map(([id]) => id)).toEqual(["claude", "codex", "gemini", "cursor", "agents-md"]);
     for (const [id, folder] of rows) {

@@ -1,6 +1,6 @@
 // @ts-check
 /**
- * The terminal of the luz-start skill (.claude/plans/luz-ai-skill.md, part A, and the owner on 2026-11-24), an
+ * The terminal of the luz skill (.claude/plans/luz-ai-skill.md, part A, and the owner on 2026-11-24), an
  * emulation of a real session, in two places:
  *
  * THE HOME (`#ai` of /, /es/ and /ar/) plays it again and again, as an animation with nothing to answer:
@@ -112,7 +112,7 @@ for (const [route, lang] of HOME) {
       await expect(home.cli(page)).toHaveAccessibleName(words['inside.l4.panel']);
       await expect(home.cli(page)).toContainText(words['inside.cli.ask']);
       await expect(home.cli(page)).toContainText('npx @luz-ds/ai init --target claude');
-      await expect(home.cli(page)).toContainText('luz-start site new');
+      await expect(home.cli(page)).toContainText('luz-ai site new');
       await expect(home.cli(page)).toContainText('index.html');
       expect(await home.cli(page).innerText(), 'only the default answers').not.toContain('index.astro');
     });
@@ -285,7 +285,7 @@ for (const [route, lang] of SKILL) {
       await expect(skill.cli(page)).toHaveAccessibleName(words['inside.l4.panel']);
       await expect(skill.cli(page)).toContainText(words['inside.cli.ask']);
       await expect(skill.cli(page)).toContainText('npx @luz-ds/ai init --target claude');
-      await expect(skill.cli(page)).toContainText('luz-start site new');
+      await expect(skill.cli(page)).toContainText('luz-ai site new');
       await expect(skill.cli(page)).toContainText('index.html');
       expect(await skill.cli(page).innerText(), 'only the default answers').not.toContain('index.astro');
     });
@@ -327,7 +327,7 @@ for (const [route, lang] of SKILL) {
       await expect(screen).toContainText('agent add luz-core-web-vitals-optimizer');
       await expect(screen).toContainText('agent add luz-seo-geo-specialist');
       const said = await screen.innerText();
-      expect(said).not.toContain('skill add luz-create-landing');
+      expect(said).not.toContain('skill add luz-landing');
       expect(said).not.toContain('--kind landing');
       await expect(skill.next(page)).toHaveAccessibleName(`Enter ${words['inside.l4.replay']}`);
       expect(await skill.cli(page).evaluate((el) => el.getBoundingClientRect().height), 'the terminal keeps its height').toBeCloseTo(height, 0);

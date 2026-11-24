@@ -1,6 +1,6 @@
 /**
  * The sources of the home's fourth level, "Your whole site, from a conversation" (.claude/plans/luz-ai-skill.md,
- * part A, and the owner on 2026-11-24): the terminal of the luz-start skill, an emulation of a real session in which
+ * part A, and the owner on 2026-11-24): the terminal of the luz skill, an emulation of a real session in which
  * the visitor answers. The rendered page is tests/home-cli.spec.js; here the template, the generator
  * (scripts/docs-site/cli-demo.js), the script, the stylesheet and the catalogs:
  *
@@ -10,7 +10,7 @@
  *    again (owner, 2026-11-24), with a button to pause it (WCAG 2.2.2) and nothing to answer;
  *  - the session is the skill's: init, the assistant, three questions whose answers are buttons (the kind of site,
  *    the stack, what matters, which picks the agents), the plan, go, site new, the check and agent add; every line
- *    the script prints is what `luz-start.mjs` prints, and the check's is what luz-check says of that page;
+ *    the script prints is what `luz.mjs` prints, and the check's is what luz-check says of that page;
  *  - without JavaScript the session of the default answers shows: every other variant and every question's buttons
  *    are `hidden`;
  *  - the home has no prompt left; landing.js starts cli.js; its animation is finite and only when motion is welcome;
@@ -32,7 +32,7 @@ const catalogs = Object.fromEntries(LANGS.map((lang) => [lang, JSON.parse(read(`
 const home = read("apps/landing/index.html");
 const level4 = home.slice(home.indexOf('id="ai"'), home.indexOf("</section>", home.indexOf('id="ai"')));
 const css = read("apps/landing/landing.css");
-const SCRIPT = join(repo, "packages/ai/skills/luz-start/scripts/luz-start.mjs");
+const SCRIPT = join(repo, "packages/ai/skills/luz/scripts/luz.mjs");
 /** The terminal as the generator writes it, in English. */
 const written = cliDemo({ say: (key) => catalogs.en[key], root: repo, escapeHtml });
 const terminal = written.cli;
@@ -90,20 +90,20 @@ describe("the template of level 4 and the terminal the generator writes", () => 
       run("init", "--target", "claude"),
       ...CLI_KINDS.flatMap((k) => ["vanilla", "astro"].map((s) => run("site", "new", "--name", "Vejer Books", "--kind", k, "--stack", s, "--target", ".").replace(/^--- /m, "  "))),
       ...CLI_AGENTS.map(([, name]) => run("agent", "add", name, "--for", "claude")),
-      run("skill", "add", "luz-create-landing"),
+      run("skill", "add", "luz-landing"),
     ].join("\n");
     const outs = [...terminal.matchAll(/<p class="landing-cli__line landing-cli__line--out"[^>]*><samp>([^<]*)<\/samp><\/p>/g)].map((m) => unescape(m[1]));
     expect(outs.length).toBeGreaterThan(20);
     for (const line of outs.filter((l) => !l.startsWith("✓"))) expect(real.split("\n"), line).toContain(line);
   });
 
-  it("runs only the commands the skill has: init, the assistant, luz-start's own and the check it prints", () => {
+  it("runs only the commands the skill has: init, the assistant, luz-ai's own and the check it prints", () => {
     const help = execFileSync(process.execPath, [SCRIPT, "--help"], { encoding: "utf-8" });
     const cmds = [...terminal.matchAll(/<span class="landing-cli__mark" aria-hidden="true">\$<\/span> <code>([^<]*)<\/code>/g)].map((m) => unescape(m[1]));
     expect(cmds[0]).toBe("npx @luz-ds/ai init --target claude");
     expect(cmds[1]).toBe("claude");
     for (const cmd of cmds.slice(2)) {
-      if (cmd.startsWith("luz-start ")) expect(help, cmd).toMatch(new RegExp(`^  ${cmd.split(" ")[1]}\\b`, "m"));
+      if (cmd.startsWith("luz-ai ")) expect(help, cmd).toMatch(new RegExp(`^  ${cmd.split(" ")[1]}\\b`, "m"));
       else expect(cmd).toMatch(/^npx @luz-ds\/check@\d+\.\d+\.\d+ \.( --ext \.astro)?$/);
     }
   });
@@ -121,7 +121,7 @@ describe("the template of level 4 and the terminal the generator writes", () => 
   });
 
   it("shows, after init, the title the script prints in a terminal: its own lines, the word read out as LUZ", () => {
-    const banner = JSON.parse(/^const BANNER = (\[[\s\S]*?\]);$/m.exec(read("packages/ai/skills/luz-start/scripts/luz-start.mjs"))[1]);
+    const banner = JSON.parse(/^const BANNER = (\[[\s\S]*?\]);$/m.exec(read("packages/ai/skills/luz/scripts/luz.mjs"))[1]);
     const art = /<div class="landing-cli__line landing-cli__line--banner"><pre class="landing-cli__art" aria-hidden="true">([\s\S]*?)<\/pre><span class="u-sr-only">LUZ<\/span><\/div>/.exec(terminal);
     expect(art, "the title, hidden from a screen reader, with the word for it").not.toBeNull();
     expect(unescape(art[1])).toBe(banner.join("\n"));

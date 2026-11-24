@@ -102,7 +102,7 @@ const IDS = ["start", "start-site", "skill", "files", "check", "rules", "agent",
 const TITLES = {
   start: "Give your agent LUZ",
   "start-site": "Start a site",
-  skill: "Install the luz-start skill",
+  skill: "Install /luz",
   files: "What an agent can read",
   check: "Check what an agent wrote",
   rules: "What check blocks and what it warns about",
@@ -446,8 +446,8 @@ describe("aiArtifacts(site): the rows of that table", () => {
 
 /* ---- check: the command, the exit codes, a real sample, the JSON fields ---------- */
 
-describe("skill: Install the luz-start skill", () => {
-  const help = () => spawnSync(process.execPath, [join(repo, "packages/ai/skills/luz-start/scripts/luz-start.mjs"), "init", "--help"], { encoding: "utf-8" }).stdout;
+describe("skill: Install /luz", () => {
+  const help = () => spawnSync(process.execPath, [join(repo, "packages/ai/skills/luz/scripts/luz.mjs"), "init", "--help"], { encoding: "utf-8" }).stdout;
   const text = () => `${textOf(section("skill"))}\n${preOf(section("skill")).join("\n")}`;
 
   it("shows the command as npx @luz-ds/ai init, with the scope and a target", () => {
@@ -468,6 +468,18 @@ describe("skill: Install the luz-start skill", () => {
     expect(text()).toMatch(/writes the folder each one reads/);
     expect(text()).not.toMatch(/\.claude\//);
     expect(text()).toMatch(/not on npm yet/);
+  });
+
+  it("says what to type in each assistant: /luz, $luz for Codex, and plain words for AGENTS.md, as init --help does", () => {
+    const usage = help();
+    const said = text();
+    expect(said).toMatch(/Type \/luz \(\s*\$luz in Codex; with agents-md\s*, say it in words\)/);
+    for (const target of ["claude", "codex", "gemini", "cursor", "agents-md"]) expect(usage, target).toContain(target);
+    expect(usage).toContain(".gemini/commands/luz.toml");
+  });
+
+  it("links to the page of the commands, which has every command with a real conversation", () => {
+    expect(linksOf(section("skill")).map((l) => l.href)).toContain("/docs/get-started/ai-commands/");
   });
 
   it("says a field left out stays [ADAPT] and the agent stops and asks", () => {
