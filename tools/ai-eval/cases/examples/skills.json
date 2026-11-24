@@ -1,0 +1,13 @@
+{
+  "example": "skills",
+  "case": "skills",
+  "model": "sonnet",
+  "date": "2026-11-24",
+  "skillVersion": "0.1.0",
+  "turns": [
+    {
+      "user": "/luz skills",
+      "assistant": "These are the skills of luz-ai. The script printed them and I wrote nothing.\n\n| Skill | What it does |\n| --- | --- |\n| `luz` | Starts a LUZ site. It asks what you want, writes a starter page and helps you finish it. It covers landing pages, blogs, apps and docs. |\n| `luz-landing` | Plans, builds or reviews a landing page. It first decides whether the page is a standard landing or one with an integrated service. It then applies the section anatomy and the SEO and GEO rules for that type. |\n| `luz-readme` | Writes or rewrites a project README so it reads as written by a person. Every README gets a title, a subtitle, a cover, section links, the repo's GitHub data and fixed sections (what it is, usage, installation, credits, license). |\n\nTo add one to this project, run `/luz add <name>`. I'll ask for its fields and show a dry run before I write anything.\n\nNothing here has been checked against your project. `/luz doctor` lists the skills and agents the project already has."
+    }
+  ]
+}

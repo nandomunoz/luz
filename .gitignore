@@ -46,3 +46,6 @@ npm-debug.log*
 !.claude/skills/
 CLAUDE.md
 CLAUDE.local.md
+
+# Runs of the skills laboratory (tools/ai-eval): generated, never committed
+/.claude/evals/ai-runs/

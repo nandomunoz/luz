@@ -1,0 +1,17 @@
+{
+  "example": "unknown",
+  "case": "unknown-subcommand",
+  "model": "sonnet",
+  "date": "2026-11-24",
+  "skillVersion": "0.1.0",
+  "turns": [
+    {
+      "user": "/luz frobnicate",
+      "assistant": "`frobnicate` isn't a LUZ subcommand, so I won't guess what you meant. These are the ones that exist:\n\n| Chat | What it does | Writes |\n| --- | --- | --- |\n| `/luz` | Starts a site. It asks questions, shows a plan, waits for your \"go\", writes the starter page, then finishes it with you. | yes, after \"go\" |\n| `/luz new <landing, blog, app or docs>` | Does the same without asking the kind of site. | yes, after \"go\" |\n| `/luz doctor` | Shows the project, its assistants, and the skills and agents it has. | no |\n| `/luz check [path]` | Checks the front matter of the project's skills and agents, or of the path you give. | no |\n| `/luz facts` | Shows the versions, kinds of site and stacks of this release. | no |\n| `/luz agents` | Lists the agents of luz-ai. | no |\n| `/luz skills` | Lists the skills of luz-ai. | no |\n| `/luz add <name>` | Adds the agent or skill of that name, after asking its fields. | yes, after \"go\" |\n| `/luz help` | Shows this table. | no |\n\nWhat would you like to do? If you want to start a site, tell me what it's for, or run `/luz new landing` (or `blog`, `app`, `docs`)."
+    },
+    {
+      "user": "Nothing for now, thanks. I only wanted to see what you can do.",
+      "assistant": "No problem. I haven't written or run anything, so your project is unchanged.\n\nWhen you want to use LUZ, run `/luz` to start a site, or `/luz doctor` or `/luz facts` to look around without changing anything."
+    }
+  ]
+}

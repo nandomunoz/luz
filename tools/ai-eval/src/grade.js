@@ -1,14 +1,14 @@
 /**
- * LUZ — the grader of the outcome evals of the `luz-start` skill (`.claude/plans/luz-ai-skill.md`, B.8).
+ * LUZ — the grader of the outcome evals of the `luz` skill (`.claude/plans/luz-ai-skill.md`, B.8).
  *
  * A run (a model, with the skill or without it) is given a folder made from a case's `fixture` and the case's
  * prompt. This reads the folder afterwards and says, check by check, whether the result is right. Every check is
  * mechanical: no model grades another. Development tooling: it never ships.
  *
- *   node scripts/ai-eval-grade.js <case id> <folder> [--json]     exit 0 when every check passes, 1 when one fails,
+ *   node tools/ai-eval/src/grade.js <case id> <folder> [--json]     exit 0 when every check passes, 1 when one fails,
  *                                                                 2 when it is used wrongly
  *
- * The checks (named in `checks` of each case of `packages/ai/skills/luz-start/evals/evals.json`):
+ * The checks (named in `checks` of each case of `tools/ai-eval/cases/evals.json`):
  *   luz-check          `luz-check` reports nothing that blocks in the target folder
  *   no-placeholder     no "…" is left in a page: the starter's marks were all filled in
  *   lang               every page has a language (the case's `lang` when it names one)
@@ -23,8 +23,8 @@ import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const repo = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const EVALS = "packages/ai/skills/luz-start/evals/evals.json";
+const repo = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
+const EVALS = "tools/ai-eval/cases/evals.json";
 
 const walk = (dir, base = dir) =>
   readdirSync(dir, { withFileTypes: true }).flatMap((e) => {
@@ -90,7 +90,7 @@ function main(argv) {
   const json = argv.includes("--json");
   const args = argv.filter((a) => a !== "--json");
   if (args.length !== 2) {
-    console.error("usage: node scripts/ai-eval-grade.js <case id> <folder> [--json]");
+    console.error("usage: node tools/ai-eval/src/grade.js <case id> <folder> [--json]");
     return 2;
   }
   let report;

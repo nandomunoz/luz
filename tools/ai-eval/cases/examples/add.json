@@ -1,0 +1,17 @@
+{
+  "example": "add",
+  "case": "add",
+  "model": "sonnet",
+  "date": "2026-11-24",
+  "skillVersion": "0.1.0",
+  "turns": [
+    {
+      "user": "/luz add luz-readme",
+      "assistant": "I'll check whether `luz-readme` is an agent or a skill by listing both.\n\n`luz-readme` is a skill, so I'll run a dry run of `skill add`. A dry run writes nothing.\n\nHere is the plan for `/luz add luz-readme`. I haven't written anything yet.\n\n**What it adds:** the `luz-readme` skill. It writes or rewrites a project README so it doesn't read as AI-written. It gives the README a title, subtitle and cover, section links, the repo's GitHub data, and the fixed sections: what it is, usage, installation, credits and license.\n\n**Files:** 12 files, about 71 KB. The same six files go in two places:\n- `.agents/skills/luz-readme/`\n- `.claude/skills/luz-readme/`\n\nEach folder holds `SKILL.md` and `references/` with `ai-tells.md`, `anatomy.md`, `audit.md`, `creative-toolkit.md` and `structure-by-type.md`.\n\n**Fields:** a skill has none to fill in.\n\n**Commands I'll run:**\n1. `node .claude/skills/luz/scripts/luz.mjs skill add luz-readme --dir .`. I'm passing `--dir` explicitly because my shell is now inside the luz skill folder. Without it, the files could land in the wrong place.\n2. `node .claude/skills/luz/scripts/luz.mjs doctor`, to confirm the project lists the new skill.\n\nThe script won't overwrite an existing file without `--force`, and I won't use that flag. I won't touch your README or any other project file.\n\nSay \"go\" to write the files."
+    },
+    {
+      "user": "go",
+      "assistant": "The `luz-readme` skill is now in the project. `skill add` wrote 12 files (71,142 bytes): the same six files under `.agents/skills/luz-readme/` and under `.claude/skills/luz-readme/`.\n\n`doctor` reports 0 problems and 0 warnings across 3 files checked. I didn't check that its list includes `luz-readme`, so I can't confirm the project picked it up. To check, run `/luz doctor` and look for it in the skills list. You may also need to restart your assistant before it appears.\n\nI didn't touch your README or any other project file. The skill doesn't write a README on its own. When you want one, ask for it with `/luz-readme`.\n\nYou still need to review any README it produces. The GitHub data, credits, license and the claims it makes about the project need a person to confirm them."
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 {
-  "$comment": "Activation: a query that should wake luz-start and one that should not. The negatives that matter are the near misses: a request about LUZ itself, or about a site that does not use it. Each is run 3 times, with a threshold of 0.5; 60% of them tune the description, 40% are held out.",
+  "$comment": "Activation: a query that should wake luz and one that should not. The negatives that matter are the near misses: a request about LUZ itself, or about a site that does not use it. Each is run 3 times, with a threshold of 0.5; 60% of them tune the description, 40% are held out.",
   "queries": [
     { "query": "I want to build a landing page for my booking app with LUZ", "should_trigger": true },
     { "query": "start a new website using the LUZ design system, plain HTML", "should_trigger": true },
@@ -11,6 +11,9 @@
     { "query": "scaffold a LUZ blog starter and check it passes luz-check", "should_trigger": true },
     { "query": "I need a one-page site for my conference, use LUZ", "should_trigger": true },
     { "query": "help me begin a new project with LUZ tokens and core", "should_trigger": true },
+    { "query": "/luz", "should_trigger": true },
+    { "query": "/luz new blog", "should_trigger": true },
+    { "query": "/luz doctor", "should_trigger": true },
     { "query": "fix the focus ring of the luz-btn component in packages/core", "should_trigger": false },
     { "query": "add a new token --luz-space-7 to the LUZ scale", "should_trigger": false },
     { "query": "write the changelog entry for the next LUZ release", "should_trigger": false },
@@ -20,6 +23,9 @@
     { "query": "translate the LUZ docs page about tabs into Arabic", "should_trigger": false },
     { "query": "why does my Vue app throw a hydration error", "should_trigger": false },
     { "query": "write a README for my Python package", "should_trigger": false },
-    { "query": "review the accessibility of the LUZ modal in the docs app", "should_trigger": false }
+    { "query": "review the accessibility of the LUZ modal in the docs app", "should_trigger": false },
+    { "query": "publish the next version of @luz-ds/ai to npm", "should_trigger": false },
+    { "query": "run /doctor on my Kubernetes cluster and tell me what is unhealthy", "should_trigger": false },
+    { "query": "how many downloads does luz-check have this week on npm", "should_trigger": false }
   ]
 }

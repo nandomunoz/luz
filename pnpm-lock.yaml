@@ -116,6 +116,8 @@ importers:
 
   packages/tokens: {}
 
+  tools/ai-eval: {}
+
 packages:
 
   '@axe-core/playwright@4.13.0':

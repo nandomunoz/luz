@@ -1,0 +1,13 @@
+{
+  "example": "help",
+  "case": "help",
+  "model": "sonnet",
+  "date": "2026-11-24",
+  "skillVersion": "0.1.0",
+  "turns": [
+    {
+      "user": "/luz help",
+      "assistant": "`/luz help` shows the table below. It wrote nothing and asked nothing.\n\n**What `/luz` does**\n\n| Chat | What it does | Writes |\n| --- | --- | --- |\n| `/luz` | Starts a site. It asks questions, shows a plan, waits for your \"go\", writes the starter page, then finishes it with you. | Yes, after \"go\" |\n| `/luz new <landing, blog, app or docs>` | Does the same without asking the kind. | Yes, after \"go\" |\n| `/luz doctor` | Reports on the project, its assistants, and the skills and agents it has. | No |\n| `/luz check [path]` | Checks the front matter of the project's skills and agents, or of the path. | No |\n| `/luz facts` | Lists the versions, kinds of site and stacks of this release. | No |\n| `/luz agents` | Lists the luz-ai agents. | No |\n| `/luz skills` | Lists the luz-ai skills. | No |\n| `/luz add <name>` | Adds the agent or skill of that name, after asking for its fields. | Yes, after \"go\" |\n| `/luz help` | Shows this table. | No |\n\n**The script's own commands**\n\nThe script behind these is `scripts/luz.mjs`. Its `--help` lists these commands:\n- `init`\n- `site new`\n- `agent`\n- `skill`\n- `facts`\n- `doctor`\n- `check`\n\nOnly `init`, `site new`, `agent add` and `skill add` write files. Every command accepts `--json`.\n\n`init` is a terminal command, not a `/luz` subcommand. `/luz-readme` and `/luz-landing` are separate skills.\n\nTo start a site, type `/luz`, or say what you want, for example \"make me a landing page with LUZ\"."
+    }
+  ]
+}

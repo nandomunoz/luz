@@ -1,0 +1,13 @@
+{
+  "example": "agents",
+  "case": "agents",
+  "model": "sonnet",
+  "date": "2026-11-24",
+  "skillVersion": "0.1.0",
+  "turns": [
+    {
+      "user": "/luz agents",
+      "assistant": "These are the luz-ai agents. Each one is a base template that needs adapting to your project before use.\n\n| Agent | What it does | Fields to fill | For |\n| --- | --- | --- | --- |\n| `luz-accessibility-auditor` | Audits accessibility (WCAG) by reviewing component, template and style code, and proposes fixes. Use it before shipping UI changes. | Business and users, Target conformance level, Applicable legal requirements, Framework and component library, Design system and color tokens, Site languages, Audit scope | claude, gemini, codex |\n| `luz-ai-auditor` | Audits AI features (chatbots, LLM search, agents with tools) for security, privacy, transparency and compliance risks. Use it before launching or extending an AI feature. | Business, AI features, Providers and models, Data sent to the model, Model tools or actions, Users, Retention and logging, Applicable regulations, Provider policy, Audit scope | claude, gemini, codex |\n| `luz-core-web-vitals-optimizer` | Diagnoses and improves Core Web Vitals (LCP, INP, CLS) and loading performance, and measures before and after. Use it when a page is slow, shifts while loading or responds late. | Business and key pages, Audience and devices, Goals, Current data, Framework and rendering, Hosting, CDN and caching, Third-party scripts, Commands (Development, Build, Measurement, Tests), Constraints | claude, codex |\n| `luz-seo-geo-specialist` | Audits technical and content SEO and readiness for GEO, so AI search engines can understand and cite the site. Proposes prioritized improvements. | Business and site goal, Audience and markets, Key pages, Target searches and questions, Reference competitors, Stance on AI crawlers, Rendering type, Framework and CMS, Available data, Audit scope | claude, gemini, codex |\n\n**What's left for you to check:** I haven't run `doctor`, so I don't know which agents or skills your project already has. An agent's fields stay `[ADAPT: …]` until someone fills them, and the agent asks until they are filled.\n\nTo add one, run `/luz add <name>`. I'll ask for its fields and show a dry run first. I'll write nothing until you say \"go\"."
+    }
+  ]
+}

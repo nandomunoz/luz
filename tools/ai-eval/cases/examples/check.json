@@ -1,0 +1,13 @@
+{
+  "example": "check",
+  "case": "check",
+  "model": "sonnet",
+  "date": "2026-11-24",
+  "skillVersion": "0.1.0",
+  "turns": [
+    {
+      "user": "/luz check",
+      "assistant": "`/luz check` ran with no path, so it looked at the project's skills and agents. It reported 0 problems and 0 warnings across 1 file.\n\nThe check only reads the front matter of skills and agents. It doesn't test whether the front matter is accurate or that the skill or agent behaves well. A person still has to review that. I wrote nothing and started no site."
+    }
+  ]
+}
