@@ -1635,6 +1635,29 @@ test.describe('Site header and navigation toggle', () => {
     });
   }
 
+  for (const width of [800, 1100, 1440]) {
+    test(`the header centres the sections and shows its tools as icons at ${width}px`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 700 });
+      await page.goto('/');
+      const m = await page.evaluate(() => {
+        const box = (s) => { const r = document.querySelector(s).getBoundingClientRect(); return { x: r.x, w: r.width }; };
+        const tool = document.querySelector('.site-header__search:not([hidden]), .site-header__az:not([hidden])');
+        return {
+          vw: innerWidth,
+          nav: box('.site-header__nav'),
+          tools: [tool, document.querySelector('.site-header__github'), document.querySelector('.site-header .luz-lang-switch__button')]
+            .filter(Boolean)
+            .map((e) => e.getBoundingClientRect().width),
+        };
+      });
+      // the middle of the sections is the middle of the header
+      expect(Math.abs(m.nav.x + m.nav.w / 2 - m.vw / 2)).toBeLessThanOrEqual(1);
+      // an icon and no word: 44px (the target size), never wider
+      expect(m.tools.length).toBeGreaterThanOrEqual(2);
+      for (const w of m.tools) expect(w).toBeLessThanOrEqual(48);
+    });
+  }
+
   for (const { path, current } of PAGES) {
     test(`one row, about 56px, with no overflow at every width: ${path}`, async ({ page }) => {
       test.slow();
