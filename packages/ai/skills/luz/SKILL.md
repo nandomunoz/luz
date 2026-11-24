@@ -68,7 +68,7 @@ Add `--help` to any of them. `--json` gives one JSON object.
    - the kind of site: landing page, blog, app or documentation.
 3. **Second round: the kind.** Read the file of the kind chosen in `references/kinds/` (`landing.md`, `blog.md`, `app.md` or `docs.md`) and ask what it lists. Do not ask which parts of LUZ to use: decide that with `references/levels.md`.
 4. **Show the plan** and wait for "go" (R2): the decisions, each file and what goes in it, and the commands you will run, the check included.
-5. **Write the starter page** (R3, R9). Run `site new --dry-run` and then `site new` with the same flags. If the stack has no page of its own, write it as plain HTML and move the markup as `references/stacks.md` says.
+5. **Write the starter page** (R3, R9). Run `site new --dry-run` and then `site new` with the same flags, and `--target` set to the folder the person named (never the script's default folder: if they named none, ask in the first round). If the stack has no page of its own, write it as plain HTML and move the markup as `references/stacks.md` says.
 6. **Fill in the page by editing the file** (R3). Replace each "…" with the person's content, one section at a time, with the editor of your assistant and never with `python3`, `perl`, `sed -i` or a program of your own. Keep every class where it is.
 7. **Check** (R6). Run the command `site new` printed as `next:` after each step. Then read `references/reviewers.md` and go through its lists.
 8. **Report** what was done, what the check found, and what neither you nor the check could verify: names, labels, alt text, contrast, a screen reader.
