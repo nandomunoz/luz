@@ -130,6 +130,9 @@ const RAW_VALUES = new Set(["content", "nav", "pagehead", "rail", "endnav", "pag
 /** Where the home page's languages live, from the repository root. */
 export const I18N_DIR = "apps/landing/i18n";
 
+/** The sections of the site the header links to, under each home: the pages of the three levels and of the skill. */
+const SECTION_PATHS = ["tokens", "core", "catalog", "ai"];
+
 /** Partials whose links to the current page and its parents get aria-current. */
 const CURRENT_PARTIALS = new Set(["header", "site-links"]);
 
@@ -239,13 +242,16 @@ export function routeOfPage(path, file = path) {
 /**
  * The site links that are current on a route, with their aria-current
  * value: "page" for the link to the route itself, "true" for its parents.
- * Home on "/" (and on each home page of `homes`, "/es/"…); Docs on every
+ * Home on "/" (and on each home page of `homes`, "/es/"…); a section of the
+ * site on its page ("/tokens/", "/es/ai/"…); Docs on every
  * docs page ("page" only on the hub); Components on the gallery ("page") and
  * on every page of the Components area ("true").
  */
 export function currentOf(route, homes = ["/"]) {
   const marks = new Map();
   if (route === "/" || homes.includes(route)) marks.set(route, "page");
+  // A section of the site (/tokens/, /es/ai/…): its link in the header and the drawer
+  for (const home of homes.length ? homes : ["/"]) if (SECTION_PATHS.some((path) => route === `${home}${path}/`)) marks.set(route, "page");
   if (route.startsWith(DOCS_ROUTE)) {
     marks.set(DOCS_ROUTE, route === DOCS_ROUTE ? "page" : "true");
     const components = `${DOCS_ROUTE}components/`;
@@ -2110,6 +2116,8 @@ function coreSections({ say, groups, objects, dependencies }) {
     video: '<div class="luz-player" data-type="video">',
     status: '<progress class="luz-progress" value="67">',
   };
+  // The password holds no value, its dots are the placeholder: a filled password field makes a browser offer to save it
+  // when the visitor leaves the page.
   // A real form, with every kind of control a form has: text, email and password (one invalid), a date, a select, a text
   // area, a plan to choose, a range with its output, checkboxes (one disabled), a switch, and the buttons. The form
   // is inert, so the keyboard stays out of it; the markup of a field is beside it
@@ -2119,11 +2127,11 @@ function coreSections({ say, groups, objects, dependencies }) {
   const formPanel = () => {
     const w = (key) => t(`level.core.sample.${key}`);
     const form = [
-      `<form class="landing-form" action="#" inert>`,
+      `<form class="landing-form" action="#" autocomplete="off" inert>`,
       `<fieldset class="luz-fieldset"><legend class="luz-legend">${w("account")}</legend>`,
       field("core-f-name", w("name"), '<input class="luz-input" id="core-f-name" type="text" value="Ada Lovelace">'),
       field("core-f-email", w("email"), '<input class="luz-input" id="core-f-email" type="email" value="ada@example.com">', `<div class="luz-field__helper">${w("hint")}</div>`),
-      field("core-f-password", w("password"), '<input class="luz-input luz-input--error" id="core-f-password" type="password" value="1234" aria-invalid="true">', `<div class="luz-field__error"><span class="u-sr-only">Error: </span>${w("passworderror")}</div>`),
+      field("core-f-password", w("password"), '<input class="luz-input luz-input--error" id="core-f-password" type="password" autocomplete="off" placeholder="••••" aria-invalid="true">', `<div class="luz-field__error"><span class="u-sr-only">Error: </span>${w("passworderror")}</div>`),
       field("core-f-country", w("country"), `<select class="luz-select" id="core-f-country"><option>${w("opt1")}</option><option>${w("opt2")}</option><option>${w("opt3")}</option></select>`),
       field("core-f-date", w("birthday"), '<input class="luz-input" id="core-f-date" type="date" value="1815-12-10">', "", true),
       field("core-f-phone", w("phone"), '<input class="luz-input" id="core-f-phone" type="tel" value="+44 20 7946 0000">', "", true),
@@ -2709,6 +2717,9 @@ export function buildSite(site, { extra = [], unchecked = [], root, languages = 
   const known = new Map([...docs.map((d) => [d.route, d.ids]), ...[...homesOf(site), ...unchecked].map((route) => [route, null])]);
   // /debug/ is a route of the real site (debug.js): a link to it is no mistake in a copy of the docs the build does not render it for
   if (!known.has(DEBUG_ROUTE)) known.set(DEBUG_ROUTE, null);
+  // The sections of the site under each home (/tokens/, /es/ai/…, the header's links) are routes of the real site
+  // (plugin.js writes them): a link to one is no mistake in a build that does not render them
+  for (const home of homesOf(site)) for (const path of SECTION_PATHS) if (!known.has(`${home}${path}/`)) known.set(`${home}${path}/`, null);
   // The pages of the docs languages exist even when this build does not render them (a link to one is not a mistake)
   if (!languages) {
     for (const language of docsI18n?.languages ?? []) {
