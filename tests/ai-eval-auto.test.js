@@ -482,3 +482,92 @@ describe("hardening from the auditor of phase 4", () => {
   });
 });
 
+describe("the viewer of a run", () => {
+  const state = {
+    runId: "2026-11-24T10-00-00-script-release",
+    meta: { layer: "release", model: "opus", mode: "script" },
+    rounds: [{ points: 0.02 }],
+    cases: {
+      green: { status: "pass", runs: [{ passed: true, tokens: { total: 1500 }, costUsd: 0.12, ms: 60000, turns: 3 }] },
+      red: { status: "fail", runs: [{ passed: false, tokens: { total: 2500 }, costUsd: 0.3, ms: 90000, turns: 2 }, { passed: false, tokens: { total: 100 }, costUsd: 0, ms: 1000, turns: 1 }] },
+    },
+  };
+  const details = {
+    green: { checks: [{ id: "luz-check", ok: true, detail: "nothing blocks" }], convo: { turns: [{ n: 0, user: "/luz doctor", assistant: "All fine.", toolUses: [{ name: "Bash", input: {} }] }] } },
+    red: { checks: [{ id: "asked-before-write", ok: false, rule: "R2", turn: 0, detail: "wrote <b>before</b> go" }], convo: { turns: [{ n: 0, user: "hi", assistant: "<script>alert(1)</script> done", toolUses: [] }] } },
+  };
+  const build = async () => {
+    const { buildViewer } = await lab("viewer.js");
+    const out = mk();
+    buildViewer({ out, state, root, details });
+    return readFileSync(join(out, "index.html"), "utf-8");
+  };
+  const textOf = (html) => html.replace(/<style>[\s\S]*?<\/style>/, "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
+
+  it("summarises the run: cases passed, runs, tokens, cost and the weekly points", async () => {
+    const html = await build();
+    expect(html).toMatch(/1\s*<small>of 2<\/small>/);
+    expect(html).toContain("4,100");
+    expect(html).toMatch(/\$0\.42/);
+    expect(html).toMatch(/2\.0\s*%/);
+    expect(html).toContain("release");
+    expect(html).toContain("opus");
+  });
+
+  it("puts the failed cases first and open, each with a status mark a reader can tell without colour", async () => {
+    const html = await build();
+    expect(html.indexOf('data-case="red"')).toBeLessThan(html.indexOf('data-case="green"'));
+    expect(html).toMatch(/<details[^>]*data-case="red"[^>]*\sopen/);
+    expect(html).not.toMatch(/<details[^>]*data-case="green"[^>]*\sopen/);
+    expect(html).toMatch(/data-status="fail"[^>]*>[^<]*FAIL/);
+    expect(html).toMatch(/data-status="pass"[^>]*>[^<]*PASS/);
+  });
+
+  it("shows the transcript as a conversation, the failed check with its rule and turn, and the fix command", async () => {
+    const html = await build();
+    expect(html).toContain("turn-person");
+    expect(html).toContain("turn-assistant");
+    expect(html).toContain("R2");
+    expect(html).toContain("/skill-fix 2026-11-24T10-00-00-script-release red");
+  });
+
+  it("escapes what a model said, has no script and no address, and styles itself", async () => {
+    const html = await build();
+    expect(html).not.toContain("<script");
+    expect(html).not.toContain("<b>before</b>");
+    expect(html).toContain("&lt;script&gt;alert(1)&lt;/script&gt;");
+    expect(html).not.toMatch(/https?:\/\//);
+    expect(html).toMatch(/<style>[\s\S]*prefers-color-scheme: dark[\s\S]*<\/style>/);
+  });
+
+  it("explains itself: a verdict with the next step, and a legend that says what a case, a run, a check, a rule and a turn are", async () => {
+    const text = textOf(await build());
+    expect(text).toMatch(/1 of 2 cases passed/);
+    expect(text).toMatch(/1 needs attention: red/);
+    expect(text).toMatch(/open the red case/i);
+    expect(text).toMatch(/How to read this page/);
+    for (const term of ["case", "run", "check", "rule", "turn", "person"]) expect(text.toLowerCase(), term).toContain(`${term} `);
+    expect(text).toMatch(/2 of 3/);
+  });
+
+  it("says in plain words what each check tests and, for a failed one, what went wrong and where", async () => {
+    const html = await build();
+    const text = textOf(html);
+    expect(text).toMatch(/Asked before writing/i);
+    expect(text).toMatch(/Went wrong: the assistant wrote a file before the person had seen the plan and said go/);
+    expect(text).toMatch(/Failed: the assistant wrote a file before the person had seen the plan/);
+    expect(text).toContain("Write no file until the person has seen the plan");
+    expect(html).toContain('id="red-turn-0"');
+    expect(html).toContain('href="#red-turn-0"');
+    expect(html).toMatch(/turn-bad/);
+  });
+
+  it("knows every check the lab can write: a judge's verdict, a folder check and a transcript check each have a plain name", async () => {
+    const { CHECK_HELP } = await lab("viewer.js");
+    const { CHECKS } = await lab("checks.js");
+    for (const id of [...Object.keys(CHECKS), "luz-check", "no-placeholder", "lang", "one-h1", "title", "only-target", "fixture-unchanged", "forbidden-absent", "conversation", "judge"]) {
+      expect(CHECK_HELP[id], id).toMatchObject({ name: expect.any(String), what: expect.any(String), fails: expect.any(String) });
+    }
+  });
+});
+
