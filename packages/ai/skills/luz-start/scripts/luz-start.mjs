@@ -31,6 +31,25 @@ const MAX_LINES = 40;
 // The stacks a starter page is written for: the page is plain HTML, and Astro takes it as a page
 const GENERATED = ["vanilla", "astro"];
 
+/**
+ * The title a person sees when they run init or --help in a terminal: the mark of LUZ (the prism, light coming in
+ * and leaving as bands) and the word in serif capitals, ASCII only, at most 69 columns. Only when stdout is a
+ * terminal: a pipe, an assistant or --json gets none, so what they read starts with the report. The home's terminal
+ * (scripts/docs-site/cli-demo.js) reads these lines from this file, so the array stays plain JSON.
+ */
+const BANNER = [
+  "            /\\              _____         _____   _____   __________",
+  "           /  \\             `| |'         `| |'   `| |'   | ____  /",
+  "          /    \\             | |           | |     | |    |/   / /",
+  "  -------/--.   \\.------     | |           | |     | |        / /",
+  "        /    `-. \\=======    | |      _    | |     | |       / /   _",
+  "       /        `\\#######    | |_____| |   \\ \\_____/ /      / /___| |",
+  "      /__________\\          _|_________|    `._____.'      /________|"
+];
+
+/** The banner and a blank line, or nothing when stdout is not a terminal. */
+const banner = (tty) => (tty ? `${BANNER.join("\n")}\n\n` : "");
+
 const HELP = `luz-start: starts a site with LUZ and checks the skills and subagents of a project. Only init, site new, agent add and skill add write.
 
 Usage:
@@ -854,9 +873,9 @@ function show(text) {
   return 0;
 }
 
-export function main(argv) {
+export function main(argv, { tty = Boolean(process.stdout.isTTY) } = {}) {
   const [command, ...rest] = argv;
-  if (command === "--help" || command === "-h") return show(HELP);
+  if (command === "--help" || command === "-h") return show(banner(tty) + HELP);
   if (!command) return usage("a command is missing (init, site new, agent, skill, facts, doctor or check)", true);
   if (!["init", "site", "agent", "skill", "facts", "doctor", "check"].includes(command)) return usage(`"${command}" is not a command (init, site new, agent, skill, facts, doctor, check)`, true);
   let args;
@@ -893,7 +912,7 @@ export function main(argv) {
     if (positionals.length) return usage("init takes no word: use --target");
     const { error, report } = runInit(values);
     if (error) return usage(error);
-    process.stdout.write(values.json ? `${JSON.stringify(report, null, 2)}\n` : initText(report));
+    process.stdout.write(values.json ? `${JSON.stringify(report, null, 2)}\n` : banner(tty) + initText(report));
     return 0;
   }
   if (command === "site") {

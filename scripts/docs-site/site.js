@@ -47,6 +47,7 @@ import { panel as structureBlock } from "./catalog-blocks/structure.js";
 import { CASCADE, FITS_KINDS, fileKinds, fitsKindsOf, isKindFile, kindPatterns } from "./kinds.js";
 import { fillAiMarkers } from "./ai.js";
 import { aiSections } from "./ai-page.js";
+import { cliDemo } from "./cli-demo.js";
 import { DEBUG_FILE, DEBUG_ROUTE, hasDebugPage, renderDebug } from "./debug.js";
 import { FILES, catalogComponents, catalogFilesIn, renderComponentLinks, renderSnippets, snippetData } from "./snippets.js";
 import { assertInlineHtml, loadLocales, localizeDocsLinks, lookup, markDocsLinks, renderAlternates, renderLangLinks, renderPageLinks, renderSwitcher, unusedKeys } from "./i18n.js";
@@ -121,10 +122,10 @@ const PLACEHOLDERS = new Set([
   "list1", "list2", "list3", "tokendemo", "tokenlooks", "tokenblocks", "ntokens", "nmodes", "ndeps",
   "coredemo", "coreblocks", "ncomponents", "nobjects", "ndepscore",
   "catalogdemo", "catalogblocks", "catalogsheets", "ncatalog", "nchunks", "ndepscatalog",
-  "aiblocks", "naiagents", "naiskills", "naitargets", "ndepsai",
+  "aiblocks", "naiagents", "naiskills", "naitargets", "ndepsai", "cli",
 ]);
 /** Values inserted as HTML, not escaped. Only the generator produces them. */
-const RAW_VALUES = new Set(["content", "nav", "pagehead", "rail", "endnav", "pagefoot", "generated", "alternates", "langswitch", "langlinks", "endir", "notice", "contentattrs", "list1", "list2", "list3", "tokendemo", "tokenblocks", "coredemo", "coreblocks", "catalogdemo", "catalogblocks", "catalogsheets", "aiblocks"]);
+const RAW_VALUES = new Set(["content", "nav", "pagehead", "rail", "endnav", "pagefoot", "generated", "alternates", "langswitch", "langlinks", "endir", "notice", "contentattrs", "list1", "list2", "list3", "tokendemo", "tokenblocks", "coredemo", "coreblocks", "catalogdemo", "catalogblocks", "catalogsheets", "aiblocks", "cli"]);
 
 /** Where the home page's languages live, from the repository root. */
 export const I18N_DIR = "apps/landing/i18n";
@@ -1787,6 +1788,7 @@ function levelLists(site, locale, used) {
     ...tokenSections({ say, tokens, groups: GROUPS, counts, families: Object.keys(tokenJson.color), root, read }),
     ...catalogSections({ say, root, groups: docsGroups("catalog", 0), sheets: allCatalogSheets, dependencies: Object.keys(JSON.parse(read("packages/catalog/package.json")).dependencies ?? {}).length, chunks: FILES.catalog.chunks.length }),
     ...aiSections({ say, root, block: levelBlock, escapeHtml }),
+    ...cliDemo({ say, root, escapeHtml }),
     ...coreSections({ say, groups: docsGroups("components", sheets("packages/core/src/components").length), objects: objects.length, dependencies: Object.keys(JSON.parse(read("packages/core/package.json")).dependencies ?? {}).length }),
     list1: [
       `<div class="landing-names" style="--n:${GROUPS.length}">`,
@@ -2498,7 +2500,7 @@ export function landingDocuments(site, file, html) {
  * The template of a page of a level (tokens, core, catalog): the home's, with the
  * inside of its <main> up to the icons replaced by `fragment`, the title and the
  * description by the level's own (`level.<name>.meta.*`), and the links to a section
- * of the home (`#inside`, `#faq`) by the same links on the language's home, because the
+ * of the home (`#tokens`, `#faq`) by the same links on the language's home, because the
  * page does not have those sections. Nothing else is written twice: the head, the
  * header, the drawer, the icons and the footer are the home's.
  */
@@ -2510,12 +2512,6 @@ export function levelTemplate(home, fragment, name, file = "the home's template"
   // (catalogSections() writes them, in the order of the cascade), before the landing's own
   const landingCss = '<link rel="stylesheet" href="/apps/landing/landing.css">';
   if (name === "catalog" && !home.includes(landingCss)) throw new Error(`${file}: the page of the catalog links its stylesheets before ${landingCss}, which the home's template lacks`);
-  // The page of the skill shows the home's terminal in its hero: one conversation, written once, in the home's template
-  if (name === "ai") {
-    const cli = /<figure class="landing-cli"[\s\S]*?<\/figure>/.exec(home);
-    if (!cli || !fragment.includes("{{cli}}")) throw new Error(`${file}: the page of the skill puts the home's terminal (<figure class="landing-cli">) where its fragment says {{cli}}`);
-    fragment = fragment.replace("{{cli}}", () => cli[0]);
-  }
   const before = home.slice(0, open.index + open[0].length).replace(landingCss, name === "catalog" ? `{{catalogsheets}}\n  ${landingCss}` : landingCss);
   const after = home.slice(icons);
   // The links (<a>) to a section of the home, outside the skip link; the icons (<use>) stay the page's own

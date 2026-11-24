@@ -4924,6 +4924,33 @@ home-light:defined ~ .landing-light__nojs {
   line-height: 1.55;
 }
 
+/* The title init prints: 69 columns of ASCII, scaled to the width of the screen so it never wraps or scrolls */
+.landing-cli__screen {
+  container-type: inline-size;
+}
+
+.landing-cli__line.landing-cli__line--banner {
+  padding-block: var(--luz-space-xs);
+  padding-inline-start: 0;
+  text-indent: 0;
+  color: var(--luz-brand-primary);
+  font-size: min(1em, 2.2cqi);
+  line-height: 1.2;
+  white-space: pre;
+  overflow-wrap: normal;
+}
+
+.landing-cli__art {
+  margin: 0;
+  padding: 0;
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+}
+
 .landing-cli__line {
   margin: 0;
   padding-inline-start: 2ch;
@@ -5011,7 +5038,100 @@ home-light:defined ~ .landing-light__nojs {
    line that has just come in fades in, the caret blinking a few times after
    it, only when motion is welcome (under five seconds, WCAG 2.2.2) */
 .landing-cli[data-cli="step"] .landing-cli__screen {
+  /* One height, as a terminal has: the session scrolls inside it to its last line, so the page never moves */
+  block-size: min(26rem, 70vh);
+  align-content: start;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   cursor: pointer;
+}
+
+/* What the script prints: quieter than what is typed */
+.landing-cli__line--out {
+  padding-inline-start: 0;
+  text-indent: 0;
+  color: var(--luz-text-secondary);
+  white-space: pre-wrap;
+}
+
+.landing-cli__line--out samp {
+  font: inherit;
+}
+
+/* The answers the visitor picks, one after another */
+.landing-cli__line--you .landing-cli__pick {
+  margin-inline-end: 1.5ch;
+}
+
+.landing-cli__line--you .landing-cli__pick::before {
+  content: "✓ ";
+}
+
+.landing-cli__rec {
+  color: var(--luz-text-secondary);
+  font-weight: 400;
+}
+
+/* A question of the skill: its answers are buttons, in the place of Enter */
+.landing-cli__choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--luz-space-xs);
+  padding-inline-start: 4ch;
+  cursor: auto;
+}
+
+.landing-cli__choices[hidden] {
+  display: none;
+}
+
+/* While a question waits, its buttons are the way on: Enter keeps its room, out of sight and of the focus order */
+.landing-cli[data-waiting] .landing-cli__next {
+  visibility: hidden;
+}
+
+.landing-cli__choice {
+  min-block-size: 2.75rem;
+  padding: var(--luz-space-2xs) var(--luz-space-sm);
+  border: 1px solid color-mix(in oklab, var(--luz-text-primary) 25%, transparent);
+  border-radius: var(--luz-radius-sm);
+  background: var(--luz-surface-page);
+  color: var(--luz-text-primary);
+  font: inherit;
+  cursor: pointer;
+}
+
+.landing-cli__choice:hover {
+  border-color: var(--luz-brand-primary);
+}
+
+.landing-cli__choice:focus-visible {
+  outline: 2px solid var(--luz-focus-ring);
+  outline-offset: 2px;
+}
+
+.landing-cli__choice[aria-pressed="true"] {
+  border-color: var(--luz-brand-primary);
+  color: var(--luz-brand-primary);
+  font-weight: 600;
+}
+
+.landing-cli__choices[data-multi] .landing-cli__choice[data-value]::before {
+  content: "[ ] ";
+}
+
+.landing-cli__choices[data-multi] .landing-cli__choice[aria-pressed="true"]::before {
+  content: "[x] ";
+}
+
+.landing-cli__choice--done {
+  border-color: var(--luz-brand-fill);
+  background: var(--luz-brand-fill);
+  color: var(--luz-text-on-fill);
+}
+
+.landing-cli__choice--done:hover {
+  background: var(--luz-brand-fill-hover);
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -5038,6 +5158,21 @@ home-light:defined ~ .landing-light__nojs {
   .landing-cli__caret {
     background: CanvasText;
   }
+}
+
+/* "Coming soon to npm": a label, not a count, so it gets room at the sides and
+   capitals (text-transform keeps the words in the catalog as written) */
+.landing-cli__note .luz-badge {
+  padding: var(--luz-space-2xs) var(--luz-space-md);
+  font-size: var(--luz-text-xs);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Arabic has no capitals, and spacing its letters would unjoin them */
+.landing-cli__note .luz-badge:lang(ar) {
+  letter-spacing: normal;
 }
 
 /* Arabic has no letters in the mono stack: its phrases in the terminal and

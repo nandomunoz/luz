@@ -73,7 +73,7 @@
     <div class="luz-sidebar__section">
       <span class="luz-sidebar__section-label" id="nav-on-page">{{t:nav.on-page}}</span>
       <ul class="page-nav__list" aria-labelledby="nav-on-page">
-        <li><a class="luz-sidebar__link" href="#inside">{{t:inside.eyebrow}}</a></li>
+        <li><a class="luz-sidebar__link" href="#tokens">{{t:inside.eyebrow}}</a></li>
         <li><a class="luz-sidebar__link" href="#faq">{{t:faq.eyebrow}}</a></li>
       </ul>
     </div>
@@ -99,8 +99,8 @@
         <h1 class="luz-hero__title" id="hero-title"><span class="landing-hero__brand landing-imago" lang="en"><span class="landing-imago__word" dir="ltr" aria-hidden="true"><span class="ch ch--l">L</span><span class="ch ch--u">U</span><span class="ch ch--z">Z</span></span><span class="u-sr-only">LUZ</span></span> {{html:hero.title}}</h1>
         <p class="luz-hero__lead">{{html:hero.lead}}</p>
         <div class="o-actions">
-          <a class="luz-btn luz-btn--outline luz-btn--lg" href="#inside">{{t:hero.start}}</a>
-          <a class="luz-btn luz-btn--primary luz-btn--lg landing-hero__ai" href="#inside-4"><svg aria-hidden="true"><use href="#i13"/></svg><span>{{t:hero.start-ai}}</span></a>
+          <a class="luz-btn luz-btn--outline luz-btn--lg" href="#tokens">{{t:hero.start}}</a>
+          <a class="luz-btn luz-btn--primary luz-btn--lg landing-hero__ai" href="#ai"><svg aria-hidden="true"><use href="#i13"/></svg><span>{{t:hero.start-ai}}</span></a>
           <a class="luz-btn luz-btn--outline luz-btn--lg" href="/docs/">{{t:hero.docs}}</a>
         </div>
       </div>
@@ -121,10 +121,10 @@
 
     <!-- ====================== 4. INSIDE: one section per level of adoption ====================== -->
 
-    <section class="landing-inside" id="inside" aria-labelledby="inside-1-title">
+    <section class="landing-inside" id="tokens" aria-labelledby="tokens-title">
         <div class="landing-inside__copy">
           <p class="landing-inside__eyebrow"><svg aria-hidden="true"><use href="#i0"/></svg><span>{{t:inside.l1.eyebrow}}</span></p>
-          <h2 class="landing-inside__title" id="inside-1-title">{{html:inside.l1.title}}</h2>
+          <h2 class="landing-inside__title" id="tokens-title">{{html:inside.l1.title}}</h2>
           <p class="landing-inside__lead">{{t:inside.l1.lead}}</p>
           <ul class="landing-inside__points">
             <li><svg aria-hidden="true"><use href="#i1"/></svg><span><strong>{{t:inside.l1.p1.name}}</strong> {{t:inside.l1.p1.text}}</span></li>
@@ -135,31 +135,31 @@
         </div>
       <div class="landing-panel">
         <nav class="luz-tabs luz-tabs--pill" aria-label="{{t:inside.l1.panel}}">
-          <a class="luz-tab" href="#in1-install"><svg class="ic" aria-hidden="true"><use href="#i4"/></svg><span>{{t:inside.tab.install}}</span></a>
-          <a class="luz-tab" href="#in1-list"><svg aria-hidden="true"><use href="#i5"/></svg><span>{{t:inside.tab.list}}</span></a>
-          <a class="luz-tab" href="#in1-code"><svg class="ic" aria-hidden="true"><use href="#i6"/></svg><span>{{t:inside.tab.code}}</span></a>
+          <a class="luz-tab" href="#tokens-install"><svg class="ic" aria-hidden="true"><use href="#i4"/></svg><span>{{t:inside.tab.install}}</span></a>
+          <a class="luz-tab" href="#tokens-list"><svg aria-hidden="true"><use href="#i5"/></svg><span>{{t:inside.tab.list}}</span></a>
+          <a class="luz-tab" href="#tokens-code"><svg class="ic" aria-hidden="true"><use href="#i6"/></svg><span>{{t:inside.tab.code}}</span></a>
         </nav>
-        <div class="luz-tabpanel landing-panel__pane" id="in1-install">
+        <div class="luz-tabpanel landing-panel__pane" id="tokens-install">
           <div class="landing-install">
             <div class="landing-install__bar">
               <span class="landing-install__label">{{t:inside.install.npm}}</span>
-              <button class="luz-copy-btn" type="button" data-copy-from="in1-npm" aria-label="{{t:inside.copy.npm}}" hidden>{{t:see.copy}}</button>
+              <button class="luz-copy-btn" type="button" data-copy-from="tokens-npm" aria-label="{{t:inside.copy.npm}}" hidden>{{t:see.copy}}</button>
             </div>
-            <pre class="luz-code-block" data-lang="bash" dir="ltr" tabindex="0" role="region" aria-label="{{t:inside.install.npm}}"><code id="in1-npm">npm install @luz-ds/tokens</code></pre>
+            <pre class="luz-code-block" data-lang="bash" dir="ltr" tabindex="0" role="region" aria-label="{{t:inside.install.npm}}"><code id="tokens-npm">npm install @luz-ds/tokens</code></pre>
           </div>
           <div class="landing-install">
             <div class="landing-install__bar">
               <span class="landing-install__label">{{t:inside.install.cdn}}</span>
-              <button class="luz-copy-btn" type="button" data-copy-from="in1-cdn" aria-label="{{t:inside.copy.cdn}}" hidden>{{t:see.copy}}</button>
+              <button class="luz-copy-btn" type="button" data-copy-from="tokens-cdn" aria-label="{{t:inside.copy.cdn}}" hidden>{{t:see.copy}}</button>
             </div>
-            <pre class="luz-code-block" data-lang="html" dir="ltr" tabindex="0" role="region" aria-label="{{t:inside.install.cdn}}"><code id="in1-cdn">&lt;link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@luz-ds/tokens@{{version}}/dist/luz-tokens.min.css"></code></pre>
+            <pre class="luz-code-block" data-lang="html" dir="ltr" tabindex="0" role="region" aria-label="{{t:inside.install.cdn}}"><code id="tokens-cdn">&lt;link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@luz-ds/tokens@{{version}}/dist/luz-tokens.min.css"></code></pre>
           </div>
         </div>
-        <div class="luz-tabpanel landing-panel__pane landing-panel__pane--list" id="in1-list">
+        <div class="luz-tabpanel landing-panel__pane landing-panel__pane--list" id="tokens-list">
           {{list1}}
         </div>
-        <div class="luz-tabpanel landing-panel__pane" id="in1-code">
-          <pre class="luz-code-block" data-lang="css" dir="ltr" tabindex="0" role="region" aria-label="{{t:inside.tab.code}}"><code id="in1-code-code">.cta {
+        <div class="luz-tabpanel landing-panel__pane" id="tokens-code">
+          <pre class="luz-code-block" data-lang="css" dir="ltr" tabindex="0" role="region" aria-label="{{t:inside.tab.code}}"><code id="tokens-code-code">.cta {
   background: var(--luz-brand-fill);
   color: var(--luz-text-on-fill);
 }
@@ -174,10 +174,10 @@ a {
         </div>
       </div>
       </section>
-    <section class="landing-inside landing-inside--flip" id="inside-2" aria-labelledby="inside-2-title">
+    <section class="landing-inside landing-inside--flip" id="core" aria-labelledby="core-title">
         <div class="landing-inside__copy">
           <p class="landing-inside__eyebrow"><svg aria-hidden="true"><use href="#i0"/></svg><span>{{t:inside.l2.eyebrow}}</span></p>
-          <h2 class="landing-inside__title" id="inside-2-title">{{html:inside.l2.title}}</h2>
+          <h2 class="landing-inside__title" id="core-title">{{html:inside.l2.title}}</h2>
           <p class="landing-inside__lead">{{t:inside.l2.lead}}</p>
           <ul class="landing-inside__points">
             <li><svg aria-hidden="true"><use href="#i1"/></svg><span><strong>{{t:inside.l2.p1.name}}</strong> {{t:inside.l2.p1.text}}</span></li>
@@ -188,33 +188,33 @@ a {
         </div>
       <div class="landing-panel">
         <nav class="luz-tabs luz-tabs--pill" aria-label="{{t:inside.l2.panel}}">
-          <a class="luz-tab" href="#in2-install"><svg class="ic" aria-hidden="true"><use href="#i4"/></svg><span>{{t:inside.tab.install}}</span></a>
-          <a class="luz-tab" href="#in2-list"><svg aria-hidden="true"><use href="#i5"/></svg><span>{{t:inside.tab.list}}</span></a>
-          <a class="luz-tab" href="#in2-code"><svg class="ic" aria-hidden="true"><use href="#i6"/></svg><span>{{t:inside.tab.code}}</span></a>
+          <a class="luz-tab" href="#core-install"><svg class="ic" aria-hidden="true"><use href="#i4"/></svg><span>{{t:inside.tab.install}}</span></a>
+          <a class="luz-tab" href="#core-list"><svg aria-hidden="true"><use href="#i5"/></svg><span>{{t:inside.tab.list}}</span></a>
+          <a class="luz-tab" href="#core-code"><svg class="ic" aria-hidden="true"><use href="#i6"/></svg><span>{{t:inside.tab.code}}</span></a>
         </nav>
-        <div class="luz-tabpanel landing-panel__pane" id="in2-install">
+        <div class="luz-tabpanel landing-panel__pane" id="core-install">
           <div class="landing-install">
             <div class="landing-install__bar">
               <span class="landing-install__label">{{t:inside.install.npm}}</span>
-              <button class="luz-copy-btn" type="button" data-copy-from="in2-npm" aria-label="{{t:inside.copy.npm}}" hidden>{{t:see.copy}}</button>
+              <button class="luz-copy-btn" type="button" data-copy-from="core-npm" aria-label="{{t:inside.copy.npm}}" hidden>{{t:see.copy}}</button>
             </div>
-            <pre class="luz-code-block" data-lang="bash" dir="ltr" tabindex="0" role="region" aria-label="{{t:inside.install.npm}}"><code id="in2-npm">npm install @luz-ds/tokens @luz-ds/core</code></pre>
+            <pre class="luz-code-block" data-lang="bash" dir="ltr" tabindex="0" role="region" aria-label="{{t:inside.install.npm}}"><code id="core-npm">npm install @luz-ds/tokens @luz-ds/core</code></pre>
           </div>
           <div class="landing-install">
             <div class="landing-install__bar">
               <span class="landing-install__label">{{t:inside.install.cdn}}</span>
-              <button class="luz-copy-btn" type="button" data-copy-from="in2-cdn" aria-label="{{t:inside.copy.cdn}}" hidden>{{t:see.copy}}</button>
+              <button class="luz-copy-btn" type="button" data-copy-from="core-cdn" aria-label="{{t:inside.copy.cdn}}" hidden>{{t:see.copy}}</button>
             </div>
-            <pre class="luz-code-block" data-lang="html" dir="ltr" tabindex="0" role="region" aria-label="{{t:inside.install.cdn}}"><code id="in2-cdn">&lt;link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@luz-ds/tokens@{{version}}/dist/luz-tokens.min.css">
+            <pre class="luz-code-block" data-lang="html" dir="ltr" tabindex="0" role="region" aria-label="{{t:inside.install.cdn}}"><code id="core-cdn">&lt;link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@luz-ds/tokens@{{version}}/dist/luz-tokens.min.css">
 &lt;link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@luz-ds/core@{{version}}/dist/luz.min.css">
 &lt;script type="module" src="https://cdn.jsdelivr.net/npm/@luz-ds/core@{{version}}/dist/luz.min.js">&lt;/script></code></pre>
           </div>
         </div>
-        <div class="luz-tabpanel landing-panel__pane landing-panel__pane--list" id="in2-list">
+        <div class="luz-tabpanel landing-panel__pane landing-panel__pane--list" id="core-list">
           {{list2}}
         </div>
-        <div class="luz-tabpanel landing-panel__pane" id="in2-code">
-          <pre class="luz-code-block" data-lang="html" dir="ltr" tabindex="0" role="region" aria-label="{{t:inside.tab.code}}"><code id="in2-code-code">&lt;div class="luz-field">
+        <div class="luz-tabpanel landing-panel__pane" id="core-code">
+          <pre class="luz-code-block" data-lang="html" dir="ltr" tabindex="0" role="region" aria-label="{{t:inside.tab.code}}"><code id="core-code-code">&lt;div class="luz-field">
   &lt;label class="luz-field__label" for="f-name">Project name&lt;/label>
   &lt;input class="luz-input" id="f-name" type="text" aria-describedby="f-name-help">
   &lt;div class="luz-field__helper" id="f-name-help">Shown on the dashboard.&lt;/div>
@@ -228,10 +228,10 @@ a {
         </div>
       </div>
       </section>
-    <section class="landing-inside" id="inside-3" aria-labelledby="inside-3-title">
+    <section class="landing-inside" id="catalog" aria-labelledby="catalog-title">
         <div class="landing-inside__copy">
           <p class="landing-inside__eyebrow"><svg aria-hidden="true"><use href="#i0"/></svg><span>{{t:inside.l3.eyebrow}}</span></p>
-          <h2 class="landing-inside__title" id="inside-3-title">{{html:inside.l3.title}}</h2>
+          <h2 class="landing-inside__title" id="catalog-title">{{html:inside.l3.title}}</h2>
           <p class="landing-inside__lead">{{t:inside.l3.lead}}</p>
           <ul class="landing-inside__points">
             <li><svg aria-hidden="true"><use href="#i1"/></svg><span><strong>{{t:inside.l3.p1.name}}</strong> {{t:inside.l3.p1.text}}</span></li>
@@ -242,24 +242,24 @@ a {
         </div>
       <div class="landing-panel">
         <nav class="luz-tabs luz-tabs--pill" aria-label="{{t:inside.l3.panel}}">
-          <a class="luz-tab" href="#in3-install"><svg class="ic" aria-hidden="true"><use href="#i4"/></svg><span>{{t:inside.tab.install}}</span></a>
-          <a class="luz-tab" href="#in3-list"><svg aria-hidden="true"><use href="#i5"/></svg><span>{{t:inside.tab.list}}</span></a>
-          <a class="luz-tab" href="#in3-code"><svg class="ic" aria-hidden="true"><use href="#i6"/></svg><span>{{t:inside.tab.code}}</span></a>
+          <a class="luz-tab" href="#catalog-install"><svg class="ic" aria-hidden="true"><use href="#i4"/></svg><span>{{t:inside.tab.install}}</span></a>
+          <a class="luz-tab" href="#catalog-list"><svg aria-hidden="true"><use href="#i5"/></svg><span>{{t:inside.tab.list}}</span></a>
+          <a class="luz-tab" href="#catalog-code"><svg class="ic" aria-hidden="true"><use href="#i6"/></svg><span>{{t:inside.tab.code}}</span></a>
         </nav>
-        <div class="luz-tabpanel landing-panel__pane" id="in3-install">
+        <div class="luz-tabpanel landing-panel__pane" id="catalog-install">
           <div class="landing-install">
             <div class="landing-install__bar">
               <span class="landing-install__label">{{t:inside.install.npm}}</span>
-              <button class="luz-copy-btn" type="button" data-copy-from="in3-npm" aria-label="{{t:inside.copy.npm}}" hidden>{{t:see.copy}}</button>
+              <button class="luz-copy-btn" type="button" data-copy-from="catalog-npm" aria-label="{{t:inside.copy.npm}}" hidden>{{t:see.copy}}</button>
             </div>
-            <pre class="luz-code-block" data-lang="bash" dir="ltr" tabindex="0" role="region" aria-label="{{t:inside.install.npm}}"><code id="in3-npm">npm install @luz-ds/tokens @luz-ds/core @luz-ds/catalog</code></pre>
+            <pre class="luz-code-block" data-lang="bash" dir="ltr" tabindex="0" role="region" aria-label="{{t:inside.install.npm}}"><code id="catalog-npm">npm install @luz-ds/tokens @luz-ds/core @luz-ds/catalog</code></pre>
           </div>
           <div class="landing-install">
             <div class="landing-install__bar">
               <span class="landing-install__label">{{t:inside.install.cdn}}</span>
-              <button class="luz-copy-btn" type="button" data-copy-from="in3-cdn" aria-label="{{t:inside.copy.cdn}}" hidden>{{t:see.copy}}</button>
+              <button class="luz-copy-btn" type="button" data-copy-from="catalog-cdn" aria-label="{{t:inside.copy.cdn}}" hidden>{{t:see.copy}}</button>
             </div>
-            <pre class="luz-code-block" data-lang="html" dir="ltr" tabindex="0" role="region" aria-label="{{t:inside.install.cdn}}"><code id="in3-cdn">&lt;link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@luz-ds/tokens@{{version}}/dist/luz-tokens.min.css">
+            <pre class="luz-code-block" data-lang="html" dir="ltr" tabindex="0" role="region" aria-label="{{t:inside.install.cdn}}"><code id="catalog-cdn">&lt;link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@luz-ds/tokens@{{version}}/dist/luz-tokens.min.css">
 &lt;link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@luz-ds/core@{{version}}/dist/luz.min.css">
 &lt;!-- One link per catalog component the page uses: here the search -->
 &lt;link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@luz-ds/catalog@{{version}}/dist/components/search.min.css">
@@ -267,11 +267,11 @@ a {
 &lt;script type="module" src="https://cdn.jsdelivr.net/npm/@luz-ds/catalog@{{version}}/dist/catalog.min.js">&lt;/script></code></pre>
           </div>
         </div>
-        <div class="luz-tabpanel landing-panel__pane landing-panel__pane--list" id="in3-list">
+        <div class="luz-tabpanel landing-panel__pane landing-panel__pane--list" id="catalog-list">
           {{list3}}
         </div>
-        <div class="luz-tabpanel landing-panel__pane" id="in3-code">
-          <pre class="luz-code-block" data-lang="html" dir="ltr" tabindex="0" role="region" aria-label="{{t:inside.tab.code}}"><code id="in3-code-code">&lt;luz-search>
+        <div class="luz-tabpanel landing-panel__pane" id="catalog-code">
+          <pre class="luz-code-block" data-lang="html" dir="ltr" tabindex="0" role="region" aria-label="{{t:inside.tab.code}}"><code id="catalog-code-code">&lt;luz-search>
   &lt;a class="luz-search__fallback" href="/docs/a-z/" data-luz-search-fallback>A–Z&lt;/a>
   &lt;button class="luz-search__trigger" type="button" data-luz-search-open hidden>Search&lt;/button>
   &lt;dialog class="luz-modal luz-search" id="luz-search"
@@ -287,19 +287,20 @@ a {
       </div>
       </section>
     <!-- The fourth level: a fake terminal that plays the conversation of the
-         LUZ skill to come (@luz-ds/ai, not published yet): it asks what you
-         want to make, the kind of site and the stack, suggests the agents and
-         skills that matter, fills their [ADAPT] fields and builds with LUZ.
-         The whole transcript is in the markup and shows whole without
-         JavaScript. With it, apps/landing/cli.js shows the first line and the
-         visitor brings the next one with Enter (its button) or a tap inside
-         the terminal; the screen is a polite live region, so each new line
-         is read out. Left to right in every language, as a terminal is; each
-         translated phrase is a <bdi> -->
-    <section class="landing-inside landing-inside--flip" id="inside-4" aria-labelledby="inside-4-title">
+         LUZ skill to come (@luz-ds/ai, not published yet), an emulation of a
+         real session in which the visitor answers: init, the assistant, the
+         kind of site, the stack, what matters (the agents), the plan, go,
+         site new, the check and agent add. {{cli}} is written by
+         scripts/docs-site/cli-demo.js from the script's own output; without
+         JavaScript the session of the default answers shows whole. With it,
+         apps/landing/cli.js plays it line by line (Enter, its button, or a
+         tap inside the terminal) and the questions are buttons; the screen
+         is a polite live region. Left to right in every language, as a
+         terminal is; each translated phrase is a <bdi> -->
+    <section class="landing-inside landing-inside--flip" id="ai" aria-labelledby="ai-title">
         <div class="landing-inside__copy">
           <p class="landing-inside__eyebrow"><svg aria-hidden="true"><use href="#i0"/></svg><span>{{t:inside.l4.eyebrow}}</span></p>
-          <h2 class="landing-inside__title" id="inside-4-title">{{html:inside.l4.title}}</h2>
+          <h2 class="landing-inside__title" id="ai-title">{{html:inside.l4.title}}</h2>
           <p class="landing-inside__lead">{{t:inside.l4.lead}}</p>
           <ul class="landing-inside__points">
             <li><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 5h15v10.5H10L6 19v-3.5H4.5Z"/></svg><span><strong>{{t:inside.l4.p1.name}}</strong> {{t:inside.l4.p1.text}}</span></li>
@@ -309,25 +310,7 @@ a {
           <p class="landing-cli__note"><span class="luz-badge luz-badge--primary">{{t:inside.l4.soon}}</span> <a href="/docs/kinds/">{{t:inside.l4.meanwhile}}</a></p>
           <div class="o-actions"><a class="luz-btn luz-btn--outline" href="{{home}}ai/">{{t:inside.l4.all}}</a></div>
         </div>
-      <figure class="landing-cli" dir="ltr" aria-label="{{t:inside.l4.panel}}" data-landing-cli>
-        <div class="landing-cli__bar" aria-hidden="true"><span class="landing-cli__dots"><span></span><span></span><span></span></span><code class="landing-cli__title">~/my-app</code></div>
-        <div class="landing-cli__screen" aria-live="polite">
-          <p class="landing-cli__line landing-cli__line--cmd"><span class="landing-cli__mark" aria-hidden="true">$</span> <code>npx @luz-ds/ai</code></p>
-          <p class="landing-cli__line"><span class="landing-cli__mark" aria-hidden="true">&gt;</span> <bdi>{{t:inside.cli.ask}}</bdi></p>
-          <p class="landing-cli__line landing-cli__line--you"><bdi class="landing-cli__you">{{t:inside.cli.answer}}</bdi></p>
-          <p class="landing-cli__line"><span class="landing-cli__mark" aria-hidden="true">&gt;</span> <bdi>{{t:inside.cli.kind}}</bdi> <span class="landing-cli__why">(<code>luz-create-landing</code>)</span></p>
-          <p class="landing-cli__line"><span class="landing-cli__mark" aria-hidden="true">&gt;</span> <bdi>{{t:inside.cli.stack}}</bdi> <span class="landing-cli__pick">[HTML + Vite]</span> <span class="landing-cli__why">Astro · Next.js · WordPress</span></p>
-          <p class="landing-cli__line"><span class="landing-cli__mark" aria-hidden="true">&gt;</span> <bdi>{{t:inside.cli.agents}}</bdi></p>
-          <p class="landing-cli__line landing-cli__line--item"><span class="landing-cli__box">[x]</span> <code>luz-seo-geo-specialist</code> <bdi class="landing-cli__why">{{t:inside.cli.seo}}</bdi></p>
-          <p class="landing-cli__line landing-cli__line--item"><span class="landing-cli__box">[x]</span> <code>luz-accessibility-auditor</code> <bdi class="landing-cli__why">{{t:inside.cli.a11y}}</bdi></p>
-          <p class="landing-cli__line landing-cli__line--item"><span class="landing-cli__box">[x]</span> <code>luz-core-web-vitals-optimizer</code> <bdi class="landing-cli__why">{{t:inside.cli.speed}}</bdi></p>
-          <p class="landing-cli__line landing-cli__line--item landing-cli__line--off"><span class="landing-cli__box">[ ]</span> <code>luz-ai-auditor</code> <bdi class="landing-cli__why">{{t:inside.cli.noai}}</bdi></p>
-          <p class="landing-cli__line"><span class="landing-cli__mark" aria-hidden="true">&gt;</span> <bdi>{{t:inside.cli.skills}}</bdi> <code>luz-create-landing</code> · <code>luz-readme</code></p>
-          <p class="landing-cli__line"><span class="landing-cli__mark" aria-hidden="true">&gt;</span> <bdi>{{t:inside.cli.adapt}}</bdi></p>
-          <p class="landing-cli__line landing-cli__line--end"><span class="landing-cli__done"><bdi>{{t:inside.cli.done}}</bdi></span> <bdi>{{t:inside.cli.build}}</bdi> <code>@luz-ds/core</code> + <code>catalog</code>: <code>hero</code>, <code>section</code>, <code>site-footer</code><span class="landing-cli__caret" aria-hidden="true"></span></p>
-        </div>
-        <button class="luz-btn luz-btn--ghost luz-btn--sm landing-cli__next" type="button" hidden><kbd>Enter</kbd> <span data-cli-next>{{t:inside.l4.next}}</span><span data-cli-replay hidden>{{t:inside.l4.replay}}</span></button>
-      </figure>
+      {{cli}}
       </section>
 
 
@@ -476,7 +459,7 @@ a {
           <h2 class="luz-site-footer__col-title" id="footer-resources">{{t:footer.resources}}</h2>
           <ul aria-labelledby="footer-resources">
             <li><a href="https://www.npmjs.com/org/luz-ds">{{t:footer.npm}}</a></li>
-            <li><a href="#inside-4">{{t:footer.ai}}</a></li>
+            <li><a href="#ai">{{t:footer.ai}}</a></li>
             <li><a href="/llms.txt" lang="en" dir="ltr">llms.txt</a></li>
             <li><a href="https://github.com/nandovejer/luz/blob/main/CHANGELOG.md">{{t:footer.changelog}}</a></li>
             <li><a href="/docs/get-started/how-luz-is-built/">{{t:footer.built}}</a></li>
