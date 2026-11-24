@@ -370,25 +370,13 @@
   block-size: 1.25rem;
 }
 
-/* 769px and up: GitHub and the search are an icon and a word, as Docs is */
+/* 769px and up: the tools (GitHub, Search, Language) are icons only; their
+   names stay for a reader */
 @media (min-width: 769px) {
   .site-header__search,
   .site-header__az {
-    inline-size: auto;
-    gap: var(--luz-space-xs);
-    padding-inline: var(--luz-space-xs);
     font-family: var(--luz-font-sans);
-    font-size: var(--luz-text-md);
     text-decoration: none;
-  }
-
-  .site-header__search .luz-search__trigger-label,
-  .site-header__az .luz-search__fallback-label {
-    position: static;
-    inline-size: auto;
-    block-size: auto;
-    overflow: visible;
-    clip-path: none;
   }
 
   /* The four controls of the end (Documentation, GitHub, Search, Language)
@@ -477,16 +465,28 @@
     margin-inline-end: 0;
   }
 
+  /* The sections sit in the middle of the row, whatever the widths of the
+     logo and of the tools: out of the flow, centred on the header */
+  .site-header__inner {
+    position: relative;
+  }
+
+  .site-header__brand {
+    margin-inline-end: auto;
+  }
+
   .site-header__nav {
-    margin-inline: var(--luz-space-lg) auto;
+    position: absolute;
+    inset-block: 0;
+    inset-inline: 0;
+    margin-inline: auto;
+    inline-size: max-content;
   }
 }
 
-/* Below 1100px the tools keep their icon and their name for a reader (hidden
-   the way u-sr-only hides, never display: none), the badge of the version
-   leaves the row (it is the footer's too), and the controls take less room,
-   so where to go keeps its words down to the phone's row */
-@media (min-width: 769px) and (max-width: 1099px) {
+/* The tools keep their icon and their name for a reader (hidden the way
+   u-sr-only hides, never display: none) */
+@media (min-width: 769px) {
   .site-header .luz-search__trigger-label,
   .site-header .luz-search__trigger-key,
   .site-header .luz-search__fallback-label,
@@ -498,13 +498,13 @@
     clip-path: inset(50%);
     white-space: nowrap;
   }
+}
 
+/* Below 1100px the badge of the version leaves the row (it is the footer's
+   too) and the controls take less room */
+@media (min-width: 769px) and (max-width: 1099px) {
   .site-header .site-badge {
     display: none;
-  }
-
-  .site-header__nav {
-    margin-inline-start: var(--luz-space-sm);
   }
 
   .site-header__nav a,
