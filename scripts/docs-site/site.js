@@ -46,6 +46,7 @@ import { panel as sitewideBlock } from "./catalog-blocks/sitewide.js";
 import { panel as structureBlock } from "./catalog-blocks/structure.js";
 import { CASCADE, FITS_KINDS, fileKinds, fitsKindsOf, isKindFile, kindPatterns } from "./kinds.js";
 import { fillAiMarkers } from "./ai.js";
+import { fillCommandMarkers } from "./ai-commands.js";
 import { aiSections } from "./ai-page.js";
 import { cliDemo } from "./cli-demo.js";
 import { DEBUG_FILE, DEBUG_ROUTE, hasDebugPage, renderDebug } from "./debug.js";
@@ -99,7 +100,7 @@ const FRONT_MATTER = {
   lead: { default: "true" },
   // A block the generator writes after the content: "gallery", "a-z" or "snippets"; "notfound" (the
   // 404) one block per other docs language; "ai" writes its tables where the content has
-  // `<!-- luz:ai files -->` and `<!-- luz:ai rules -->`
+  // `<!-- luz:ai files -->` and `<!-- luz:ai rules -->`; "ai-commands" writes the commands of the luz skill at `<!-- luz:commands -->`
   generate: { default: "" },
 };
 
@@ -292,7 +293,7 @@ export function parseFrontMatter(source, file, areas = null) {
   }
   if (!["h2", "h2,h3", "false"].includes(meta.toc)) throw new Error(`${file}: toc is "h2", "h2,h3" or "false"`);
   if (!["", "controls"].includes(meta.parts)) throw new Error(`${file}: parts is "controls" or empty`);
-  if (!["", "gallery", "a-z", "snippets", "ai", "notfound"].includes(meta.generate)) throw new Error(`${file}: generate is "gallery", "a-z", "snippets", "ai" or "notfound"`);
+  if (!["", "gallery", "a-z", "snippets", "ai", "ai-commands", "notfound"].includes(meta.generate)) throw new Error(`${file}: generate is "gallery", "a-z", "snippets", "ai", "ai-commands" or "notfound"`);
   if (meta.group && !NAME.test(meta.group)) throw new Error(`${file}: group "${meta.group}" is not a valid name`);
   // "Fits best" (decision 71): both keys on a pattern page of catalog, on no other page
   const fitsPage = isCatalogPattern(meta);
@@ -1229,7 +1230,8 @@ export function renderAZ(site, page) {
  */
 export function markCurrent(html, marks) {
   if (!marks?.size) return html;
-  return html.replace(/<(nav|ul)\b[\s\S]*?<\/\1>/g, (list) =>
+  // The lists of links, and the header's Documentation icon, which sits beside GitHub and not in a list
+  return html.replace(/<(nav|ul)\b[\s\S]*?<\/\1>|<a class="site-header__docs"[^>]*>/g, (list) =>
     list.replace(/<a\b([^>]*?)\shref="([^"]*)"([^>]*)>/g, (whole, before, value, after) =>
       marks.has(value) && !/\saria-current=|\shreflang=/.test(before + after) ? `<a${before} href="${value}"${after} aria-current="${marks.get(value)}">` : whole,
     ),
@@ -1498,7 +1500,7 @@ function renderPageIn(page, site, options) {
   const strings = { locale, used: options.used };
   const expanded = expand(page.body, { file: page.file, firstLine: page.bodyLine, partial: reader.partial, current, placeholders: false, ...strings });
   // "ai" is written inside the content, at its two markers, so it is known to the table of contents
-  const filled = withComponentLinks(page.meta.generate === "ai" ? fillAiMarkers(expanded, site, { file: page.file }) : expanded, page, site, options);
+  const filled = withComponentLinks(page.meta.generate === "ai" ? fillAiMarkers(expanded, site, { file: page.file }) : page.meta.generate === "ai-commands" ? fillCommandMarkers(expanded, site, { file: page.file }) : expanded, page, site, options);
   // `<!-- luz:generated -->` in the content puts the generated block where it stands, once
   const block = renderGenerated(page, site, options);
   const marked = filled.includes(GENERATED_MARKER);

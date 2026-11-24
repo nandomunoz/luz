@@ -1,0 +1,24 @@
+<!-- luz:page
+title: The commands of /luz
+description: Every command of /luz, with a real conversation of each.
+area: get-started
+order: 11
+generate: ai-commands
+keywords: luz, skill, commands, /luz, claude, codex, gemini, cursor, subcommand
+-->
+    <section class="docs-block" aria-labelledby="commands">
+      <h2 class="docs-chapter__title" id="commands">The commands</h2>
+      <p class="docs-lead">Type <code>/luz</code> in your assistant, with a subcommand or without. The word after it is the subcommand, and a word that is not in the table gets the table. The same names run in a terminal with <code>luz-ai</code>.</p>
+      <p>The conversations are real: each one is the text of a run of the skill that passed its checks, frozen as it was said, with the model and the date. They are English, whatever the language of this page, because that is what the assistant said. The output of the terminal is what the script prints when this site is built. <a href="/docs/get-started/ai/#skill">How to install the skill</a> is on the page about working with AI.</p>
+      <!-- luz:commands -->
+    </section>
+
+    <section class="docs-block" aria-labelledby="others">
+      <h2 class="docs-chapter__title" id="others">Other commands</h2>
+      <p class="docs-lead">Two skills of their own and one command for the terminal.</p>
+      <ul>
+        <li><code>/luz-readme</code> drafts or audits the README of a project, and removes the signs of machine writing from it. It is a skill of its own: <code>luz-ai skill add luz-readme</code> adds it.</li>
+        <li><code>/luz-landing</code> plans, builds or reviews a landing page, section by section, with its SEO and GEO. <code>luz-ai skill add luz-landing</code> adds it.</li>
+        <li><code>npx @luz-ds/ai init --target &lt;assistant&gt;</code> installs the skill for <code>claude</code>, <code>codex</code>, <code>gemini</code>, <code>cursor</code> or <code>agents-md</code>. It runs only in a terminal, never in the chat, and it never overwrites a file without <code>--force</code>.</li>
+      </ul>
+    </section>

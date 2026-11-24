@@ -1,6 +1,6 @@
 # @luz-ds/ai
 
-The luz-start skill for AI assistants. It asks what you want to make with LUZ, writes a starter page that [`@luz-ds/check`](https://www.npmjs.com/package/@luz-ds/check) reads without a finding, and finishes it with you. It can also add the agents and skills of luz-ai (accessibility, SEO, Core Web Vitals, AI features, a README, a landing page) to your project. It is a tool, not a stylesheet: it loads nothing in a page.
+The luz skill for AI assistants. It asks what you want to make with LUZ, writes a starter page that [`@luz-ds/check`](https://www.npmjs.com/package/@luz-ds/check) reads without a finding, and finishes it with you. It can also add the agents and skills of luz-ai (accessibility, SEO, Core Web Vitals, AI features, a README, a landing page) to your project. It is a tool, not a stylesheet: it loads nothing in a page.
 
 > **Beta, version 0.x.** This package has its own version, apart from tokens, core and catalog. Pin an exact version and read the changelog before you upgrade.
 
@@ -10,19 +10,37 @@ The luz-start skill for AI assistants. It asks what you want to make with LUZ, w
 npx @luz-ds/ai init --target claude
 ```
 
-That puts the skill in your project, where your assistant reads it. Then tell the assistant what you want to make: "a landing page for my booking app, with LUZ". It asks the rest in a few questions, shows you the plan, and writes nothing until you say go.
+That puts the skill in your project, where your assistant reads it. Type `/luz` (`$luz` in Codex), or tell the assistant what you want to make: "a landing page for my booking app, with LUZ". It asks the rest in a few questions, shows you the plan, and writes nothing until you say go.
 
 | `--target` | Writes | Read by |
 | --- | --- | --- |
-| `claude` | `.claude/skills/luz-start` | Claude Code |
-| `codex` | `.agents/skills/luz-start` | Codex |
-| `gemini` | `.agents/skills/luz-start` | Gemini CLI |
-| `cursor` | `.agents/skills/luz-start` | Cursor (it also reads `.claude/skills`) |
+| `claude` | `.claude/skills/luz` | Claude Code |
+| `codex` | `.agents/skills/luz` | Codex |
+| `gemini` | `.agents/skills/luz` | Gemini CLI |
+| `cursor` | `.agents/skills/luz` | Cursor (it also reads `.claude/skills`) |
 | `agents-md` | a short LUZ section for `AGENTS.md` | any assistant that reads it |
 
 Give several, comma separated: `--target claude,codex`. `--dry-run` shows what would be written and writes nothing. Nothing is overwritten without `--force`, and a `AGENTS.md` that exists is never touched: the section is printed for you to add. The command never asks a question: a missing `--target` is an error that says so.
 
 The folders are the ones each assistant documents. Claude Code reads `.claude/skills` and does not document `.agents/skills`; Codex, Gemini CLI and Cursor read `.agents/skills`.
+
+## The commands
+
+Type `/luz` in your assistant, with a subcommand or without. A word that is not in the table gets the table, never a guess.
+
+| In the chat | What it does | Writes |
+| --- | --- | --- |
+| `/luz` | Asks what you want to make, shows the plan, waits for your go, writes the starter page and finishes it with you. | yes, after "go" |
+| `/luz new <landing, blog, app or docs>` | The same, without asking the kind of site. | yes, after "go" |
+| `/luz doctor` | The project, its assistants, and the skills and agents it has. | no |
+| `/luz check [path]` | The front matter of the skills and agents of the project, or of the path. | no |
+| `/luz facts` | The versions, the kinds of site and the stacks of this release. | no |
+| `/luz agents` | The agents of luz-ai. | no |
+| `/luz skills` | The skills of luz-ai. | no |
+| `/luz add <name>` | Adds the agent or the skill you name, after asking its fields. | yes, after "go" |
+| `/luz help` | This table. | no |
+
+Each one has a real conversation, and what the script prints, on https://nandovejer.github.io/luz/docs/get-started/ai-commands/. `/luz-readme` and `/luz-landing` are skills of their own, and `init` runs only in a terminal.
 
 ## The script
 

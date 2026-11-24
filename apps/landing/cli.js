@@ -1,5 +1,5 @@
 /**
- * LUZ landing — the terminal of the luz-start skill (the home's fourth level and the hero of /ai/).
+ * LUZ landing — the terminal of the luz skill (the home's fourth level and the hero of /ai/).
  *
  * An emulation of a session with the skill, written by scripts/docs-site/cli-demo.js. The markup holds every
  * variant of the session; an element with `data-when` ("kind=blog stack=astro", "agent=<name>") belongs to some

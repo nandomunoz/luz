@@ -28,8 +28,8 @@ keywords: llms.txt, agent, claude, copilot, cursor, manifest, check
     </section>
 
     <section class="docs-block" aria-labelledby="skill">
-      <h2 class="docs-chapter__title" id="skill">Install the luz-start skill</h2>
-      <p class="docs-lead"><code>luz-start</code> asks what to make with LUZ and writes a starter page.</p>
+      <h2 class="docs-chapter__title" id="skill">Install /luz</h2>
+      <p class="docs-lead">Type <code>/luz</code> (<code>$luz</code> in Codex; with <code>agents-md</code>, say it in words). <a href="/docs/get-started/ai-commands/">All the commands</a>.</p>
       <p><code>@luz-ds/ai</code> is not on npm yet.</p>
       <div class="docs-snippet">
         <div class="docs-snippet__bar">
@@ -38,8 +38,8 @@ keywords: llms.txt, agent, claude, copilot, cursor, manifest, check
         </div>
         <pre class="luz-code-block" data-lang="bash" tabindex="0" role="region" aria-label="The command"><code id="code-skill-init">npx @luz-ds/ai init --target claude</code></pre>
       </div>
-      <p>Targets: <code>claude</code>, <code>codex</code>, <code>gemini</code>, <code>cursor</code>. <code>init</code> writes the folder each one reads.</p>
-      <p>It can add luz-ai's agents: a field you leave out stays <code>[ADAPT: …]</code>, and the agent stops and asks.</p>
+      <p>Targets: <code>claude</code>, <code>codex</code>, <code>gemini</code>, <code>cursor</code>. <code>init</code> writes the folder each one reads, and <code>/luz</code> for Gemini CLI and Cursor.</p>
+      <p>An added agent stops and asks about a field left as <code>[ADAPT: …]</code>.</p>
     </section>
 
     <section class="docs-block" aria-labelledby="files">

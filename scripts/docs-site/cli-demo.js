@@ -1,10 +1,10 @@
 /**
- * LUZ — the terminal of the luz-start skill ({{cli}}: the home's fourth level and the hero of /ai/).
+ * LUZ — the terminal of the luz skill ({{cli}}: the home's fourth level and the hero of /ai/).
  *
  * An emulation of a real session with the skill, in which the visitor answers: install it (`init`), open the
  * assistant, ask for a site, answer the skill's questions (the kind of site, the stack, what matters, which picks
  * the agents), see the plan, say go, and watch it write the starter page, check it and add the agents. What the
- * script prints is the script's own: every output line is read from `luz-start.mjs --dry-run` when the site is built
+ * script prints is the script's own: every output line is read from `luz.mjs --dry-run` when the site is built
  * ("would write" said as "wrote", since the session writes), for every kind of site, stack and agent, never typed.
  *
  * The markup holds every variant of the session. An element with `data-when` belongs to some answers only:
@@ -17,7 +17,7 @@ import { readFileSync, realpathSync } from "node:fs";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 
-const SCRIPT = "packages/ai/skills/luz-start/scripts/luz-start.mjs";
+const SCRIPT = "packages/ai/skills/luz/scripts/luz.mjs";
 
 /** The kinds of site of the first question, the recommended first. */
 export const CLI_KINDS = ["landing", "blog", "app", "docs"];
@@ -33,7 +33,7 @@ export const CLI_AGENTS = [
 /** The answers a session starts with, and the one the page shows without JavaScript. */
 export const CLI_DEFAULTS = { kind: "landing", stack: "vanilla", agents: ["luz-seo-geo-specialist", "luz-accessibility-auditor"] };
 /** A skill of luz-ai the session adds, for the kinds of site it is made for. */
-const CLI_SKILLS = { landing: "luz-create-landing" };
+const CLI_SKILLS = { landing: "luz-landing" };
 /** The name of the site in the commands: a name, the same in every language. */
 const SITE_NAME = "Vejer Books";
 
@@ -167,14 +167,14 @@ export function cliDemo({ say, root, escapeHtml }) {
     choices("go", t("inside.cli.go"), choice("go", "go", t("inside.cli.go.button"), true)),
     you(t("inside.cli.go.button")),
     // It writes the page and checks it
-    per(CLI_KINDS, (k) => per(CLI_STACKS, (s) => cmd(`luz-start site new --name "${SITE_NAME}" --kind ${k} --stack ${written(s)}`, `kind=${k} stack=${s}`))),
+    per(CLI_KINDS, (k) => per(CLI_STACKS, (s) => cmd(`luz-ai site new --name "${SITE_NAME}" --kind ${k} --stack ${written(s)}`, `kind=${k} stack=${s}`))),
     per(CLI_KINDS, (k) => per(CLI_STACKS, (s) => site[`${k}/${written(s)}`].lines.map((l) => out(l, `kind=${k} stack=${s}`)).join(""))),
     per(CLI_KINDS, (k) => per(["vanilla", "astro"], (s) => cmd(esc(site[`${k}/${s}`].next), `kind=${k} stack=${s}`))),
     cmd(esc(site["landing/vanilla"].next), "stack=react"),
     out(`✓ 0 blocking and 0 warnings in 1 file`),
     // It adds the skill and the agents
-    per(Object.entries(CLI_SKILLS), ([k, name]) => cmd(`luz-start skill add ${name}`, `kind=${k}`) + out(skills[name], `kind=${k}`)),
-    per(CLI_AGENTS, ([, name]) => cmd(`luz-start agent add ${name} --for claude`, `agent=${name}`) + agents[name].map((l) => out(l, `agent=${name}`)).join("")),
+    per(Object.entries(CLI_SKILLS), ([k, name]) => cmd(`luz-ai skill add ${name}`, `kind=${k}`) + out(skills[name], `kind=${k}`)),
+    per(CLI_AGENTS, ([, name]) => cmd(`luz-ai agent add ${name} --for claude`, `agent=${name}`) + agents[name].map((l) => out(l, `agent=${name}`)).join("")),
     skill(t("inside.cli.adapt")),
     // Done
     line(

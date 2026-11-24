@@ -552,6 +552,7 @@ const SUMMARY_POINTERS = new Map([
   ["/docs/tokens/figma/", "How to import the tokens file into Figma and other design tools, step by step: open its URL."],
   ["/docs/get-started/migrate/", "Moves a project that has its own CSS to LUZ one page at a time, in five steps: open its URL."],
   ["/docs/get-started/bundler/", "Imports LUZ in Astro and other build tools step by step, with the layer order and the fonts: open its URL."],
+  ["/docs/get-started/ai-commands/", ""],
 ]);
 
 // The accessibility statement is about LUZ, not about the markup an agent writes (what is checked, what has
@@ -569,7 +570,7 @@ const OUTLINE_POINTERS = new Map([
 // is not trimmed.
 const AI_ROUTE = "/docs/get-started/ai/";
 const AI_POINTER =
-  "The files an agent can read are in `llms.txt`. The commands, options and exit codes (`npx @luz-ds/check@" + CHECK + " --help`), a sample of the output, the fields of `--json` and the tables of files and rules are on the page.";
+  "The files an agent can read are in `llms.txt`. The options and exit codes (`npx @luz-ds/check@" + CHECK + " --help`), an output sample, the `--json` fields and the tables are on the page.";
 
 /** The first `<p>` of a piece of markup, as markup. */
 const firstParagraph = (html) => /<p\b[\s\S]*?<\/p>/.exec(html)?.[0] ?? "";
@@ -588,7 +589,8 @@ function twoItems(html) {
  * The body of the AI page for llms-full.txt, by the id of its h2. The prompt
  * of `start` is the one the head of the file already gives, so it is left out,
  * and so is the table of `files`. `check` is its first paragraph and a line
- * that says where the commands, the options and the tables are; `rules` its lead; `agent` its lead,
+ * that says where the commands, the options and the tables are; `rules` its lead; `skill` its lead, the note on npm and the
+ * command (how `init` writes each assistant's files is on the page); `agent` its lead,
  * the command and the two items that are about overwriting and reading; the
  * rest whole.
  */
@@ -602,6 +604,7 @@ function aiBodyOf(body, headings) {
     if (h.id === "check") parts.push(head, firstParagraph(section), `<p>${AI_POINTER}</p>`);
     else if (h.id === "rules") parts.push(head, firstParagraph(section));
     else if (h.id === "agent") parts.push(head, twoItems(section), `<p>${AI_AGENT_POINTER}</p>`);
+    else if (h.id === "skill") parts.push(head, section.slice(0, section.indexOf("</div>", section.indexOf("</pre>")) + 6));
     else parts.push(head, section);
   }
   return parts.join("\n");
@@ -866,8 +869,8 @@ function markupBlocks(page) {
 const LAYOUT_FIRST = ["sidebar", "navbar", "terminal", "timeline"].map((name) => `components/${name}.css`);
 const inCascadeOrder = (files) => [...LAYOUT_FIRST.filter((f) => files.includes(f)), ...files.filter((f) => !LAYOUT_FIRST.includes(f))];
 
-const escText = (text) => text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-const escAttr = (text) => escText(text).replace(/"/g, "&quot;");
+export const escText = (text) => text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+export const escAttr = (text) => escText(text).replace(/"/g, "&quot;");
 /** Text for a comment: `--` would end it. */
 const inComment = (text) => text.replace(/-{2,}/g, "-");
 
@@ -962,7 +965,7 @@ const WHAT = {
 
 const MADE_BY = { pages: "ai.made-pages", prompts: "ai.made-prompts", manifests: "ai.made-manifests" };
 
-const tOf = (site) => site.t ?? englishT();
+export const tOf = (site) => site.t ?? englishT();
 
 /**
  * The AI files of the Pages site as table rows, in this order: `llms.txt`,
@@ -1000,7 +1003,7 @@ export function aiArtifacts(site, { siteUrl = "" } = {}) {
 const MARKER = /^([ \t]*)<!-- luz:ai ([a-z]+) -->[ \t]*$/gm;
 
 /** A scrollable, labelled luz-table: `columns` are the headers, `rows` arrays of cell HTML. */
-function tableOf(label, columns, rows, lang = "", regionLabel = label) {
+export function tableOf(label, columns, rows, lang = "", regionLabel = label) {
   const head = columns.map((c) => `<th scope="col">${c}</th>`).join("");
   const body = rows.map((cells) => `<tr>${cells.map((cell, i) => `<td data-label="${columns[i]}"><div>${cell}</div></td>`).join("")}</tr>`);
   return [

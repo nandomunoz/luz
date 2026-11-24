@@ -1,0 +1,23 @@
+<!-- luz:page
+title: Los comandos de /luz
+description: Cada comando de /luz, con una conversación real de cada uno.
+keywords: luz, skill, comandos, /luz, claude, codex, gemini, cursor, subcomando
+source: 3f528a5b96ce
+reviewed: false
+-->
+    <section class="docs-block" aria-labelledby="commands">
+      <h2 class="docs-chapter__title" id="commands">Los comandos</h2>
+      <p class="docs-lead">Escribe <code>/luz</code> en tu asistente, con un subcomando o sin él. La palabra que sigue es el subcomando, y una palabra que no está en la tabla recibe la tabla. Los mismos nombres se ejecutan en una terminal con <code>luz-ai</code>.</p>
+      <p>Las conversaciones son reales: cada una es el texto de una ejecución de la skill que pasó sus comprobaciones, congelado tal como se dijo, con el modelo y la fecha. Están en inglés, sea cual sea el idioma de esta página, porque es lo que dijo el asistente. La salida de la terminal es lo que imprime el script cuando se construye este sitio. <a href="/docs/get-started/ai/#skill">Cómo instalar la skill</a> está en la página sobre trabajar con IA.</p>
+      <!-- luz:commands -->
+    </section>
+
+    <section class="docs-block" aria-labelledby="others">
+      <h2 class="docs-chapter__title" id="others">Otros comandos</h2>
+      <p class="docs-lead">Dos skills propias y un comando para la terminal.</p>
+      <ul>
+        <li><code>/luz-readme</code> redacta o audita el README de un proyecto y le quita las señales de escritura automática. Es una skill propia: <code>luz-ai skill add luz-readme</code> la añade.</li>
+        <li><code>/luz-landing</code> planifica, construye o revisa una landing, sección a sección, con su SEO y GEO. <code>luz-ai skill add luz-landing</code> la añade.</li>
+        <li><code>npx @luz-ds/ai init --target &lt;assistant&gt;</code> instala la skill para <code>claude</code>, <code>codex</code>, <code>gemini</code>, <code>cursor</code> o <code>agents-md</code>. Solo se ejecuta en una terminal, nunca en el chat, y nunca sobrescribe un archivo sin <code>--force</code>.</li>
+      </ul>
+    </section>

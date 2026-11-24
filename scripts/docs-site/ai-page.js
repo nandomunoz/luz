@@ -1,9 +1,9 @@
 /**
- * LUZ — the page of the luz-start skill (apps/landing/levels/ai.html, route /ai/).
+ * LUZ — the page of the luz skill (apps/landing/levels/ai.html, route /ai/).
  *
  * For a developer who does not yet know what `@luz-ds/ai` gives: what the skill does, the agents and skills it can
  * add to a project, the assistants it installs itself for, and what it never does. Everything that is a fact of the
- * package is read from `packages/ai/skills/luz-start/` and never typed:
+ * package is read from `packages/ai/skills/luz/` and never typed:
  *
  *  - the agents: `assets/agents/*.md`, their `name` and `tools`. An agent with a tool of `acting` (tool-map.json)
  *    changes code; the others only read and propose. An acting tool with no verified name for Gemini CLI leaves the
@@ -18,10 +18,11 @@
  */
 import { readFileSync, readdirSync } from "node:fs";
 import { resolve } from "node:path";
+import { commandRows } from "./ai-commands.js";
 
-const SKILL_DIR = "packages/ai/skills/luz-start";
+const SKILL_DIR = "packages/ai/skills/luz";
 
-/** The commands the page explains, in the order a person meets them; each is a command of `luz-start --help`. */
+/** The commands the page explains, in the order a person meets them; each is a command of `luz-ai --help`. */
 export const AI_COMMANDS = ["init", "site new", "agent add", "skill add", "doctor", "check"];
 
 /** The assistant each target of `init` is for: names of products, not words to translate (agents-md is the catalog's). */
@@ -42,7 +43,7 @@ function frontMatter(text, file) {
   return fields;
 }
 
-/** The agents and skills luz-start carries, and the assistants it installs itself for. */
+/** The agents and skills luz carries, and the assistants it installs itself for. */
 export function aiFacts(root) {
   const dir = resolve(root, SKILL_DIR);
   const map = JSON.parse(readFileSync(resolve(dir, "assets/tool-map.json"), "utf-8"));
@@ -60,8 +61,8 @@ export function aiFacts(root) {
     .filter((e) => e.isDirectory())
     .map((e) => frontMatter(readFileSync(resolve(dir, "assets/skills", e.name, "SKILL.md"), "utf-8"), `${SKILL_DIR}/assets/skills/${e.name}/SKILL.md`).name)
     .sort();
-  const line = /^const INIT_TARGETS = (\{.*\});$/m.exec(readFileSync(resolve(dir, "scripts/luz-start.mjs"), "utf-8"));
-  if (!line) throw new Error(`${SKILL_DIR}/scripts/luz-start.mjs: no line "const INIT_TARGETS = {…};" to read the assistants of init from`);
+  const line = /^const INIT_TARGETS = (\{.*\});$/m.exec(readFileSync(resolve(dir, "scripts/luz.mjs"), "utf-8"));
+  if (!line) throw new Error(`${SKILL_DIR}/scripts/luz.mjs: no line "const INIT_TARGETS = {…};" to read the assistants of init from`);
   const INIT_TARGETS = JSON.parse(line[1].replace(/([{,]\s*)([a-z]+):/g, '$1"$2":'));
   const targets = Object.entries(INIT_TARGETS).map(([id, folders]) => ({ id, assistant: ASSISTANTS[id] ?? null, folder: folders[0] ?? "AGENTS.md" }));
   const dependencies = Object.keys(JSON.parse(readFileSync(resolve(root, "packages/ai/package.json"), "utf-8")).dependencies ?? {}).length;
@@ -77,6 +78,14 @@ export function aiSections({ say, root, block, escapeHtml }) {
   const { agents, skills, targets, dependencies } = aiFacts(root);
   const code = (text) => `<code>${escapeHtml(text)}</code>`;
   const docs = [{ href: "/docs/get-started/ai/#skill", label: t("level.ai.docs"), count: "" }];
+
+  const chat = [
+    `<table class="luz-table landing-ai__table">`,
+    `<thead><tr><th scope="col">${t("level.ai.does.command")}</th><th scope="col">${t("level.ai.does.what")}</th><th scope="col">${t("level.ai.commands.writes")}</th></tr></thead>`,
+    `<tbody>${commandRows(root).map((r) => `<tr><th scope="row">${code(r.chat)}</th><td>${t(`level.ai.chat.${r.slug}`)}</td><td>${t(r.writes ? "level.ai.commands.yes" : "level.ai.commands.no")}</td></tr>`).join("")}</tbody>`,
+    `</table>`,
+  ].join("");
+  const commandsDocs = [{ href: "/docs/get-started/ai-commands/", label: t("level.ai.commands.link"), count: "" }];
 
   const commands = [
     `<table class="luz-table landing-ai__table">`,
@@ -110,6 +119,7 @@ export function aiSections({ say, root, block, escapeHtml }) {
   const limits = `<ul class="landing-ai__limits">${[1, 2, 3, 4, 5].map((n) => `<li>${t(`level.ai.limits.${n}`)}</li>`).join("")}</ul>`;
 
   const BLOCKS = [
+    ["commands", `<div class="landing-ai__scroll" tabindex="0" role="region" aria-label="${t("level.ai.commands.title")}">${chat}</div>`, commandsDocs],
     ["does", `<div class="landing-ai__scroll" tabindex="0" role="region" aria-label="${t("level.ai.does.command")}">${commands}</div>`, docs],
     ["agents", `<div class="landing-cards">${agentCards}</div>`, []],
     ["skills", `<div class="landing-cards">${skillCards}</div>`, []],
