@@ -439,7 +439,6 @@
   "level.ai.skills.title": "Skills para el trabajo alrededor del sitio",
   "level.ai.skills.lead": "Recetas que sigue tu asistente cuando se las pides. Solo añade las que eliges.",
   "level.ai.skill.luz-create-landing": "Planifica, construye o revisa una landing, sección a sección, con su SEO y GEO.",
-  "level.ai.skill.luz-create-video": "Hace un tráiler animado de tu proyecto para compartirlo.",
   "level.ai.skill.luz-readme": "Escribe o reescribe el README de tu proyecto.",
   "level.ai.assistants.title": "Funciona con el asistente que usas",
   "level.ai.assistants.lead": "La misma skill para todos los asistentes: init la escribe en la carpeta que lee cada uno.",

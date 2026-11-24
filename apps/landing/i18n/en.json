@@ -439,7 +439,6 @@
   "level.ai.skills.title": "Skills for the work around the site",
   "level.ai.skills.lead": "Recipes your assistant follows when you ask for them. It adds only the ones you choose.",
   "level.ai.skill.luz-create-landing": "Plans, builds or reviews a landing page, section by section, with its SEO and GEO.",
-  "level.ai.skill.luz-create-video": "Makes an animated trailer of your project to share.",
   "level.ai.skill.luz-readme": "Writes or rewrites the README of your project.",
   "level.ai.assistants.title": "Works with the assistant you use",
   "level.ai.assistants.lead": "The same skill for every assistant: init writes it to the folder each one reads.",

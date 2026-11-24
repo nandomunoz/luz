@@ -62,7 +62,7 @@ Loading LUZ from a CDN sends your visitors' IP addresses to the CDN. If you do n
 
 The starter pages load LUZ from a CDN, as the prompts of the site do, so tell the person who publishes the site.
 
-LUZ is not affiliated with Anthropic, OpenAI, Google, Anysphere (Cursor) or HeyGen. Claude Code, Codex, Gemini CLI, Cursor and HyperFrames are named only to say which files each reads; their names belong to their owners.
+LUZ is not affiliated with Anthropic, OpenAI, Google or Anysphere (Cursor). Claude Code, Codex, Gemini CLI and Cursor are named only to say which files each reads; their names belong to their owners.
 
 Gemini CLI has no verified name here for every tool, so the one agent that needs to edit files and run commands (`luz-core-web-vitals-optimizer`) is written for Claude Code and Codex only.
 

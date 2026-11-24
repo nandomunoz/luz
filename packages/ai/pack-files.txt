@@ -13,7 +13,6 @@ dist/skills/luz-start/assets/skills/luz-create-landing/references/anatomy-integr
 dist/skills/luz-start/assets/skills/luz-create-landing/references/anatomy-standard.md
 dist/skills/luz-start/assets/skills/luz-create-landing/references/decision.md
 dist/skills/luz-start/assets/skills/luz-create-landing/references/seo-geo.md
-dist/skills/luz-start/assets/skills/luz-create-video/SKILL.md
 dist/skills/luz-start/assets/skills/luz-readme/SKILL.md
 dist/skills/luz-start/assets/skills/luz-readme/references/ai-tells.md
 dist/skills/luz-start/assets/skills/luz-readme/references/anatomy.md
