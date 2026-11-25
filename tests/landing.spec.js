@@ -613,6 +613,59 @@ test.describe('Landing page', () => {
       expect(kb(await section.innerText()), 'no weight in KB').toBeNaN();
     });
 
+    for (const id of ['tokens', 'core', 'catalog', 'ai']) {
+      test(`#${id}: on a wide screen both columns are sticky: scrolled into the section, the shorter one stays under the header while the longer goes by`, async ({ page }) => {
+        await page.setViewportSize({ width: 1280, height: 600 });
+        await open(page);
+        const section = page.locator(`section#${id}`);
+        const got = await section.evaluate(async (el) => {
+          const cols = [...el.children];
+          const styles = cols.map((c) => ({ position: getComputedStyle(c).position, align: getComputedStyle(c).alignSelf }));
+          const [a, b] = cols.map((c) => c.getBoundingClientRect().height);
+          const short = cols[a <= b ? 0 : 1];
+          const header = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--site-header-h')) || 0;
+          // Halfway into the difference of heights: the short one has stuck, the section has not ended
+          const top = el.getBoundingClientRect().top + window.scrollY;
+          window.scrollTo({ top: top + Math.abs(a - b) / 2, behavior: 'instant' });
+          await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+          return { styles, diff: Math.abs(a - b), shortTop: short.getBoundingClientRect().top, sectionTop: el.getBoundingClientRect().top, header };
+        });
+        for (const s of got.styles) expect(s).toEqual({ position: 'sticky', align: 'start' });
+        if (got.diff > 40) {
+          expect(got.shortTop, 'the shorter column stays in view').toBeGreaterThan(got.sectionTop + 20);
+          expect(got.shortTop, 'under the header').toBeGreaterThanOrEqual(got.header);
+        }
+      });
+
+      test(`#${id}: each point's icon sits on its first line, and the button has more room above it than the points have between them`, async ({ page }) => {
+        await page.setViewportSize({ width: 360, height: 900 });
+        await open(page);
+
+        const section = page.locator(`section#${id}`);
+        const got = await section.evaluate((el) => {
+          const items = [...el.querySelectorAll('.landing-inside__points > li')].map((li) => {
+            const icon = li.querySelector('svg').getBoundingClientRect();
+            // The span is a flex item: its first line is its top plus one line-height
+            const span = li.querySelector('span');
+            const box = span.getBoundingClientRect();
+            const line = parseFloat(getComputedStyle(span).lineHeight);
+            return { iconTop: icon.top, iconBottom: icon.bottom, lineTop: box.top, lineBottom: box.top + line, wraps: box.height > line * 1.5 };
+          });
+          const list = el.querySelector('.landing-inside__points');
+          const actions = el.querySelector('.landing-inside__copy > .o-actions');
+          const gapInside = parseFloat(getComputedStyle(list).rowGap);
+          const above = actions.getBoundingClientRect().top - list.getBoundingClientRect().bottom;
+          return { items, gapInside, above };
+        });
+        expect(got.items.some((i) => i.wraps), 'at 360 px a point wraps').toBe(true);
+        for (const i of got.items) {
+          expect(i.iconTop, 'the icon starts within the first line').toBeGreaterThanOrEqual(i.lineTop - 1);
+          expect(i.iconBottom, 'the icon ends within the first line').toBeLessThanOrEqual(i.lineBottom + 1);
+        }
+        expect(got.above, 'the button stands apart from the points').toBeGreaterThan(got.gapInside * 2);
+      });
+    }
+
     test('each level weighs what the ones below it weigh, and a little more', async ({ page }) => {
       await open(page);
 
