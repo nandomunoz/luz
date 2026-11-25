@@ -208,7 +208,7 @@ initSiteHeader();
 initCopy();
 initModes();
 initCli();
-// The panels of "What's inside": install, code and result
+// The panels of "What's inside": install, code and result; level 4's, install and use
 for (const panel of document.querySelectorAll(".landing-panel")) {
   initTabs(panel);
   initTabCycle(panel);

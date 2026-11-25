@@ -292,8 +292,11 @@ a {
          init prints, then the assistant and the request. The generator
          (scripts/docs-site/cli-demo.js, {{cliinstall}}) writes it from the
          script's own output; it stays still, with nothing to answer, and the
-         command has its copy button (hidden until the script shows it). The
-         page of the skill, /ai/, has the terminal of a whole session. Left to
+         command has its copy button (hidden until the script shows it). Two
+         tabs (owner, 2026-11-25): Install, npm and the usual commands of
+         luz-ai, and Use, that terminal, which plays only while its tab is
+         open. The page of the
+         skill, /ai/, has the terminal of a whole session. Left to
          right in every language, as a terminal is -->
     <section class="landing-inside landing-inside--flip" id="ai" aria-labelledby="ai-title">
         <div class="landing-inside__copy">
@@ -305,10 +308,39 @@ a {
             <li><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h9m4 0h3M4 17h3m4 0h9M15 5v4M9 15v4"/></svg><span><strong>{{t:inside.l4.p2.name}}</strong> {{t:inside.l4.p2.text}}</span></li>
             <li><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="m8.5 12 2.5 2.5 4.5-5"/></svg><span><strong>{{t:inside.l4.p3.name}}</strong> {{t:inside.l4.p3.text}}</span></li>
           </ul>
-          <p class="landing-cli__note"><span class="luz-badge luz-badge--primary">{{t:inside.l4.soon}}</span> <a href="/docs/kinds/">{{t:inside.l4.meanwhile}}</a></p>
           <div class="o-actions"><a class="luz-btn luz-btn--outline" href="{{home}}ai/">{{t:inside.l4.all}}</a></div>
         </div>
-        {{cliinstall}}
+        <div class="landing-inside__side">
+          <div class="landing-panel landing-clitabs">
+            <nav class="luz-tabs luz-tabs--pill" aria-label="{{t:inside.l4.tabs}}">
+              <a class="luz-tab" href="#ai-install"><svg class="ic" aria-hidden="true"><use href="#i4"/></svg><span>{{t:inside.tab.install}}</span></a>
+              <a class="luz-tab" href="#ai-use"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 5h15v10.5H10L6 19v-3.5H4.5Z"/></svg><span>{{t:inside.tab.use}}</span></a>
+            </nav>
+            <div class="luz-tabpanel landing-clitabs__pane" id="ai-install">
+              <div class="landing-install">
+                <div class="landing-install__bar">
+                  <span class="landing-install__label">{{t:inside.install.npm}}</span>
+                  <button class="luz-copy-btn" type="button" data-copy-from="ai-npm" aria-label="{{t:inside.copy.npm}}" hidden>{{t:see.copy}}</button>
+                </div>
+                <pre class="luz-code-block" data-lang="bash" dir="ltr" tabindex="0" role="region" aria-label="{{t:inside.install.npm}}"><code id="ai-npm">npx @luz-ds/ai init</code></pre>
+              </div>
+              <div class="landing-install">
+                <div class="landing-install__bar">
+                  <span class="landing-install__label">{{t:inside.l4.commands}}</span>
+                </div>
+                <pre class="luz-code-block" data-lang="shell" dir="ltr" tabindex="0" role="region" aria-label="{{t:inside.l4.commands}}"><code id="ai-commands">luz-ai site new --kind landing
+luz-ai skill add luz-landing
+luz-ai agent add luz-seo-geo-specialist
+luz-ai doctor
+npx @luz-ds/check</code></pre>
+              </div>
+            </div>
+            <div class="luz-tabpanel landing-clitabs__pane" id="ai-use">
+              {{cliinstall}}
+            </div>
+          </div>
+          <p class="landing-cli__note"><span class="luz-badge luz-badge--primary">{{t:inside.l4.soon}}</span> <a href="/docs/kinds/">{{t:inside.l4.meanwhile}}</a></p>
+        </div>
       </section>
 
 

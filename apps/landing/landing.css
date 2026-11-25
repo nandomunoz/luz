@@ -724,7 +724,7 @@ home-light:defined ~ .landing-light__nojs {
   /* The tab the loop opens comes in softly: a short fade, from a little
      lower. Only after a turn (data-turned), so nothing fades when the panel
      first comes into view */
-  .landing-panel[data-cycle][data-turned] .landing-panel__pane:not([hidden]) {
+  .landing-panel[data-cycle][data-turned] :is(.landing-panel__pane, .landing-clitabs__pane):not([hidden]) {
     animation: landing-pane-in var(--luz-duration-slower) var(--luz-easing-enter) both;
   }
 }
@@ -954,7 +954,8 @@ home-light:defined ~ .landing-light__nojs {
   }
 }
 
-.landing-panel .luz-code-block {
+.landing-panel .luz-code-block,
+.landing-clitabs .landing-install .luz-code-block {
   margin: 0;
   overflow: auto;
   background: transparent;
@@ -1023,7 +1024,8 @@ home-light:defined ~ .landing-light__nojs {
 }
 
 /* The tab says what the code is: no language label over the copy button */
-.landing-panel .luz-code-block::before {
+.landing-panel .luz-code-block::before,
+.landing-clitabs .landing-install .luz-code-block::before {
   display: none;
 }
 
@@ -5047,7 +5049,7 @@ home-light:defined ~ .landing-light__nojs {
   font-size: var(--luz-text-xs);
 }
 
-/* Under the words: the skill is not published yet, and the way to the
+/* Under the panel: the skill is not published yet, and the way to the
    prompts that do its job until it is */
 .landing-cli__note {
   display: flex;
@@ -5297,6 +5299,33 @@ home-light:defined ~ .landing-light__nojs {
   to {
     clip-path: inset(0);
   }
+}
+
+/* The two tabs above the terminal: Install and Use; without a script both
+   terminals show, one under the other */
+/* Level 4's side: the panel of the tabs, and under it the note that the
+   skill is not published yet, with the way to the docs meanwhile */
+.landing-inside__side {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--luz-space-md);
+  align-content: start;
+  min-inline-size: 0;
+}
+
+/* Level 4's panel (.landing-panel: its frame, and its tabs that turn by
+   themselves): its panes take their own height, and a gap under the tabs */
+.landing-clitabs {
+  gap: var(--luz-space-sm);
+  align-self: start;
+}
+
+/* Only the open tab: a closed one is hidden (until-found), which this must not undo */
+.landing-clitabs__pane:not([hidden]) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--luz-space-sm);
+  min-inline-size: 0;
 }
 
 .landing-cli__caption {
