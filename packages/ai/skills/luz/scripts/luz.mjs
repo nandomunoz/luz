@@ -526,7 +526,7 @@ function runDoctor(dir) {
       const a = tree(join(first, entry.name));
       const b = tree(join(second, entry.name));
       const differ = [...new Set([...a.keys(), ...b.keys()])].filter((k) => a.get(k) !== b.get(k));
-      if (differ.length) warnings.push(`${entry.name} is not the same in ${SKILL_PLACES[0]} and ${SKILL_PLACES[1]} (${differ.slice(0, 3).join(", ")}${differ.length > 3 ? ", …" : ""}): run init --target claude,codex --force`);
+      if (differ.length) warnings.push(`${entry.name} is not the same in ${SKILL_PLACES[0]} and ${SKILL_PLACES[1]} (${differ.slice(0, 3).join(", ")}${differ.length > 3 ? ", …" : ""}): ${entry.name === SELF ? "run init --target claude,codex --force" : "make the two copies the same"}`);
     }
   }
   const { checked, problems: found } = runCheck([], dir);

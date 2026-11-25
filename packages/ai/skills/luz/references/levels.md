@@ -16,7 +16,7 @@ LUZ has three packages, each needing the one before it:
 | A new site, or a refactor onto LUZ | Tokens, core, and the catalog stylesheets of the kind of site |
 | An existing project that gets some LUZ pieces | Tokens and core first, then the catalog pieces they name, page by page |
 
-For a new site the starter page already links the right set for its kind: `site new` wrote it. Link only the catalog stylesheets a page uses, after core, in the order the starter page has.
+For a new site the starter page links the stylesheets that fit its kind, so that a section added later already has its styles: `site new` wrote them. When the page is finished, remove the ones the page does not use. Link them after core, in the order the starter page has.
 
 ## Refactoring a site onto LUZ
 
