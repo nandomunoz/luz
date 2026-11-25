@@ -45,12 +45,40 @@ const unescape = (text) => text.replace(/&quot;/g, '"').replace(/&lt;/g, "<").re
 const conditioned = [...terminal.matchAll(/<[a-z]+\b[^>]*\sdata-when="([^"]*)"[^>]*>/g)].map((m) => ({ when: m[1], hidden: /\shidden\b/.test(m[0]) }));
 
 describe("the template of level 4 and the terminal the generator writes", () => {
-  it("the templates leave the terminal to the generator: the home's {{cliloop}} and the skill's page {{cli}}, once each", () => {
-    expect(level4.match(/\{\{cliloop\}\}/g)).toHaveLength(1);
-    expect(level4).not.toMatch(/\{\{cli\}\}/);
+  it("the skill's page has the terminal of a whole session ({{cli}}); the home, a person installing the skill ({{cliinstall}}), once each (owner, 2026-11-25)", () => {
     expect(aiPage.match(/\{\{cli\}\}/g)).toHaveLength(1);
-    expect(aiPage).not.toMatch(/\{\{cliloop\}\}/);
+    expect(level4.match(/\{\{cliinstall\}\}/g)).toHaveLength(1);
+    expect(level4).not.toMatch(/\{\{cli(loop)?\}\}/);
     expect(level4).not.toContain("landing-cli__line");
+  });
+
+  it("the home's terminal installs the skill for each assistant, one round each: the command, what init prints, then the assistant and the request", () => {
+    const install = written.cliinstall;
+    expect(install).toMatch(/^<figure class="landing-cli landing-cli--install" dir="ltr" aria-label="[^"]+" data-landing-cli="loop" data-rounds="target=claude target=codex target=gemini target=cursor">/);
+    const lineOf = (html) => html.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
+    const linesFor = (target) =>
+      [...install.matchAll(/<p class="landing-cli__line[^"]*"( data-when="([^"]*)")?( hidden)?>([\s\S]*?)<\/p>/g)]
+        .filter((m) => !m[2] || m[2] === `target=${target}`)
+        .map((m) => ({ text: lineOf(m[4]), hidden: Boolean(m[3]) }));
+    const opens = { claude: "claude", codex: "codex", gemini: "gemini", cursor: "cursor-agent" };
+    const calls = { claude: "/luz", codex: "$luz", gemini: "/luz", cursor: "/luz" };
+    for (const target of Object.keys(opens)) {
+      const lines = linesFor(target);
+      expect(lines[0].text, target).toBe(`$ npx @luz-ds/ai init --target ${target}`);
+      expect(lines.at(-2).text, target).toBe(`$ ${opens[target]}`);
+      expect(lines.at(-1).text, target).toBe(`› ${catalogs.en["level.ai.steps.2.ask"].replace("/luz", calls[target])}`);
+      // What init prints for it, from its own dry run: the first line and the "next:"
+      const real = execFileSync(process.execPath, [SCRIPT, "init", "--target", target, "--dry-run"], { cwd: tmpdir(), encoding: "utf-8" }).split("\n");
+      expect(lines.slice(1, -2).map((l) => l.text), target).toEqual([real[0].replace("would write", "wrote"), real.find((l) => l.startsWith("next: "))]);
+      // Claude Code's round is the one shown without JavaScript; the others are hidden
+      for (const line of lines) expect(line.hidden, `${target}: ${line.text}`).toBe(target !== "claude");
+    }
+    expect(install).toMatch(/<code id="home-ai-init">npx @luz-ds\/ai init --target claude<\/code>/);
+    expect(install).toMatch(/<button class="luz-copy-btn" type="button" data-copy-from="home-ai-init" aria-label="[^"]+" hidden>/);
+    // A loop: a button pauses it (WCAG 2.2.2), hidden until the script shows it; nothing to answer
+    expect(install).toMatch(/<button class="luz-btn luz-btn--ghost luz-btn--sm landing-cli__pause" type="button" hidden>/);
+    expect(install).not.toMatch(/landing-cli__(next|choices)/);
+    expect(install).toContain(`<figcaption class="landing-cli__caption">${escapeHtml(catalogs.en["inside.l4.install.tested"])}</figcaption>`);
   });
 
   it("is a terminal, left to right, named, with its screen a polite live region", () => {

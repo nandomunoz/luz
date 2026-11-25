@@ -36,7 +36,7 @@ const sectionOf = (html, id) => {
   const next = html.indexOf("<section", start + 1);
   return html.slice(start, next < 0 ? html.indexOf("</main>", start) : next);
 };
-const terminalOf = (html) => /<figure class="landing-cli"[\s\S]*?<\/figure>/.exec(html)?.[0] ?? "";
+const terminalOf = (html) => /<figure class="landing-cli[ "][\s\S]*?<\/figure>/.exec(html)?.[0] ?? "";
 /** The lines of a terminal: the home's loops them, the page of the skill's lets the visitor answer, and both say the same session. */
 const screenOf = (html) => /<div class="landing-cli__screen"[^>]*>([\s\S]*)<\/div>\n<button/.exec(terminalOf(html))?.[1] ?? "";
 
@@ -56,13 +56,15 @@ describe("the page of the luz skill, /ai/", () => {
     expect(/<title>([^<]*)<\/title>/.exec(html)[1]).toBe(escape(catalog(code)["level.ai.meta.title"]));
   });
 
-  it.each(LANGS)("in %s: the hero's live part is the home's terminal, the same session, the visitor answering it, once", (code, prefix) => {
+  it.each(LANGS)("in %s: the hero's live part is the terminal of the whole session, the visitor answering it, once; the home's is the install, a loop", (code, prefix) => {
     const hero = sectionOf(rendered.get(`${prefix}ai/`), "hero");
     expect(hero).toMatch(/^<section class="landing-intro\b/);
     const cli = terminalOf(hero);
     expect(cli).not.toBe("");
     expect(screenOf(hero)).not.toBe("");
-    expect(screenOf(hero)).toBe(screenOf(rendered.get(prefix)));
+    // The home's terminal is another one since 2026-11-25 (owner): a person installing the skill, played by itself
+    expect(screenOf(hero)).not.toBe(screenOf(rendered.get(prefix)));
+    expect(terminalOf(rendered.get(prefix))).toMatch(/landing-cli--install/);
     expect(cli).toMatch(/data-landing-cli>/);
     expect(cli).toContain("landing-cli__next");
     expect(terminalOf(rendered.get(prefix))).toMatch(/data-landing-cli="loop"/);

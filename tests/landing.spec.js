@@ -715,13 +715,13 @@ test.describe('Landing page', () => {
     });
 
     for (const [route, lang] of ROUTES) {
-      test(`${route}: level 4 is the terminal of the LUZ skill to come, with no prompt and no card of a kind of site, and the words say it is not published yet (${lang})`, async ({ page }) => {
+      test(`${route}: level 4 is a terminal that installs the LUZ skill to come, with no prompt and no card of a kind of site, and the words say it is not published yet (${lang})`, async ({ page }) => {
         const words = catalog(lang);
         await open(page, route);
 
-        const cli = page.locator('#ai figure.landing-cli');
-        await expect(cli).toHaveAccessibleName(words['inside.l4.panel']);
-        await expect(cli).toContainText('npx @luz-ds/ai');
+        const cli = page.locator('#ai figure.landing-cli--install');
+        await expect(cli).toHaveAccessibleName(words['inside.l4.install.title']);
+        await expect(cli).toContainText('npx @luz-ds/ai init --target claude');
         await expect(page.locator('#ai .landing-kind, #ai [data-prompt-open], #ai a[href^="/prompts/"]')).toHaveCount(0);
         await expect(page.locator('#ai .landing-cli__note')).toContainText(words['inside.l4.soon']);
         // The way to the prompts until the skill is out: the kinds of site in the docs of the language; Arabic has none yet, so it says it is English
@@ -968,10 +968,10 @@ test.describe('Landing page', () => {
       for (const { n } of LEVELS) {
         for (const pane of ['install', 'list', 'code']) await expect(page.locator(`#${LEVEL_ID[n]}-${pane}`), `level ${n} ${pane}`).toBeVisible();
       }
-      // Level 4 has no install panes: its terminal shows the session of the default answers, still (the other
-      // answers stay hidden: tests/home-cli.spec.js), and the way to the prompts is a link
+      // Level 4 has no panes: its terminal shows Claude Code's install whole, still (the other assistants' lines stay
+      // hidden: tests/home-cli.spec.js), and the way to the prompts is a link
       const lines = page.locator('#ai .landing-cli__line:not([hidden])');
-      expect(await lines.count()).toBeGreaterThanOrEqual(25);
+      expect(await lines.count()).toBeGreaterThanOrEqual(5);
       await expect(page.locator('#ai .landing-cli__line:visible')).toHaveCount(await lines.count());
       await expect(page.locator('#ai a[href="/docs/kinds/"]')).toBeVisible();
     });
@@ -979,10 +979,10 @@ test.describe('Landing page', () => {
     test('the controls that need a script are not shown: the Copy buttons', async ({ page }) => {
       await page.goto('/');
 
-      // Levels 1 to 3 have two each (npm, CDN); level 4 is a prompt, with nothing to copy from the page
-      const copy = page.locator('#tokens [data-copy-from], #core [data-copy-from], #catalog [data-copy-from]');
-      expect(await copy.count()).toBeGreaterThanOrEqual(6);
-      await expect(page.locator('#ai [data-copy-from]')).toHaveCount(0);
+      // Levels 1 to 3 have two each (npm, CDN); level 4 one, the install command in its terminal
+      const copy = page.locator('#tokens [data-copy-from], #core [data-copy-from], #catalog [data-copy-from], #ai [data-copy-from]');
+      expect(await copy.count()).toBeGreaterThanOrEqual(7);
+      await expect(page.locator('#ai [data-copy-from]')).toHaveCount(1);
       for (const control of await copy.all()) await expect(control).toBeHidden();
     });
 
