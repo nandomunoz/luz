@@ -43,7 +43,7 @@
       { "href": "/docs/components/" },
       { "href": "/docs/get-started/" }
     ] },
-    { "id": "html", "label": "HTML elements", "slug": "html", "package": "@luz-ds/core", "essentials": [
+    { "id": "html", "label": "HTML elements", "slug": "html", "package": "@luz-ds/core", "nestIn": "catalog", "essentials": [
       { "href": "/docs/a-z/" },
       { "href": "/docs/components/form-inputs/" },
       { "href": "/docs/components/" }

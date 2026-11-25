@@ -603,7 +603,9 @@ export function renderNav(site, page) {
     `<li>${link(p.route, p.meta.title, ` class="luz-sidebar__link"${p.fallback && !listIsEnglish ? enLang(site) : ""}${p.route === page.route ? ' aria-current="page"' : ""}`)}</li>`;
   const mark = (area) => {
     const route = areaRoute(area, root);
-    return current?.id !== area.id ? "" : page.route === route ? ' aria-current="page"' : ' aria-current="true"';
+    // The area of the current page, and the area it is nested in (the HTML elements, in Catalog), are the ones marked "true"
+    if (current?.id !== area.id && current?.nestIn !== area.id) return "";
+    return page.route === route ? ' aria-current="page"' : ' aria-current="true"';
   };
   const areaHead = (area, attrs) => {
     const route = areaRoute(area, root);
@@ -626,15 +628,31 @@ export function renderNav(site, page) {
         "</ul></li>",
       ];
     });
-  const items = site.areas.map((area) => {
+  // An area with `nestIn` has no fold of its own: its index and its pages are a labelled group at the end of the fold of the
+  // area it is nested in (the HTML elements, in Catalog), and the fold of that area is the one open on its pages
+  const nestedIn = (area) => site.areas.filter((a) => a.nestIn === area.id);
+  const nestedGroup = (nested) => {
+    const own = listOf(nested);
+    const index = indexOf(site, nested);
+    const pages = [...(index ? [index] : []), ...own.sections.flatMap((s) => s.pages)];
+    const english = pages.every((p) => p.fallback);
+    return [
+      `<li class="docs-nav__group"><span class="luz-sidebar__section-label" id="nav-${nested.id}">${escapeHtml(nested.label)}</span>`,
+      `<ul class="docs-nav__pages"${english ? enLang(site) : ""} aria-labelledby="nav-${nested.id}">`,
+      ...pages.map((p) => item(p, english)),
+      "</ul></li>",
+    ];
+  };
+  const items = site.areas.filter((area) => !area.nestIn).map((area) => {
     const own = listOf(area);
-    const children = pagesOf(own);
+    const nested = nestedIn(area);
+    const children = [...pagesOf(own), ...nested.flatMap(nestedGroup)];
     if (!children.length) return `<li>${areaHead(area, ' class="luz-sidebar__link docs-nav__area"')}</li>`;
     // The area's link goes to its index; the fold beside it opens and closes its pages. Only the area of the
     // current page is open, and one name makes the folds an accordion: opening one closes the others
     const id = `a-${area.id}`;
     return [
-      `<li>${areaHead(area, ` class="luz-sidebar__link docs-nav__area" id="${id}"`)}<details name="nav"${current?.id === area.id ? " open" : ""}><summary aria-labelledby="${id}"></summary><ul${own.allEnglish ? enLang(site) : ""}>`,
+      `<li>${areaHead(area, ` class="luz-sidebar__link docs-nav__area" id="${id}"`)}<details name="nav"${current?.id === area.id || nested.some((n) => n.id === current?.id) ? " open" : ""}><summary aria-labelledby="${id}"></summary><ul${own.allEnglish ? enLang(site) : ""}>`,
       ...children,
       "</ul></details></li>",
     ].join("\n");
