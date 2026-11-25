@@ -143,7 +143,7 @@ function agentsReference(root) {
     "",
     "## Agents",
     "",
-    "Each is a base template with fields left to fill. `agent add <name> --for <assistants>` writes it for Claude Code, Gemini CLI or Codex. A field left out stays `[ADAPT: …]`, and the agent stops and asks until it is filled.",
+    "`agent add <name> --for <assistants>` writes it for Claude Code, Gemini CLI or Codex. An agent with no field is written as it is. A field left out of one that has fields stays `[ADAPT: …]`, and the agent stops and asks until it is filled.",
     "",
     ...agents.map((a) => `- \`${a.name}\` (tools: ${a.tools}): ${a.description}`),
     "",
