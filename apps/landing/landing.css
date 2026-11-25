@@ -1004,7 +1004,7 @@ home-light:defined ~ .landing-light__nojs {
   /* At 400 % text the bar wraps, and a label never stacks a letter per line */
   white-space: nowrap;
   font-family: var(--luz-font-mono);
-  font-size: var(--luz-text-xs);
+  font-size: var(--luz-text-sm);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--luz-text-secondary);
@@ -2580,7 +2580,7 @@ home-light:defined ~ .landing-light__nojs {
   padding: 0;
   list-style: none;
   font-family: var(--luz-font-sans);
-  font-size: var(--luz-text-sm);
+  font-size: var(--luz-text-base);
   color: var(--luz-text-secondary);
 }
 
@@ -4934,7 +4934,7 @@ home-light:defined ~ .landing-light__nojs {
 
 .landing-cli__title {
   font-family: var(--luz-font-mono);
-  font-size: var(--luz-text-xs);
+  font-size: var(--luz-text-sm);
   color: var(--luz-text-secondary);
 }
 
@@ -5372,7 +5372,7 @@ home-light:defined ~ .landing-light__nojs {
 .landing-ai-works__title {
   margin: 0;
   font-family: var(--luz-font-sans);
-  font-size: var(--luz-text-sm);
+  font-size: var(--luz-text-base);
   font-weight: 600;
   color: var(--luz-text-secondary);
 }
@@ -5393,7 +5393,7 @@ home-light:defined ~ .landing-light__nojs {
 .landing-ai-works__note {
   margin: 0;
   max-inline-size: 40rem;
-  font-size: var(--luz-text-sm);
+  font-size: var(--luz-text-base);
   color: var(--luz-text-secondary);
 }
 
@@ -5436,9 +5436,13 @@ home-light:defined ~ .landing-light__nojs {
   font-size: var(--luz-text-base);
 }
 
+.landing-ai__id code {
+  font-size: 1em;
+}
+
 .landing-ai__id {
   margin: 0;
-  font-size: var(--luz-text-xs);
+  font-size: var(--luz-text-sm);
   color: var(--luz-text-secondary);
 }
 
@@ -5446,7 +5450,7 @@ home-light:defined ~ .landing-light__nojs {
 .landing-ai__text {
   flex: 1;
   margin: 0;
-  font-size: var(--luz-text-sm);
+  font-size: var(--luz-text-base);
   color: var(--luz-text-secondary);
 }
 
@@ -5456,7 +5460,7 @@ home-light:defined ~ .landing-light__nojs {
   align-items: center;
   gap: var(--luz-space-xs);
   margin: 0;
-  font-size: var(--luz-text-xs);
+  font-size: var(--luz-text-sm);
   color: var(--luz-text-secondary);
 }
 
@@ -5489,6 +5493,14 @@ home-light:defined ~ .landing-light__nojs {
 .landing-ai__ask code {
   min-inline-size: 0;
   overflow-wrap: anywhere;
+  /* The size of the box, not the 0.875em that core gives code: what you type is read at 14 px at least */
+  font-size: 1em;
+}
+
+/* A badge and a copy button of the page read at 14 px as well: the 12 px of core is for a badge among text, not for the one that says what a card does */
+.landing-ai__meta .luz-badge,
+.landing-install__bar .luz-copy-btn {
+  font-size: var(--luz-text-sm);
 }
 
 .landing-ai__mark {
@@ -5523,7 +5535,7 @@ home-light:defined ~ .landing-light__nojs {
   grid-template-columns: auto minmax(0, 1fr);
   align-items: start;
   gap: var(--luz-space-xs);
-  font-size: var(--luz-text-sm);
+  font-size: var(--luz-text-base);
 }
 
 .landing-ai-decide .landing-ai__icon {
