@@ -708,7 +708,7 @@ describe("llms-full.txt: the curated text of the pages, from the real site", () 
   it("makes every internal link absolute under the site URL, and none root-absolute", () => {
     const prose = proseOf(full());
     expect(prose).not.toMatch(/\]\(\/docs\//);
-    expect(prose).toMatch(/\]\(https:\/\/nandomunoz\.github\.io\/luz\/docs\//);
+    expect(prose).toMatch(/\]\(https:\/\/luzds\.com\/docs\//);
     expect(proseOf(full(""))).toMatch(/\]\(\/docs\//);
   });
 
@@ -936,7 +936,7 @@ describe("llms-full.txt: what a page contributes, on a fixture", () => {
 /* ---- the plugin: emitted by the build, served by the dev server -------------- */
 
 describe("the Vite plugin emits and serves the two files", () => {
-  const plugin = (relative) => docsSite({ repoRoot: root, relative, outRoot: join(tmpdir(), "luz-ai-files-out"), pagesBase: "/luz/", siteUrl: SITE_URL });
+  const plugin = (relative) => docsSite({ repoRoot: root, relative, outRoot: join(tmpdir(), "luz-ai-files-out"), pagesBase: new URL(SITE_URL).pathname, siteUrl: SITE_URL });
 
   it("emits llms.txt and llms-full.txt at the root of the pages build, with the absolute site URL", () => {
     const emitted = [];
@@ -1633,7 +1633,7 @@ describe("llms.txt and llms-full.txt name the examples and the manifests", () =>
 
 describe("the Vite plugin emits and serves the examples and the manifests", () => {
   const plugin = (relative) =>
-    docsSite({ repoRoot: root, relative, outRoot: join(tmpdir(), "luz-ai-files-out"), pagesBase: "/luz/", siteUrl: SITE_URL, csp: PAGES_CSP });
+    docsSite({ repoRoot: root, relative, outRoot: join(tmpdir(), "luz-ai-files-out"), pagesBase: new URL(SITE_URL).pathname, siteUrl: SITE_URL, csp: PAGES_CSP });
   const bytesOf = (relative) => readFileSync(join(root, relative));
   const same = (source, expected) => Buffer.from(source).equals(Buffer.isBuffer(expected) ? expected : Buffer.from(expected));
 

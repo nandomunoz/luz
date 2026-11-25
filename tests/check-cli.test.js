@@ -68,7 +68,7 @@ const messages = await checkModule("messages");
 const root = fileURLToPath(new URL("../", import.meta.url));
 const FIXTURES = join(root, "tests/fixtures/check");
 const CLI_URL = new URL("../packages/check/src/cli.js", import.meta.url).href;
-const SITE_URL = "https://nandomunoz.github.io/luz/";
+const SITE_URL = "https://luzds.com/";
 
 // Characters that must never reach a terminal or a model: built from code points
 const ESC = String.fromCharCode(0x1b);

@@ -47,13 +47,13 @@ const SHORT = ['# A title', '', 'alpha beta', '- gamma', 'delta `code` "said"', 
 const SHORT_NORMALIZED = '# A title alpha beta - gamma delta `code` "said"';
 
 /** Addresses: two of the site and of @luz-ds, and four that look like them and are not. */
-const SITE = 'https://nandomunoz.github.io/luz/llms.txt';
+const SITE = 'https://luzds.com/llms.txt';
 const CDN = 'https://cdn.jsdelivr.net/npm/@luz-ds/core@0.2.1/dist/luz.min.css';
 const NOT_LINKED = [
   'https://example.com/luz/',
-  'https://nandomunoz.github.io.example.org/luz/',
+  'https://luzds.com.example.org/',
   'https://cdn.jsdelivr.net/npm/other-package/x.js',
-  'http://nandomunoz.github.io/luz/',
+  'http://luzds.com/',
 ];
 const ADDRESSES = ['# Addresses', '', `Site: ${SITE}. CDN: ${CDN}, and no more.`, `Not linked: ${NOT_LINKED.join(' and ')} here.`, ''].join('\n');
 
@@ -362,7 +362,7 @@ test.describe('addresses', () => {
   }
 
   test('following an address opens another tab, keeps the dialog open, the progress and the lock', async ({ page, context }) => {
-    await context.route('https://nandomunoz.github.io/**', (route) => route.fulfill({ contentType: 'text/html', body: '<title>site</title>' }));
+    await context.route('https://luzds.com/**', (route) => route.fulfill({ contentType: 'text/html', body: '<title>site</title>' }));
     await serve(page, LONG);
     const dialog = await openStart(page, 'en');
     const region = regionOf(dialog);

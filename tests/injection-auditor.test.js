@@ -243,7 +243,7 @@ describe("the cases file", () => {
 
   it("has no real-looking URL other than the host example.invalid", () => {
     // A prompt for AI that LUZ ships links the published site and the CDN of @luz-ds, nothing else
-    const shipped = ["nandomunoz.github.io", "cdn.jsdelivr.net"];
+    const shipped = ["luzds.com", "cdn.jsdelivr.net"];
     for (const c of data().cases) {
       for (const m of textOf(c).matchAll(/\b[a-z][a-z0-9+.-]*:\/\/([^\s/:"'?#)>\]\\]+)/gi)) {
         const host = m[1].toLowerCase();
