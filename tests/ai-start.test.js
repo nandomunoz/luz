@@ -1007,6 +1007,12 @@ describe("portability", () => {
     expect(r.code).toBe(0);
     const warning = JSON.parse(r.out).warnings.join(" ");
     expect(warning).toMatch(/luz is not the same in \.agents\/skills and \.claude\/skills/);
+    expect(warning).toContain("init --target claude,codex --force");
+    // A skill that is not luz is not put right by init: the hint says to make the two copies the same
+    const other = dir({ ".agents/skills/mine/SKILL.md": '---\nname: mine\ndescription: "x"\n---\n\nBody.\n', ".claude/skills/mine/SKILL.md": '---\nname: mine\ndescription: "x"\n---\n\nBody changed.\n' });
+    const w = JSON.parse(run(["doctor", "--json", "--dir", other]).out).warnings.join(" ");
+    expect(w).toMatch(/mine is not the same/);
+    expect(w).not.toContain("init --target");
   });
 
 });

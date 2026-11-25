@@ -43,6 +43,12 @@ describe("the skill says what it does", () => {
     }
   });
 
+  it("levels.md says what the starter links, and that the unused stylesheets go when the page is finished", () => {
+    const text = read(`${SKILL}/references/levels.md`);
+    expect(text).toMatch(/starter page links the stylesheets that fit its kind/);
+    expect(text).toMatch(/remove the ones the page does not use/);
+  });
+
   it("no name or model of the past is left", () => {
     expect(read(`${SKILL}/agents/openai.yaml`)).not.toMatch(/LUZ start/);
     expect(read("packages/ai/README.md")).not.toMatch(/prompts of the site/);
