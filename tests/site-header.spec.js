@@ -104,7 +104,7 @@ function controls(page, javaScript) {
     header,
     brand: header.locator('a[href="/"], a[href="/es/"]').first(),
     version: header.locator('a[href$="/CHANGELOG.md"]'),
-    docs: header.locator('.site-header__nav a[href="/docs/"]'),
+    docs: header.locator('.site-header__docs'),
     github: header.locator(`a[href="${GITHUB}"]`),
     search: header.locator(javaScript ? '[data-luz-search-open]' : '[data-luz-search-fallback]'),
     lang: header.locator('luz-lang-switch button'),
@@ -153,28 +153,33 @@ test.describe('the header at the top of a wide screen', () => {
   }
 
   for (const path of [HOME, DOCS]) {
-    test(`${path}: where to go after the logo, in words; what to use at the end: GitHub as its mark, Search with its word, Language`, async ({ page, javaScriptEnabled }) => {
+    test(`${path}: where to go in the middle, in words; what to use at the end, as icons: Documentation, GitHub, Search, Language`, async ({ page, javaScriptEnabled }) => {
       await open(page, path, javaScriptEnabled);
       const c = controls(page, javaScriptEnabled);
       await expect(page.locator('#site-header luz-lang-switch'), 'the language switch is on the home and on the docs').toHaveCount(1);
       const nav = page.locator('#site-header .site-header__nav');
       const brand = await box(c.brand);
       const navBox = await box(nav);
-      const tools = [c.github, c.search, c.lang];
+      const tools = [c.docs, c.github, c.search, c.lang];
       const boxes = [];
       for (const control of tools) {
         await expect(control).toBeVisible();
         boxes.push(await box(control));
       }
-      // The nav sits by the logo, the tools at the end, the free space between them
-      expect(navBox.left - brand.right, 'the nav by the logo').toBeLessThanOrEqual(await px(page, 'calc(var(--luz-space-lg) + var(--luz-space-md))'));
-      expect(boxes[0].left - navBox.right, 'the free space between where to go and what to use').toBeGreaterThan(100);
+      // The nav sits in the middle of the header, between the logo and the tools
+      const headerBox = await box(c.header);
+      expect(Math.abs(navBox.left + navBox.width / 2 - (headerBox.left + headerBox.width / 2)), 'the nav in the middle').toBeLessThanOrEqual(2);
+      expect(navBox.left, 'after the logo').toBeGreaterThan(brand.right);
+      expect(boxes[0].left, 'before the tools').toBeGreaterThan(navBox.right);
       for (let i = 1; i < boxes.length; i++) expect(boxes[i].left, `tool ${i} after tool ${i - 1}`).toBeGreaterThanOrEqual(boxes[i - 1].right - 1);
       const middles = [navBox, ...boxes].map((b) => b.top + b.height / 2);
       expect(Math.max(...middles) - Math.min(...middles), 'one row').toBeLessThanOrEqual(2);
       // The nav: words, no icons
       await expect(nav.locator('svg')).toHaveCount(0);
-      expect(await visibleText(c.docs)).toBe('Documentation');
+      // Documentation: the book, its name for a reader and on hover
+      await expect(c.docs.locator('svg').first()).toBeVisible();
+      await expect(c.docs).toHaveAccessibleName('Documentation');
+      expect(await visibleText(c.docs), 'no word beside the book').toBe('');
       // GitHub: its mark, its name for a reader and on hover
       const icon = c.github.locator('svg').first();
       await expect(icon).toBeVisible();
@@ -183,7 +188,7 @@ test.describe('the header at the top of a wide screen', () => {
       expect(await visibleText(c.github), 'no word beside the mark').toBe('');
       if (javaScriptEnabled) {
         await expect(c.search).toHaveAccessibleName('Search');
-        expect(await visibleText(c.search), 'just "Search": no "docs", no ellipsis, no Ctrl K key').toBe('Search');
+        expect(await visibleText(c.search), 'an icon: no word, no Ctrl K key').toBe('');
       }
     });
 
@@ -280,14 +285,15 @@ test.describe('the header at the top of a wide screen', () => {
 test.describe('the four sections of the site in the row', () => {
   for (const width of [769, 900, 1024, 1280]) {
     for (const path of ['/', '/es/', '/ar/', '/docs/', '/catalog/', '/es/ai/']) {
-      test(`${path} at ${width}px: Tokens, Core, Catalog and AI come after the logo and before Documentation, in one row, with nothing over anything`, async ({ page, javaScriptEnabled }) => {
+      test(`${path} at ${width}px: Tokens, Core, Catalog and AI come after the logo and before the Documentation icon, in one row, with nothing over anything`, async ({ page, javaScriptEnabled }) => {
         await page.setViewportSize({ width, height: 700 });
         await open(page, path, javaScriptEnabled);
         const nav = page.locator('#site-header .site-header__nav a');
-        await expect(nav).toHaveCount(5);
+        await expect(nav).toHaveCount(4);
+        await expect(page.locator('#site-header .site-header__docs')).toBeVisible();
         const home = path.startsWith('/docs/') ? '/' : path.match(/^\/(?:es\/|ar\/)?/)[0];
         expect(await nav.evaluateAll((all) => all.map((a) => a.getAttribute('href')).slice(0, 4))).toEqual(['tokens/', 'core/', 'catalog/', 'ai/'].map((p) => home + p));
-        for (let i = 0; i < 5; i++) await expect(nav.nth(i)).toBeVisible();
+        for (let i = 0; i < 4; i++) await expect(nav.nth(i)).toBeVisible();
         const shown = await drawnControls(page);
         for (const s of shown) {
           expect(s.left, `${s.name} inside the window`).toBeGreaterThanOrEqual(0);

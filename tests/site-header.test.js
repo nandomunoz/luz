@@ -133,7 +133,7 @@ describe("the header's row", () => {
     }
   });
 
-  it("links to the four sections of the site first, Tokens, Core, Catalog and AI, under the page's home and in its language, then Documentation", () => {
+  it("links to the four sections of the site, Tokens, Core, Catalog and AI, under the page's home and in its language; Documentation is the icon beside GitHub", () => {
     for (const route of [...homes, ...levelRoutes, ...DOCS_PAGES]) {
       const nav = query(headerOf(route), "nav.site-header__nav");
       expect(nav, route).toBeTruthy();
@@ -142,8 +142,11 @@ describe("the header's row", () => {
       const navLinks = links(nav);
       expect(navLinks.map(href).slice(0, 4), route).toEqual(SECTIONS.map(([path]) => `${home}${path}/`));
       expect(navLinks.slice(0, 4).map(visibleText), route).toEqual(SECTIONS.map(([, key]) => words[key]));
-      expect(href(navLinks[4]), `${route}: Documentation after them`).toMatch(/\/docs\/$/);
-      expect(navLinks, route).toHaveLength(5);
+      expect(navLinks, route).toHaveLength(4);
+      const docs = query(headerOf(route), "a.site-header__docs");
+      expect(docs, `${route}: the Documentation icon`).toBeTruthy();
+      expect(href(docs), route).toBe(docsHref(home));
+      expect(docs.open.index, `${route}: after the sections`).toBeGreaterThan(nav.open.index);
     }
   });
 
@@ -182,12 +185,13 @@ describe("the header's row", () => {
     }
   });
 
-  it("gives GitHub and Search an icon, GitHub's word kept for a reader only, and the links of the nav words alone", () => {
+  it("gives Documentation, GitHub and Search an icon, their words kept for a reader only, and the links of the nav words alone", () => {
     for (const route of [...homes, ...DOCS_PAGES]) {
       const header = headerOf(route);
       const github = links(header).find((a) => href(a) === GITHUB);
+      const docs = query(header, "a.site-header__docs");
       const trigger = find(header, (n) => n.name === "button" && n.attrs.has("data-luz-search-open"));
-      for (const [name, node] of Object.entries({ github, trigger })) {
+      for (const [name, node] of Object.entries({ docs, github, trigger })) {
         expect(find(node, (n) => n.name === "svg"), `${route}: ${name} has an icon`).toBeTruthy();
         expect(textOf(node), `${route}: ${name} has a name`).not.toBe("");
       }
@@ -208,7 +212,9 @@ describe("the header's row", () => {
     for (const [route, words] of Object.entries(expected)) {
       const header = headerOf(route);
       const docs = links(header).find((a) => href(a) === docsHref(route));
-      expect(visibleText(docs), `${route}: the docs link`).toBe(words.docs);
+      // An icon: its word is its name for a reader, and on hover
+      expect(spokenText(docs), `${route}: the docs link`).toBe(words.docs);
+      expect(docs.attrs.get("title"), `${route}: the docs link on hover`).toBe(words.docs);
       // A link into docs the page's language does not have is marked as English
       if (route === "/ar/") expect(docs.attrs.get("hreflang"), `${route}: the English docs`).toBe("en");
       const label = query(header, "span.luz-search__trigger-label");

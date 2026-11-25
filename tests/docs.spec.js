@@ -171,8 +171,12 @@ test.describe('Documentation site', () => {
     test('the header has Documentation and GitHub, with Documentation current on the hub (no Home link: the logo is it)', async ({ page }) => {
       await open(page);
 
-      await expect(page.locator('.site-header__nav a')).toHaveText(['Documentation']);
-      await expect(page.locator('.site-header__nav a[aria-current="page"]')).toHaveText('Documentation');
+      await expect(page.locator('.site-header__docs')).toHaveText('Documentation');
+      await expect(page.locator('.site-header__docs[aria-current="page"]')).toHaveText('Documentation');
+      // Documentation is an icon beside GitHub, in the tools at the end
+      const [docs, github] = await Promise.all(['.site-header__docs', '.site-header__github'].map((s) => page.locator(s).boundingBox()));
+      expect(Math.abs(github.x - (docs.x + docs.width))).toBeLessThanOrEqual(16);
+      expect(docs.width).toBeLessThanOrEqual(48);
       await expect(page.locator('#site-header').getByRole('link', { name: 'GitHub' })).toBeVisible();
       await expect(page.locator('#site-header').getByRole('link', { name: 'Home' })).toHaveCount(0);
       // Exactly one radio group drives the tokens on this page
@@ -183,8 +187,8 @@ test.describe('Documentation site', () => {
 
     test('on a component page, Documentation is the current section', async ({ page }) => {
       await gotoId(page, 'c-button');
-      await expect(page.locator('.site-header__nav a[aria-current="true"]')).toHaveText(['Documentation']);
-      await expect(page.locator('.site-header__nav a[aria-current="page"]')).toHaveCount(0);
+      await expect(page.locator('.site-header__docs[aria-current="true"]')).toHaveText('Documentation');
+      await expect(page.locator('.site-header__docs[aria-current="page"]')).toHaveCount(0);
     });
 
     test('the round button in the footer steps through the three modes and Auto (the system\'s), under core\'s key', async ({ page }) => {
@@ -1116,7 +1120,7 @@ test.describe('Documentation site', () => {
       await expect(drawer).toHaveAttribute('popover', '');
       await expect(page.locator('.luz-nav-toggle[popovertarget="page-nav"]')).toHaveCount(1);
       const hrefs = await drawer.locator('a').evaluateAll((all) => all.map((a) => a.getAttribute('href')));
-      expect(hrefs).toEqual(['/docs/', 'https://github.com/nandomunoz/luz']);
+      expect(hrefs).toEqual(['/tokens/', '/core/', '/catalog/', '/ai/', '/docs/', 'https://github.com/nandomunoz/luz']);
     });
 
     test('at 390px the menu button opens the drawer and the two site links are reachable', async ({ page }) => {
@@ -1567,8 +1571,9 @@ test.describe('Site header and navigation toggle', () => {
     expect(HEADER).toContain('popovertarget="page-nav"');
     expect(HEADER).not.toContain('aria-current');
     const row = HEADER.match(/<nav class="site-header__nav"[\s\S]*?<\/nav>/)[0];
-    // The row holds Documentation; GitHub is the control after it, and the logo ({{home}}) is the link to the home page
-    expect([...row.matchAll(/href="([^"]+)"/g)].map((m) => m[1])).toEqual(['/docs/']);
+    // The row holds the four sections of the site; Documentation and GitHub are the icons after it, and the logo ({{home}}) is the link to the home page
+    expect([...row.matchAll(/href="([^"]+)"/g)].map((m) => m[1])).toEqual(['{{home}}tokens/', '{{home}}core/', '{{home}}catalog/', '{{home}}ai/']);
+    expect(HEADER).toMatch(/class="site-header__docs" href="\/docs\/"/);
     expect(HEADER).toContain('href="https://github.com/nandomunoz/luz"');
     expect(HEADER).toMatch(/class="site-header__brand" href="\{\{home\}\}"/);
     expect(HEADER).toContain('data-luz-search-open');
@@ -1576,7 +1581,7 @@ test.describe('Site header and navigation toggle', () => {
     // list inside the drawer's nav, not a nav in a nav (a11y.md F4)
     expect(SITE_LINKS).toMatch(/<ul class="page-nav__row" aria-label="\{\{t:site\.label\}\}">/);
     expect(SITE_LINKS).not.toContain('<nav');
-    expect([...SITE_LINKS.matchAll(/href="([^"]+)"/g)].map((m) => m[1])).toEqual(['/docs/', 'https://github.com/nandomunoz/luz']);
+    expect([...SITE_LINKS.matchAll(/href="([^"]+)"/g)].map((m) => m[1])).toEqual(['{{home}}tokens/', '{{home}}core/', '{{home}}catalog/', '{{home}}ai/', '/docs/', 'https://github.com/nandomunoz/luz']);
     for (const [file, partials] of Object.entries(INCLUDERS)) {
       for (const name of partials) expect(read(file), file).toContain(`<!-- luz:include ${name} -->`);
       // tabindex="-1": a scrollable nav is a Tab stop of its own in Firefox
@@ -1675,7 +1680,7 @@ test.describe('Site header and navigation toggle', () => {
 
     test(`the current page link is marked by more than color: ${path}`, async ({ page }) => {
       await page.goto(path);
-      const link = page.locator('.site-header__nav a[aria-current]');
+      const link = page.locator('.site-header__nav a[aria-current], .site-header__docs[aria-current]');
       if (!current) {
         await expect(link).toHaveCount(0);
         return;
@@ -1692,6 +1697,10 @@ test.describe('Site header and navigation toggle', () => {
         '.luz-skip-link',
         '.site-header__brand',
         '.site-header__nav a >> nth=0',
+        '.site-header__nav a >> nth=1',
+        '.site-header__nav a >> nth=2',
+        '.site-header__nav a >> nth=3',
+        '.site-header__docs',
         '.site-header__github',
         '.site-header__search',
       ]],
@@ -1717,13 +1726,13 @@ test.describe('Site header and navigation toggle', () => {
       await menu.focus();
       await page.keyboard.press('Enter');
       const site = page.getByRole('list', { name: 'Site', exact: true });
-      await expect(site.getByRole('link')).toHaveText(['Documentation', 'GitHub']);
+      await expect(site.getByRole('link')).toHaveText(['Tokens', 'Core', 'Catalog', 'AI', 'Documentation', 'GitHub']);
       await expect(page.locator('#page-nav').getByRole('link', { name: 'Home' })).toHaveCount(0);
       if (current) {
         await expect(site.locator('[aria-current]')).toHaveText(current);
-        // first in the docs drawer: the first Tab from the button lands on Documentation
+        // the drawer starts with the sections of the site: the first Tab from the button lands on Tokens
         await page.keyboard.press('Tab');
-        await expect(site.getByRole('link', { name: 'Documentation' })).toBeFocused();
+        await expect(site.getByRole('link', { name: 'Tokens' })).toBeFocused();
         const underline = await site.locator('[aria-current]').evaluate((el) => getComputedStyle(el).textDecorationLine);
         expect(underline).toBe('underline');
       } else {

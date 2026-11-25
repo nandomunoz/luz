@@ -127,8 +127,9 @@ for (const { route, lang, dir, name, label } of LANGUAGES) {
       await expect(logo).toHaveAccessibleName(`LUZ ${JSON.parse(read(`apps/landing/i18n/${lang}.json`))['footer.beta']} v${VERSION}`);
       expect(new URL(await logo.evaluate((a) => a.href)).pathname).toBe(route);
       await expect(page.locator('.site-header__nav a[aria-current="page"]')).toHaveCount(0);
-      // Where to go: the four sections of the site, then the docs
-      await expect(page.locator('.site-header__nav a')).toHaveCount(5);
+      // Where to go: the four sections of the site; the docs are an icon beside GitHub
+      await expect(page.locator('.site-header__nav a')).toHaveCount(4);
+      await expect(page.locator('.site-header__docs')).toHaveCount(1);
     });
   });
 }

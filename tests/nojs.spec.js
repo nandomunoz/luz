@@ -273,13 +273,13 @@ test('docs: the specimens carry no data-theme without JavaScript, and the radios
 
 // The drawer's names on the home page in another language (apps/landing/i18n)
 const DRAWER = {
-  '/es/': { menu: 'Menú', site: 'Sitio', links: ['Documentación', 'GitHub'] },
-  '/ar/': { menu: 'القائمة', site: 'الموقع', links: ['التوثيق', 'GitHub'] },
+  '/es/': { menu: 'Menú', site: 'Sitio', links: ['Tokens', 'Core', 'Catálogo', 'IA', 'Documentación', 'GitHub'] },
+  '/ar/': { menu: 'القائمة', site: 'الموقع', links: ['الرموز', 'النواة', 'الكتالوج', 'الذكاء الاصطناعي', 'التوثيق', 'GitHub'] },
 };
 
 for (const app of APPS) {
   test(`${app}: the menu drawer opens and closes without JavaScript`, async ({ page }) => {
-    const names = DRAWER[app] ?? { menu: 'Menu', site: 'Site', links: ['Documentation', 'GitHub'] };
+    const names = DRAWER[app] ?? { menu: 'Menu', site: 'Site', links: ['Tokens', 'Core', 'Catalog', 'AI', 'Documentation', 'GitHub'] };
     await page.setViewportSize({ width: 360, height: 640 });
     await page.goto(app);
     const toggle = page.getByRole('button', { name: names.menu, exact: true });

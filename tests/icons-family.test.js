@@ -293,7 +293,7 @@ describe("the icons of the header, the footer and the prompt dialog are the fami
     for (const svg of triggers) expect(drawing(svg), "a search trigger draws search").toEqual(set.get("search"));
     const github = queryAll(query(header, "a.site-header__github"), "svg");
     expect(github.map(drawing), "the repository link draws git-branch").toEqual([set.get("git-branch")]);
-    const docs = queryAll(query(header, "nav.site-header__nav"), "svg");
+    const docs = queryAll(query(header, "a.site-header__docs"), "svg");
     expect(docs.map(drawing), "Documentation draws the book").toEqual([set.get("book")]);
     const modes = queryAll(footer, "input.luz-theme-mode__input").map((input) => [input.attrs.get("value"), drawing(find(input.parent, (n) => n.name === "svg"))]);
     expect(Object.fromEntries(modes)).toEqual({ auto: set.get("auto"), light: set.get("sun"), dark: set.get("moon"), "high-contrast": set.get("contrast") });
@@ -399,7 +399,7 @@ describe("no third-party mark in what is published or served", () => {
     expect(svgs[0].attrs.get("aria-hidden")).toBe("true");
     expect(query(link, "span.site-header__github-label")?.html.slice(query(link, "span.site-header__github-label").open.end, query(link, "span.site-header__github-label").close.index)).toBe("GitHub");
     // The same size as the other icons of the row: one class, one rule
-    expect(svgs[0].attrs.get("class")).toBe(queryAll(query(header, "nav.site-header__nav"), "svg")[0].attrs.get("class"));
+    expect(svgs[0].attrs.get("class")).toBe(queryAll(query(header, "a.site-header__docs"), "svg")[0].attrs.get("class"));
     expect(find(link, matcher("circle")), "git-branch has circles").toBeTruthy();
   });
 });
