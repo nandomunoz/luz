@@ -229,7 +229,7 @@ test.describe('the four areas of the packages that are gone are not served', () 
     await page.goto('/docs/catalog/hero/');
     const hrefs = await page.locator('nav.luz-docs-nav a').evaluateAll((links) => links.map((a) => a.getAttribute('href') ?? ''));
     expect(hrefs.filter((href) => /^\/docs\/(landing|cms|app|documentation)\//.test(href))).toEqual([]);
-    await expect(page.locator('a.docs-nav__area')).toHaveText(['Get started', 'Kinds of site', 'Tokens', 'Core', 'Catalog', 'HTML elements', 'Accessibility']);
+    await expect(page.locator('a.docs-nav__area')).toHaveText(['Get started', 'AI', 'Tokens', 'Core', 'Catalog', 'HTML elements', 'Accessibility']);
   });
 
   test('the files of the four packages are not served', async ({ request }) => {

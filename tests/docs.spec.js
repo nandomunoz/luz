@@ -281,7 +281,7 @@ test.describe('Documentation site', () => {
       await page.setViewportSize({ width: 1440, height: 900 });
       await gotoId(page, 'c-button');
       const areas = page.locator('.docs-nav a.docs-nav__area');
-      await expect(areas).toHaveText(['Get started', 'Kinds of site', 'Tokens', 'Core', 'Catalog', 'HTML elements', 'Accessibility']);
+      await expect(areas).toHaveText(['Get started', 'AI', 'Tokens', 'Core', 'Catalog', 'HTML elements', 'Accessibility']);
       // HTML elements is an area like the others, not nested in Catalog
       await expect(page.locator('.docs-nav > li > a.docs-nav__area[href="/docs/html/"]')).toHaveText('HTML elements');
       await expect(page.locator('.docs-nav .docs-nav__sub')).toHaveCount(0);
@@ -322,7 +322,7 @@ test.describe('Documentation site', () => {
       await page.goto('/docs/tokens/');
       const end = page.getByRole('navigation', { name: 'Keep going' });
       const pager = page.locator('.luz-pager');
-      await expect(pager.getByRole('link', { name: 'Previous Documentation site', exact: true })).toHaveAttribute('href', /\/docs\/kinds\/docs\/$/);
+      await expect(pager.getByRole('link', { name: 'Previous Documentation site', exact: true })).toHaveAttribute('href', /\/docs\/ai\/docs\/$/);
       await expect(pager.getByRole('link', { name: 'Next Color', exact: true })).toHaveAttribute('href', /\/docs\/tokens\/color\/$/);
       await expect(end.locator('.docs-end__links a')).toHaveText(['Color modes and themes', 'Core', 'Tokens in Figma']);
     });
