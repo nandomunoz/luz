@@ -44,7 +44,7 @@ describe("an unknown field is a warning", () => {
       const report = JSON.parse(r.out);
       expect(r.code, what).toBe(0);
       expect(report.problems, what).toEqual([]);
-      expect(report.warnings.map((w) => w.rule), what).toContain("field/unknown");
+      expect(report.warnings.join(" "), what).toContain("field/unknown");
     }
   });
 

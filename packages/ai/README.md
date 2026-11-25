@@ -61,7 +61,7 @@ npx @luz-ds/ai lint .claude
 | `new` | Writes the starter page of a kind of site (landing page, blog, app, documentation) for plain HTML or Astro. |
 | `agents`, `add` | Lists the agents of luz-ai (named `luz-agent-<word>`), or writes one for Claude Code, Gemini CLI and Codex, with the fields you give it filled in (`luz-agent-accessibility` has none: it reads your files as it is). A field left out stays `[ADAPT: …]`, and the agent stops and asks until it is filled. |
 | `doctor` | The project, the assistants it has, the skills and agents it finds, and whether the two copies of a skill agree. |
-| `lint` | The front matter and the body of skills and agents: strict YAML, the closed list of fields of each assistant, names, descriptions, hidden characters and references. |
+| `lint` | The front matter and the body of skills and agents: strict YAML, names, descriptions, hidden characters and references. A field that the list of an assistant does not know is a warning, never a failure: the lists were read at their sources on a date. |
 
 Every command takes `--help`, and `--json` prints one JSON object. Only `init`, `new` and `add` write (`site new`, `agent list` and `agent add` are their long forms), only the files they name, and never over a file that exists unless `--force` says so, nor through a symbolic link.
 

@@ -39,6 +39,8 @@ afterAll(() => tmp.forEach((d) => rmSync(d, { recursive: true, force: true })));
 const GOOD = `---\nname: demo\ndescription: "Does one thing: it demos."\n---\n\n# Demo\n\nBody.\n`;
 const skillOf = (front, body = "# Demo\n\nBody.\n", name = "demo") => dir({ [`.agents/skills/${name}/SKILL.md`]: `---\n${front}\n---\n\n${body}` });
 const rules = (r) => JSON.parse(r.out).problems.map((p) => p.rule);
+/** A field a list does not know is a warning (tests/ai-lint-warnings.test.js): its text, with the rule and the field named. */
+const warned = (r) => JSON.parse(r.out).warnings.join("\n");
 
 describe("the data beside the script", () => {
   const fields = json(join(skill, "assets/fields.json"));
@@ -187,19 +189,18 @@ describe("check: a skill", () => {
     expect(rules(run(["lint", "--json", skillOf(`name: demo\ndescription: >\n  folded`)]))).toContain("yaml/block-scalar");
   });
 
-  it("fails a field the portable list does not have, and says which", () => {
+  it("warns of a field the portable list does not have, and says which, without failing", () => {
     const r = run(["lint", "--json", skillOf(`name: demo\ndescription: x\nargument-hint: "[a]"\nversion: "1"`)]);
-    const unknown = JSON.parse(r.out).problems.filter((p) => p.rule === "field/unknown");
-    expect(unknown.map((p) => p.message).join(" ")).toMatch(/argument-hint/);
-    expect(unknown.map((p) => p.message).join(" ")).toMatch(/version/);
-    expect(r.code).toBe(1);
+    expect(warned(r)).toMatch(/field\/unknown: argument-hint/);
+    expect(warned(r)).toMatch(/field\/unknown: version/);
+    expect(r.code).toBe(0);
   });
 
   it("takes a field of Claude Code under .claude/skills only", () => {
     const front = `name: demo\ndescription: x\ndisable-model-invocation: true`;
     const claude = dir({ ".claude/skills/demo/SKILL.md": `---\n${front}\n---\n\nBody.\n` });
     expect(run(["lint", "--json", claude]).code).toBe(0);
-    expect(rules(run(["lint", "--json", "--target", "portable", claude]))).toContain("field/unknown");
+    expect(warned(run(["lint", "--json", "--target", "portable", claude]))).toContain("field/unknown");
   });
 
   it("fails a name that is not the folder, not a valid name or a reserved word", () => {
@@ -262,8 +263,8 @@ describe("check: a subagent", () => {
     expect(r.code, r.out).toBe(0);
   });
 
-  it("fails a dashed field, which Claude Code ignores without a word", () => {
-    expect(rules(run(["lint", "--json", agent(`name: demo-runner\ndescription: x\ndisallowed-tools: Write`)]))).toContain("field/unknown");
+  it("warns of a dashed field, which Claude Code ignores without a word", () => {
+    expect(warned(run(["lint", "--json", agent(`name: demo-runner\ndescription: x\ndisallowed-tools: Write`)]))).toContain("field/unknown");
   });
 
   it("fails a name that is not the file's, and a plain value with ': '", () => {
@@ -895,7 +896,7 @@ describe("check: the formats of Gemini CLI and Codex", () => {
   it("reads a list of tools in a Gemini CLI agent, and fails a string or a field that is not Gemini's", () => {
     expect(run(["lint", "--json", gemini("name: demo\ndescription: x\ntools:\n  - read_file\n  - grep_search\nmax_turns: 5")]).code).toBe(0);
     expect(rules(run(["lint", "--json", gemini("name: demo\ndescription: x\ntools: read_file")]))).toContain("field/type");
-    expect(rules(run(["lint", "--json", gemini("name: demo\ndescription: x\nmax-turns: 5")]))).toContain("field/unknown");
+    expect(warned(run(["lint", "--json", gemini("name: demo\ndescription: x\nmax-turns: 5")]))).toContain("field/unknown");
     expect(rules(run(["lint", "--json", gemini("name: demo\ndescription: x\ntools:\n  - a\n  - b: c")]))).toContain("yaml/plain-scalar");
   });
 
@@ -910,9 +911,9 @@ describe("check: the formats of Gemini CLI and Codex", () => {
     expect(rules(run(["lint", "--json", codex(`name = "demo"\ndescription = "x"\n`)]))).toContain("instructions/missing");
   });
 
-  it("fails a Codex key that is not one of its keys, a table that is not one, and a string that is not closed", () => {
-    expect(rules(run(["lint", "--json", codex(`${GOOD_TOML}sandbox_mode = "read-only"\n`)]))).toContain("field/unknown");
-    expect(rules(run(["lint", "--json", codex(`${GOOD_TOML}[mystery]\nx = 1\n`)]))).toContain("field/unknown");
+  it("warns of a Codex key that is not one of its keys, fails, a table that is not one, and a string that is not closed", () => {
+    expect(warned(run(["lint", "--json", codex(`${GOOD_TOML}sandbox_mode = "read-only"\n`)]))).toContain("field/unknown");
+    expect(warned(run(["lint", "--json", codex(`${GOOD_TOML}[mystery]\nx = 1\n`)]))).toContain("field/unknown");
     expect(run(["lint", "--json", codex(`${GOOD_TOML}[features]\nshell_tool = false\n`)]).code).toBe(0);
     expect(rules(run(["lint", "--json", codex(`name = "demo"\ndescription = "x"\ndeveloper_instructions = ${TRIPLE}\nnever closed\n`)]))).toContain("toml/syntax");
     expect(rules(run(["lint", "--json", codex(`name = demo\n${GOOD_TOML}`)]))).toContain("toml/syntax");
@@ -952,17 +953,16 @@ describe("portability", () => {
   it("fails an agents/openai.yaml with a key Codex does not read, a flag that is not true or false, and a value that is a comment", () => {
     const withOpenai = (yaml) => dir({ ".agents/skills/demo/SKILL.md": GOOD, ".agents/skills/demo/agents/openai.yaml": yaml });
     const bad = (yaml) => JSON.parse(run(["lint", "--json", withOpenai(yaml)]).out).problems;
+    const soft = (yaml) => warned(run(["lint", "--json", withOpenai(yaml)]));
     expect(bad("interface:\n  display_name: \"Demo\"\n").length).toBe(0);
-    expect(bad("interface:\n  title: \"Demo\"\n").map((p) => p.rule)).toContain("field/unknown");
+    expect(soft("interface:\n  title: \"Demo\"\n")).toContain("field/unknown");
     expect(bad("policy:\n  allow_implicit_invocation: maybe\n").map((p) => p.rule)).toContain("field/type");
-    expect(bad("policy:\n  implicit: true\n").map((p) => p.rule)).toContain("field/unknown");
-    expect(bad("mystery: 1\n").map((p) => p.rule)).toContain("field/unknown");
+    expect(soft("policy:\n  implicit: true\n")).toContain("field/unknown");
+    expect(soft("mystery: 1\n")).toContain("field/unknown");
     expect(bad("interface:\n  brand_color: #3B82F6\n").map((p) => p.rule)).toContain("yaml/plain-scalar");
     expect(bad("interface:\n  brand_color: \"#3B82F6\"\n")).toEqual([]);
-    const p = bad("interface:\n  title: x\n")[0];
-    expect(p.file).toMatch(/agents\/openai\.yaml$/);
-    // The line of the map the key is in
-    expect(p.line).toBe(1);
+    // The file and the line of the map the key is in
+    expect(soft("interface:\n  title: x\n")).toMatch(/agents\/openai\.yaml:1 {2}field\/unknown/);
   });
 
   it("installs itself, as the same folder in .agents/skills and .claude/skills, with the evals left behind", () => {

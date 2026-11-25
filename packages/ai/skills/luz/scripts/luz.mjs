@@ -171,7 +171,8 @@ Usage:
 A path is a skill folder (with SKILL.md), a folder of skills, a folder named agents, or one .md file. With no
 path it reads .agents/skills, .claude/skills, .claude/agents and .gemini/agents of the current folder.
 --target portable allows only the six fields of the open Agent Skills specification; the default is portable
-for a skill outside .claude and Claude Code's fields for one inside it.
+for a skill outside .claude and Claude Code's fields for one inside it. A field that the lists do not know is a
+warning (field/unknown), because an assistant adds fields with a release: it names the field and never fails.
 
 Rules, each reported as <rule>: frontmatter/missing, yaml/plain-scalar, yaml/flow, yaml/nested, yaml/block-scalar,
 yaml/duplicate, yaml/syntax, field/unknown, name/missing, name/pattern, name/folder, name/file, name/reserved,
@@ -466,6 +467,9 @@ function runCheck(paths, base, forced) {
   const seen = new Set();
   const checked = [];
   const problems = [];
+  // The lists of fields were read at their sources on a date and an assistant adds a field with a release: a field that is
+  // not in a list is a warning that names it, never a failure
+  const warnings = [];
   for (const place of places) {
     for (const { file, kind } of discover(place)) {
       if (seen.has(file)) continue;
@@ -473,10 +477,14 @@ function runCheck(paths, base, forced) {
       const target = forced ?? (file.split(sep).includes(".claude") ? "claude" : "portable");
       const shown = relative(base, file) || file;
       checked.push(shown);
-      for (const { sub, ...p } of checkFile(file, kind, target)) problems.push({ file: sub ? join(dirname(shown), sub) : shown, ...p });
+      for (const { sub, ...p } of checkFile(file, kind, target)) {
+        const at = sub ? join(dirname(shown), sub) : shown;
+        if (p.rule === "field/unknown") warnings.push(`${at}${p.line ? `:${p.line}` : ""}  ${p.rule}: ${p.message}`);
+        else problems.push({ file: at, ...p });
+      }
     }
   }
-  return { checked, problems };
+  return { checked, problems, warnings };
 }
 
 // ---- report ---------------------------------------------------------------------------------------------------
@@ -530,8 +538,9 @@ function runDoctor(dir) {
       if (differ.length) warnings.push(`${entry.name} is not the same in ${SKILL_PLACES[0]} and ${SKILL_PLACES[1]} (${differ.slice(0, 3).join(", ")}${differ.length > 3 ? ", …" : ""}): ${entry.name === SELF ? "run init --target claude,codex --force" : "make the two copies the same"}`);
     }
   }
-  const { checked, problems: found } = runCheck([], dir);
+  const { checked, problems: found, warnings: soft } = runCheck([], dir);
   problems.push(...found);
+  warnings.push(...soft);
   return { ok: problems.length === 0, node, luz, assistants, facts: FACTS.versions, warnings, checked, problems };
 }
 
@@ -930,7 +939,7 @@ export function main(argv, { tty = Boolean(process.stdout.isTTY) } = {}) {
   try {
     const missing = [base, ...paths].find((p) => !existsSync(p));
     if (missing) return usage(`${missing} was not found`);
-    const result = command === "doctor" ? runDoctor(base) : { ...runCheck(paths, base, values.target), warnings: [] };
+    const result = command === "doctor" ? runDoctor(base) : runCheck(paths, base, values.target);
     const report = { ok: result.problems.length === 0, ...result };
     process.stdout.write(values.json ? `${JSON.stringify(report, null, 2)}\n` : textReport(command, report));
     return report.ok ? 0 : 1;
