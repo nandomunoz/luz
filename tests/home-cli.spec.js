@@ -96,7 +96,7 @@ for (const [route, lang] of HOME) {
     for (const line of await shown(page).all()) await expect(line).toBeVisible();
     await expect(term(page).locator('[data-when="target=codex"]:not([hidden])')).toHaveCount(0);
     await expect(term(page).locator('.landing-cli__pause')).toBeHidden();
-    await expect(term(page).locator('figcaption')).toHaveText(words['inside.l4.install.tested']);
+    await expect(term(page).locator('figcaption .landing-cli__tested')).toHaveText(words['inside.l4.install.tested']);
   });
 
   test(`${route}: with motion, it plays once in view, a line at a time, then the next assistant's install, and a button pauses it`, async ({ page, javaScriptEnabled }) => {
@@ -105,7 +105,8 @@ for (const [route, lang] of HOME) {
     await open(page, route);
     await term(page).scrollIntoViewIfNeeded();
     await page.clock.runFor(200);
-    await expect(term(page).locator('.landing-cli__pause')).toBeVisible();
+    // The pause button is in the foot, beside the note
+    await expect(term(page).locator('figcaption .landing-cli__pause')).toBeVisible();
     await expect(shown(page)).toHaveCount(1);
     await expect(shown(page).first()).toHaveText('$ npx @luz-ds/ai init --target claude');
     // The whole round, the pause at its end, then the second round: Codex

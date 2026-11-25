@@ -78,7 +78,8 @@ describe("the template of level 4 and the terminal the generator writes", () => 
     // A loop: a button pauses it (WCAG 2.2.2), hidden until the script shows it; nothing to answer
     expect(install).toMatch(/<button class="luz-btn luz-btn--ghost luz-btn--sm landing-cli__pause" type="button" hidden>/);
     expect(install).not.toMatch(/landing-cli__(next|choices)/);
-    expect(install).toContain(`<figcaption class="landing-cli__caption">${escapeHtml(catalogs.en["inside.l4.install.tested"])}</figcaption>`);
+    // The foot: where it is tested, and the pause button beside it
+    expect(install).toMatch(new RegExp(`<figcaption class="landing-cli__caption"><span class="landing-cli__tested">${escapeHtml(catalogs.en["inside.l4.install.tested"]).replace(/[.;]/g, "\\$&")}</span><button class="luz-btn luz-btn--ghost luz-btn--sm landing-cli__pause" type="button" hidden>[\\s\\S]*?</button></figcaption>`));
   });
 
   it("is a terminal, left to right, named, with its screen a polite live region", () => {
