@@ -24,13 +24,13 @@ export const EXTRA = ["unknown", "hostile"];
 
 /** The terminal command each subcommand stands for, run in an empty folder, and the line a person types. */
 const TERMINAL = {
-  start: ["site", "new", "--name", "Acme", "--kind", "landing", "--stack", "vanilla", "--target", "./acme", "--dry-run"],
-  new: ["site", "new", "--name", "Acme", "--kind", "blog", "--stack", "vanilla", "--target", "./acme", "--dry-run"],
+  start: ["new", "--name", "Acme", "--kind", "landing", "--stack", "vanilla", "--target", "./acme", "--dry-run"],
+  new: ["new", "--name", "Acme", "--kind", "blog", "--stack", "vanilla", "--target", "./acme", "--dry-run"],
   doctor: ["doctor", "--dir", "."],
-  check: ["check", "."],
+  lint: ["lint", "."],
   facts: ["facts"],
-  agents: ["agent", "list"],
-  add: ["agent", "add", "luz-agent-accessibility", "--for", "claude", "--dir", ".", "--dry-run"],
+  agents: ["agents"],
+  add: ["add", "luz-agent-accessibility", "--for", "claude", "--dir", ".", "--dry-run"],
   help: ["--help"],
 };
 

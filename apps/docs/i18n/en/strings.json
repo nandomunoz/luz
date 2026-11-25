@@ -159,7 +159,7 @@
   "ai.cmd.what.start": "Asks what you want to make, shows the plan, waits for your \"go\", writes the starter page and finishes it with you.",
   "ai.cmd.what.new": "The same as /luz, without asking the kind of site: the word after new gives it.",
   "ai.cmd.what.doctor": "Looks at the project: the assistants it has, and the skills and agents it finds.",
-  "ai.cmd.what.check": "Checks the front matter of the skills and agents of the project, or of the path you give.",
+  "ai.cmd.what.lint": "Checks the front matter of the skills and agents of the project, or of the path you give.",
   "ai.cmd.what.facts": "Says the versions, the kinds of site and the stacks of this release.",
   "ai.cmd.what.agents": "Lists the agents of luz-ai that you can add.",
   "ai.cmd.what.add": "Adds the agent you name, after asking for the fields it needs and waiting for your \"go\".",

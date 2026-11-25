@@ -7,7 +7,7 @@
  * network and runs no program. It finds its own data from its own path, so it works from any folder.
  *
  *   luz-ai doctor [--dir <folder>] [--json]
- *   luz-ai check [path...] [--target portable|claude] [--json]
+ *   luz-ai lint [path...] [--target portable|claude] [--json]
  *   luz-ai facts [--json]
  *   luz-ai site new --name <name> --kind <kind> --stack <stack> --target <folder> [--lang <code>] [--dry-run] [--force] [--json]
  *
@@ -49,18 +49,19 @@ const BANNER = [
 /** The banner and a blank line, or nothing when stdout is not a terminal. */
 const banner = (tty) => (tty ? `${BANNER.join("\n")}\n\n` : "");
 
-const HELP = `luz-ai: starts a site with LUZ and checks the skills and subagents of a project. Only init, site new and agent add write.
+const HELP = `luz-ai: starts a site with LUZ and lints the skills and subagents of a project. Only init, new and add write.
 
 Usage:
   luz-ai <command> [options]
 
 Commands:
   init      put this skill where an assistant reads it (--target claude, codex, gemini, cursor or agents-md)
-  site new  write the starter page of a kind of site and a stack (--dry-run shows it first)
-  agent     list the agents of luz-ai, or add one to a project for Claude Code, Gemini CLI or Codex
+  new       write the starter page of a kind of site and a stack (--dry-run shows it first); also site new
+  agents    list the agents of luz-ai; also agent list
+  add       add an agent to a project for Claude Code, Gemini CLI or Codex; also agent add
   facts     the versions, the kinds of site and the stacks of this release
-  doctor    the project, the assistants it has and whether their skills and agents pass check
-  check     the front matter and the body of skills (SKILL.md) and subagents (.md)
+  doctor    the project, the assistants it has and whether their skills and agents pass lint
+  lint      the front matter and the body of skills (SKILL.md) and subagents (.md)
 
 Options:
   --json        one JSON object on stdout
@@ -149,23 +150,23 @@ Example:
   luz-ai facts --json
 `;
 
-const HELP_DOCTOR = `luz-ai doctor: the project, its assistants, and a check of what it finds.
+const HELP_DOCTOR = `luz-ai doctor: the project, its assistants, and a lint of what it finds.
 
 Usage:
   luz-ai doctor [--dir <folder>] [--json]
 
 Reads package.json for the @luz-ds packages, looks for the assistants' folders (.claude, .agents, .codex,
 .gemini, .cursor, AGENTS.md, CLAUDE.md), warns when AGENTS.md is over the 32 KiB that Codex reads, and runs
-check on the skills and agents it finds. A warning never fails; exit 0 or 1.
+lint on the skills and agents it finds. A warning never fails; exit 0 or 1.
 
 Example:
   luz-ai doctor --dir ./my-site
 `;
 
-const HELP_CHECK = `luz-ai check: the front matter and the body of skills and subagents.
+const HELP_LINT = `luz-ai lint: the front matter and the body of skills and subagents.
 
 Usage:
-  luz-ai check [path...] [--target portable|claude] [--json]
+  luz-ai lint [path...] [--target portable|claude] [--json]
 
 A path is a skill folder (with SKILL.md), a folder of skills, a folder named agents, or one .md file. With no
 path it reads .agents/skills, .claude/skills, .claude/agents and .gemini/agents of the current folder.
@@ -178,7 +179,7 @@ description/missing, description/long, compatibility/long, body/long, chars/hidd
 reference/outside, reference/chain.
 
 Example:
-  luz-ai check .claude --json
+  luz-ai lint .claude --json
 `;
 
 // ---- front matter: a strict subset of YAML --------------------------------------------------------------------
@@ -798,7 +799,7 @@ const INIT_TARGETS = { claude: [".claude/skills"], codex: [".agents/skills"], ge
 const SKILL_FILE = ".agents/skills/luz/SKILL.md";
 const COMMAND_TEXT = `Run the luz skill: read ${SKILL_FILE} and follow it. What the person typed after /luz is the subcommand and its argument, and if it is empty the skill starts a site.`;
 const INIT_COMMANDS = {
-  gemini: { path: ".gemini/commands/luz.toml", content: `description = "Start a site with LUZ, or run one subcommand: new, doctor, check, facts, agents, skills, add or help"\nprompt = """\n${COMMAND_TEXT}\n\nArguments: {{args}}\n"""\n` },
+  gemini: { path: ".gemini/commands/luz.toml", content: `description = "Start a site with LUZ, or run one subcommand: new, doctor, lint, facts, agents, add or help"\nprompt = """\n${COMMAND_TEXT}\n\nArguments: {{args}}\n"""\n` },
   cursor: { path: ".cursor/commands/luz.md", content: `${COMMAND_TEXT}\n` },
 };
 // How to call it, per assistant, for the `next` line
@@ -851,11 +852,15 @@ function show(text) {
   return 0;
 }
 
+// The words of the chat are the words of the script: /luz new, /luz agents and /luz add run these (the long forms still work)
+const ALIASES = { new: ["site", "new"], agents: ["agent", "list"], add: ["agent", "add"] };
+
 export function main(argv, { tty = Boolean(process.stdout.isTTY) } = {}) {
+  if (ALIASES[argv[0]]) argv = [...ALIASES[argv[0]], ...argv.slice(1)];
   const [command, ...rest] = argv;
   if (command === "--help" || command === "-h") return show(banner(tty) + HELP);
-  if (!command) return usage("a command is missing (init, site new, agent, facts, doctor or check)", true);
-  if (!["init", "site", "agent", "facts", "doctor", "check"].includes(command)) return usage(`"${command}" is not a command (init, site new, agent, facts, doctor, check)`, true);
+  if (!command) return usage("a command is missing (init, new, site new, agents, add, agent, facts, doctor or lint)", true);
+  if (!["init", "site", "agent", "facts", "doctor", "lint"].includes(command)) return usage(`"${command}" is not a command (init, new, site new, agents, add, agent, facts, doctor, lint)`, true);
   let args;
   try {
     args = parseArgs({
@@ -885,7 +890,7 @@ export function main(argv, { tty = Boolean(process.stdout.isTTY) } = {}) {
     const v = values[flag];
     if (v !== undefined && (/[\r\n]/.test(v) || HIDDEN.test(v) || v.startsWith("-"))) return usage(`--${flag} is a path on one line, with no control or hidden character, and not starting with "-"`);
   }
-  if (values.help) return show({ init: HELP_INIT, site: HELP_SITE, agent: HELP_AGENT, facts: HELP_FACTS, doctor: HELP_DOCTOR, check: HELP_CHECK }[command]);
+  if (values.help) return show({ init: HELP_INIT, site: HELP_SITE, agent: HELP_AGENT, facts: HELP_FACTS, doctor: HELP_DOCTOR, lint: HELP_LINT }[command]);
   if (command === "init") {
     if (positionals.length) return usage("init takes no word: use --target");
     const { error, report } = runInit(values);
@@ -917,7 +922,7 @@ export function main(argv, { tty = Boolean(process.stdout.isTTY) } = {}) {
     return 0;
   }
   if (command === "facts") return show(runFacts(values.json));
-  if (command === "check" && values.target && !["portable", "claude"].includes(values.target)) return usage(`--target is portable or claude, not "${values.target}"`);
+  if (command === "lint" && values.target && !["portable", "claude"].includes(values.target)) return usage(`--target is portable or claude, not "${values.target}"`);
   if (command === "doctor" && positionals.length) return usage("doctor takes no path: use --dir <folder>");
 
   const base = resolve(values.dir ?? ".");

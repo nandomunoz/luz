@@ -120,7 +120,7 @@ export function aiSections({ say, root, escapeHtml }) {
   const phases = [
     card("ask", t("level.ai.skill.ask.title"), t("level.ai.skill.ask.text"), "", ask("›", code("/luz"))),
     card("plan", t("level.ai.skill.plan.title"), t("level.ai.skill.plan.text"), "", ask("›", code(say("inside.cli.go.button")))),
-    card("write", t("level.ai.skill.write.title"), t("level.ai.skill.write.text"), "", ask("$", code("luz-ai site new --kind landing"))),
+    card("write", t("level.ai.skill.write.title"), t("level.ai.skill.write.text"), "", ask("$", code("luz-ai new --kind landing"))),
     card("check", t("level.ai.skill.check.title"), t("level.ai.skill.check.text"), "", ask("$", code("npx @luz-ds/check"))),
   ].join("");
 
@@ -142,7 +142,7 @@ export function aiSections({ say, root, escapeHtml }) {
 
   // The commands of the chat, a card for each row of the table of SKILL.md: what to type, what it does, and whether it writes
   const TYPED = { start: "/luz", new: "/luz new landing", add: "/luz add luz-agent-accessibility" };
-  const ICON_OF = { start: "write", new: "write", doctor: "doctor", check: "validate", facts: "plan", agents: "luz-agent-accessibility", add: "add", help: "help" };
+  const ICON_OF = { start: "write", new: "write", doctor: "doctor", lint: "validate", facts: "plan", agents: "luz-agent-accessibility", add: "add", help: "help" };
   const commandCards = commandRows(root)
     .map((row) => {
       const typed = row.chat.replace(/ [<[].*$/, "");

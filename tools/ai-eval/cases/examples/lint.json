@@ -1,0 +1,13 @@
+{
+  "example": "lint",
+  "case": "lint",
+  "model": "sonnet",
+  "date": "2026-11-25",
+  "skillVersion": "0.1.0",
+  "turns": [
+    {
+      "user": "/luz lint",
+      "assistant": "`/luz lint` ran on the project and found nothing: 0 problems, 0 warnings, 1 file checked. The check read the front matter of the project's skills and agents, and it wrote nothing.\n\nThe check covers front matter only. It doesn't tell you whether each skill or agent describes what it does well, or whether its instructions are right. A person has to review those."
+    }
+  ]
+}

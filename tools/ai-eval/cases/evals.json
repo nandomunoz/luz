@@ -1,5 +1,5 @@
 {
-  "$comment": "Scripted cases of the luz skill. `prompt` opens the conversation; `answers` is the map a cheap model picks the person's reply from, by topic (a question outside it is answered \"Whatever you recommend.\" and flagged); `checks` are the folder checks of grade.js, `transcript` the checks of checks.js, each tied to a rule R1…R9 of SKILL.md. `readOnly` cases must write nothing. `ran` and `says` are regular expressions.",
+  "$comment": "Scripted cases of the luz skill. `prompt` opens the conversation; `answers` is the map a cheap model picks the person's reply from, by topic (a question outside it is answered \"Whatever you recommend.\" and flagged); `checks` are the folder checks of grade.js, `transcript` the checks of checks.js, each tied to a rule R1\u2026R9 of SKILL.md. `readOnly` cases must write nothing. `ran` and `says` are regular expressions.",
   "cases": [
     {
       "id": "landing-vanilla",
@@ -151,7 +151,7 @@
       "fixture": {},
       "checks": [],
       "ran": [
-        "luz\\.mjs agent list"
+        "luz\\.mjs (agent list|agents)\\b"
       ],
       "says": [
         "luz-agent-accessibility"
@@ -251,15 +251,15 @@
       }
     },
     {
-      "id": "check",
-      "example": "check",
-      "prompt": "/luz check",
+      "id": "lint",
+      "example": "lint",
+      "prompt": "/luz lint",
       "readOnly": true,
       "target": "site",
       "fixture": {},
       "checks": [],
       "ran": [
-        "luz\\.mjs check"
+        "luz\\.mjs lint"
       ],
       "answers": {},
       "transcript": [
@@ -276,7 +276,7 @@
       "fixture": {},
       "checks": [],
       "ran": [
-        "luz\\.mjs agent add luz-agent-accessibility"
+        "luz\\.mjs (agent )?add luz-agent-accessibility"
       ],
       "answers": {
         "go": "go",

@@ -38,7 +38,7 @@ export const CLI_TARGETS = [
 /**
  * The assistants of the tabs of the skill's page (owner, 2026-11-25), one session each: the --target, the command that
  * opens it, how the skill is called, and the --for of its agents (none for Cursor:
- * `luz-ai agent add --help` writes agents for claude, gemini and codex only, so its session asks nothing about them).
+ * `luz-ai add --help` writes agents for claude, gemini and codex only, so its session asks nothing about them).
  */
 export const CLI_HANDS = [
   { target: "claude", open: "claude", trigger: "/luz", agents: "claude" },
@@ -197,13 +197,13 @@ export function cliDemo({ say, root, escapeHtml }) {
     choices("go", t("inside.cli.go"), choice("go", "go", t("inside.cli.go.button"), true)),
     you(t("inside.cli.go.button")),
     // It writes the page and checks it
-    per(CLI_KINDS, (k) => per(CLI_STACKS, (s) => cmd(`luz-ai site new --name "${SITE_NAME}" --kind ${k} --stack ${written(s)}`, `kind=${k} stack=${s}`))),
+    per(CLI_KINDS, (k) => per(CLI_STACKS, (s) => cmd(`luz-ai new --name "${SITE_NAME}" --kind ${k} --stack ${written(s)}`, `kind=${k} stack=${s}`))),
     per(CLI_KINDS, (k) => per(CLI_STACKS, (s) => site[`${k}/${written(s)}`].lines.map((l) => out(l, `kind=${k} stack=${s}`)).join(""))),
     per(CLI_KINDS, (k) => per(["vanilla", "astro"], (s) => cmd(esc(site[`${k}/${s}`].next), `kind=${k} stack=${s}`))),
     cmd(esc(site["landing/vanilla"].next), "stack=react"),
     out(`✓ 0 blocking and 0 warnings in 1 file`),
     // It adds the agents
-    agentsFor ? per(CLI_AGENTS, ([, name]) => cmd(`luz-ai agent add ${name} --for ${agentsFor}`, `agent=${name}`) + agents[agentsFor][name].map((l) => out(l, `agent=${name}`)).join("")) : "",
+    agentsFor ? per(CLI_AGENTS, ([, name]) => cmd(`luz-ai add ${name} --for ${agentsFor}`, `agent=${name}`) + agents[agentsFor][name].map((l) => out(l, `agent=${name}`)).join("")) : "",
     skill(t(agentsFor ? "inside.cli.adapt" : "inside.cli.adapt.page")),
     // Done
     line(

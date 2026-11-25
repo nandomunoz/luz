@@ -5362,6 +5362,12 @@ home-light:defined ~ .landing-light__nojs {
 
 /* Below the steps the page is ordered by goal (owner, 2026-11-25): a strip of the assistants, four sections of cards
    with an icon, a title and the sentence you say or the command that runs, and a strip of what you decide */
+.landing-clitabs__note {
+  margin: 0 0 var(--luz-space-sm);
+  font-size: var(--luz-text-sm);
+  color: var(--luz-text-secondary);
+}
+
 .landing-ai-works {
   display: grid;
   justify-items: center;

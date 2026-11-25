@@ -183,7 +183,7 @@
   "ai.cmd.what.start": "Pregunta qué quieres hacer, muestra el plan, espera tu «go», escribe la página de partida y la termina contigo.",
   "ai.cmd.what.new": "Lo mismo que /luz, sin preguntar el tipo de sitio: lo da la palabra que sigue a new.",
   "ai.cmd.what.doctor": "Mira el proyecto: los asistentes que tiene y las skills y agentes que encuentra.",
-  "ai.cmd.what.check": "Comprueba el front matter de las skills y agentes del proyecto, o de la ruta que des.",
+  "ai.cmd.what.lint": "Comprueba el front matter de las skills y agentes del proyecto, o de la ruta que des.",
   "ai.cmd.what.facts": "Dice las versiones, los tipos de sitio y los stacks de esta versión.",
   "ai.cmd.what.agents": "Lista los agentes de luz-ai que puedes añadir.",
   "ai.cmd.what.add": "Añade el agente que nombres, tras pedirte los campos que necesita y esperar tu «go».",

@@ -7,7 +7,7 @@
   "turns": [
     {
       "user": "/luz facts",
-      "assistant": "`/luz facts` printed this for the current release:\n\n**Versions**\n- `@luz-ds/tokens` 0.4.1\n- `@luz-ds/core` 0.4.1\n- `@luz-ds/catalog` 0.4.1\n- `@luz-ds/check` 0.3.2\n- `@luz-ds/ai` 0.0.0\n\n**Kinds of site:** landing, blog, app, docs\n\n**Stacks**\n- `vanilla` and `astro` get a starter page of their own.\n- `react`, `vue`, `angular` and `other` are marked \"by hand\". They get a plain HTML page, and you move its markup into the framework yourself.\n\nThe command only read this information and wrote no files. Nothing needs checking on your side. To start a site, run `/luz` or `/luz new <kind>`."
+      "assistant": "**`/luz facts`** (this release):\n\n| Package | Version |\n| --- | --- |\n| `@luz-ds/tokens` | 0.4.1 |\n| `@luz-ds/core` | 0.4.1 |\n| `@luz-ds/catalog` | 0.4.1 |\n| `@luz-ds/check` | 0.3.2 |\n| `@luz-ds/ai` | 0.0.0 |\n\n- **Kinds of site:** landing, blog, app, docs\n- **Stacks:** `vanilla` and `astro` get a starter page. `react`, `vue`, `angular` and `other` are \"by hand\". They get a plain page, and you move its markup into your framework yourself.\n\nThe script printed versions only. It did not check that these packages are installed in your project. `@luz-ds/ai` at 0.0.0 looks like a placeholder version, so confirm it is the one you expect.\n\nThe command wrote nothing. To start a site, run `/luz` or `/luz new <landing, blog, app or docs>`."
     }
   ]
 }

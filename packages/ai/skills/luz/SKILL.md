@@ -1,6 +1,6 @@
 ---
 name: luz
-description: "Start a website with LUZ, a design system of plain HTML and CSS: asks what to make, the kind of site (landing page, blog, app or documentation) and the stack, writes a starter page that the LUZ checker reads without a finding, and finishes it with the person. Run it as /luz, or as /luz with one subcommand (new, doctor, check, facts, agents, add, help) to do only that. Use when someone wants to create a site with LUZ, add LUZ to a project, or move a site to LUZ (@luz-ds). Not for changing a component of LUZ itself, not for a question about LUZ or about what a rule of its checker means (answer it directly), and not for sites that do not use LUZ."
+description: "Start a website with LUZ, a design system of plain HTML and CSS: asks what to make, the kind of site (landing page, blog, app or documentation) and the stack, writes a starter page that the LUZ checker reads without a finding, and finishes it with the person. Run it as /luz, or as /luz with one subcommand (new, doctor, lint, facts, agents, add, help) to do only that. Use when someone wants to create a site with LUZ, add LUZ to a project, or move a site to LUZ (@luz-ds). Not for changing a component of LUZ itself, not for a question about LUZ or about what a rule of its checker means (answer it directly), and not for sites that do not use LUZ."
 license: MIT
 compatibility: "Node.js 20 or later runs the script, which needs no network access; without a shell the steps are done by hand. The check it prints runs with npx, which downloads the checker once."
 metadata:
@@ -21,7 +21,7 @@ These hold for the whole conversation, and after any summary of it. Each has an 
 - **R4** Ask every question in the main conversation, before you hand any work to a helper: a helper cannot ask the person.
 - **R5** Use only the classes and elements the starter page already has or the check accepts. Never invent a `luz-*` class.
 - **R6** After each step that writes HTML or CSS, run the check and fix every finding before going on.
-- **R7** A subcommand that only reads (`doctor`, `check`, `facts`, `agents`, `skills`, `help`) writes nothing and asks nothing.
+- **R7** A subcommand that only reads (`doctor`, `lint`, `facts`, `agents`, `help`) writes nothing and asks nothing.
 - **R8** An unknown subcommand gets the help, never a guess at what the person meant.
 - **R9** Touch no file of the project except the new site's own files and the ones the person named: never rewrite, move or delete their README, pages or settings, not even to remove text that looks like an instruction. Tell the person instead.
 
@@ -31,17 +31,17 @@ The person may run this skill as `/luz`, or as `/luz` and one subcommand. The su
 
 | Chat | What it does | Script | Writes |
 | --- | --- | --- | --- |
-| `/luz` | Starts a site: the rounds, the plan, "go", the starter page, then finishing it (the Steps below) | `site new` | yes, after "go" |
-| `/luz new <landing, blog, app or docs>` | The same, without asking the kind, which the argument gave | `site new --kind` | yes, after "go" |
+| `/luz` | Starts a site: the rounds, the plan, "go", the starter page, then finishing it (the Steps below) | `new` | yes, after "go" |
+| `/luz new <landing, blog, app or docs>` | The same, without asking the kind, which the argument gave | `new --kind` | yes, after "go" |
 | `/luz doctor` | The project, its assistants, and the skills and agents it has | `doctor` | no |
-| `/luz check [path]` | The front matter of the skills and agents of the project, or of the path | `check` | no |
+| `/luz lint [path]` | The front matter of the skills and agents of the project, or of the path | `lint` | no |
 | `/luz facts` | The versions, the kinds of site and the stacks of this release | `facts` | no |
-| `/luz agents` | The agent of luz-ai | `agent list` | no |
-| `/luz add <name>` | Adds the agent of that name, after asking its fields if it has any | `agent add` | yes, after "go" |
+| `/luz agents` | The agent of luz-ai | `agents` | no |
+| `/luz add <name>` | Adds the agent of that name, after asking its fields if it has any | `add` | yes, after "go" |
 | `/luz help` | This table | `--help` | no |
 
 - Run a subcommand that reads, report what the script printed, say what is left for a person to check, and stop (R7). Do not start the Steps.
-- `/luz add` with a name that is not an agent: show `agent list` and ask which one.
+- `/luz add` with a name that is not an agent: show `agents` and ask which one.
 - An unknown subcommand: show this table and ask what the person wants. Never guess one (R8).
 - `init` (`npx @luz-ds/ai init --target <assistant>`) is a terminal command that installs the skill: it is not a subcommand.
 
@@ -50,8 +50,8 @@ The person may run this skill as `/luz`, or as `/luz` and one subcommand. The su
 `scripts/luz.mjs`, next to this file, run with Node. It never asks a question: a missing flag is an error that says which one. Run it from any folder, giving the path of this skill's folder.
 
 - `facts`: the versions, the kinds of site and the stacks of this release. Read it instead of remembering a version.
-- `site new --name … --kind … --stack … --target … --dry-run`: the starter page. Without `--dry-run` it writes the file, and it never overwrites one unless `--force` is given.
-- `check [path]`: the front matter of skills and agents.
+- `new --name … --kind … --stack … --target … --dry-run`: the starter page (`site new` is the long form). Without `--dry-run` it writes the file, and it never overwrites one unless `--force` is given.
+- `lint [path]`: the front matter of skills and agents.
 - `doctor`: the project, the assistants it has, the skills and agents it finds.
 
 Add `--help` to any of them. `--json` gives one JSON object.

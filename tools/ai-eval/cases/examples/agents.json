@@ -7,7 +7,7 @@
   "turns": [
     {
       "user": "/luz agents",
-      "assistant": "The luz-ai release has one agent.\n\n**`luz-agent-accessibility`**\n- **What it does:** It reviews a web project's HTML, CSS and JavaScript for accessibility. It checks against WCAG 2.2 level AA and EN 301 549. Run it when a page or component is written or changed.\n- **Access:** It reads source files only and writes nothing.\n- **Fields:** None, so you don't fill in anything.\n- **Assistants:** claude, gemini, codex.\n\n**Still for you to check:** The agent reads source files only. It can't judge contrast as rendered, how a screen reader sounds, or whether labels and alt text make sense to a person. Those need a manual check.\n\nTo add it, run `/luz add luz-agent-accessibility`. I'll show a dry run first and write nothing until you say \"go\"."
+      "assistant": "The script's `agents` subcommand lists one agent for luz-ai:\n\n**`luz-agent-accessibility`**\n- **What it does:** Reviews a web project's HTML, CSS and JavaScript for accessibility against WCAG 2.2 level AA and EN 301 549. It reads source files only and writes nothing.\n- **When to use it:** After you write or change a page or component.\n- **Fields:** None. It reads the project's own files and asks you nothing.\n- **Assistants it supports:** claude, gemini, codex\n\n**What's left for you to check:** The agent reads source only. It can't judge real contrast, alt text quality, or how a screen reader behaves. You still need to check those yourself.\n\nTo add it, run `/luz add luz-agent-accessibility`. I'll show a `--dry-run` first and write nothing until you say \"go\"."
     }
   ]
 }
