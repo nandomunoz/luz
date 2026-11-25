@@ -21,6 +21,10 @@ export const MANIFESTO_FILE = "apps/site/manifesto/index.html";
 export const HUMANS_ROUTE = "/humans.txt";
 export const HUMANS_FILE = "apps/site/humans.txt";
 
+/** robots.txt: every crawler may read every page; at the root, served and written as it is. */
+export const ROBOTS_ROUTE = "/robots.txt";
+export const ROBOTS_FILE = "apps/site/robots.txt";
+
 /** The page as the build serves it: the file, untouched. */
 export function readManifesto(repoRoot) {
   return readFileSync(resolve(repoRoot, MANIFESTO_FILE), "utf-8");

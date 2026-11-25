@@ -2,7 +2,7 @@
 
 **Design system for humans, ready for AI.**
 
-How we build LUZ: the rules we make LUZ with, not rules for what you build with it. Published at [/manifesto/](https://nandomunoz.github.io/luz/manifesto/); [PRINCIPLES.md](./PRINCIPLES.md) has the rules that enforce it.
+How we build LUZ: the rules we make LUZ with, not rules for what you build with it. Published at [/manifesto/](https://luzds.com/manifesto/); [PRINCIPLES.md](./PRINCIPLES.md) has the rules that enforce it.
 
 1. **Native first.** The standard is the path, and the browser the means.
 2. **Accessible, always.** Accessibility is not optional in a starting point.

@@ -28,22 +28,23 @@ if (pagesRoot !== resolve(__dirname, "docs") && !insideTmp) {
 }
 
 /**
- * The site's path on GitHub Pages (https://<user>.github.io/luz/). Only the
- * not-found page uses it, as its <base href>: GitHub Pages serves /404.html
- * at whatever URL was missing, so its relative URLs need a fixed base. A fork
- * or a custom domain changes it ("/" for a domain of its own); if it is wrong,
- * the 404 page is still readable, only unstyled.
+ * The site's path on its domain: "/", because GitHub Pages serves the site at
+ * the root of luzds.com. Only the not-found page uses it, as its <base href>:
+ * GitHub Pages serves /404.html at whatever URL was missing, so its relative
+ * URLs need a fixed base. A fork served at https://<user>.github.io/<repo>/
+ * changes it to "/<repo>/"; if it is wrong, the 404 page is still readable,
+ * only unstyled.
  */
-export const PAGES_BASE = "/luz/";
+export const PAGES_BASE = "/";
 
 /**
- * The published site's root URL: GitHub Pages of the repository
- * github.com/nandomunoz/luz (the git remote), at PAGES_BASE. The pages build
- * writes the home pages' canonical and hreflang alternates with it, absolute
- * as search engines ask; the dev server keeps them root-absolute. A fork or a
- * custom domain changes it with PAGES_BASE.
+ * The published site's root URL: luzds.com, the custom domain of the GitHub
+ * Pages of github.com/nandomunoz/luz (the git remote). The pages build writes
+ * the home pages' canonical and hreflang alternates with it, absolute as
+ * search engines ask, and CNAME with its host (cnameOf() in
+ * scripts/docs-site/plugin.js); the dev server keeps them root-absolute.
  */
-export const SITE_URL = `https://nandomunoz.github.io${PAGES_BASE}`;
+export const SITE_URL = `https://luzds.com${PAGES_BASE}`;
 
 /**
  * Content-Security-Policy for the published GitHub Pages site. Pages cannot

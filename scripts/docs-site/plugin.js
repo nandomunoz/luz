@@ -79,7 +79,7 @@ import {
 } from "./site.js";
 import { localize } from "./docs-i18n.js";
 import { DEBUG_FILE, DEBUG_ROUTE, hasDebugPage, renderDebug } from "./debug.js";
-import { HUMANS_FILE, HUMANS_ROUTE, MANIFESTO_FILE, MANIFESTO_ROUTE } from "./manifesto.js";
+import { HUMANS_FILE, HUMANS_ROUTE, MANIFESTO_FILE, MANIFESTO_ROUTE, ROBOTS_FILE, ROBOTS_ROUTE } from "./manifesto.js";
 import { PACKAGES } from "../luz-packages.js";
 import { promptFiles } from "./prompts.js";
 import { MOVED, renderRedirect } from "./redirect.js";
@@ -87,6 +87,17 @@ import { AI_ROUTES, exampleAssets, exampleDocuments, manifestAssets, renderLlmsF
 import { SITE_URL } from "./i18n.js";
 
 const LANDING = { route: "/", file: "apps/landing/index.html" };
+
+/**
+ * The host GitHub Pages serves the site at, for the CNAME file of the build:
+ * the site URL's host, or null for a github.io address (which needs none).
+ * @param {string} siteUrl
+ */
+export function cnameOf(siteUrl) {
+  if (!siteUrl) return null;
+  const { host } = new URL(siteUrl);
+  return host.endsWith(".github.io") ? null : host;
+}
 
 /** The pages of the levels (tokens, core, catalog) and of the skill (ai): each is the home's template with the <main> of apps/landing/levels/<name>.html. */
 const LEVELS = ["tokens", "core", "catalog", "ai"];
@@ -293,6 +304,8 @@ export function docsSite({ repoRoot, relative: relativeUrls, outRoot, pagesBase 
       ...promptFiles({ root: repoRoot }),
       // humans.txt (humanstxt.org): who makes the site, a file of apps/site served as it is
       ...(existsSync(resolve(repoRoot, HUMANS_FILE)) ? [[HUMANS_ROUTE, () => readFileSync(resolve(repoRoot, HUMANS_FILE), "utf-8")]] : []),
+      // robots.txt: every crawler may read every page; files of apps/site served as they are
+      ...(existsSync(resolve(repoRoot, ROBOTS_FILE)) ? [[ROBOTS_ROUTE, () => readFileSync(resolve(repoRoot, ROBOTS_FILE), "utf-8")]] : []),
     ]);
   };
 
@@ -596,6 +609,9 @@ export function docsSite({ repoRoot, relative: relativeUrls, outRoot, pagesBase 
 
       // GitHub Pages: serve the files as they are, without Jekyll
       if (relativeUrls) writeFileSync(join(outRoot, ".nojekyll"), "", "utf-8");
+      // The custom domain: without CNAME in the deployed files, GitHub Pages drops it
+      const cname = relativeUrls ? cnameOf(siteUrl) : null;
+      if (cname) writeFileSync(join(outRoot, "CNAME"), `${cname}\n`, "utf-8");
     },
   };
 }
