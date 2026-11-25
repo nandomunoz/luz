@@ -1,9 +1,11 @@
 /**
- * LUZ — the release gate of the luz skill (`.claude/plans/ai-eval-lab.md`, phase 5). A version of @luz-ds/ai is published only
- * when a green pass of the release layer exists for it: `packages/ai/tested.json` (written by `pnpm ai:eval tested <run>`) names
- * this package version, this skill version and the release model, and no frozen example of the docs is older than the skill.
+ * LUZ — what is known about the luz skill before a release (`.claude/plans/ai-eval-lab.md`, phase 5). The lab informs and the
+ * deterministic tests are the gate: a model is not the same every time, so a pass of the release layer is a claim ("Tested in")
+ * and never a blocker. `packages/ai/tested.json` (written by `pnpm ai:eval tested <run>`, nine cases in ten green) should name
+ * this package version, this skill version and the release model, and no frozen example of the docs should be older than the skill.
  *
- *   node scripts/check-ai-tested.js     exit 0 when the pass is there, 1 and what is missing otherwise
+ *   node scripts/check-ai-tested.js [--root <folder>] [--strict]
+ *                       prints what is missing or stale as warnings and exits 0; with --strict it exits 1 on any
  *
  * Reads files of the repository; no network, no process. Importing this module runs nothing.
  */
@@ -36,8 +38,10 @@ export function checkAiTested(root = repo) {
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  const problems = checkAiTested();
-  for (const p of problems) process.stderr.write(`check:ai-tested: ${p}\n`);
-  if (!problems.length) process.stdout.write("check:ai-tested: the skill has a green release pass and no stale example\n");
-  process.exitCode = problems.length ? 1 : 0;
+  const args = process.argv.slice(2);
+  const at = args.indexOf("--root");
+  const problems = checkAiTested(at === -1 ? repo : resolve(args[at + 1] ?? "."));
+  for (const p of problems) process.stderr.write(`check:ai-tested: ! ${p}\n`);
+  if (!problems.length) process.stdout.write("check:ai-tested: the skill has a release pass for this version and no stale example\n");
+  process.exitCode = problems.length && args.includes("--strict") ? 1 : 0;
 }

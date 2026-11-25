@@ -48,7 +48,7 @@ const steps = [
   { name: "Tarball contents", cmd: [pnpm, "check:pack"] },
   { name: "Token contrast (RL-7)", cmd: [pnpm, "check:contrast"] },
   { name: "Files for AI agents (RL-19: manifests, llms.txt, examples, READMEs, agent)", cmd: [pnpm, "check:ai"] },
-  { name: "The luz skill has a green release pass and no stale example (ai:eval)", cmd: [pnpm, "check:ai-tested"] },
+  { name: "The luz skill has a release pass and no stale example (ai:eval; a warning, never blocks)", cmd: [pnpm, "check:ai-tested"] },
   { name: "Unit tests", cmd: [pnpm, "test:unit"] },
   ...(args.has("--skip-ui") ? [] : [{ name: "Playwright: chromium and chromium-nojs", cmd: [pnpm, "exec", "playwright", "test", ...UI] }]),
 ];

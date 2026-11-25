@@ -28,7 +28,7 @@ describe("tested.json: what a green release pass writes", () => {
   it("records host, model, versions, date and the cases, for a green script run of the release layer", async () => {
     const { makeTested } = await lab("tested.js");
     const t = makeTested(green(), { skillVersion: "0.2.0", packageVersion: "0.4.1", cli: "2.1.331", now: new Date("2026-11-24T10:00:00Z") });
-    expect(t).toEqual({ host: "claude-code", cli: "2.1.331", model: "opus", skillVersion: "0.2.0", packageVersion: "0.4.1", date: "2026-11-24", cases: ["a", "b"] });
+    expect(t).toEqual({ host: "claude-code", cli: "2.1.331", model: "opus", skillVersion: "0.2.0", packageVersion: "0.4.1", date: "2026-11-24", cases: ["a", "b"], failed: [] });
   });
 
   it("refuses a run that is not the release layer, not a script run, or with too many cases red", async () => {
