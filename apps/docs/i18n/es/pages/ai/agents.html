@@ -1,19 +1,20 @@
 <!-- luz:page
-title: El agente de /luz
-description: El agente de accesibilidad que /luz puede añadir a un proyecto, con lo que revisa y las herramientas que puede usar.
-keywords: agente, subagente, accesibilidad, luz-agent, luz-ai
-source: 7b325d902c90
+title: Los agentes de /luz
+description: Los agentes que /luz puede añadir a un proyecto (accesibilidad, diseño y UX, velocidad, SEO y GEO, legal y privacidad), con lo que revisa cada uno y las herramientas que puede usar.
+keywords: agente, subagente, accesibilidad, ux, rendimiento, core web vitals, seo, geo, legal, privacidad, luz-agent, luz-ai
+source: 432f34b8c033
 reviewed: false
 -->
     <section class="docs-block" aria-labelledby="choose">
       <h2 class="docs-chapter__title" id="choose">Elige por lo que te importa</h2>
-      <p class="docs-lead">Dile a <code>/luz</code> lo que te importa y te ofrece el agente que encaja. Nunca ofrece uno que no necesitas. Todo agente se llama <code>luz-agent-</code> y una palabra que dice lo que vigila.</p>
+      <p class="docs-lead">Dile a <code>/luz</code> lo que te importa y te ofrece los agentes que encajan. Nunca ofrece uno que no necesitas. Todo agente se llama <code>luz-agent-</code> y una palabra que dice lo que vigila.</p>
       <!-- luz:agents needs -->
     </section>
 
     <section class="docs-block" aria-labelledby="agents">
       <h2 class="docs-chapter__title" id="agents">Los agentes</h2>
-      <p class="docs-lead">El agente no pregunta nada antes de escribirse: lee tus propios archivos. Revisa e informa; no los reescribe. Es el mismo revisor que imprime <code>npx @luz-ds/check agent</code>.</p>
+      <p class="docs-lead">Cuatro agentes leen tus archivos y proponen; <code>luz-agent-optimiza</code> además los cambia, después de que aceptes su lista de cambios. <code>luz-agent-accessibility</code> no pregunta nada antes de escribirse, y es el mismo revisor que imprime <code>npx @luz-ds/check agent</code>. Los demás preguntan antes algunos datos de tu proyecto (su objetivo, sus visitantes, sus mercados) y se detienen hasta tenerlos.</p>
+      <p><code>luz-agent-legal</code> es una revisión de tu código, no asesoramiento jurídico: un abogado decide qué se aplica.</p>
       <p>Las descripciones son las de los archivos de los agentes, así que están en inglés, sea cual sea el idioma de esta página.</p>
       <!-- luz:agents agents -->
     </section>
@@ -35,5 +36,5 @@ reviewed: false
         </div>
         <pre class="luz-code-block" data-lang="bash" tabindex="0" role="region" aria-label="El comando en una terminal"><code id="code-agents-shell">npx @luz-ds/ai agent add luz-agent-accessibility --for claude</code></pre>
       </div>
-      <p><code>--for</code> admite <code>claude</code>, <code>gemini</code> o <code>codex</code>: el comando escribe el agente en la carpeta que lee cada uno. <a href="/docs/ai/commands/#cmd-add">El comando <code>/luz add</code></a> muestra una conversación entera.</p>
+      <p><code>--for</code> admite <code>claude</code>, <code>gemini</code> o <code>codex</code>: el comando escribe el agente en la carpeta que lee cada uno. Un agente que cambia código aún no se escribe para Gemini CLI. <a href="/docs/ai/commands/#cmd-add">El comando <code>/luz add</code></a> muestra una conversación entera.</p>
     </section>

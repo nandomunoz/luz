@@ -3,6 +3,10 @@ README.md
 dist/skills/luz/SKILL.md
 dist/skills/luz/agents/openai.yaml
 dist/skills/luz/assets/agents/luz-agent-accessibility.md
+dist/skills/luz/assets/agents/luz-agent-legal.md
+dist/skills/luz/assets/agents/luz-agent-optimiza.md
+dist/skills/luz/assets/agents/luz-agent-seogeo.md
+dist/skills/luz/assets/agents/luz-agent-ux.md
 dist/skills/luz/assets/facts.json
 dist/skills/luz/assets/fields.json
 dist/skills/luz/assets/templates/app.html.tpl

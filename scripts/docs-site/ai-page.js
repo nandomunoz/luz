@@ -3,8 +3,10 @@
  *
  * For a developer who is deciding whether `@luz-ds/ai` is for their project (owner, 2026-11-25): below the hero and the
  * three steps the page is ordered by what the reader wants, not by the parts of the tool: the assistants it works
- * with (a strip), then a section for each element of the skill, in this order (owner, 2026-11-25): its commands, its agents and
- * the skill itself (what it does in a session), and last what you decide (a strip). The tables of commands and of targets
+ * with (a strip) and a list of links to the sections, then a section for each element of the skill, in this order (owner,
+ * 2026-11-25): its commands (in two groups: the ones that write, after your go, and the ones that only read), its agents
+ * (an agent that changes code says so in its badge) and the skill itself (what it does in a session), and last what you
+ * decide (a strip). The tables of commands and of targets
  * are in /docs/ai/. Everything that is a fact of the package is read from `packages/ai/skills/luz/` and never typed:
  *
  *  - the agents: `assets/agents/*.md`, their `name` and `tools`. An agent with a tool of `acting` (tool-map.json)
@@ -72,6 +74,11 @@ const ICONS = {
   doctor: "M3 12h4l2.5-6 4 12 2.5-6H21",
   validate: "M5 5h14v14H5ZM9 12l2.5 2.5L15.5 9.5",
   "luz-agent-accessibility": "M12 3.5a2 2 0 1 0 0 4 2 2 0 0 0 0-4ZM5 9h14M12 9v5m0 0-3 6m3-6 3 6",
+  "luz-agent-legal": "M12 4v16M8 20h8M5 7h14M5 7l-2.5 6a2.5 2.5 0 0 0 5 0ZM19 7l-2.5 6a2.5 2.5 0 0 0 5 0Z",
+  "luz-agent-optimiza": "M13 3 5 13.5h6L10 21l8-10.5h-6Z",
+  "luz-agent-seogeo": "M10.5 4a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM15.5 15.5 20 20",
+  "luz-agent-ux": "M4 5h16v14H4ZM4 10h16M10 10v9",
+  agents: "M8.5 4.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5ZM3.5 19c0-3 2.2-5.5 5-5.5s5 2.5 5 5.5M16 6.5a2 2 0 1 0 0 4 2 2 0 0 0 0-4ZM15 13.6c3 0 5.5 2.2 5.5 5.4",
   add: "M12 5v14M5 12h14",
   help: "M12 3.5a8.5 8.5 0 1 0 0 17 8.5 8.5 0 0 0 0-17ZM9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 .9-1 1.7M12 17h.01",
   promise: "M12 3.5a8.5 8.5 0 1 0 0 17 8.5 8.5 0 0 0 0-17ZM8.5 12l2.5 2.5 4.5-5",
@@ -93,7 +100,7 @@ export function aiSections({ say, root, escapeHtml }) {
   const ask = (sign, inner) => `<p class="landing-ai__ask"><span class="landing-ai__mark" aria-hidden="true">${sign}</span> ${inner}</p>`;
   const card = (id, title, text, extra, foot, mod = "") =>
     `<article class="landing-card landing-ai__card${mod}">${icon(id)}<p class="landing-card__title">${title}</p>${extra}<p class="landing-ai__text">${text}</p>${foot}</article>`;
-  const goal = (id, links, cards) =>
+  const goal = (id, links, cards, raw = false) =>
     [
       `<section class="landing-ai-goal" id="a-${id}" aria-labelledby="a-${id}-title">`,
       `  <div class="landing-ai-goal__head">`,
@@ -101,7 +108,7 @@ export function aiSections({ say, root, escapeHtml }) {
       `    <p class="landing-inside__lead">${t(`level.ai.${id}.lead`)}</p>`,
       links.length ? `    <ul class="landing-block__groups">${links.map((l) => `<li><a class="landing-block__link" href="${l.href}">${l.label}</a></li>`).join("")}</ul>` : "",
       `  </div>`,
-      `  <div class="landing-cards landing-ai__cards">${cards}</div>`,
+      raw ? cards : `  <div class="landing-cards landing-ai__cards">${cards}</div>`,
       `</section>`,
     ]
       .filter(Boolean)
@@ -124,9 +131,7 @@ export function aiSections({ say, root, escapeHtml }) {
     card("check", t("level.ai.skill.check.title"), t("level.ai.skill.check.text"), "", ask("$", code("npx @luz-ds/check"))),
   ].join("");
 
-  // No agent of the package changes code now: a card for one that does needs its own badge words (and the key level.ai.agents.acts)
-  const acting = agents.find((a) => a.acts);
-  if (acting) throw new Error(`${acting.name} changes code: add its badge to the card of the agents (scripts/docs-site/ai-page.js) and the key level.ai.agents.acts to the catalogs`);
+  // An agent that changes code (a tool of `acting`) says so in its badge, filled like the commands that write
   const agentCards = agents
     .map((a) =>
       card(
@@ -134,23 +139,31 @@ export function aiSections({ say, root, escapeHtml }) {
         t(`level.ai.agent.${a.name}.title`),
         t(`level.ai.agent.${a.name}.text`),
         `<p class="landing-ai__id">${code(a.name)}</p>`,
-        `<p class="landing-ai__meta"><span class="luz-badge luz-badge--gray">${t("level.ai.agents.reads")}</span> <span>${t("level.ai.agents.for")} ${a.hosts.map((h) => `<bdi>${h}</bdi>`).join(" · ")}</span></p>${ask("›", code(`/luz add ${a.name}`))}`,
-        ` landing-ai__card--reads`,
+        `<p class="landing-ai__meta"><span class="luz-badge ${a.acts ? "luz-badge--primary" : "luz-badge--gray"}">${t(a.acts ? "level.ai.agents.acts" : "level.ai.agents.reads")}</span> <span>${t("level.ai.agents.for")} ${a.hosts.map((h) => `<bdi>${h}</bdi>`).join(" · ")}</span></p>${ask("›", code(`/luz add ${a.name}`))}`,
+        a.acts ? " landing-ai__card--acts" : " landing-ai__card--reads",
       ),
     )
     .join("");
 
   // The commands of the chat, a card for each row of the table of SKILL.md: what to type, what it does, and whether it writes
   const TYPED = { start: "/luz", new: "/luz new landing", add: "/luz add luz-agent-accessibility" };
-  const ICON_OF = { start: "write", new: "write", doctor: "doctor", lint: "validate", facts: "plan", agents: "luz-agent-accessibility", add: "add", help: "help" };
-  const commandCards = commandRows(root)
-    .map((row) => {
+  const ICON_OF = { start: "write", new: "write", doctor: "doctor", lint: "validate", facts: "plan", agents: "agents", add: "add", help: "help" };
+  const commandCard = (row) => {
       const typed = row.chat.replace(/ [<[].*$/, "");
       const badge = `<span class="luz-badge ${row.writes ? "luz-badge--primary" : "luz-badge--gray"}">${t(row.writes ? "level.ai.cmd.writes" : "level.ai.cmd.reads")}</span>`;
       if (!ICON_OF[row.slug]) throw new Error(`scripts/docs-site/ai-page.js: no icon for the command "${row.slug}": add it to ICON_OF`);
       return card(ICON_OF[row.slug], escapeHtml(typed), t(`level.ai.cmd.${row.slug}`), "", `<p class="landing-ai__meta">${badge}</p>${ask("›", code(TYPED[row.slug] ?? typed))}`, row.writes ? " landing-ai__card--acts" : " landing-ai__card--reads");
-    })
-    .join("");
+  };
+  // Two groups: the commands that write, after your go, then the ones that only read, each in the order of SKILL.md
+  const rows = commandRows(root);
+  const group = (id, list) =>
+    [
+      `<div class="landing-ai-group" id="a-commands-${id}">`,
+      `  <h3 class="landing-ai-group__title" id="a-commands-${id}-title">${t(`level.ai.commands.${id}`)}</h3>`,
+      `  <div class="landing-cards landing-ai__cards">${list.map(commandCard).join("")}</div>`,
+      `</div>`,
+    ].join("\n");
+  const commandGroups = [group("writes", rows.filter((r) => r.writes)), group("reads", rows.filter((r) => !r.writes))].join("\n");
 
   // What you decide: the guarantees of the skill, in a row of five
   const decide = [
@@ -161,11 +174,18 @@ export function aiSections({ say, root, escapeHtml }) {
     `</section>`,
   ].join("\n");
 
+  // The sections of the page, under the strip of assistants: a list of links, titled by the sections themselves
+  const toc = [
+    `<nav class="landing-ai-toc" aria-label="${t("level.ai.toc.label")}">`,
+    `  <ul class="landing-ai-toc__list">${[["a-commands", "level.ai.commands.title"], ["a-agents", "level.ai.agents.title"], ["a-skill", "level.ai.skill.title"], ["a-decide", "level.ai.limits.title"]].map(([id, key]) => `<li><a href="#${id}">${t(key)}</a></li>`).join("")}</ul>`,
+    `</nav>`,
+  ].join("\n");
+
   const commandsDocs = [{ href: "/docs/ai/commands/", label: t("level.ai.commands.link") }];
   const skillDocs = [{ href: "/docs/ai/", label: t("level.ai.next.docs") }];
   const agentsDocs = [{ href: "/docs/ai/agents/", label: t("level.ai.agents.link") }];
   return {
-    aiblocks: [works, goal("commands", commandsDocs, commandCards), goal("agents", agentsDocs, agentCards), goal("skill", skillDocs, phases), decide].join("\n"),
+    aiblocks: [works, toc, goal("commands", commandsDocs, commandGroups, true), goal("agents", agentsDocs, agentCards), goal("skill", skillDocs, phases), decide].join("\n"),
     naiagents: String(agents.length),
     naitargets: String(targets.length),
     ndepsai: String(dependencies),

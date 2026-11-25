@@ -36,7 +36,7 @@ The person may run this skill as `/luz`, or as `/luz` and one subcommand. The su
 | `/luz doctor` | The project, its assistants, and the skills and agents it has | `doctor` | no |
 | `/luz lint [path]` | The front matter of the skills and agents of the project, or of the path | `lint` | no |
 | `/luz facts` | The versions, the kinds of site and the stacks of this release | `facts` | no |
-| `/luz agents` | The agent of luz-ai | `agents` | no |
+| `/luz agents` | The agents of luz-ai | `agents` | no |
 | `/luz add <name>` | Adds the agent of that name, after asking its fields if it has any | `add` | yes, after "go" |
 | `/luz help` | This table | `--help` | no |
 
@@ -82,7 +82,7 @@ Add `--help` to any of them. `--json` gives one JSON object.
 
 ## Agents
 
-Read `references/agents.md` and match what the person says matters to them with the agent of luz-ai. Offer it only if it fits, and say plainly when none is needed. The agents are named `luz-agent-<word>`.
+Read `references/agents.md` and match what the person says matters to them with the agents of luz-ai. Offer only the ones that fit, and say plainly when none is needed. The agents are named `luz-agent-<word>`.
 
 - `agent list` shows what is there, and the fields of each agent.
 - A field goes into a file your assistant sends to its provider: put no secret, key, password or personal data in it, and describe users in general terms.

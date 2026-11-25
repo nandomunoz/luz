@@ -196,5 +196,9 @@
   "ai.agents.col-agent": "Agente",
   "ai.agents.col-reviews": "Qué revisa",
   "ai.agents.col-tools": "Herramientas que puede usar",
-  "ai.agents.need.luz-agent-accessibility": "Que lo use todo el mundo, con teclado, lector de pantalla o una pantalla pequeña"
+  "ai.agents.need.luz-agent-accessibility": "Que lo use todo el mundo, con teclado, lector de pantalla o una pantalla pequeña",
+  "ai.agents.need.luz-agent-ux": "Fácil de entender y de usar, y agradable de ver",
+  "ai.agents.need.luz-agent-optimiza": "Rápido al cargar y al responder, también en el móvil",
+  "ai.agents.need.luz-agent-seogeo": "Que lo encuentren los buscadores y lo citen los asistentes de IA",
+  "ai.agents.need.luz-agent-legal": "Claro con los datos personales, las cookies y los demás aspectos legales de un sitio en la Unión Europea"
 }

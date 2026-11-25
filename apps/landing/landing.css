@@ -5421,6 +5421,75 @@ home-light:defined ~ .landing-light__nojs {
   margin: 0;
 }
 
+/* The sections of the page, under the strip of assistants: one row of links that wraps, centred like the strip, and
+   held close to it (half the gap between the sections), so the two read as the page's one entrance */
+.landing-ai-toc {
+  margin-block-start: calc(var(--level-gap) / -2);
+}
+
+.landing-ai-toc__list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--luz-space-xs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--luz-font-sans);
+  font-size: var(--luz-text-base);
+}
+
+.landing-ai-toc__list a {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 2.75rem;
+  padding-inline: var(--luz-space-md);
+  border: 1px solid var(--luz-divider);
+  border-radius: var(--luz-radius-full);
+  color: var(--luz-text-primary);
+  text-decoration: none;
+}
+
+.landing-ai-toc__list a:hover {
+  border-color: var(--luz-brand-primary);
+  color: var(--luz-brand-primary);
+}
+
+.landing-ai-toc__list a:focus-visible {
+  outline: 2px solid var(--luz-focus-ring);
+  outline-offset: 2px;
+}
+
+/* The commands in two groups, the ones that write and the ones that read, on one grid of columns so the cards line up */
+.landing-ai-group {
+  display: grid;
+  gap: var(--luz-space-sm);
+  min-inline-size: 0;
+}
+
+.landing-ai-group + .landing-ai-group {
+  margin-block-start: var(--luz-space-md);
+}
+
+.landing-ai-group__title {
+  margin: 0;
+  padding-block-end: var(--luz-space-xs);
+  border-block-end: 1px solid var(--luz-divider);
+  font-family: var(--luz-font-sans);
+  font-size: var(--luz-text-base);
+  font-weight: 600;
+  color: var(--luz-text-secondary);
+}
+
+.landing-ai-group .landing-ai__cards {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 13.5rem), 1fr));
+}
+
+/* Five agents: three columns on a wide screen (three and two), never one lone card on a row of four */
+#a-agents .landing-ai__cards {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 21rem), 1fr));
+}
+
 .landing-ai__icon {
   inline-size: 1.75rem;
   block-size: 1.75rem;

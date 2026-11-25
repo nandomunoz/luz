@@ -172,5 +172,9 @@
   "ai.agents.col-agent": "Agent",
   "ai.agents.col-reviews": "What it reviews",
   "ai.agents.col-tools": "Tools it may use",
-  "ai.agents.need.luz-agent-accessibility": "Usable by everyone, with a keyboard, a screen reader or a small screen"
+  "ai.agents.need.luz-agent-accessibility": "Usable by everyone, with a keyboard, a screen reader or a small screen",
+  "ai.agents.need.luz-agent-ux": "Easy to understand and to use, and good to look at",
+  "ai.agents.need.luz-agent-optimiza": "Fast to load and quick to answer, on a phone too",
+  "ai.agents.need.luz-agent-seogeo": "Found by search engines and cited by AI assistants",
+  "ai.agents.need.luz-agent-legal": "Clear about personal data, cookies and the other legal points of a site in the European Union"
 }

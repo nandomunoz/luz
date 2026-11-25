@@ -1,6 +1,6 @@
 # @luz-ds/ai
 
-The luz skill for AI assistants. It asks what you want to make with LUZ, writes a starter page that [`@luz-ds/check`](https://www.npmjs.com/package/@luz-ds/check) reads without a finding, and finishes it with you. It can also add the accessibility agent of luz-ai, `luz-agent-accessibility`, to your project. It is a tool, not a stylesheet: it loads nothing in a page.
+The luz skill for AI assistants. It asks what you want to make with LUZ, writes a starter page that [`@luz-ds/check`](https://www.npmjs.com/package/@luz-ds/check) reads without a finding, and finishes it with you. It can also add the agents of luz-ai to your project: `luz-agent-accessibility`, `luz-agent-ux` (design and UX), `luz-agent-optimiza` (speed and Core Web Vitals), `luz-agent-seogeo` (SEO and GEO) and `luz-agent-legal` (legal and privacy in the European Union, not legal advice). It is a tool, not a stylesheet: it loads nothing in a page.
 
 > **Beta, version 0.x.** This package has its own version, apart from tokens, core and catalog. Pin an exact version and read the changelog before you upgrade.
 
@@ -37,7 +37,7 @@ The skill is tested only in Claude Code. The other assistants get it written fro
 | `/luz doctor` | The project, its assistants, and the skills and agents it has. | no |
 | `/luz lint [path]` | The front matter of the skills and agents of the project, or of the path. | no |
 | `/luz facts` | The versions, the kinds of site and the stacks of this release. | no |
-| `/luz agents` | The agent of luz-ai. | no |
+| `/luz agents` | The agents of luz-ai. | no |
 | `/luz add <name>` | Adds the agent you name, after asking its fields. | yes, after "go" |
 | `/luz help` | This table. | no |
 
@@ -59,7 +59,7 @@ npx @luz-ds/ai lint .claude
 | --- | --- |
 | `init` | Puts this skill where your assistant reads it. |
 | `new` | Writes the starter page of a kind of site (landing page, blog, app, documentation) for plain HTML or Astro. |
-| `agents`, `add` | Lists the agents of luz-ai (named `luz-agent-<word>`), or writes one for Claude Code, Gemini CLI and Codex, with the fields you give it filled in (`luz-agent-accessibility` has none: it reads your files as it is). A field left out stays `[ADAPT: …]`, and the agent stops and asks until it is filled. |
+| `agents`, `add` | Lists the agents of luz-ai (named `luz-agent-<word>`), or writes one for Claude Code, Gemini CLI and Codex, with the fields you give it filled in (`luz-agent-accessibility` has none: it reads your files as it is). `luz-agent-optimiza` edits files, after you agree to its list of changes, so it is not written for Gemini CLI yet; the others only read. A field left out stays `[ADAPT: …]`, and the agent stops and asks until it is filled. |
 | `doctor` | The project, the assistants it has, the skills and agents it finds, and whether the two copies of a skill agree. |
 | `lint` | The front matter and the body of skills and agents: strict YAML, names, descriptions, hidden characters and references. A field that the list of an assistant does not know is a warning, never a failure: the lists were read at their sources on a date. |
 

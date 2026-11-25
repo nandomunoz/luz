@@ -127,7 +127,13 @@ function frontOf(text) {
 
 // What the person says matters to them, and the agent for it: the choice the skill offers. The names are checked
 // against the agents the package has (tests/ai-start.test.js), so an agent renamed or removed fails there.
-const BY_NEED = [["Usable by everyone, with a keyboard, a screen reader or a small screen", "luz-agent-accessibility"]];
+const BY_NEED = [
+  ["Usable by everyone, with a keyboard, a screen reader or a small screen", "luz-agent-accessibility"],
+  ["Easy to understand and to use, and good to look at", "luz-agent-ux"],
+  ["Fast to load and quick to answer, on a phone too", "luz-agent-optimiza"],
+  ["Found by search engines and cited by AI assistants", "luz-agent-seogeo"],
+  ["Clear about personal data, cookies and the other legal points of a site in the European Union", "luz-agent-legal"],
+];
 
 function agentsReference(root) {
   const dir = join(root, SKILL, "assets");
