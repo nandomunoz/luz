@@ -64,7 +64,7 @@
   justify-content: center;
   min-width: 20px;
   min-height: 20px;
-  padding: 1px var(--luz-space-2xs) 0; /* the mono face leaves descender room: the digits sit about 1 px high without it */
+  padding: 1px var(--luz-space-xs) 0; /* the mono face leaves descender room: the digits sit about 1 px high without it; 8 px at the sides so words are not against the edge of the pill */
   font-size: var(--luz-text-xs);
   line-height: 1;
   font-weight: 500;
@@ -82,7 +82,7 @@
     min-width: 20px;
     min-height: 0;
     padding-block: calc((var(--luz-space-md) + var(--luz-space-2xs) - 1cap) / 2);
-    padding-inline: var(--luz-space-2xs);
+    padding-inline: var(--luz-space-xs);
     text-align: center;
     text-box: trim-both cap alphabetic;
     white-space: nowrap;
