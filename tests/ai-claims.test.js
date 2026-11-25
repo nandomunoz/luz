@@ -37,10 +37,20 @@ describe("the skill says what it does", () => {
     expect(en["level.ai.limits.3"]).toMatch(/npx/);
   });
 
-  it("agent fields are filled from what the repo shows, and the rest is asked", () => {
-    for (const k of ["inside.l4.p2.text", "level.ai.steps.result.2", "level.ai.agents.lead"]) {
-      expect(en[k], k).toMatch(/ask|answer/i);
-    }
+  it("says the accessibility agent has no field to fill: it reads the project's own files", () => {
+    for (const k of ["inside.l4.p2.text", "level.ai.steps.result.2", "level.ai.agents.lead", "inside.cli.plan.agent", "inside.cli.adapt"]) expect(en[k], k).not.toMatch(/ADAPT/);
+    for (const k of ["inside.l4.p2.text", "level.ai.steps.result.2", "level.ai.agents.lead"]) expect(en[k], k).not.toMatch(/fills/i);
+    expect(read("apps/docs/pages/ai/agents.html")).not.toMatch(/fields left to fill|\[ADAPT/);
+    expect(read(`${SKILL}/SKILL.md`)).toMatch(/agent with no field is written as it is/);
+  });
+
+  it("facts say which stacks get a page written and which are moved by hand, and the script agrees", () => {
+    const facts = JSON.parse(read(`${SKILL}/assets/facts.json`));
+    for (const st of facts.stacks) expect(typeof st.page, st.id).toBe("boolean");
+    expect(facts.stacks.filter((st) => st.page).map((st) => st.id)).toEqual(["vanilla", "astro"]);
+    const script = read(`${SKILL}/scripts/luz.mjs`);
+    expect(script).toMatch(/GENERATED = FACTS\.stacks\.filter\(\(s\) => s\.page\)/);
+    expect(read(`${SKILL}/SKILL.md`)).toMatch(/by hand/);
   });
 
   it("levels.md says what the starter links, and that the unused stylesheets go when the page is finished", () => {
