@@ -572,6 +572,14 @@ home-light:defined ~ .landing-light__nojs {
   .landing-inside--flip .landing-inside__copy {
     order: 2;
   }
+
+  /* Both columns are sticky: the shorter one stays in view under the header
+     while the longer goes by, then both leave with their section */
+  .landing-inside > * {
+    position: sticky;
+    inset-block-start: calc(var(--site-header-h, 0px) + var(--luz-space-lg));
+    align-self: start;
+  }
 }
 
 .landing-inside__copy {
@@ -640,9 +648,17 @@ home-light:defined ~ .landing-light__nojs {
   color: var(--luz-text-secondary);
 }
 
+/* The icon sits on the first line of its point, centred in it, so a point
+   that wraps keeps its icon at the top, beside its name */
 .landing-inside__points svg {
-  align-self: center;
+  align-self: start;
+  margin-block-start: calc((1lh - 1.15em) / 2);
   color: var(--luz-text-primary);
+}
+
+/* The button stands apart from the points it closes */
+.landing-inside__points + .o-actions {
+  margin-block-start: var(--luz-space-md);
 }
 
 .landing-inside__points strong {
