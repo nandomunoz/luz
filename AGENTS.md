@@ -2,6 +2,16 @@
 
 **See [PRINCIPLES.md](./PRINCIPLES.md) for the principles and red lines every change must respect, [DESIGN.md](./DESIGN.md) for the design rules of how the published system looks, [VANILLA-FIRST.md](./dev/VANILLA-FIRST.md) for architectural principles, [STRUCTURE.md](./dev/STRUCTURE.md) for directory layout, and [QUICK-REFERENCE.md](./dev/QUICK-REFERENCE.md) for naming, tokens, and commands.**
 
+**The manifesto** ([MANIFESTO.md](./MANIFESTO.md), published at `/manifesto/`): how LUZ is built, not rules for what is built with it. Every change keeps to it:
+
+1. **Native first.** The standard is the path, and the browser the means.
+2. **Accessible, always.** Accessibility is not optional in a starting point.
+3. **Lightweight.** Zero dependencies, more optimization.
+4. **Tested, without overdoing it.** No test, no paradise.
+5. **AI is the means, not the end.** AI helps, but does not decide for us.
+
+The page is `apps/site/manifesto/index.html` (English, Spanish and Arabic, a switch with no script), served as it is by `scripts/docs-site/manifesto.js`; a change to a point changes MANIFESTO.md and the page together (`tests/manifesto-page.test.js`).
+
 ---
 
 ## Critical Implementation Rules

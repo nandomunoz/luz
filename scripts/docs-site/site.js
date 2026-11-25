@@ -50,6 +50,7 @@ import { fillCommandMarkers } from "./ai-commands.js";
 import { aiSections } from "./ai-page.js";
 import { cliDemo } from "./cli-demo.js";
 import { DEBUG_FILE, DEBUG_ROUTE, hasDebugPage, renderDebug } from "./debug.js";
+import { MANIFESTO_FILE, MANIFESTO_ROUTE, readManifesto } from "./manifesto.js";
 import { FILES, catalogComponents, catalogFilesIn, renderComponentLinks, renderSnippets, snippetData } from "./snippets.js";
 import { assertInlineHtml, loadLocales, localizeDocsLinks, lookup, markDocsLinks, renderAlternates, renderLangLinks, renderPageLinks, renderSwitcher, unusedKeys } from "./i18n.js";
 import { isDemo, loadDocsLocales, localizeLinks, localize } from "./docs-i18n.js";
@@ -2713,6 +2714,15 @@ export function buildSite(site, { extra = [], unchecked = [], root, languages = 
     const { ids, links } = readHtml(html, file);
     rendered.set(DEBUG_ROUTE, html);
     docs.push({ route: DEBUG_ROUTE, ids: new Set(ids.keys()), links: links.map((l) => ({ ...l, file })) });
+  }
+
+  // /manifesto/: a file on disk, served as it is (manifesto.js); its ids and links are checked like any page's
+  if (site.repoRoot && existsSync(resolve(site.repoRoot, MANIFESTO_FILE))) {
+    const html = readManifesto(site.repoRoot);
+    const file = MANIFESTO_FILE;
+    const { ids, links } = readHtml(html, file);
+    rendered.set(MANIFESTO_ROUTE, html);
+    docs.push({ route: MANIFESTO_ROUTE, ids: new Set(ids.keys()), links: links.map((l) => ({ ...l, file })) });
   }
 
   // The home pages (/, /es/, /ar/) are not docs: a link to one is not checked

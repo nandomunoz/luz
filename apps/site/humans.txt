@@ -1,0 +1,17 @@
+/* TEAM */
+Maintainer: Nando Muñoz
+GitHub: https://github.com/nandomunoz
+Role: design, code and documentation
+
+/* THANKS */
+Everyone who opens an issue, reads a page with a screen reader, or proposes a change.
+
+/* SITE */
+Last update: 2026/11/25
+Language: English / Español / العربية
+Doctype: HTML
+Standards: HTML, CSS, ES modules, WCAG 2.2 AA
+Components: @luz-ds/tokens, @luz-ds/core, @luz-ds/catalog (zero runtime dependencies)
+Software: Vite, Vitest, Playwright, ESLint, Stylelint, esbuild
+Licence: MIT
+Manifesto: /manifesto/

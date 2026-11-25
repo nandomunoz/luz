@@ -79,6 +79,7 @@ import {
 } from "./site.js";
 import { localize } from "./docs-i18n.js";
 import { DEBUG_FILE, DEBUG_ROUTE, hasDebugPage, renderDebug } from "./debug.js";
+import { HUMANS_FILE, HUMANS_ROUTE, MANIFESTO_FILE, MANIFESTO_ROUTE } from "./manifesto.js";
 import { PACKAGES } from "../luz-packages.js";
 import { promptFiles } from "./prompts.js";
 import { MOVED, renderRedirect } from "./redirect.js";
@@ -230,6 +231,8 @@ export function docsSite({ repoRoot, relative: relativeUrls, outRoot, pagesBase 
       ...moved(),
       // /debug/: a virtual document of the real site, rendered from the scan (debug.js)
       ...(hasDebugPage(current) ? [{ route: DEBUG_ROUTE, file: DEBUG_FILE, kind: "debug", virtual: true }] : []),
+      // /manifesto/: a file on disk, served and built as it is (manifesto.js)
+      ...(existsSync(resolve(repoRoot, MANIFESTO_FILE)) ? [{ route: MANIFESTO_ROUTE, file: MANIFESTO_FILE, kind: "manifesto" }] : []),
     ];
     const markdown = markdownTable(current);
     derived = {
@@ -288,6 +291,8 @@ export function docsSite({ repoRoot, relative: relativeUrls, outRoot, pagesBase 
       [AI_ROUTES.llms, () => renderLlmsTxt(scan(), options)],
       [AI_ROUTES.llmsFull, () => renderLlmsFull(scan(), options)],
       ...promptFiles({ root: repoRoot }),
+      // humans.txt (humanstxt.org): who makes the site, a file of apps/site served as it is
+      ...(existsSync(resolve(repoRoot, HUMANS_FILE)) ? [[HUMANS_ROUTE, () => readFileSync(resolve(repoRoot, HUMANS_FILE), "utf-8")]] : []),
     ]);
   };
 
