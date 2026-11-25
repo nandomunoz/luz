@@ -311,6 +311,7 @@
    their accessible names, clipped, not removed. */
 .site-header__search,
 .site-header__az,
+.site-header__docs,
 .site-header__github,
 .site-header__menu {
   display: inline-flex;
@@ -329,6 +330,7 @@
 
 .site-header__search:hover,
 .site-header__az:hover,
+.site-header__docs:hover,
 .site-header__github:hover,
 .site-header__menu:hover {
   border-color: transparent;
@@ -336,6 +338,7 @@
   color: var(--luz-text-primary);
 }
 
+.site-header__docs:focus-visible,
 .site-header__github:focus-visible {
   outline: 2px solid var(--luz-focus-ring);
   outline-offset: 2px;
@@ -349,6 +352,7 @@
 
 .site-header__search .luz-search__trigger-label,
 .site-header__az .luz-search__fallback-label,
+.site-header__docs-label,
 .site-header__github-label {
   position: absolute;
   inline-size: 1px;
@@ -403,6 +407,7 @@
   }
 
   .site-header__nav a,
+  .site-header__docs,
   .site-header__github,
   .site-header__search,
   .site-header__az,
@@ -419,6 +424,7 @@
   }
 
   .site-header__nav a:hover,
+  .site-header__docs:hover,
   .site-header__github:hover,
   .site-header__search:hover,
   .site-header__az:hover,
@@ -428,6 +434,7 @@
   }
 
   .site-header__nav a[aria-current],
+  .site-header__docs[aria-current],
   .site-header :where(luz-search):has(dialog[open]) .site-header__search,
   .site-header .luz-lang-switch__button:has(+ :popover-open) {
     border-block-end-color: currentcolor;
@@ -439,6 +446,7 @@
   /* The ring sits inside the control: outside it, the header's edge would
      cut it */
   .site-header__nav a:focus-visible,
+  .site-header__docs:focus-visible,
   .site-header__github:focus-visible,
   .site-header__search:focus-visible,
   .site-header__az:focus-visible,
@@ -465,8 +473,16 @@
     margin-inline-end: 0;
   }
 
-  /* The sections sit in the middle of the row, whatever the widths of the
-     logo and of the tools: out of the flow, centred on the header */
+  /* Where the row is narrow, the sections sit in the middle of the free
+     space between the logo and the tools, in the flow: they never cover them */
+  .site-header__nav {
+    margin-inline: auto;
+  }
+}
+
+/* Where there is room, the sections sit in the middle of the header itself,
+   whatever the widths of the logo and of the tools: out of the flow */
+@media (min-width: 1024px) {
   .site-header__inner {
     position: relative;
   }
@@ -508,6 +524,7 @@
   }
 
   .site-header__nav a,
+  .site-header__docs,
   .site-header__github,
   .site-header__search,
   .site-header__az,
@@ -713,6 +730,7 @@
   @media (max-width: 768px) {
     /* The row: Brand, Search, Mode, menu */
     .site-header__nav,
+    .site-header__docs,
     .site-header__github,
     .site-header :where(luz-lang-switch) {
       display: none;
