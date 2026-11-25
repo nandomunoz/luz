@@ -553,3 +553,10 @@ describe("the new home page: catalogs and rendered pages (F5)", () => {
     if (existsSync(built)) warnIfOver("docs/ar/index.html", readFileSync(built).length, ON_DISK);
   });
 });
+
+describe("the home's slogan in Spanish", () => {
+  it("reads 'Sistema de diseño para humanos, preparado para IA.' with the same emphasis as the English", () => {
+    const es = JSON.parse(readFileSync(join(repo, "apps/landing/i18n/es.json"), "utf-8"));
+    expect(es["hero.title"]).toBe("Sistema de diseño para <em>humanos</em>, preparado para <em>IA</em>.");
+  });
+});
