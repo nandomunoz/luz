@@ -12,7 +12,7 @@ import { EXTRA, commandRows, fillCommandMarkers, loadExample, slugOf, terminalOu
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (p) => readFileSync(join(root, p), "utf-8");
 const strings = (lang) => JSON.parse(read(`apps/docs/i18n/${lang}/strings.json`));
-const SLUGS = ["start", "new", "doctor", "check", "facts", "agents", "add", "help"];
+const SLUGS = ["start", "new", "doctor", "lint", "facts", "agents", "add", "help"];
 
 describe("the rows come from SKILL.md", () => {
   it("are the eight subcommands, in the order of the table, with what the script runs and whether it writes", () => {

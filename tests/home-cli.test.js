@@ -72,7 +72,7 @@ describe("the template of level 4 and the terminal the generator writes", () => 
     // Codex's agents are its own files (luz-ai agent add --for codex); Cursor gets none, and no question about them
     const codexAgent = execFileSync(process.execPath, [SCRIPT, "agent", "add", "luz-agent-accessibility", "--for", "codex", "--dry-run"], { cwd: tmpdir(), encoding: "utf-8" }).split("\n")[1].trim();
     expect(written.clicodex).toContain(`<code>${codexAgent}</code>`);
-    expect(written.clicodex).toContain("luz-ai agent add luz-agent-accessibility --for codex");
+    expect(written.clicodex).toContain("luz-ai add luz-agent-accessibility --for codex");
     expect(written.clicursor).not.toMatch(/data-ask="agent"|agent add/);
     expect(said(written.clicursor)).toContain(catalogs.en["inside.cli.adapt.page"]);
     // The panel of a terminal the visitor answers never turns by itself

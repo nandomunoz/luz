@@ -105,6 +105,15 @@ describe("the page of the luz skill, /ai/", () => {
     }
   });
 
+  it.each(LANGS)("in %s: the sessions of Codex and Cursor say they follow the documentation of the assistant and that the skill is tested only in Claude Code; Claude's does not", (code, prefix) => {
+    const html = rendered.get(`${prefix}ai/`);
+    const pane = (id) => new RegExp(`<div class="luz-tabpanel landing-clitabs__pane" id="${id}">([\\s\\S]*?)</figure>`).exec(html)?.[1] ?? "";
+    const note = `<p class="landing-clitabs__note">${escape(catalog(code)["level.ai.tab.untested"])}</p>`;
+    expect(pane("hero-codex")).toContain(note);
+    expect(pane("hero-cursor")).toContain(note);
+    expect(pane("hero-claude")).not.toContain("landing-clitabs__note");
+  });
+
   it.each(LANGS)("in %s: the strip of assistants names the ones init writes for, from the package, and says where the skill is tested", (code, prefix) => {
     const block = sectionOf(rendered.get(`${prefix}ai/`), "a-assistants");
     for (const { assistant } of aiFacts(repo).targets.filter((x) => x.assistant)) expect(block, assistant).toContain(`<li><bdi>${assistant}</bdi></li>`);
@@ -119,9 +128,9 @@ describe("the page of the luz skill, /ai/", () => {
     const list = cards(block);
     expect(list.map(titleOf)).toEqual(["ask", "plan", "write", "check"].map((k) => escape(words[`level.ai.skill.${k}.title`])));
     const says = [...block.matchAll(/<p class="landing-ai__ask"><span class="landing-ai__mark" aria-hidden="true">(.)<\/span> <code>([^<]*)<\/code>/g)].map((m) => [m[1], m[2]]);
-    expect(says).toEqual([["›", "/luz"], ["›", escape(words["inside.cli.go.button"])], ["$", "luz-ai site new --kind landing"], ["$", "npx @luz-ds/check"]]);
+    expect(says).toEqual([["›", "/luz"], ["›", escape(words["inside.cli.go.button"])], ["$", "luz-ai new --kind landing"], ["$", "npx @luz-ds/check"]]);
     expect(chatCommands.map((c) => c.chat)).toContain("/luz");
-    expect(help()).toMatch(/^ {2}site\b/m);
+    expect(help()).toMatch(/^ {2}new\b/m);
     expect(block).toMatch(/href="[^"]*\/docs\/ai\/"/);
   });
 
@@ -174,7 +183,7 @@ describe("the page of the luz skill, /ai/", () => {
     });
     expect(block).toContain("docs/ai/commands/");
     // The two that only read and never change a file, said plainly
-    for (const slug of ["doctor", "check", "facts", "agents", "help"]) expect(rows.find((r) => r.slug === slug).writes, slug).toBe(false);
+    for (const slug of ["doctor", "lint", "facts", "agents", "help"]) expect(rows.find((r) => r.slug === slug).writes, slug).toBe(false);
   });
 
   it("has a sentence for every command in the three languages, and none for a command that is gone", () => {

@@ -146,7 +146,7 @@ for (const [route, lang] of HOME) {
     const install = page.locator('section#ai #ai-install');
     await expect(tabs).toHaveText([words['inside.tab.install'], words['inside.tab.use']]);
     await expect(install.locator('code#ai-npm')).toHaveText('npx @luz-ds/ai init');
-    await expect(install.locator('code#ai-commands')).toContainText('luz-ai site new');
+    await expect(install.locator('code#ai-commands')).toContainText('luz-ai new');
     await expect(install.locator('figure.landing-cli')).toHaveCount(0);
     if (!javaScriptEnabled) {
       await expect(install).toBeVisible();
@@ -228,7 +228,7 @@ for (const [route, lang] of SKILL) {
       await expect(skill.cli(page)).toHaveAccessibleName(words['inside.l4.panel']);
       await expect(skill.cli(page)).toContainText(words['inside.cli.ask']);
       await expect(skill.cli(page)).toContainText('npx @luz-ds/ai init --target claude');
-      await expect(skill.cli(page)).toContainText('luz-ai site new');
+      await expect(skill.cli(page)).toContainText('luz-ai new');
       await expect(skill.cli(page)).toContainText('index.html');
       expect(await skill.cli(page).innerText(), 'only the default answers').not.toContain('index.astro');
     });
@@ -267,7 +267,7 @@ for (const [route, lang] of SKILL) {
       await expect(screen).toContainText('--kind blog --stack astro');
       await expect(screen).toContainText('src/pages/index.astro');
       await expect(screen).toContainText('--ext .astro');
-      await expect(screen).toContainText('agent add luz-agent-accessibility');
+      await expect(screen).toContainText('luz-ai add luz-agent-accessibility');
       const said = await screen.innerText();
       expect(said).not.toContain('skill add');
       expect(said).not.toContain('--kind landing');

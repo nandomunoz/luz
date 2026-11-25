@@ -121,11 +121,11 @@ describe("help and usage", () => {
   it("says the commands and the exit codes", () => {
     const r = run(["--help"]);
     expect(r.code).toBe(0);
-    for (const w of ["site new", "facts", "doctor", "check", "--json", "--no-input", "0", "1", "2"]) expect(r.out, w).toContain(w);
+    for (const w of ["new", "facts", "doctor", "lint", "--json", "--no-input", "0", "1", "2"]) expect(r.out, w).toContain(w);
   });
 
   it("has help at every level, with an example", () => {
-    for (const c of ["site", "facts", "doctor", "check"]) {
+    for (const c of ["site", "facts", "doctor", "lint"]) {
       const r = run([c, "--help"]);
       expect(r.code, c).toBe(0);
       expect(r.out, c).toMatch(/example/i);
@@ -141,11 +141,11 @@ describe("help and usage", () => {
   });
 
   it("accepts --no-input, since it never asks", () => {
-    expect(run(["check", "--no-input", "--json", dir({ ".agents/skills/demo/SKILL.md": GOOD })]).code).toBe(0);
+    expect(run(["lint", "--no-input", "--json", dir({ ".agents/skills/demo/SKILL.md": GOOD })]).code).toBe(0);
   });
 
   it("exits 2 when a path does not exist", () => {
-    const r = run(["check", join(tmpdir(), "luz-ai-nothing-here")]);
+    const r = run(["lint", join(tmpdir(), "luz-ai-nothing-here")]);
     expect(r.code).toBe(2);
     expect(r.err).toMatch(/not found|does not exist/);
   });
@@ -154,41 +154,41 @@ describe("help and usage", () => {
 describe("check: a skill", () => {
   it("passes a good one, from any folder", () => {
     const d = dir({ ".agents/skills/demo/SKILL.md": GOOD });
-    const r = run(["check", "--json", d], tmpdir());
+    const r = run(["lint", "--json", d], tmpdir());
     expect(r.code).toBe(0);
     expect(JSON.parse(r.out)).toMatchObject({ ok: true, problems: [] });
   });
 
   it("finds the skills of the usual folders when no path is given", () => {
     const d = dir({ ".claude/skills/demo/SKILL.md": GOOD, ".agents/skills/other/SKILL.md": GOOD.replace("demo", "other") });
-    const r = run(["check", "--json"], d);
+    const r = run(["lint", "--json"], d);
     expect(JSON.parse(r.out).checked.length).toBe(2);
     expect(r.code).toBe(0);
   });
 
   it("fails a file that does not start with ---", () => {
     const d = dir({ ".agents/skills/demo/SKILL.md": `\n${GOOD}` });
-    expect(rules(run(["check", "--json", d]))).toContain("frontmatter/missing");
+    expect(rules(run(["lint", "--json", d]))).toContain("frontmatter/missing");
   });
 
   it("fails a plain value with ': ' or ' #' that a strict YAML parser rejects", () => {
-    expect(rules(run(["check", "--json", skillOf("name: demo\ndescription: Does one thing: it demos.")]))).toContain("yaml/plain-scalar");
-    expect(rules(run(["check", "--json", skillOf("name: demo\ndescription: Does one thing # it demos.")]))).toContain("yaml/plain-scalar");
+    expect(rules(run(["lint", "--json", skillOf("name: demo\ndescription: Does one thing: it demos.")]))).toContain("yaml/plain-scalar");
+    expect(rules(run(["lint", "--json", skillOf("name: demo\ndescription: Does one thing # it demos.")]))).toContain("yaml/plain-scalar");
   });
 
   it("takes a quoted value, single or double, and a one-level metadata map", () => {
-    const a = run(["check", "--json", skillOf(`name: demo\ndescription: 'It''s: fine'\nmetadata:\n  version: "0.1.0"\n  owner: luz`)]);
+    const a = run(["lint", "--json", skillOf(`name: demo\ndescription: 'It''s: fine'\nmetadata:\n  version: "0.1.0"\n  owner: luz`)]);
     expect(a.code, a.out).toBe(0);
   });
 
   it("fails a nested map, a flow value and a block scalar: outside the subset", () => {
-    expect(rules(run(["check", "--json", skillOf(`name: demo\ndescription: x\nmetadata:\n  a:\n    b: c`)]))).toContain("yaml/nested");
-    expect(rules(run(["check", "--json", skillOf(`name: demo\ndescription: [x, y]`)]))).toContain("yaml/flow");
-    expect(rules(run(["check", "--json", skillOf(`name: demo\ndescription: >\n  folded`)]))).toContain("yaml/block-scalar");
+    expect(rules(run(["lint", "--json", skillOf(`name: demo\ndescription: x\nmetadata:\n  a:\n    b: c`)]))).toContain("yaml/nested");
+    expect(rules(run(["lint", "--json", skillOf(`name: demo\ndescription: [x, y]`)]))).toContain("yaml/flow");
+    expect(rules(run(["lint", "--json", skillOf(`name: demo\ndescription: >\n  folded`)]))).toContain("yaml/block-scalar");
   });
 
   it("fails a field the portable list does not have, and says which", () => {
-    const r = run(["check", "--json", skillOf(`name: demo\ndescription: x\nargument-hint: "[a]"\nversion: "1"`)]);
+    const r = run(["lint", "--json", skillOf(`name: demo\ndescription: x\nargument-hint: "[a]"\nversion: "1"`)]);
     const unknown = JSON.parse(r.out).problems.filter((p) => p.rule === "field/unknown");
     expect(unknown.map((p) => p.message).join(" ")).toMatch(/argument-hint/);
     expect(unknown.map((p) => p.message).join(" ")).toMatch(/version/);
@@ -198,44 +198,44 @@ describe("check: a skill", () => {
   it("takes a field of Claude Code under .claude/skills only", () => {
     const front = `name: demo\ndescription: x\ndisable-model-invocation: true`;
     const claude = dir({ ".claude/skills/demo/SKILL.md": `---\n${front}\n---\n\nBody.\n` });
-    expect(run(["check", "--json", claude]).code).toBe(0);
-    expect(rules(run(["check", "--json", "--target", "portable", claude]))).toContain("field/unknown");
+    expect(run(["lint", "--json", claude]).code).toBe(0);
+    expect(rules(run(["lint", "--json", "--target", "portable", claude]))).toContain("field/unknown");
   });
 
   it("fails a name that is not the folder, not a valid name or a reserved word", () => {
-    expect(rules(run(["check", "--json", skillOf("name: other\ndescription: x")]))).toContain("name/folder");
-    expect(rules(run(["check", "--json", skillOf("name: Demo\ndescription: x", undefined, "Demo")]))).toContain("name/pattern");
-    expect(rules(run(["check", "--json", skillOf("name: claude-helper\ndescription: x", undefined, "claude-helper")]))).toContain("name/reserved");
-    expect(rules(run(["check", "--json", skillOf("name: a--b\ndescription: x", undefined, "a--b")]))).toContain("name/pattern");
+    expect(rules(run(["lint", "--json", skillOf("name: other\ndescription: x")]))).toContain("name/folder");
+    expect(rules(run(["lint", "--json", skillOf("name: Demo\ndescription: x", undefined, "Demo")]))).toContain("name/pattern");
+    expect(rules(run(["lint", "--json", skillOf("name: claude-helper\ndescription: x", undefined, "claude-helper")]))).toContain("name/reserved");
+    expect(rules(run(["lint", "--json", skillOf("name: a--b\ndescription: x", undefined, "a--b")]))).toContain("name/pattern");
   });
 
   it("fails a description that is missing, empty or over 1,024 characters", () => {
-    expect(rules(run(["check", "--json", skillOf("name: demo")]))).toContain("description/missing");
-    expect(rules(run(["check", "--json", skillOf(`name: demo\ndescription: "${"a".repeat(1025)}"`)]))).toContain("description/long");
-    expect(run(["check", "--json", skillOf(`name: demo\ndescription: "${"a".repeat(1024)}"`)]).code).toBe(0);
+    expect(rules(run(["lint", "--json", skillOf("name: demo")]))).toContain("description/missing");
+    expect(rules(run(["lint", "--json", skillOf(`name: demo\ndescription: "${"a".repeat(1025)}"`)]))).toContain("description/long");
+    expect(run(["lint", "--json", skillOf(`name: demo\ndescription: "${"a".repeat(1024)}"`)]).code).toBe(0);
   });
 
   it("fails a body over 500 lines", () => {
-    expect(rules(run(["check", "--json", skillOf("name: demo\ndescription: x", "line\n".repeat(500))]))).toContain("body/long");
+    expect(rules(run(["lint", "--json", skillOf("name: demo\ndescription: x", "line\n".repeat(500))]))).toContain("body/long");
     // The blank line after the front matter is part of the body: 499 lines and it make 500
-    expect(run(["check", "--json", skillOf("name: demo\ndescription: x", "line\n".repeat(499))]).code).toBe(0);
+    expect(run(["lint", "--json", skillOf("name: demo\ndescription: x", "line\n".repeat(499))]).code).toBe(0);
   });
 
   it("echoes the name of a file it did not write without hidden characters and in at most 80, so a report is not a way to pass a model text", () => {
     const evil = `A\u202E${"x".repeat(200)}`;
-    const r = run(["check", "--json", dir({ ".agents/skills/demo/SKILL.md": `---\nname: ${evil}\ndescription: x\n---\n` })]);
+    const r = run(["lint", "--json", dir({ ".agents/skills/demo/SKILL.md": `---\nname: ${evil}\ndescription: x\n---\n` })]);
     const messages = JSON.parse(r.out).problems.filter((p) => p.rule !== "chars/hidden").map((p) => p.message);
     expect(messages.length).toBeGreaterThan(0);
     for (const m of messages) {
       expect(m, m).not.toMatch(/\u202E/);
       expect(m.length, m).toBeLessThan(400);
     }
-    const bad = run(["check", "--json", dir({ ".agents/skills/demo/SKILL.md": `---\nname: demo\n${"y".repeat(300)}\u202E\n---\n` })]);
+    const bad = run(["lint", "--json", dir({ ".agents/skills/demo/SKILL.md": `---\nname: demo\n${"y".repeat(300)}\u202E\n---\n` })]);
     for (const p of JSON.parse(bad.out).problems.filter((x) => x.rule === "yaml/syntax")) expect(p.message).not.toMatch(/\u202E/);
   });
 
   it("fails a hidden or bidi character, with its line", () => {
-    const r = run(["check", "--json", skillOf("name: demo\ndescription: x", "one\ntwo \u202E three\n")]);
+    const r = run(["lint", "--json", skillOf("name: demo\ndescription: x", "one\ntwo \u202E three\n")]);
     const p = JSON.parse(r.out).problems.find((x) => x.rule === "chars/hidden");
     expect(p.line).toBeGreaterThan(5);
     expect(r.code).toBe(1);
@@ -244,13 +244,13 @@ describe("check: a skill", () => {
   it("fails a reference that is missing, outside the folder, or that points on to another one", () => {
     const base = ".agents/skills/demo";
     const a = dir({ [`${base}/SKILL.md`]: `${GOOD}\nRead [the stacks](references/stacks.md).\n` });
-    expect(rules(run(["check", "--json", a]))).toContain("reference/missing");
+    expect(rules(run(["lint", "--json", a]))).toContain("reference/missing");
     const b = dir({ [`${base}/SKILL.md`]: `${GOOD}\nRead [x](../../etc/passwd).\n` });
-    expect(rules(run(["check", "--json", b]))).toContain("reference/outside");
+    expect(rules(run(["lint", "--json", b]))).toContain("reference/outside");
     const c = dir({ [`${base}/SKILL.md`]: `${GOOD}\nRead \`references/a.md\`.\n`, [`${base}/references/a.md`]: "See [b](b.md).\n", [`${base}/references/b.md`]: "b\n" });
-    expect(rules(run(["check", "--json", c]))).toContain("reference/chain");
+    expect(rules(run(["lint", "--json", c]))).toContain("reference/chain");
     const ok = dir({ [`${base}/SKILL.md`]: `${GOOD}\nRead [a](references/a.md) and https://example.com/x.md and [top](#demo).\n`, [`${base}/references/a.md`]: "a\n" });
-    expect(run(["check", "--json", ok]).code).toBe(0);
+    expect(run(["lint", "--json", ok]).code).toBe(0);
   });
 });
 
@@ -258,23 +258,23 @@ describe("check: a subagent", () => {
   const agent = (front, name = "demo-runner") => dir({ [`.claude/agents/${name}.md`]: `---\n${front}\n---\n\nYou are a runner.\n` });
 
   it("passes one with camelCase fields and a long description", () => {
-    const r = run(["check", "--json", agent(`name: demo-runner\ndescription: "${"long ".repeat(300)}"\ntools: Read, Grep\nmodel: sonnet\ndisallowedTools: Write`)]);
+    const r = run(["lint", "--json", agent(`name: demo-runner\ndescription: "${"long ".repeat(300)}"\ntools: Read, Grep\nmodel: sonnet\ndisallowedTools: Write`)]);
     expect(r.code, r.out).toBe(0);
   });
 
   it("fails a dashed field, which Claude Code ignores without a word", () => {
-    expect(rules(run(["check", "--json", agent(`name: demo-runner\ndescription: x\ndisallowed-tools: Write`)]))).toContain("field/unknown");
+    expect(rules(run(["lint", "--json", agent(`name: demo-runner\ndescription: x\ndisallowed-tools: Write`)]))).toContain("field/unknown");
   });
 
   it("fails a name that is not the file's, and a plain value with ': '", () => {
-    expect(rules(run(["check", "--json", agent(`name: other\ndescription: x`)]))).toContain("name/file");
-    expect(rules(run(["check", "--json", agent(`name: demo-runner\ndescription: a: b`)]))).toContain("yaml/plain-scalar");
+    expect(rules(run(["lint", "--json", agent(`name: other\ndescription: x`)]))).toContain("name/file");
+    expect(rules(run(["lint", "--json", agent(`name: demo-runner\ndescription: a: b`)]))).toContain("yaml/plain-scalar");
   });
 });
 
 describe("check: this repository", () => {
   it("passes the thirteen agents and the skill it has", () => {
-    const r = run(["check", "--json"], root);
+    const r = run(["lint", "--json"], root);
     const out = JSON.parse(r.out);
     expect(out.problems, JSON.stringify(out.problems)).toEqual([]);
     expect(out.checked.length).toBeGreaterThanOrEqual(14);
@@ -285,7 +285,7 @@ describe("check: this repository", () => {
 describe("text report", () => {
   it("puts the summary first, then the problems, and stays short", () => {
     const d = skillOf("name: other\ndescription: a: b");
-    const r = run(["check", d]);
+    const r = run(["lint", d]);
     expect(r.code).toBe(1);
     const lines = r.out.trim().split("\n");
     expect(lines[0]).toMatch(/\d+ problems?/);
@@ -295,7 +295,7 @@ describe("text report", () => {
   it("keeps the report within a bound however many problems there are", () => {
     const files = {};
     for (let i = 0; i < 80; i++) files[`.agents/skills/s${i}/SKILL.md`] = `---\nname: x${i}\ndescription: a: b\n---\n`;
-    const r = run(["check", dir(files)]);
+    const r = run(["lint", dir(files)]);
     expect(r.out.length).toBeLessThan(10000);
     expect(r.out).toMatch(/more/);
   });
@@ -340,7 +340,7 @@ describe("doctor", () => {
     const list = () => readdirSync(d, { recursive: true }).sort().join("\n");
     const before = list();
     run(["doctor", "--dir", d]);
-    run(["check", d]);
+    run(["lint", d]);
     expect(list()).toBe(before);
     expect(existsSync(join(d, ".agents"))).toBe(false);
   });
@@ -488,7 +488,7 @@ describe("the skill", () => {
   const body = read(join(skill, "SKILL.md"));
 
   it("passes its own check", () => {
-    const r = run(["check", "--json", skill]);
+    const r = run(["lint", "--json", skill]);
     expect(JSON.parse(r.out).problems).toEqual([]);
     expect(r.code).toBe(0);
   });
@@ -553,8 +553,8 @@ describe("the skill as /luz <subcommand>: the router and the rule IDs (owner, 20
     expect(section("Subcommands")).toContain("$ARGUMENTS");
   });
 
-  it("has a row for each subcommand: none, new, doctor, check, facts, agents, add and help", () => {
-    expect(rows().map((r) => r.chat.replace(/^\/luz ?/, "").split(" ")[0])).toEqual(["", "new", "doctor", "check", "facts", "agents", "add", "help"]);
+  it("has a row for each subcommand: none, new, doctor, lint, facts, agents, add and help", () => {
+    expect(rows().map((r) => r.chat.replace(/^\/luz ?/, "").split(" ")[0])).toEqual(["", "new", "doctor", "lint", "facts", "agents", "add", "help"]);
   });
 
   it("takes the kinds of `new` from the facts, never typed twice", () => {
@@ -570,9 +570,9 @@ describe("the skill as /luz <subcommand>: the router and the rule IDs (owner, 20
     for (const c of used) expect(help, c).toContain(c.split(" ")[0]);
   });
 
-  it("writes nothing for doctor, check, facts, agents and help, and writes only after \"go\" for the rest", () => {
+  it("writes nothing for doctor, lint, facts, agents and help, and writes only after \"go\" for the rest", () => {
     const by = Object.fromEntries(rows().map((r) => [r.chat.replace(/^\/luz ?/, "").split(" ")[0], r.writes]));
-    for (const c of ["doctor", "check", "facts", "agents", "help"]) expect(by[c], c).toBe("no");
+    for (const c of ["doctor", "lint", "facts", "agents", "help"]) expect(by[c], c).toBe("no");
     for (const c of ["", "new", "add"]) expect(by[c], c).toBe("yes");
     expect(section("Subcommands")).toMatch(/"go"/);
   });
@@ -725,7 +725,7 @@ describe("the agents of luz-ai", () => {
     expect(list("agent").map((a) => a.name)).toEqual(AGENTS);
     for (const a of AGENTS) expect(a, a).toMatch(/^luz-agent-[a-z]+$/);
     expect(existsSync(join(assets, "skills"))).toBe(false);
-    const r = run(["check", "--json", join(assets, "agents")]);
+    const r = run(["lint", "--json", join(assets, "agents")]);
     expect(JSON.parse(r.out).problems).toEqual([]);
     expect(JSON.parse(r.out).checked.length).toBe(1);
   });
@@ -771,7 +771,7 @@ describe("the agents of luz-ai", () => {
     expect(gemini).toMatch(/^tools:\n {2}- read_file\n {2}- grep_search\n---/m);
     expect(codex).toMatch(/^name = "luz-agent-accessibility"$/m);
     expect(codex).toContain(`developer_instructions = ${"'".repeat(3)}\n${source}\n${"'".repeat(3)}\n`);
-    const c = run(["check", "--json"], d);
+    const c = run(["lint", "--json"], d);
     expect(JSON.parse(c.out).problems).toEqual([]);
     expect(JSON.parse(c.out).checked.length).toBe(3);
   });
@@ -781,7 +781,7 @@ describe("the agents of luz-ai", () => {
     const rows = list("agent");
     for (const a of rows) expect(add(d, a.name, ["--for", a.for.join(",")]).code, a.name).toBe(0);
     expect(rows.find((a) => a.name === "luz-agent-accessibility").for).toEqual(["claude", "gemini", "codex"]);
-    expect(JSON.parse(run(["check", "--json"], d).out).problems).toEqual([]);
+    expect(JSON.parse(run(["lint", "--json"], d).out).problems).toEqual([]);
   });
 
   it("refuses an agent for Gemini CLI when it needs a tool Gemini CLI has no verified name for, and writes nothing", () => {
@@ -893,49 +893,49 @@ describe("check: the formats of Gemini CLI and Codex", () => {
   const GOOD_TOML = `name = "demo"\ndescription = "Does a thing."\ndeveloper_instructions = ${TRIPLE}\nLine one.\nLine two.\n${TRIPLE}\n`;
 
   it("reads a list of tools in a Gemini CLI agent, and fails a string or a field that is not Gemini's", () => {
-    expect(run(["check", "--json", gemini("name: demo\ndescription: x\ntools:\n  - read_file\n  - grep_search\nmax_turns: 5")]).code).toBe(0);
-    expect(rules(run(["check", "--json", gemini("name: demo\ndescription: x\ntools: read_file")]))).toContain("field/type");
-    expect(rules(run(["check", "--json", gemini("name: demo\ndescription: x\nmax-turns: 5")]))).toContain("field/unknown");
-    expect(rules(run(["check", "--json", gemini("name: demo\ndescription: x\ntools:\n  - a\n  - b: c")]))).toContain("yaml/plain-scalar");
+    expect(run(["lint", "--json", gemini("name: demo\ndescription: x\ntools:\n  - read_file\n  - grep_search\nmax_turns: 5")]).code).toBe(0);
+    expect(rules(run(["lint", "--json", gemini("name: demo\ndescription: x\ntools: read_file")]))).toContain("field/type");
+    expect(rules(run(["lint", "--json", gemini("name: demo\ndescription: x\nmax-turns: 5")]))).toContain("field/unknown");
+    expect(rules(run(["lint", "--json", gemini("name: demo\ndescription: x\ntools:\n  - a\n  - b: c")]))).toContain("yaml/plain-scalar");
   });
 
   it("takes a name of its own in a Gemini CLI agent, since Gemini CLI does not say it is the file's", () => {
-    expect(run(["check", "--json", gemini("name: other_name\ndescription: x")]).code).toBe(0);
-    expect(rules(run(["check", "--json", gemini("name: Bad Name\ndescription: x")]))).toContain("name/pattern");
+    expect(run(["lint", "--json", gemini("name: other_name\ndescription: x")]).code).toBe(0);
+    expect(rules(run(["lint", "--json", gemini("name: Bad Name\ndescription: x")]))).toContain("name/pattern");
   });
 
   it("reads a Codex agent file and needs name, description and developer_instructions", () => {
-    expect(run(["check", "--json", codex(GOOD_TOML)]).code).toBe(0);
-    expect(rules(run(["check", "--json", codex(GOOD_TOML.replace(/description = .*\n/, ""))]))).toContain("description/missing");
-    expect(rules(run(["check", "--json", codex(`name = "demo"\ndescription = "x"\n`)]))).toContain("instructions/missing");
+    expect(run(["lint", "--json", codex(GOOD_TOML)]).code).toBe(0);
+    expect(rules(run(["lint", "--json", codex(GOOD_TOML.replace(/description = .*\n/, ""))]))).toContain("description/missing");
+    expect(rules(run(["lint", "--json", codex(`name = "demo"\ndescription = "x"\n`)]))).toContain("instructions/missing");
   });
 
   it("fails a Codex key that is not one of its keys, a table that is not one, and a string that is not closed", () => {
-    expect(rules(run(["check", "--json", codex(`${GOOD_TOML}sandbox_mode = "read-only"\n`)]))).toContain("field/unknown");
-    expect(rules(run(["check", "--json", codex(`${GOOD_TOML}[mystery]\nx = 1\n`)]))).toContain("field/unknown");
-    expect(run(["check", "--json", codex(`${GOOD_TOML}[features]\nshell_tool = false\n`)]).code).toBe(0);
-    expect(rules(run(["check", "--json", codex(`name = "demo"\ndescription = "x"\ndeveloper_instructions = ${TRIPLE}\nnever closed\n`)]))).toContain("toml/syntax");
-    expect(rules(run(["check", "--json", codex(`name = demo\n${GOOD_TOML}`)]))).toContain("toml/syntax");
+    expect(rules(run(["lint", "--json", codex(`${GOOD_TOML}sandbox_mode = "read-only"\n`)]))).toContain("field/unknown");
+    expect(rules(run(["lint", "--json", codex(`${GOOD_TOML}[mystery]\nx = 1\n`)]))).toContain("field/unknown");
+    expect(run(["lint", "--json", codex(`${GOOD_TOML}[features]\nshell_tool = false\n`)]).code).toBe(0);
+    expect(rules(run(["lint", "--json", codex(`name = "demo"\ndescription = "x"\ndeveloper_instructions = ${TRIPLE}\nnever closed\n`)]))).toContain("toml/syntax");
+    expect(rules(run(["lint", "--json", codex(`name = demo\n${GOOD_TOML}`)]))).toContain("toml/syntax");
   });
 
   it("fails text after the closing of a multi-line literal string", () => {
     const closed = (tail) => GOOD_TOML.slice(0, GOOD_TOML.lastIndexOf(TRIPLE)) + TRIPLE + tail + "\n";
-    expect(rules(run(["check", "--json", codex(closed(" extra"))]))).toContain("toml/syntax");
-    expect(run(["check", "--json", codex(closed(" # a comment"))]).code).toBe(0);
+    expect(rules(run(["lint", "--json", codex(closed(" extra"))]))).toContain("toml/syntax");
+    expect(run(["lint", "--json", codex(closed(" # a comment"))]).code).toBe(0);
   });
 
   it("fails a hidden character in a Codex file", () => {
-    expect(rules(run(["check", "--json", codex(GOOD_TOML.replace("Line one.", "Line \u202E one."))]))).toContain("chars/hidden");
+    expect(rules(run(["lint", "--json", codex(GOOD_TOML.replace("Line one.", "Line \u202E one."))]))).toContain("chars/hidden");
   });
 
   it("lets a reference point to another that SKILL.md names, and fails one that it does not", () => {
     const base = ".agents/skills/demo";
     const ok = dir({ [`${base}/SKILL.md`]: `${GOOD}\nRead [a](references/a.md) and [b](references/b.md).\n`, [`${base}/references/a.md`]: "See [b](b.md).\n", [`${base}/references/b.md`]: "b\n" });
-    expect(run(["check", "--json", ok]).code).toBe(0);
+    expect(run(["lint", "--json", ok]).code).toBe(0);
   });
 
   it("looks in .codex/agents when no path is given", () => {
-    expect(JSON.parse(run(["check", "--json"], codex(GOOD_TOML)).out).checked).toEqual([".codex/agents/demo.toml"]);
+    expect(JSON.parse(run(["lint", "--json"], codex(GOOD_TOML)).out).checked).toEqual([".codex/agents/demo.toml"]);
   });
 });
 
@@ -946,12 +946,12 @@ describe("portability", () => {
     const text = read(openai);
     expect(text).toMatch(/^interface:/m);
     expect(text).toMatch(/^policy:\n {2}allow_implicit_invocation: true$/m);
-    expect(run(["check", "--json", skill]).code).toBe(0);
+    expect(run(["lint", "--json", skill]).code).toBe(0);
   });
 
   it("fails an agents/openai.yaml with a key Codex does not read, a flag that is not true or false, and a value that is a comment", () => {
     const withOpenai = (yaml) => dir({ ".agents/skills/demo/SKILL.md": GOOD, ".agents/skills/demo/agents/openai.yaml": yaml });
-    const bad = (yaml) => JSON.parse(run(["check", "--json", withOpenai(yaml)]).out).problems;
+    const bad = (yaml) => JSON.parse(run(["lint", "--json", withOpenai(yaml)]).out).problems;
     expect(bad("interface:\n  display_name: \"Demo\"\n").length).toBe(0);
     expect(bad("interface:\n  title: \"Demo\"\n").map((p) => p.rule)).toContain("field/unknown");
     expect(bad("policy:\n  allow_implicit_invocation: maybe\n").map((p) => p.rule)).toContain("field/type");
