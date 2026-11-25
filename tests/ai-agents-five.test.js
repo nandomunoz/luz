@@ -41,7 +41,7 @@ describe("the agents of luz-ai", () => {
     }
     expect(tools("luz-agent-optimiza")).toEqual(["Read", "Grep", "Glob", "Edit"]);
     expect(description("luz-agent-optimiza")).toMatch(/after the user agrees/);
-    expect(agent("luz-agent-optimiza")).toMatch(/edits only after the user says go/);
+    expect(agent("luz-agent-optimiza")).toMatch(/edits only when it is called again/);
     expect(agent("luz-agent-optimiza")).toMatch(/It runs nothing/);
   });
 
@@ -83,7 +83,7 @@ describe("the agents of luz-ai", () => {
     // cache headers are a change to the server, which it does not make unless asked
     expect(text).not.toMatch(/cache headers\./);
     // an element added after the scan needs its chunk imported by hand (AGENTS.md)
-    expect(text).not.toMatch(/do not import every chunk by hand/);
+    expect(text).toMatch(/added after the scan needs its chunk imported by hand/);
     // no shell is true in Claude Code only: the text says where it is not
     expect(text).toMatch(/no shell in Claude Code/);
   });

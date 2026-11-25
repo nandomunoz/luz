@@ -682,7 +682,7 @@ function wrapAgent(agent, body, target) {
   }
   const triple = "'".repeat(3);
   if (body.includes(triple)) return { error: `${agent.name} holds ${triple}, which a Codex multi-line literal string cannot` };
-  const notes = acting.length ? [] : [`${agent.name} for codex: the agent's file cannot limit its tools or make it read-only, so only its instructions say it does not edit; set the sandbox of the session`];
+  const notes = [acting.length ? `${agent.name} for codex: the agent's file cannot limit its tools, so only its instructions say it runs no command; set the sandbox of the session` : `${agent.name} for codex: the agent's file cannot limit its tools or make it read-only, so only its instructions say it does not edit; set the sandbox of the session`];
   return { path: `.codex/agents/${agent.name}.toml`, content: `name = ${JSON.stringify(agent.name)}\ndescription = ${JSON.stringify(agent.description)}\ndeveloper_instructions = ${triple}\n${body}\n${triple}\n`, notes };
 }
 
