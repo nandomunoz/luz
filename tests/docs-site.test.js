@@ -495,13 +495,16 @@ describe("the LUZ docs site", () => {
   // /debug/ is a tool page of the real site (scripts/docs-site/debug.js), not a docs page: no site header, sidebar, h1 of .docs-title or pager.
   // The tests about the docs pages leave it out on purpose; its own tests (tests/debug-*.test.js) and the one below say what it has instead.
   const DEBUG = "/debug/";
-  const pages = [...rendered].filter(([route]) => !homes.includes(route) && route !== DEBUG);
+  // /manifesto/ is a standalone page of the real site too (scripts/docs-site/manifesto.js): its own tests are tests/manifesto-page.test.js
+  const MANIFESTO = "/manifesto/";
+  const STANDALONE = new Set([DEBUG, MANIFESTO]);
+  const pages = [...rendered].filter(([route]) => !homes.includes(route) && !STANDALONE.has(route));
 
   it("builds with every source well nested, every internal link resolving and every catalog key used", () => {
     expect(problems).toEqual([]);
     expect(homes).toEqual(["/", "/es/", "/ar/"]);
     // The pages of the docs, the not-found page, the homes and /debug/ (the one route that is no page of apps/docs/pages/)
-    expect([...rendered.keys()].sort()).toEqual([...homes, "/404.html", DEBUG, ...site.pages.map((p) => p.route)].sort());
+    expect([...rendered.keys()].sort()).toEqual([...homes, "/404.html", DEBUG, MANIFESTO, ...site.pages.map((p) => p.route)].sort());
     expect(site.byRoute.has(DEBUG)).toBe(false);
   });
 
@@ -540,8 +543,8 @@ describe("the LUZ docs site", () => {
     const switcherOf = (html) => header(html).match(/<luz-lang-switch>[\s\S]*?<\/luz-lang-switch>/)?.[0] ?? "";
     const docsHeader = flat(header(rendered.get("/docs/")));
     for (const [route, html] of rendered) {
-      // /debug/ has no site header on purpose (tested above)
-      if (route === DEBUG) continue;
+      // /debug/ and /manifesto/ have no site header on purpose
+      if (STANDALONE.has(route)) continue;
       const own = header(html);
       if (route === "/" || !homes.includes(route)) expect(flat(own), route).toBe(docsHeader);
       // A docs page has the switcher (the not-found page, which is no page in any language, does not: its text names the languages)
@@ -630,7 +633,8 @@ describe("the LUZ docs site", () => {
       const main = quoted(html).match(/<main[\s\S]*?<\/main>/)[0].replace(/<nav class="luz-page-rail__onpage"[\s\S]*?<\/nav>/, "");
       return new Set([...main.matchAll(/href="((?:\/[a-z]{2,3})?\/docs\/[^"#]*)/g)].map((m) => m[1]));
     };
-    const starts = [...withLanguages.rendered].filter(([route]) => route !== "/404.html");
+    // The manifesto stands alone: its one way on is the home page
+    const starts = [...withLanguages.rendered].filter(([route]) => route !== "/404.html" && route !== MANIFESTO);
     // Every language is a start page, its home and, when it has docs, its docs pages
     for (const code of homeCodes) expect(starts.some(([route]) => route === `/${code}/`), `${code} home`).toBe(true);
     for (const code of codes) {
