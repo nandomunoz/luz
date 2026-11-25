@@ -36,10 +36,7 @@ const SCRIPT = join(repo, "packages/ai/skills/luz/scripts/luz.mjs");
 /** The terminal as the generator writes it, in English. */
 const written = cliDemo({ say: (key) => catalogs.en[key], root: repo, escapeHtml });
 const terminal = written.cli;
-/** The same terminal as the home has it: the animation. */
-const loop = written.cliloop;
 const aiPage = read("apps/landing/levels/ai.html");
-const screenOf = (html) => /<div class="landing-cli__screen"[^>]*>([\s\S]*)<\/div>\n<button/.exec(html)?.[1] ?? "";
 const unescape = (text) => text.replace(/&quot;/g, '"').replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&#39;/g, "'").replace(/&amp;/g, "&");
 /** Every element of the screen with its `data-when` and whether it is `hidden` in the markup. */
 const conditioned = [...terminal.matchAll(/<[a-z]+\b[^>]*\sdata-when="([^"]*)"[^>]*>/g)].map((m) => ({ when: m[1], hidden: /\shidden\b/.test(m[0]) }));
@@ -48,7 +45,8 @@ describe("the template of level 4 and the terminal the generator writes", () => 
   it("the skill's page has the terminal of a whole session ({{cli}}); the home, a person installing the skill ({{cliinstall}}), once each (owner, 2026-11-25)", () => {
     expect(aiPage.match(/\{\{cli\}\}/g)).toHaveLength(1);
     expect(level4.match(/\{\{cliinstall\}\}/g)).toHaveLength(1);
-    expect(level4).not.toMatch(/\{\{cli(loop)?\}\}/);
+    expect(level4).not.toMatch(/\{\{cli(loop|use)?\}\}/);
+    expect(written).not.toHaveProperty("cliuse");
     expect(level4).not.toContain("landing-cli__line");
   });
 
@@ -175,18 +173,57 @@ describe("the template of level 4 and the terminal the generator writes", () => 
   });
 });
 
-describe("the terminal of the home: an animation that plays the session again and again, with nothing to answer", () => {
-  it("is the same terminal, marked as a loop, with the same screen line by line", () => {
-    expect(loop).toMatch(new RegExp(`^<figure class="landing-cli" dir="ltr" aria-label="${escapeHtml(catalogs.en["inside.l4.panel"])}" data-landing-cli="loop">`));
-    expect(screenOf(loop)).not.toBe("");
-    expect(screenOf(loop)).toBe(screenOf(terminal));
+describe("the home's two tabs (owner, 2026-11-25): Install, npm and the usual commands; Use, the terminal", () => {
+  const install = level4.slice(level4.indexOf('id="ai-install"'), level4.indexOf('id="ai-use"'));
+
+  it("the template has two tabs, Install then Use, each with its panel, and the terminal is in Use", () => {
+    expect(level4).toMatch(/<nav class="luz-tabs luz-tabs--pill" aria-label="\{\{t:inside\.l4\.tabs\}\}">/);
+    const tabs = [...level4.matchAll(/<a class="luz-tab" href="#([a-z-]+)">[\s\S]*?<span>\{\{t:([a-z0-9.]+)\}\}<\/span><\/a>/g)].map((m) => [m[1], m[2]]);
+    expect(tabs).toEqual([["ai-install", "inside.tab.install"], ["ai-use", "inside.tab.use"]]);
+    expect(level4).toMatch(/<div class="luz-tabpanel landing-clitabs__pane" id="ai-use">\s*\{\{cliinstall\}\}\s*<\/div>/);
+    expect(install).not.toContain("{{cliinstall}}");
+    for (const lang of LANGS) {
+      expect(catalogs[lang]["inside.tab.use"], lang).toMatch(/\S/);
+      expect(catalogs[lang]["inside.l4.tabs"], lang).toMatch(/\S/);
+      expect(catalogs[lang], lang).not.toHaveProperty("inside.l4.use.title");
+    }
+    expect(catalogs.en["inside.tab.use"]).toBe("Use");
   });
 
-  it("has no Enter and no key to press, and a button to pause it, hidden until the script shows it (WCAG 2.2.2)", () => {
-    expect(loop).not.toContain("landing-cli__next");
-    expect(loop).not.toContain("<kbd>");
-    expect(loop).toContain(`<button class="luz-btn luz-btn--ghost luz-btn--sm landing-cli__pause" type="button" hidden><span data-cli-pause>${catalogs.en["inside.l4.pause"]}</span><span data-cli-play hidden>${catalogs.en["inside.l4.play"]}</span></button>`);
-    expect(loop.match(/<button\b[^>]*landing-cli__pause/g)).toHaveLength(1);
+  it("Install has npm, with its copy button, and the usual commands of luz-ai, simplified, to read (no copy button)", () => {
+    const blocks = [...install.matchAll(/<div class="landing-install">([\s\S]*?)<\/pre>/g)].map((m) => ({
+      label: /<span class="landing-install__label">\{\{t:([a-z0-9.]+)\}\}<\/span>/.exec(m[1])?.[1],
+      copy: /data-copy-from="([a-z-]+)"/.exec(m[1])?.[1] ?? null,
+      id: /<code id="([a-z-]+)">/.exec(m[1])?.[1],
+      code: /<code id="[a-z-]+">([^<]+)<\/code>/.exec(m[1])?.[1],
+    }));
+    expect(blocks.map(({ label, copy, id }) => [label, copy, id])).toEqual([
+      ["inside.install.npm", "ai-npm", "ai-npm"],
+      ["inside.l4.commands", null, "ai-commands"],
+    ]);
+    expect(blocks[0].code).toBe("npx @luz-ds/ai init");
+    expect(install, "no CDN: the skill is not linked from a page").not.toMatch(/cdn|jsdelivr/i);
+    // Each usual command is one the skill has (its --help), or the check
+    const help = execFileSync(process.execPath, [SCRIPT, "--help"], { encoding: "utf-8" });
+    const commands = blocks[1].code.split("\n");
+    expect(commands.length).toBeGreaterThanOrEqual(3);
+    for (const command of commands) {
+      if (command.startsWith("npx @luz-ds/check")) continue;
+      const [bin, name] = command.split(" ");
+      expect(bin, command).toBe("luz-ai");
+      expect(help, command).toMatch(new RegExp(`^ {2}${name}\\b`, "m"));
+    }
+    for (const lang of LANGS) {
+      expect(catalogs[lang]["inside.l4.commands"], lang).toMatch(/\S/);
+      expect(catalogs[lang], lang).not.toHaveProperty("inside.l4.copy.commands");
+    }
+  });
+
+  it("the terminal of Use is written in every language with the words of its pause button", () => {
+    for (const lang of LANGS) {
+      const said = cliDemo({ say: (key) => catalogs[lang][key], root: repo, escapeHtml }).cliinstall;
+      expect(said, lang).toContain(`<span data-cli-pause>${escapeHtml(catalogs[lang]["inside.l4.pause"])}</span><span data-cli-play hidden>${escapeHtml(catalogs[lang]["inside.l4.play"])}</span>`);
+    }
   });
 
   it("leaves the interactive terminal as it was: Enter, no pause", () => {
@@ -195,12 +232,6 @@ describe("the terminal of the home: an animation that plays the session again an
     expect(terminal).not.toContain("landing-cli__pause");
   });
 
-  it("is written in every language with the words of its button", () => {
-    for (const lang of LANGS) {
-      const said = cliDemo({ say: (key) => catalogs[lang][key], root: repo, escapeHtml }).cliloop;
-      expect(said, lang).toContain(`<span data-cli-pause>${escapeHtml(catalogs[lang]["inside.l4.pause"])}</span><span data-cli-play hidden>${escapeHtml(catalogs[lang]["inside.l4.play"])}</span>`);
-    }
-  });
 });
 
 describe("apps/landing/landing.js and cli.js", () => {

@@ -773,10 +773,13 @@ test.describe('Landing page', () => {
         await open(page, route);
 
         const cli = page.locator('#ai figure.landing-cli--install');
-        await expect(cli).toHaveAccessibleName(words['inside.l4.install.title']);
-        await expect(cli).toContainText('npx @luz-ds/ai init --target claude');
+        // In the tab Use, closed at first with JavaScript: its name and text are read from the markup
+        await expect(cli).toHaveAttribute('aria-label', words['inside.l4.install.title']);
+        expect(await cli.textContent()).toContain('npx @luz-ds/ai init --target claude');
         await expect(page.locator('#ai .landing-kind, #ai [data-prompt-open], #ai a[href^="/prompts/"]')).toHaveCount(0);
-        await expect(page.locator('#ai .landing-cli__note')).toContainText(words['inside.l4.soon']);
+        // The note sits under the panel of the tabs, no longer under the words
+        await expect(page.locator('#ai .landing-clitabs + .landing-cli__note')).toContainText(words['inside.l4.soon']);
+        await expect(page.locator('#ai .landing-inside__copy .landing-cli__note')).toHaveCount(0);
         // The way to the prompts until the skill is out: the kinds of site in the docs of the language; Arabic has none yet, so it says it is English
         const meanwhile = page.locator('#ai').getByRole('link', { name: words['inside.l4.meanwhile'], exact: true });
         await expect(meanwhile).toHaveAttribute('href', `${lang === 'es' ? '/es' : ''}/docs/kinds/`);
@@ -1032,10 +1035,11 @@ test.describe('Landing page', () => {
     test('the controls that need a script are not shown: the Copy buttons', async ({ page }) => {
       await page.goto('/');
 
-      // Levels 1 to 3 have two each (npm, CDN); level 4 one, the install command in its terminal
+      // Levels 1 to 3 have npm and the CDN; level 4 npm and the install command in its terminal
       const copy = page.locator('#tokens [data-copy-from], #core [data-copy-from], #catalog [data-copy-from], #ai [data-copy-from]');
-      expect(await copy.count()).toBeGreaterThanOrEqual(7);
-      await expect(page.locator('#ai [data-copy-from]')).toHaveCount(1);
+      expect(await copy.count()).toBeGreaterThanOrEqual(8);
+      // npm, and the command in its terminal; the usual commands are to read, not to copy
+      await expect(page.locator('#ai [data-copy-from]')).toHaveCount(2);
       for (const control of await copy.all()) await expect(control).toBeHidden();
     });
 
@@ -1045,8 +1049,9 @@ test.describe('Landing page', () => {
       const blocks = page.locator('main pre.luz-code-block, main pre.luz-terminal__code'); // the terminal's code is not a .luz-code-block
       // Three for each of the three levels: npm, CDN and the code example
       expect(await blocks.count()).toBeGreaterThanOrEqual(9);
-      // the one pre of level 4 is the title the skill prints, a picture hidden from a screen reader (tests/home-cli.test.js)
-      await expect(page.locator('#ai pre:not(.landing-cli__art[aria-hidden="true"])')).toHaveCount(0);
+      // Level 4 has npm and the usual commands; its other pre is the title the skill prints, a picture hidden from a screen reader (tests/home-cli.test.js)
+      await expect(page.locator('#ai pre:not(.landing-cli__art[aria-hidden="true"]):not(.luz-code-block)')).toHaveCount(0);
+      await expect(page.locator('#ai pre.luz-code-block')).toHaveCount(2);
       for (const block of await blocks.all()) {
         await expect(block).toHaveAttribute('tabindex', '0');
         await expect(block).toHaveAttribute('role', 'region');

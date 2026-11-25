@@ -86,10 +86,15 @@ for (const [route, lang] of HOME) {
   const words = catalog(lang);
   const term = (page) => page.locator('section#ai figure.landing-cli--install');
   const shown = (page) => term(page).locator('.landing-cli__line:not([hidden])');
+  // The terminal is in the tab Use: with JavaScript the tab Install opens first
+  const toUse = async (page, javaScriptEnabled) => {
+    if (javaScriptEnabled) await page.locator('section#ai .landing-clitabs .luz-tab').nth(1).click();
+  };
 
-  test(`${route}: still (no script, or reduced motion), the terminal shows Claude Code's install whole, the other assistants' hidden, nothing to pause`, async ({ page }) => {
+  test(`${route}: still (no script, or reduced motion), the terminal shows Claude Code's install whole, the other assistants' hidden, nothing to pause`, async ({ page, javaScriptEnabled }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await open(page, route);
+    await toUse(page, javaScriptEnabled);
     await expect(term(page)).toHaveAccessibleName(words['inside.l4.install.title']);
     await expect(shown(page).first()).toHaveText('$ npx @luz-ds/ai init --target claude');
     await expect(shown(page).last()).toContainText(words['level.ai.steps.2.ask']);
@@ -103,6 +108,7 @@ for (const [route, lang] of HOME) {
     test.skip(!javaScriptEnabled, 'the loop needs JavaScript');
     await page.clock.install();
     await open(page, route);
+    await toUse(page, javaScriptEnabled);
     await term(page).scrollIntoViewIfNeeded();
     await page.clock.runFor(200);
     // The pause button is in the foot, beside the note
@@ -119,8 +125,29 @@ for (const [route, lang] of HOME) {
     await expect(shown(page)).toHaveCount(before);
   });
 
+  test(`${route}: two tabs, Install and Use: Install has npm and the usual commands, Use the terminal; without JavaScript both show, one under the other`, async ({ page, javaScriptEnabled }) => {
+    await open(page, route);
+    const tabs = page.locator('section#ai .landing-clitabs .luz-tab');
+    const install = page.locator('section#ai #ai-install');
+    await expect(tabs).toHaveText([words['inside.tab.install'], words['inside.tab.use']]);
+    await expect(install.locator('code#ai-npm')).toHaveText('npx @luz-ds/ai init');
+    await expect(install.locator('code#ai-commands')).toContainText('luz-ai site new');
+    await expect(install.locator('figure.landing-cli')).toHaveCount(0);
+    if (!javaScriptEnabled) {
+      await expect(install).toBeVisible();
+      await expect(term(page)).toBeVisible();
+      return;
+    }
+    await expect(install).toBeVisible();
+    await expect(term(page)).toBeHidden();
+    await toUse(page, javaScriptEnabled);
+    await expect(term(page)).toBeVisible();
+    await expect(install).toBeHidden();
+  });
+
   test(`${route}: the command's copy button shows with JavaScript and copies it, and stays hidden without it`, async ({ page, context, javaScriptEnabled }) => {
     await open(page, route);
+    await toUse(page, javaScriptEnabled);
     const copy = term(page).locator('.luz-copy-btn');
     await expect(copy).toHaveCount(1);
     if (!javaScriptEnabled) {
