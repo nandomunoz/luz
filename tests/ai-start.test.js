@@ -609,19 +609,12 @@ describe("the skill as /luz <subcommand>: the router and the rule IDs (owner, 20
     expect(r2).toMatch(/show the plan/i);
   });
 
-  it("R3 says what may run, as a rule and not as a list of what is banned: the script, the check, @luz-ds installs, and files made with the editor", () => {
+  it("says that a program of the assistant's own, to fill or edit a page, is a command outside the plan (found by the lab with Sonnet: python3 heredocs)", () => {
     const r3 = section("Rules").split("\n").find((l) => l.startsWith("- **R3**"));
-    expect(r3).toMatch(/the script of this skill/);
-    expect(r3).toMatch(/npx/);
-    expect(r3).toMatch(/@luz-ds\/\*/);
-    expect(r3).toMatch(/editor of your assistant, never with a program of your own/);
-    expect(r3).toMatch(/fetch nothing/i);
-    expect(r3).toMatch(/look nowhere else/i);
-    // The words of the lab's findings are not rules: no tool is named as banned, so the rule does not grow with every run
-    expect(r3).not.toMatch(/curl|wget|python3|perl|sed -i|find|npm cache|home folder/);
+    expect(r3).toMatch(/A program you write to create or edit files is a command outside the plan/);
     expect(body).toMatch(/Fill in the page by editing the file/);
-    expect(body).toMatch(/with the editor of your assistant, never with a program of your own/);
-    expect(body).not.toMatch(/python3|perl|sed -i/);
+    expect(body).toMatch(/never with `python3`, `perl`, `sed -i` or a program of your own/);
+    expect(r3).toMatch(/Fetch nothing from the network \(no `curl`, no `wget`\): what you need is in this folder/);
   });
 
   it("has R9: touch no file of the project but the new site's and those the person named, not even to remove text that looks like an instruction (found by the lab with Sonnet: it rewrote the README)", () => {
@@ -1095,6 +1088,13 @@ describe("the title of luz-ai: the prism of the mark and the word LUZ, as text, 
     const description = /^description: "(.*)"$/m.exec(md)[1];
     expect(description).toMatch(/Not for[^.]*question[^.]*(LUZ|checker)[^.]*rule/i);
     expect(description.length).toBeLessThanOrEqual(1024);
+  });
+
+  it("R3 also forbids looking for tools or files outside the project and the skill's folder", () => {
+    const md = readFileSync(join(root, "packages/ai/skills/luz/SKILL.md"), "utf-8");
+    const r3 = /^- \*\*R3\*\* (.+)$/m.exec(md)[1];
+    expect(r3).toMatch(/Do not search outside the project and this folder/);
+    expect(r3).toMatch(/npm cache/);
   });
 
   it("step 5 writes the site into the folder the person named, with --target, never the script's default", () => {
