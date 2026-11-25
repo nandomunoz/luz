@@ -663,7 +663,7 @@ describe("the page of the catalog: a stylesheet per piece, linked only when used
     expect(steps).toContain("npm install @luz-ds/tokens @luz-ds/core @luz-ds/catalog");
     expect(steps).toContain("components/search.min.css");
     expect(steps).toContain("catalog.min.js");
-    expect(sectionOf(html, "next")).toMatch(/href="(\/(es|ar))?\/docs\/kinds\/"/);
+    expect(sectionOf(html, "next")).toMatch(/href="(\/(es|ar))?\/docs\/ai\/"/);
     expect(html).not.toContain('id="all"');
     expect(html).not.toContain("landing-level__fold");
   });

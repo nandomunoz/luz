@@ -68,7 +68,26 @@ describe("the data beside the script", () => {
     const facts = buildAiFacts({ root });
     for (const pkg of ["tokens", "core", "catalog", "check"]) expect(facts.versions[pkg], pkg).toBe(json(join(root, `packages/${pkg}/package.json`)).version);
     expect(facts.kinds).toEqual(["landing", "blog", "app", "docs"]);
-    expect(facts.stacks.map((s) => s.id)).toEqual(json(join(root, "apps/site/prompts/stacks.json")).stacks.map((s) => s.id));
+    expect(facts.stacks.map((s) => s.id)).toEqual(json(join(root, "packages/ai/src/stacks.json")).stacks.map((s) => s.id));
+  });
+});
+
+describe("the skill is built from its own sources, not from the prompts for AI", () => {
+  const builder = read(join(root, "scripts/build-ai-facts.js"));
+
+  it("keeps the preset of each kind, the stacks and the starter's base in packages/ai/src", () => {
+    for (const kind of ["landing", "blog", "app", "docs"]) expect(existsSync(join(root, `packages/ai/src/kinds/${kind}.md`)), kind).toBe(true);
+    expect(existsSync(join(root, "packages/ai/src/stacks.json"))).toBe(true);
+    const { base } = json(join(root, "packages/ai/src/starter.json"));
+    const known = json(join(root, "packages/catalog/dist/classes.json")).classes.flatMap((c) => c.files ?? []);
+    for (const file of base) expect(known, file).toContain(file);
+  });
+
+  it("no longer reads apps/site/prompts nor scripts/docs-site/prompts.js", () => {
+    expect(builder).not.toMatch(/apps\/site\/prompts/);
+    expect(builder).not.toMatch(/docs-site\/prompts/);
+    expect(existsSync(join(root, "apps/site/prompts/stacks.json"))).toBe(false);
+    expect(existsSync(join(root, "apps/site/prompts/presets"))).toBe(false);
   });
 });
 

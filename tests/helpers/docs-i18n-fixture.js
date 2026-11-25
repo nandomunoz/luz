@@ -160,8 +160,8 @@ export function pseudoCatalog(code, enStrings, siteJson) {
 export const SITE_JSON = {
   areas: [
     { id: "get-started", label: "Get started", slug: "get-started", essentials: [{ href: "/docs/components/" }, { href: "/docs/tokens/color/", label: "Color tokens" }] },
-    // The pages of the kinds of site: "Fits best" links each kind to /docs/kinds/<kind>/
-    { id: "kinds", label: "Kinds of site", slug: "kinds" },
+    // The pages of the AI area, the four kinds of site among them: "Fits best" links each kind to /docs/ai/<kind>/
+    { id: "ai", label: "AI", slug: "ai" },
     { id: "tokens", label: "Tokens", slug: "tokens", package: "@luz-ds/tokens", groups: [{ id: "families", label: "Token families" }] },
     {
       id: "components",
@@ -279,14 +279,14 @@ export const PAGES = {
         `<p>${t("Copy it.")}</p>`,
       ].join("\n"),
   },
-  "kinds/index.html": {
-    meta: { title: "Kinds of site", description: "The four kinds of site.", area: "kinds", generate: "gallery" },
+  "ai/index.html": {
+    meta: { title: "AI", description: "The AI area.", area: "ai", generate: "gallery" },
     body: (t) => `<p>${t("The kinds.")}</p>\n<!-- luz:generated -->`,
   },
   ...Object.fromEntries(
     ["landing", "blog", "app", "docs"].map((kind, i) => [
-      `kinds/${kind}.html`,
-      { meta: { title: `Kind ${kind}`, description: `A ${kind} site.`, area: "kinds", order: String(i + 1) }, body: (t) => `<p>${t("A kind of site.")}</p>` },
+      `ai/${kind}.html`,
+      { meta: { title: `Kind ${kind}`, description: `A ${kind} site.`, area: "ai", order: String(i + 1) }, body: (t) => `<p>${t("A kind of site.")}</p>` },
     ]),
   ),
   "catalog/index.html": {

@@ -777,14 +777,15 @@ test.describe('Landing page', () => {
         await expect(cli).toHaveAttribute('aria-label', words['inside.l4.install.title']);
         expect(await cli.textContent()).toContain('npx @luz-ds/ai init --target claude');
         await expect(page.locator('#ai .landing-kind, #ai [data-prompt-open], #ai a[href^="/prompts/"]')).toHaveCount(0);
-        // The note sits under the panel of the tabs, no longer under the words
-        await expect(page.locator('#ai .landing-clitabs + .landing-cli__note')).toContainText(words['inside.l4.soon']);
+        // The note sits under the panel of the tabs, beside nothing: the badge and the link to the docs
+        const note = page.locator('#ai .landing-clitabs + .landing-cli__note');
+        await expect(note.locator('.luz-badge')).toHaveCount(0);
         await expect(page.locator('#ai .landing-inside__copy .landing-cli__note')).toHaveCount(0);
-        // The way to the prompts until the skill is out: the kinds of site in the docs of the language; Arabic has none yet, so it says it is English
-        const meanwhile = page.locator('#ai').getByRole('link', { name: words['inside.l4.meanwhile'], exact: true });
-        await expect(meanwhile).toHaveAttribute('href', `${lang === 'es' ? '/es' : ''}/docs/kinds/`);
-        if (lang === 'ar') await expect(meanwhile).toHaveAttribute('hreflang', 'en');
-        else await expect(meanwhile).not.toHaveAttribute('hreflang', /./);
+        // The way to the skill's documentation, in the docs of the language; Arabic has none yet, so it says it is English
+        const docs = note.getByRole('link', { name: words['inside.l4.docs'], exact: true });
+        await expect(docs).toHaveAttribute('href', `${lang === 'es' ? '/es' : ''}/docs/ai/`);
+        if (lang === 'ar') await expect(docs).toHaveAttribute('hreflang', 'en');
+        else await expect(docs).not.toHaveAttribute('hreflang', /./);
       });
     }
 
@@ -1029,7 +1030,7 @@ test.describe('Landing page', () => {
       const lines = page.locator('#ai .landing-cli__line:not([hidden])');
       expect(await lines.count()).toBeGreaterThanOrEqual(5);
       await expect(page.locator('#ai .landing-cli__line:visible')).toHaveCount(await lines.count());
-      await expect(page.locator('#ai a[href="/docs/kinds/"]')).toBeVisible();
+      await expect(page.locator('#ai a[href="/docs/ai/"]')).toBeVisible();
     });
 
     test('the controls that need a script are not shown: the Copy buttons', async ({ page }) => {
@@ -1049,7 +1050,7 @@ test.describe('Landing page', () => {
       const blocks = page.locator('main pre.luz-code-block, main pre.luz-terminal__code'); // the terminal's code is not a .luz-code-block
       // Three for each of the three levels: npm, CDN and the code example
       expect(await blocks.count()).toBeGreaterThanOrEqual(9);
-      // Level 4 has npm and the usual commands; its other pre is the title the skill prints, a picture hidden from a screen reader (tests/home-cli.test.js)
+      // Level 4 has npm and the CDN too; its other pre is the title the skill prints, a picture hidden from a screen reader (tests/home-cli.test.js)
       await expect(page.locator('#ai pre:not(.landing-cli__art[aria-hidden="true"]):not(.luz-code-block)')).toHaveCount(0);
       await expect(page.locator('#ai pre.luz-code-block')).toHaveCount(2);
       for (const block of await blocks.all()) {

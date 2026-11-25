@@ -2,7 +2,7 @@
  * The site's icons are one family: a 24 grid, a 1.5 px stroke in the text colour
  * (`currentColor`), round caps and joins, no fill, no colour typed in the markup.
  * The Icons page (apps/docs/pages/components/icons.html and its Spanish page) is
- * where they are shown and copied; the header, footer, prompt dialog, language
+ * where they are shown and copied; the header, footer, language
  * switch, search and colour mode draw the same shapes. What a browser paints and
  * what the copy buttons put on the clipboard are tests/icons-page.spec.js and
  * tests/site-header-repo-icon.spec.js; this file reads the sources.
@@ -13,7 +13,7 @@
  *  - the page carries each icon once: no `data-copy` in the HTML (a script fills it from
  *    the icon beside the button), the sprite block is a short sample, and no number of
  *    icons is typed in the prose (the count is the page's own);
- *  - the icons of the header, the footer and the prompt dialog are the ones of the page
+ *  - the icons of the header and the footer are the ones of the page
  *    (RL-13: the repository link draws LUZ's own git-branch, never GitHub's mark), with
  *    a 1.5 stroke wherever one is written, in the markup and in the CSS that styles them;
  *  - no octocat path in `apps/` or `packages/*\/src`;
@@ -257,8 +257,8 @@ describe("the Spanish Icons page has the icons of the English one", () => {
   });
 });
 
-describe("the icons of the header, the footer and the prompt dialog are the family's", () => {
-  const PARTIALS = ["header", "footer", "prompt-dialog"].map((name) => ({ name, root: parse(read(`apps/site/_partials/${name}.html`), name) }));
+describe("the icons of the header and the footer are the family's", () => {
+  const PARTIALS = ["header", "footer"].map((name) => ({ name, root: parse(read(`apps/site/_partials/${name}.html`), name) }));
   /** The svgs of the partials on the 24 grid, and the logo (32) apart. */
   const svgs = () => PARTIALS.flatMap(({ name, root }) => queryAll(root, "svg").map((svg) => ({ name, svg })));
   const onGrid = () => svgs().filter(({ svg }) => svg.attrs.get("viewbox") === "0 0 24 24");

@@ -8,7 +8,7 @@
  *      Charts, Site-wide, Documentation and Reference, each with its pages (in English and in Spanish); since F7 the navbar and
  *      the sidebar are in Navigation, and the terminal and the timeline in Content (they came from core)
  *   2  a pattern page says where it fits best, "Fits best: <kinds> - <sentence>", under the lead and above the
- *      chips, each kind a link to /docs/kinds/<kind>/ and "any site" no link; the card of the gallery says it too;
+ *      chips, each kind a link to /docs/ai/<kind>/ and "any site" no link; the card of the gallery says it too;
  *      in Spanish, in the words of the language; a page of core has no such line
  *   3  the four areas of the packages that are gone (/docs/landing/, /docs/cms/, /docs/app/, /docs/documentation/),
  *      their pages and their templates answer 404, in English and in Spanish, and neither the search index
@@ -152,7 +152,7 @@ test.describe('every pattern page says where it fits best', () => {
         else {
           await expect(links).toHaveCount(kinds.length);
           for (const [i, kind] of kinds.entries()) {
-            await expect(links.nth(i)).toHaveAttribute('href', `${prefix}/docs/kinds/${kind}/`);
+            await expect(links.nth(i)).toHaveAttribute('href', `${prefix}/docs/ai/${kind}/`);
             await expect(links.nth(i)).toHaveText(kindWord(code, kind));
           }
         }
@@ -183,12 +183,12 @@ test.describe('every pattern page says where it fits best', () => {
   test('the lines of the pages are the lines of the kinds: landing is a link on the page of the Hero and any site is not one on the Announcement', async ({ page }) => {
     await page.goto('/docs/catalog/hero/');
     await expect(page.locator('p.docs-fits')).toHaveText('Fits best: landing — the top of a landing page, under the header');
-    await expect(page.locator('p.docs-fits a')).toHaveAttribute('href', '/docs/kinds/landing/');
+    await expect(page.locator('p.docs-fits a')).toHaveAttribute('href', '/docs/ai/landing/');
     await page.goto('/docs/catalog/announcement/');
     await expect(page.locator('p.docs-fits')).toHaveText('Fits best: any site — a short notice for every visitor, such as a sale or planned maintenance');
     await page.goto('/docs/catalog/masthead/');
     await expect(page.locator('p.docs-fits a')).toHaveText('blog');
-    await expect(page.locator('p.docs-fits a')).toHaveAttribute('href', '/docs/kinds/blog/');
+    await expect(page.locator('p.docs-fits a')).toHaveAttribute('href', '/docs/ai/blog/');
     await page.goto('/docs/catalog/site-header/');
     await expect(page.locator('p.docs-fits a')).toHaveText(['landing', 'blog']);
   });

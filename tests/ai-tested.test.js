@@ -106,8 +106,8 @@ describe("the notes", () => {
 
   it("the README, the commands page (en and es) and the /ai/ strings say it, and name the host tested.json names", () => {
     expect(read("packages/ai/README.md")).toMatch(/tested only in Claude Code/i);
-    expect(read("apps/docs/pages/get-started/ai-commands.html")).toMatch(/tested only in Claude Code/i);
-    expect(read("apps/docs/i18n/es/pages/get-started/ai-commands.html")).toMatch(/solo en Claude Code/i);
+    expect(read("apps/docs/pages/ai/commands.html")).toMatch(/tested only in Claude Code/i);
+    expect(read("apps/docs/i18n/es/pages/ai/commands.html")).toMatch(/solo en Claude Code/i);
     expect(JSON.parse(read("apps/landing/i18n/en.json"))["level.ai.commands.lead"]).toMatch(/tested only in Claude Code/i);
     expect(JSON.parse(read("apps/landing/i18n/es.json"))["level.ai.commands.lead"]).toMatch(/solo en Claude Code/i);
     expect(JSON.parse(read("apps/landing/i18n/ar.json"))["level.ai.commands.lead"]).toContain("Claude Code");

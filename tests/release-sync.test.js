@@ -152,7 +152,7 @@ describe("syncVersions: the commands an agent is told to run (npx)", () => {
   beforeEach(() => {
     manifest("check", "0.2.0");
     put("README.md", "Run `npx @luz-ds/check@0.1.0 <files>` and `npx @luz-ds/tokens@0.1.0 check-contrast my.css`.\n");
-    put("apps/docs/pages/get-started/ai.html", page("title: AI", "<pre><code>npx @luz-ds/check@0.1.0 src --json</code></pre>\n<p>Say <code>npx @luz-ds/check@0.1.0</code>.</p>"));
+    put("apps/docs/pages/ai/index.html", page("title: AI", "<pre><code>npx @luz-ds/check@0.1.0 src --json</code></pre>\n<p>Say <code>npx @luz-ds/check@0.1.0</code>.</p>"));
   });
 
   it("writes the version of check and of tokens in `npx @luz-ds/<name>@<version>` of the markdown and of the pages", () => {
@@ -160,29 +160,29 @@ describe("syncVersions: the commands an agent is told to run (npx)", () => {
 
     expect(get("README.md")).toContain("`npx @luz-ds/check@0.2.0 <files>`");
     expect(get("README.md")).toContain("`npx @luz-ds/tokens@0.2.0 check-contrast my.css`");
-    expect(get("apps/docs/pages/get-started/ai.html")).toContain("npx @luz-ds/check@0.2.0 src --json");
-    expect(get("apps/docs/pages/get-started/ai.html")).toContain("<code>npx @luz-ds/check@0.2.0</code>");
+    expect(get("apps/docs/pages/ai/index.html")).toContain("npx @luz-ds/check@0.2.0 src --json");
+    expect(get("apps/docs/pages/ai/index.html")).toContain("<code>npx @luz-ds/check@0.2.0</code>");
   });
 
   it("writes the version of @luz-ds/ai in a page too, once it has a release, and leaves its placeholder alone", () => {
-    put("apps/docs/pages/get-started/ai.html", page("title: AI", "<p>Run <code>npx @luz-ds/ai@0.0.0 init --target claude</code>.</p>"));
+    put("apps/docs/pages/ai/index.html", page("title: AI", "<p>Run <code>npx @luz-ds/ai@0.0.0 init --target claude</code>.</p>"));
     manifest("ai", "0.0.0");
     syncVersions(root);
-    expect(get("apps/docs/pages/get-started/ai.html")).toContain("npx @luz-ds/ai@0.0.0 init");
+    expect(get("apps/docs/pages/ai/index.html")).toContain("npx @luz-ds/ai@0.0.0 init");
     manifest("ai", "0.1.0");
     syncVersions(root);
-    expect(get("apps/docs/pages/get-started/ai.html")).toContain("<code>npx @luz-ds/ai@0.1.0 init --target claude</code>");
+    expect(get("apps/docs/pages/ai/index.html")).toContain("<code>npx @luz-ds/ai@0.1.0 init --target claude</code>");
   });
 
   it("moves the `source` of the translation of a page whose command changed", () => {
-    const body = get("apps/docs/pages/get-started/ai.html").replace(/^<!-- luz:page\n[\s\S]*?\n-->\n/, "");
-    put("apps/docs/i18n/es/pages/get-started/ai.html", page(`title: IA\nsource: ${sourceHash(body)}\nreviewed: false`, body));
+    const body = get("apps/docs/pages/ai/index.html").replace(/^<!-- luz:page\n[\s\S]*?\n-->\n/, "");
+    put("apps/docs/i18n/es/pages/ai/index.html", page(`title: IA\nsource: ${sourceHash(body)}\nreviewed: false`, body));
 
     syncVersions(root);
 
-    const after = get("apps/docs/pages/get-started/ai.html").replace(/^<!-- luz:page\n[\s\S]*?\n-->\n/, "");
-    expect(get("apps/docs/i18n/es/pages/get-started/ai.html")).toContain(`source: ${sourceHash(after)}`);
-    expect(get("apps/docs/i18n/es/pages/get-started/ai.html")).toContain("npx @luz-ds/check@0.2.0 src --json");
+    const after = get("apps/docs/pages/ai/index.html").replace(/^<!-- luz:page\n[\s\S]*?\n-->\n/, "");
+    expect(get("apps/docs/i18n/es/pages/ai/index.html")).toContain(`source: ${sourceHash(after)}`);
+    expect(get("apps/docs/i18n/es/pages/ai/index.html")).toContain("npx @luz-ds/check@0.2.0 src --json");
   });
 
   it("is listed by releaseDrift while it says another version, and gone once synced", () => {

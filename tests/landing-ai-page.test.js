@@ -101,7 +101,7 @@ describe("the page of the luz skill, /ai/", () => {
     for (const c of chat) expect(block, c).toContain(`<code>${escape(c)}</code>`);
     expect(block.match(/<tr>/g)).toHaveLength(chat.length + 1);
     for (const key of ["level.ai.chat.start", "level.ai.chat.doctor", "level.ai.chat.help"]) expect(block, key).toContain(escape(catalog(code)[key]));
-    expect(block).toContain("docs/get-started/ai-commands/");
+    expect(block).toContain("docs/ai/commands/");
   });
 
   it.each(LANGS)("in %s: names every agent the skill carries, once, with what it does in the language and whether it changes code", (code, prefix) => {

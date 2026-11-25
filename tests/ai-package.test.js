@@ -144,7 +144,7 @@ describe("the README", () => {
     expect(readme.indexOf("## The commands")).toBeGreaterThan(0);
     expect(readme.indexOf("## The commands")).toBeLessThan(readme.indexOf("## The script"));
     for (const c of chat) expect(readme, c).toContain(`| \`${c}\` |`);
-    expect(readme).toContain("/docs/get-started/ai-commands/");
+    expect(readme).toContain("/docs/ai/commands/");
     expect(readme).toMatch(/Type `\/luz`/);
   });
 

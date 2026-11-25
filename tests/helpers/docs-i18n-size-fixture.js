@@ -156,8 +156,6 @@ export function makeSite({ languages = ["es", "ar"], probe = false } = {}) {
   });
   mkdirSync(join(repoRoot, "apps/site"), { recursive: true });
   cpSync(join(REAL_REPO, "apps/site/_partials"), join(repoRoot, "apps/site/_partials"), { recursive: true });
-  // The build also writes the five prompts for AI (/prompts/<kind>.txt) from these
-  if (existsSync(join(REAL_REPO, "apps/site/prompts"))) cpSync(join(REAL_REPO, "apps/site/prompts"), join(repoRoot, "apps/site/prompts"), { recursive: true });
   mkdirSync(join(repoRoot, "apps/landing"), { recursive: true });
   cpSync(join(REAL_REPO, "apps/landing/i18n"), join(repoRoot, "apps/landing/i18n"), { recursive: true });
   cpSync(join(REAL_REPO, "apps/landing/index.html"), join(repoRoot, "apps/landing/index.html"));
@@ -244,10 +242,9 @@ export function makeScriptRepo() {
   const sources = [
     ...tracked("apps"),
     ...tracked("scripts"),
-    // ai.js imports it (the prompts for AI); a new file is not tracked until it is committed
-    "scripts/docs-site/prompts.js",
-    // the commands page (get-started/ai-commands) runs the script of the luz skill and reads SKILL.md and the frozen examples
+    // the commands page (ai/commands) runs the script of the luz skill and reads SKILL.md and the frozen examples
     "scripts/docs-site/ai-commands.js",
+    "scripts/docs-site/ai-agents.js",
     ...tracked("packages/ai/skills/luz"),
     ...readdirSync(join(REAL_REPO, "tools/ai-eval/cases/examples")).map((f) => `tools/ai-eval/cases/examples/${f}`),
     ...tracked("packages/check/src"),

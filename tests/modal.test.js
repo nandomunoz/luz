@@ -1,8 +1,8 @@
 /**
  * LUZ — the modal on a small screen: what the stylesheets declare and read, from their sources
- * (the pixels are tests/modal.spec.js, tests/search.spec.js and tests/prompt-dialog.spec.js).
+ * (the pixels are tests/modal.spec.js and tests/search.spec.js).
  *
- *   - core's modal, the catalog's search dialog and the site's prompt dialog go full screen under the same query:
+ *   - core's modal, and the catalog's search dialog go full screen under the same query:
  *     the mobile break of the tokens (--luz-mq-sm, 640 px) or a window 30rem tall;
  *   - the sizes of the pinned header and footer (--luz-modal-head-size, --luz-modal-foot-size) are declared once, on
  *     .luz-modal, are at least a 44 px close or action and its line, and are what the dialog's scroll-padding reads,
@@ -22,7 +22,6 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (path) => readFileSync(resolve(root, path), "utf-8");
 const modal = read("packages/core/src/components/modal.css");
 const search = read("packages/catalog/src/components/search.css");
-const prompt = read("apps/site/prompt-dialog.css");
 const tokensCss = read("packages/tokens/dist/luz-tokens.css");
 
 /** Every stylesheet under a folder, without node_modules and dist */
@@ -56,7 +55,7 @@ const SMALL = /@media\s*\(\s*max-width:\s*(\d+)px\s*\)\s*,\s*\(\s*max-height:\s*
 describe("the small-screen query", () => {
   const scope = tokenScope();
 
-  for (const [name, css] of [["core's modal.css", modal], ["catalog's search.css", search], ["the site's prompt-dialog.css", prompt]]) {
+  for (const [name, css] of [["core's modal.css", modal], ["catalog's search.css", search]]) {
     it(`${name} goes full screen at the mobile break of the tokens, or in a window 30rem tall`, () => {
       const queries = [...css.matchAll(SMALL)].map((m) => [Number(m[1]), m[2]]);
       expect(queries.length, "a (max-width) , (max-height) query").toBeGreaterThan(0);

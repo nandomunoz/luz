@@ -23,7 +23,7 @@ import { routeOf } from './helpers/docs-site.js';
 
 const FIXTURE = '/tests/fixtures/modal.html';
 const SEARCH_PAGE = routeOf('c-button');
-const PROMPT_PAGE = '/docs/get-started/ai/';
+const PROMPT_PAGE = '/docs/ai/';
 
 /** Windows that are the screen: two phones held upright, and a window 800x400 (the `max-height: 30rem` branch). */
 const SMALL = [

@@ -21,10 +21,10 @@ export const KIND_AREAS = [];
 /**
  * The npm package an area's index names in its eyebrow ("Components · @luz-ds/core"), or null for an
  * area that documents no package (Get started, Accessibility, HTML elements). Components document core,
- * Tokens document tokens, and Catalog documents catalog; the name is read from the package.json.
+ * Tokens document tokens, Catalog documents catalog and AI documents the luz skill, @luz-ds/ai; the name is read from the package.json.
  */
 export function eyebrowPackageOf(area) {
-  const dir = area === "components" ? "core" : area === "tokens" ? "tokens" : PATTERN_AREAS.includes(area) ? packageOfArea(area) : null;
+  const dir = area === "components" ? "core" : area === "tokens" ? "tokens" : area === "ai" ? "ai" : PATTERN_AREAS.includes(area) ? packageOfArea(area) : null;
   if (dir === null) return null;
   return JSON.parse(readFileSync(new URL(`../../packages/${dir}/package.json`, import.meta.url), "utf-8")).name;
 }

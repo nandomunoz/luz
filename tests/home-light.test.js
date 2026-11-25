@@ -403,13 +403,13 @@ describe("budgets.json and PRINCIPLES.md section 8: the three rows of the home's
     expect(budgets.some((b) => /light\/(?:city|map|puzzle)\.js$/.test(b.file ?? ""))).toBe(false);
   });
 
-  it("puts them after the theme-boot script row of core, with the prompts row and the debug page row appended after them (no catalog row in between: no weight limit, 2026-11-02; no other row moved or raised)", () => {
+  it("puts them after the theme-boot script row of core, with the debug page row appended after them (no catalog row in between: no weight limit, 2026-11-02; no other row moved or raised)", () => {
     // core has no loose sheet any more (the four charts are catalog's, 2026-11-03): no row of budgets.json names one
     expect(budgets.filter((b) => /loose sheet/.test(b.name))).toEqual([]);
     const names = budgets.map((b) => b.name);
     const boot = names.findIndex((name) => /^core theme-boot script/.test(name));
     expect(boot, "the theme-boot script row").toBeGreaterThanOrEqual(0);
-    expect(names.slice(boot + 1)).toEqual([...ROWS.map(([name]) => name), "prompts (each, uncompressed)", "debug page HTML (docs/debug/index.html, uncompressed)"]);
+    expect(names.slice(boot + 1)).toEqual([...ROWS.map(([name]) => name), "debug page HTML (docs/debug/index.html, uncompressed)"]);
   });
 
   it("repeats them in the PRINCIPLES.md table, with the same ceilings, in the same order", () => {
@@ -424,10 +424,9 @@ describe("budgets.json and PRINCIPLES.md section 8: the three rows of the home's
     const boot = table.findIndex((cells) => /^`core` theme boot script/.test(cells[0]));
     expect(boot, "the theme boot script row of the table").toBeGreaterThanOrEqual(0);
     const at = boot;
-    // the prompts row (the kinds plan, F1) comes after them, then the debug page row
+    // the debug page row comes after them
     const rows = table.slice(at + 1, at + 1 + ROWS.length);
-    expect(table.slice(at + 1)).toHaveLength(ROWS.length + 2);
-    expect(table.at(-2)[0]).toMatch(/prompt/i);
+    expect(table.slice(at + 1)).toHaveLength(ROWS.length + 1);
     expect(table.at(-1)[0]).toMatch(/debug page/i);
     rows.forEach((cells, i) => {
       expect(cells[0].replace(/`/g, ""), `row ${i + 1}`).toMatch(new RegExp(ROWS[i][0].replace(/`/g, "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));

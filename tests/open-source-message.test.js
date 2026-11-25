@@ -13,10 +13,10 @@
  *                apps/landing/index.html writes it as {{html:hero.lead}}; the old built.* keys are gone
  *   README.md, PRINCIPLES.md   both statements before the first `## ` heading
  *   Page         apps/docs/pages/get-started/how-luz-is-built.html: front matter
- *                title "How LUZ is built", area get-started, order 12 (after Classless),
+ *                title "How LUZ is built", area get-started, order 11 (after Migrate),
  *                toc: false, a description; h2 sections "Human-first, AI-ready",
  *                "Tests first", "Zero dependencies"; links to PRINCIPLES.md, TESTING.md
- *                and /docs/get-started/ai/; every /docs/ link goes to a page that exists
+ *                and /docs/ai/; every /docs/ link goes to a page that exists
  *   Table        a markdown table under a heading "Use or contribute", in README.md and
  *                CONTRIBUTING.md, the same lines in both: header `| I want to | How |`,
  *                then these eight rows, first cell exactly:
@@ -118,7 +118,7 @@ describe("get-started/how-luz-is-built", () => {
     const f = front();
     expect(f.title).toBe("How LUZ is built");
     expect(f.area).toBe("get-started");
-    expect(f.order).toBe("12");
+    expect(f.order).toBe("11");
     expect(f.toc).toBe("false");
     expect((f.description ?? "").length).toBeGreaterThan(20);
   });
@@ -135,7 +135,7 @@ describe("get-started/how-luz-is-built", () => {
     const hrefs = linksOf(body()).map((l) => l.href);
     expect(hrefs.some((h) => h.includes("PRINCIPLES.md"))).toBe(true);
     expect(hrefs.some((h) => h.includes("TESTING.md"))).toBe(true);
-    expect(hrefs).toContain("/docs/get-started/ai/");
+    expect(hrefs).toContain("/docs/ai/");
   });
 
   it("every internal link goes to a page that exists, written root-absolute with a trailing slash", () => {

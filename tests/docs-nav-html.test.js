@@ -9,7 +9,7 @@
  *   site.json     no area carries "parent"; scanSite does not read it (no check, no field).
  *   sidebar       `html` is a top-level item of `ul.docs-nav`: `a.docs-nav__area` (the area label, linking
  *                 to the area index) and the list of the 14 other pages in its fold, as Documentation and
- *                 Accessibility. Order: Get started, Kinds of site, Tokens, Core, Catalog (since F5b it holds the
+ *                 Accessibility. Order: Get started, AI, Tokens, Core, Catalog (since F5b it holds the
  *                 patterns of the kinds of site), HTML elements, Accessibility. `.docs-nav__sub` and `a.docs-nav__subarea` are gone.
  *   aria-current  on an HTML page: "page" on its own link and "true" on the HTML elements area link (and not
  *                 on Documentation); on the HTML index the area link is "page".
@@ -34,7 +34,7 @@ const repo = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
 /** The top-level areas of the sidebar, in order (the owner's list). */
 // F5b: landing, cms, app and documentation are not areas any more, their pages are catalog's (groups of Catalog)
-const AREA_ORDER = ["get-started", "kinds", "tokens", "components", "catalog", "html", "accessibility"];
+const AREA_ORDER = ["get-started", "ai", "tokens", "components", "catalog", "html", "accessibility"];
 
 /* ---- site.json: "parent" is gone ----------------------------------------------------------------- */
 
@@ -67,7 +67,7 @@ describe("site.json: no area is nested", () => {
     expect(site.areas.filter((a) => a.parent !== undefined).map((a) => a.id)).toEqual([]);
   });
 
-  it("lists the areas in the sidebar order, Kinds of site right after Get started, HTML elements right after Catalog and before Accessibility", () => {
+  it("lists the areas in the sidebar order, AI right after Get started, HTML elements right after Catalog and before Accessibility", () => {
     const site = scanSite(join(repo, "apps/docs"), repo);
     expect(site.areas.map((a) => a.id)).toEqual(AREA_ORDER);
   });
@@ -256,7 +256,7 @@ describe("the reading order (Previous / Next)", () => {
   const areaRuns = (routes, areaOf) => routes.map(areaOf).filter((id, i, all) => id !== all[i - 1]);
   const areaOfRoute = (route) => site.byRoute.get(route).meta.area;
 
-  it("lists the areas in runs, in the sidebar's order, with Kinds of site after Get started and HTML elements after Catalog and before Accessibility", () => {
+  it("lists the areas in runs, in the sidebar's order, with AI after Get started and HTML elements after Catalog and before Accessibility", () => {
     expect(areaRuns(orderRoutes, areaOfRoute)).toEqual(AREA_ORDER);
     expect(orderRoutes.at(-1)).toBe(ACCESSIBILITY);
   });

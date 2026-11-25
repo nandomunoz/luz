@@ -510,11 +510,12 @@ describe("the page head: eyebrow, h1, lead, then the chips", () => {
     }
   });
 
-  it("names the package of an area on its index: Components · @luz-ds/core, Tokens · @luz-ds/tokens, Catalog · @luz-ds/catalog, and no other (the packages of the kinds of site are gone)", () => {
+  it("names the package of an area on its index: Components · @luz-ds/core, Tokens · @luz-ds/tokens, Catalog · @luz-ds/catalog, AI · @luz-ds/ai, and no other (the packages of the kinds of site are gone)", () => {
     const expected = {
       components: "@luz-ds/core",
       tokens: "@luz-ds/tokens",
       catalog: "@luz-ds/catalog",
+      ai: "@luz-ds/ai",
     };
     for (const [id, pkg] of Object.entries(expected)) {
       const area = site.areas.find((a) => a.id === id);

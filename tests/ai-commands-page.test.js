@@ -1,5 +1,5 @@
 /**
- * The page of the commands of /luz (`get-started/ai-commands`, plan `.claude/plans/ai-eval-lab.md`, phase 3): nothing on it is
+ * The page of the commands of /luz (`ai/commands`, plan `.claude/plans/ai-eval-lab.md`, phase 3): nothing on it is
  * typed. Its table is the Subcommands table of SKILL.md, the terminal output is what the script prints, and each conversation is
  * the text of a green run of `pnpm ai:eval`, frozen. A command with no example fails, and so does a page that drifts.
  */
@@ -105,21 +105,21 @@ describe("the page", () => {
   });
 
   it("has the two pages, in English and Spanish, with one marker each, and the English one links the Spanish its siblings", () => {
-    for (const f of ["apps/docs/pages/get-started/ai-commands.html", "apps/docs/i18n/es/pages/get-started/ai-commands.html"]) {
+    for (const f of ["apps/docs/pages/ai/commands.html", "apps/docs/i18n/es/pages/ai/commands.html"]) {
       expect(existsSync(join(root, f)), f).toBe(true);
       expect(read(f).match(/^\s*<!-- luz:commands -->$/gm), f).toHaveLength(1);
     }
-    expect(read("apps/docs/pages/get-started/ai-commands.html")).toMatch(/^generate: ai-commands$/m);
+    expect(read("apps/docs/pages/ai/commands.html")).toMatch(/^generate: ai-commands$/m);
   });
 
   it("is in llms-full.txt as its summary and a pointer to its URL, like the migration page: the commands are in the page, the conversations are for a person", () => {
-    expect(read("scripts/docs-site/ai.js")).toContain('["/docs/get-started/ai-commands/"');
+    expect(read("scripts/docs-site/ai.js")).toContain('["/docs/ai/commands/"');
   });
 
   it("is linked from the page about working with AI, the README of the package and the landing's /ai/", () => {
-    for (const f of ["apps/docs/pages/get-started/ai.html", "apps/docs/i18n/es/pages/get-started/ai.html"]) expect(read(f), f).toContain("/docs/get-started/ai-commands/");
-    expect(read("packages/ai/README.md")).toContain("docs/get-started/ai-commands/");
-    expect(read("scripts/docs-site/ai-page.js")).toContain("/docs/get-started/ai-commands/");
+    for (const f of ["apps/docs/pages/ai/index.html", "apps/docs/i18n/es/pages/ai/index.html"]) expect(read(f), f).toContain("/docs/ai/commands/");
+    expect(read("packages/ai/README.md")).toContain("docs/ai/commands/");
+    expect(read("scripts/docs-site/ai-page.js")).toContain("/docs/ai/commands/");
   });
 
   it("has every example file of the repository used by the page", () => {

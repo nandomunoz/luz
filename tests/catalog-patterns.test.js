@@ -498,8 +498,8 @@ describe("the pages of the 25 patterns, at /docs/catalog/<block>/", () => {
 });
 
 describe("the four areas of the packages are gone from the docs", () => {
-  it("site.json has get-started, kinds, tokens, components, catalog, html and accessibility, and no landing, cms, app or documentation", () => {
-    expect(repoSite.areas.map((a) => a.id)).toEqual(["get-started", "kinds", "tokens", "components", "catalog", "html", "accessibility"]);
+  it("site.json has get-started, ai, tokens, components, catalog, html and accessibility, and no landing, cms, app or documentation", () => {
+    expect(repoSite.areas.map((a) => a.id)).toEqual(["get-started", "ai", "tokens", "components", "catalog", "html", "accessibility"]);
     for (const old of ["landing", "cms", "app", "documentation"]) expect(repoSite.areas.find((a) => a.id === old), old).toBeUndefined();
   });
 
@@ -587,10 +587,10 @@ describe("the pages that count the pieces name the patterns as files of catalog"
     expect(structure, "no class of the old names").not.toMatch(/\.luz-(?:landing-|cms-|app-(?:header|dashboard)|docs-(?:shell|page-|rail|pager|example|dodont))/);
   });
 
-  it("get-started/index.html names each of the files of a kind in a `<code>` (the social links fit any site: they are not one), says there is no package for a kind, and links /docs/catalog/ and /docs/kinds/", () => {
+  it("get-started/index.html names each of the files of a kind in a `<code>` (the social links fit any site: they are not one), says there is no package for a kind, and links /docs/catalog/ and /docs/ai/", () => {
     const named = [...start.matchAll(/<code class="luz-code-inline">([a-z-]+)<\/code>/g)].map((m) => m[1]);
     expect(ALL.filter((name) => name !== "social" && !named.includes(name))).toEqual([]);
-    expect(start).toContain('href="/docs/kinds/"');
+    expect(start).toContain('href="/docs/ai/"');
     expect(start).toContain('href="/docs/catalog/"');
     expect(start).not.toMatch(/pnpm add [^"<]*@luz-ds\/(?:landing|cms|app|docs)(?![\w-])/);
     expect(start).not.toMatch(/data-copy-from="code-cdn-(?:landing|cms|app|docs)"/);
@@ -598,7 +598,7 @@ describe("the pages that count the pieces name the patterns as files of catalog"
 
   it("the home and the Kinds pages link the pages of the patterns, not an area of a package: the first link of each kind page is under /docs/catalog/", () => {
     for (const kind of ["landing", "blog", "app", "docs"]) {
-      const body = repoSite.byRoute.get(`/docs/kinds/${kind}/`).body;
+      const body = repoSite.byRoute.get(`/docs/ai/${kind}/`).body;
       expect(body, kind).toMatch(/href="\/docs\/catalog\/[a-z-]+\/"/);
       expect(body, kind).not.toMatch(/href="\/docs\/(?:landing|cms|app|documentation)\//);
     }
@@ -797,9 +797,9 @@ describe("Fits best: what a page, a card and the Spanish page say", () => {
     const said = textOf(fits).replace(/ ,/g, ",");
     expect(said.startsWith(`${LABEL[lang]} ${kinds.map((k) => KIND_WORD[lang][k]).join(", ")} — `), `${route}: ${said}`).toBe(true);
     if (lang === "en") expect(textOf(fits).endsWith(` — ${page.meta.fits}`), route).toBe(true);
-    // Each kind but `any` is a link to its page of Kinds of site, in the language of the page
+    // Each kind but `any` is a link to its page of the AI area, in the language of the page
     const hrefs = findAll(fits, (n) => n.name === "a").map((a) => a.attrs.get("href"));
-    expect(hrefs, route).toEqual(kinds.filter((k) => k !== "any").map((k) => `${lang === "es" ? "/es" : ""}/docs/kinds/${k}/`));
+    expect(hrefs, route).toEqual(kinds.filter((k) => k !== "any").map((k) => `${lang === "es" ? "/es" : ""}/docs/ai/${k}/`));
     // After the lead and before the chips
     const order = [query(head, "p.luz-doc-header__lead"), fits, query(head, "ul.luz-doc-header__meta")].map((n) => n.open.index);
     expect(order, route).toEqual([...order].sort((a, b) => a - b));
@@ -813,7 +813,7 @@ describe("Fits best: what a page, a card and the Spanish page say", () => {
   });
 
   it("a page that is not a pattern of catalog has no such line: a component, the class reference and the gallery", () => {
-    for (const route of ["/docs/components/button/", "/docs/catalog/classes/", "/docs/catalog/", "/docs/kinds/landing/"]) {
+    for (const route of ["/docs/components/button/", "/docs/catalog/classes/", "/docs/catalog/", "/docs/ai/landing/"]) {
       expect(rendered.get(route), route).not.toContain("docs-fits");
     }
   });
@@ -984,14 +984,14 @@ describe("the post list: a pattern of a blog, after the article in the cascade, 
   });
 
   it.each([
-    ["en", "apps/docs/pages/kinds/blog.html"],
-    ["es", "apps/docs/i18n/es/pages/kinds/blog.html"],
+    ["en", "apps/docs/pages/ai/blog.html"],
+    ["es", "apps/docs/i18n/es/pages/ai/blog.html"],
   ])("the Blog kind page (%s) links the post list, and its translation is not stale", (lang, file) => {
     const text = read(file);
     expect(text).toContain('href="/docs/catalog/post-list/"');
     if (lang === "es") {
-      const english = repoSite.byRoute.get("/docs/kinds/blog/").body;
-      expect(/^source: ([0-9a-f]{12})$/m.exec(text)?.[1], "source of kinds/blog.html").toBe(createHash("sha256").update(english.replace(/\s+/g, " ").trim()).digest("hex").slice(0, 12));
+      const english = repoSite.byRoute.get("/docs/ai/blog/").body;
+      expect(/^source: ([0-9a-f]{12})$/m.exec(text)?.[1], "source of ai/blog.html").toBe(createHash("sha256").update(english.replace(/\s+/g, " ").trim()).digest("hex").slice(0, 12));
     }
   });
 });

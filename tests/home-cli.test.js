@@ -156,8 +156,16 @@ describe("the template of level 4 and the terminal the generator writes", () => 
     expect(terminal.indexOf("landing-cli__line--banner")).toBeLessThan(terminal.indexOf("init: wrote"));
   });
 
-  it("says the skill is not published yet, with the way to the prompts until it is", () => {
-    expect(level4).toMatch(/<span class="luz-badge luz-badge--primary">\{\{t:inside\.l4\.soon\}\}<\/span> <a href="\/docs\/kinds\/">\{\{t:inside\.l4\.meanwhile\}\}<\/a>/);
+  it("ends with the way to the skill's documentation, and no label that says it is coming to npm", () => {
+    expect(level4).toMatch(/<p class="landing-cli__note"><a href="\/docs\/ai\/">\{\{t:inside\.l4\.docs\}\}<\/a><\/p>/);
+    expect(level4).not.toContain("inside.l4.soon");
+    expect(level4).not.toContain("inside.l4.meanwhile");
+    for (const code of ["en", "es", "ar"]) {
+      const words = JSON.parse(readFileSync(join(repo, `apps/landing/i18n/${code}.json`), "utf-8"));
+      expect(Object.keys(words), code).not.toContain("inside.l4.soon");
+      expect(Object.keys(words), code).not.toContain("inside.l4.meanwhile");
+      expect(words["inside.l4.docs"], code).toBeTruthy();
+    }
   });
 
   it("has no prompt left on the home: no opener, no dialog, no stylesheet of it, no card of a kind of site", () => {
@@ -287,7 +295,7 @@ describe("the catalogs, in en, es and ar", () => {
   it("have the same keys for level 4", () => {
     expect(level("es")).toEqual(level("en"));
     expect(level("ar")).toEqual(level("en"));
-    expect(level("en")).toEqual(expect.arrayContaining(["inside.l4.next", "inside.l4.replay", "inside.l4.pause", "inside.l4.play", "inside.l4.soon", "inside.l4.meanwhile", "inside.cli.ask", "inside.cli.kind", "inside.cli.stack", "inside.cli.agents", "inside.cli.go", "inside.cli.build"]));
+    expect(level("en")).toEqual(expect.arrayContaining(["inside.l4.next", "inside.l4.replay", "inside.l4.pause", "inside.l4.play", "inside.l4.docs", "inside.cli.ask", "inside.cli.kind", "inside.cli.stack", "inside.cli.agents", "inside.cli.go", "inside.cli.build"]));
   });
 
   it("have no key of the old prompts of the home", () => {

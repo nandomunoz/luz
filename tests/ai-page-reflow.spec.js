@@ -1,6 +1,6 @@
 // @ts-check
 /**
- * Reflow of "Working with AI" (WCAG 1.4.10, 1.4.4): /docs/get-started/ai/ does
+ * Reflow of "Working with AI" (WCAG 1.4.10, 1.4.4): /docs/ai/ does
  * not scroll sideways at 320 px, whatever the reader's text size. Reviewed
  * 2026-10-16 (Safari and Firefox reviews, the same in Chromium):
  *   - 200 % text: the document is 13 px too wide, and the `button.luz-copy-btn`
@@ -12,7 +12,7 @@
  */
 import { test, expect } from '@playwright/test';
 
-const PAGES = ['/docs/get-started/ai/', '/docs/get-started/ai-commands/'];
+const PAGES = ['/docs/ai/', '/docs/ai/commands/'];
 
 const sideways = (page) => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
 

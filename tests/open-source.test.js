@@ -16,7 +16,7 @@
  *                          "Report privately through GitHub: <advisory URL of SECURITY.md>"
  *                          and no e-mail address anywhere
  *   .github/labels.yml     a list of `- name:` / `color:` (six hex digits, no #) /
- *                          `description:`, the fourteen labels of the spec and of SR-10
+ *                          `description:`, the fifteen labels of the spec, of SR-10 and of the luz skill
  *   .github/pull_request_template.md   first checkbox = MIT, then Test first, Browsers by issue
  *   .github/ISSUE_TEMPLATE/*.yml       every template has `labels:`, all of them in labels.yml
  *   .github/workflows/*.yml            SR-10 (a verdict in 30 minutes): every job with `runs-on:` has
@@ -329,12 +329,12 @@ describe("CODE_OF_CONDUCT.md is the Contributor Covenant 2.1 with a private GitH
 
 /* ---- Labels, pull request template, issue templates ----------------------------- */
 
-const LABELS = ["bug", "accessibility", "component", "docs", "language", "tokens", "needs-browser-review", "good first issue", "help wanted", "breaking", "security", "wontfix", "visual", "post-merge-failure"];
+const LABELS = ["bug", "accessibility", "component", "docs", "language", "tokens", "needs-browser-review", "good first issue", "help wanted", "breaking", "security", "wontfix", "visual", "post-merge-failure", "ai-target"];
 
 describe(".github/labels.yml", () => {
   const labels = () => parseLabels(read(".github/labels.yml"));
 
-  it("has the fourteen labels (the twelve of the spec, `visual` and `post-merge-failure`), and no other", () => {
+  it("has the fifteen labels (the twelve of the spec, `visual`, `post-merge-failure` and `ai-target`), and no other", () => {
     expect(labels().map((l) => l.name).sort()).toEqual([...LABELS].sort());
   });
 
@@ -354,11 +354,11 @@ describe(".github/labels.yml", () => {
 describe("issue forms use labels that exist", () => {
   const forms = () => readdirSync(path(".github/ISSUE_TEMPLATE")).filter((f) => f.endsWith(".yml") && f !== "config.yml");
 
-  it("has the three forms", () => {
-    expect(forms().sort()).toEqual(["accessibility.yml", "bug.yml", "component.yml"]);
+  it("has the four forms", () => {
+    expect(forms().sort()).toEqual(["accessibility.yml", "ai-target.yml", "bug.yml", "component.yml"]);
   });
 
-  it.each(["accessibility.yml", "bug.yml", "component.yml"])("%s has labels: and each is in labels.yml", (file) => {
+  it.each(["accessibility.yml", "ai-target.yml", "bug.yml", "component.yml"])("%s has labels: and each is in labels.yml", (file) => {
     const known = parseLabels(read(".github/labels.yml")).map((l) => l.name);
     const used = labelsOfForm(read(`.github/ISSUE_TEMPLATE/${file}`));
     expect(used.length, `${file} labels`).toBeGreaterThan(0);

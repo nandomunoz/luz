@@ -28,7 +28,7 @@ const catalog = (code) => JSON.parse(read(`apps/landing/i18n/${code}.json`));
 
 /** The twenty-one links of the site map, as the English home writes them, in order, by group. */
 const GROUPS = [
-  { id: "footer-docs", links: ["/docs/get-started/", "/docs/get-started/migrate/", "/docs/get-started/make-it-yours/", "/docs/get-started/ai/", "/docs/a-z/"] },
+  { id: "footer-docs", links: ["/docs/get-started/", "/docs/get-started/migrate/", "/docs/get-started/make-it-yours/", "/docs/ai/", "/docs/a-z/"] },
   { id: "footer-reference", links: ["/docs/tokens/", "/docs/html/", "/docs/components/", "/docs/catalog/", "/docs/accessibility/", "/docs/privacy/"] },
   { id: "footer-resources", links: ["https://www.npmjs.com/org/luz-ds", "#ai", "/llms.txt", `${GITHUB}/blob/main/CHANGELOG.md`, "/docs/get-started/how-luz-is-built/"] },
   { id: "footer-community", links: [GITHUB, `${GITHUB}/issues/new/choose`, `${GITHUB}/blob/main/CONTRIBUTING.md`, `${GITHUB}/blob/main/CODE_OF_CONDUCT.md`, `${GITHUB}/blob/main/SECURITY.md`] },

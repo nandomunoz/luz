@@ -22,7 +22,6 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { exampleDocuments } from "../scripts/docs-site/ai.js";
 import { CASCADE } from "../scripts/docs-site/kinds.js";
-import { assemblePrompt } from "../scripts/docs-site/prompts.js";
 import * as snippets from "../scripts/docs-site/snippets.js";
 import { PAGES_CSP } from "../vite.config.js";
 import { site } from "./helpers/debug-page.js";
@@ -146,7 +145,7 @@ describe("the pages of the four", () => {
         else if (/\.(?:html|json|md|js|css)$/.test(entry.name) && old.test(read(path))) offenders.push(path);
       }
     };
-    for (const dir of ["apps/docs/pages", "apps/docs/i18n", "apps/landing", "apps/site/prompts"]) walk(dir);
+    for (const dir of ["apps/docs/pages", "apps/docs/i18n", "apps/landing", "packages/ai/src"]) walk(dir);
     expect(offenders).toEqual([]);
   });
 
@@ -223,30 +222,6 @@ describe("the generated examples of the four", () => {
     const hrefs = hrefsOf(examples().find((e) => e.route === "/examples/catalog/dashboard.html"));
     expect(hrefs).toEqual(expect.arrayContaining(["../dist/catalog/components/bar-list.min.css", "../dist/catalog/components/stacked-bar.min.css"]));
     expect(hrefs.filter((h) => /column-chart|heat-map/.test(h))).toEqual([]);
-  });
-});
-
-/* ---- The prompts ------------------------------------------------------------------------------------------------------ */
-
-describe("the prompts for AI", () => {
-  const prompt = (id) => assemblePrompt(id, { root });
-  const catalogLinks = (text) => [...text.matchAll(/@luz-ds\/catalog@[^/"]+\/dist\/components\/([a-z0-9-]+)\.min\.css/g)].map((m) => m[1]);
-
-  it("the prompt for an app links the four sheets from catalog, lists their classes under catalog and their docs pages under /docs/catalog/", () => {
-    const text = prompt("app");
-    expect(catalogLinks(text)).toEqual(expect.arrayContaining(CHARTS));
-    const fromCatalog = text.split("From `@luz-ds/catalog`:")[1];
-    for (const block of BLOCKS) expect(fromCatalog, block).toMatch(new RegExp(`^- \`${block}\``, "m"));
-    for (const name of CHARTS) expect(text).toContain(`docs/catalog/${name}/: markup of the ${name.replace(/-/g, " ")}.`);
-    expect(text).not.toMatch(/docs\/components\/(?:bar-list|column-chart|stacked-bar|heat-map)\//);
-    expect(text, "no clause of a loose sheet").not.toContain("after `luz.css`)");
-  });
-
-  it.each(["start", "landing", "blog", "docs"])("the prompt %s links none of the four, lists none of their classes and names none of their pages", (id) => {
-    const text = prompt(id);
-    expect(catalogLinks(text).filter((n) => CHARTS.includes(n))).toEqual([]);
-    for (const block of BLOCKS) expect(text, block).not.toContain(`\`${block}`);
-    for (const name of CHARTS) expect(text, name).not.toContain(`docs/catalog/${name}/`);
   });
 });
 

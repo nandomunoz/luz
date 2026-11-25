@@ -142,11 +142,11 @@ describe("the AI-ready rows of budgets.json and PRINCIPLES.md section 8", () => 
     expect(budgets.slice(0, BEFORE.length).map((b) => [b.name, b.max])).toEqual(BEFORE);
   });
 
-  it("appends the three AI-ready rows after the docs page row, then the language chunk row (F6), core's rows of the color mode (the chunk and the boot script), the three rows of the home's light (F3), then the prompts row, then the debug page row, and nothing else (catalog has no row: no weight limit, 2026-11-02)", () => {
+  it("appends the three AI-ready rows after the docs page row, then the language chunk row (F6), core's rows of the color mode (the chunk and the boot script), the three rows of the home's light (F3), then the debug page row, and nothing else (catalog has no row: no weight limit, 2026-11-02)", () => {
     // core has no loose sheet any more (the four charts are catalog's, 2026-11-03): no row for them
     const rest = budgets;
     expect(budgets.filter((b) => /loose sheet/.test(b.name))).toEqual([]);
-    expect(rest).toHaveLength(BEFORE.length + 11);
+    expect(rest).toHaveLength(BEFORE.length + 10);
     expect(rest.at(BEFORE.length - 1).name).toBe(last);
     expect(rest.slice(BEFORE.length + 3).map((b) => b.name)).toEqual([
       "core JS lazy chunk: i18n-es",
@@ -155,7 +155,6 @@ describe("the AI-ready rows of budgets.json and PRINCIPLES.md section 8", () => 
       "home light controller JS",
       "home light visual: globe",
       "home light data: globe",
-      "prompts (each, uncompressed)",
       "debug page HTML (docs/debug/index.html, uncompressed)",
     ]);
   });
@@ -183,13 +182,12 @@ describe("the AI-ready rows of budgets.json and PRINCIPLES.md section 8", () => 
   });
 
   it("keeps the numbers of the page and AI-reading rows and marks them `warn: true` (owner, 2026-11-02): they are warnings to optimise, and no number moved", () => {
-    const WARN = [last, "llms.txt and llms-full.txt (each, uncompressed)", "prompts (each, uncompressed)", "debug page HTML (docs/debug/index.html, uncompressed)"];
+    const WARN = [last, "llms.txt and llms-full.txt (each, uncompressed)", "debug page HTML (docs/debug/index.html, uncompressed)"];
     expect(budgets.filter((b) => b.warn).map((b) => b.name)).toEqual(WARN);
     for (const name of WARN) expect(budgets.find((b) => b.name === name).warn, name).toBe(true);
     expect(budgets.filter((b) => b.warn).map((b) => [b.ideal, b.max])).toEqual([
       [60 * KiB, 80 * KiB],
       [416 * KiB, 448 * KiB],
-      [14 * KiB, 16 * KiB],
       [230 * KiB, 240 * KiB],
     ]);
   });
@@ -246,7 +244,7 @@ describe("the AI-ready rows of budgets.json and PRINCIPLES.md section 8", () => 
 
   it("repeats the rows in the PRINCIPLES.md table, in the same order, after \"Each docs page\"", () => {
     expect(table.filter((cells) => /loose sheet/.test(cells[0]))).toEqual([]);
-    expect(table).toHaveLength(BEFORE.length + 11);
+    expect(table).toHaveLength(BEFORE.length + 10);
     expect(table[BEFORE.length - 1][0]).toMatch(/^Each docs page/);
     const [cli, text, manifests] = table.slice(BEFORE.length);
     expect(cli[0]).toMatch(/check/);

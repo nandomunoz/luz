@@ -3,7 +3,7 @@
  * (HTML and classes, Existing projects), so the home keeps two groups. Read from its sources and from the page the
  * generator writes; what a browser draws is in tests/docs-faq-page.spec.js.
  *
- * - It follows How LUZ is built in Get started (order 13), in English and in Spanish.
+ * - It follows How LUZ is built in Get started (order 11), in English and in Spanish.
  * - Two groups, each an h2 over its questions, the questions as native details, the answers with the ids
  *   faq-classes, faq-unstyled, faq-why-classes, faq-same, faq-classless, faq-new-only, faq-worth and faq-migrate.
  * - The Spanish translation keeps the ids, the groups and the order, and says it is pending review.
@@ -37,9 +37,9 @@ describe("the page More questions, in English", () => {
   const meta = frontMatter(source);
   const page = structure(source);
 
-  it("is page 13 of Get started, with a one-line description", () => {
+  it("is page 12 of Get started, with a one-line description", () => {
     expect(meta.area).toBe("get-started");
-    expect(meta.order).toBe("13");
+    expect(meta.order).toBe("12");
     expect(meta.description.length).toBeGreaterThan(40);
   });
 
