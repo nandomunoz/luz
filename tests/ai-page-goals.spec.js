@@ -17,9 +17,9 @@ import AxeBuilder from '@axe-core/playwright';
 
 const ROUTES = ['/ai/', '/es/ai/', '/ar/ai/'];
 const GOALS = [
-  ['a-start', 4],
+  ['a-commands', 8],
   ['a-agents', 1],
-  ['a-keep', 2],
+  ['a-skill', 4],
 ];
 
 for (const route of ROUTES) {
@@ -45,7 +45,7 @@ for (const route of ROUTES) {
       await page.goto(route);
       if (zoom === 400) await page.evaluate(() => { document.documentElement.style.fontSize = '400%'; });
       // The page as a whole is tests/home-cli.spec.js' and tests/ai-page-reflow.spec.js'; here, only the goals
-      const outside = await page.locator('#a-assistants, #a-start, #a-agents, #a-keep, #a-decide').locator('h2, p, li, article, code').evaluateAll((all) =>
+      const outside = await page.locator('#a-assistants, #a-commands, #a-agents, #a-skill, #a-decide').locator('h2, p, li, article, code').evaluateAll((all) =>
         all
           .map((el) => ({ el, box: el.getBoundingClientRect() }))
           .filter(({ box }) => box.width > 0 && (box.right > window.innerWidth + 0.5 || box.left < -0.5))
@@ -59,7 +59,7 @@ for (const route of ROUTES) {
     test(`${route}: axe finds nothing in the goals (${scheme})`, async ({ page }) => {
       await page.emulateMedia({ colorScheme: scheme, reducedMotion: 'reduce' });
       await page.goto(route);
-      const results = await new AxeBuilder({ page }).include('#a-assistants').include('#a-start').include('#a-agents').include('#a-keep').include('#a-decide').analyze();
+      const results = await new AxeBuilder({ page }).include('#a-assistants').include('#a-commands').include('#a-agents').include('#a-skill').include('#a-decide').analyze();
       expect(results.violations, results.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`).join(' | ')).toEqual([]);
     });
   }
