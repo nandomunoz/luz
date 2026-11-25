@@ -1144,6 +1144,12 @@ home-light:defined ~ .landing-light__nojs {
   margin-block-start: var(--luz-space-2xl);
 }
 
+/* The line to the rest of the questions stands well apart from the last
+   group (owner, 2026-11-25); it wins over the 0 of the two columns below */
+.landing-faq .luz-faq__more {
+  margin-block-start: var(--luz-space-3xl);
+}
+
 @media (max-width: 1023.98px) {
   .landing-faq .luz-faq__nav ul {
     justify-content: center;
