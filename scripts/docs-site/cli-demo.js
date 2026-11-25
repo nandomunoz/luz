@@ -237,8 +237,8 @@ export function cliDemo({ say, root, escapeHtml }) {
       per2(([target, , trigger]) => line("you", `${mark("›")}<bdi class="landing-cli__you">${request(trigger)}</bdi>${target === "claude" ? '<span class="landing-cli__caret" aria-hidden="true"></span>' : ""}`, `target=${target}`)),
     ].join("\n"),
     `</div>`,
-    `<button class="luz-btn luz-btn--ghost luz-btn--sm landing-cli__pause" type="button" hidden><span data-cli-pause>${t("inside.l4.pause")}</span><span data-cli-play hidden>${t("inside.l4.play")}</span></button>`,
-    `<figcaption class="landing-cli__caption">${t("inside.l4.install.tested")}</figcaption>`,
+    // The foot: where it is tested, and beside it the button that pauses the loop
+    `<figcaption class="landing-cli__caption"><span class="landing-cli__tested">${t("inside.l4.install.tested")}</span><button class="luz-btn luz-btn--ghost luz-btn--sm landing-cli__pause" type="button" hidden><span data-cli-pause>${t("inside.l4.pause")}</span><span data-cli-play hidden>${t("inside.l4.play")}</span></button></figcaption>`,
     `</figure>`,
   ].join("\n");
   return { cli: figure(false), cliloop: figure(true), cliinstall: install };

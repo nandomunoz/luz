@@ -5278,6 +5278,11 @@ home-light:defined ~ .landing-light__nojs {
 }
 
 .landing-cli__caption {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--luz-space-2xs) var(--luz-space-sm);
   padding: var(--luz-space-xs) var(--luz-space-md) var(--luz-space-sm);
   border-block-start: 1px solid color-mix(in oklab, var(--luz-text-primary) 12%, transparent);
   color: var(--luz-text-secondary);
@@ -5286,6 +5291,18 @@ home-light:defined ~ .landing-light__nojs {
 
 .landing-cli__caption:lang(ar) {
   direction: rtl;
+}
+
+/* The note gives way and wraps inside its own room, so the button stays beside it */
+.landing-cli__tested {
+  flex: 1 1 0;
+  min-inline-size: 12rem;
+}
+
+/* The pause button in the foot sits in its row, at the end: none of the margin it has under a screen */
+.landing-cli__caption .landing-cli__pause {
+  flex-shrink: 0;
+  margin: 0;
 }
 
 /* ====================== The page of the skill (apps/landing/levels/ai.html) ======================
