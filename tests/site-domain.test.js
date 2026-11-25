@@ -34,7 +34,8 @@ describe("the domain", () => {
     let hits = "";
     try {
       // Written or escaped in a regular expression (nandomunoz\.github\.io)
-      hits = execFileSync("git", ["grep", "-l", "-E", "nandomunoz(\\\\)?\\.github(\\\\)?\\.io"], { cwd: repo, encoding: "utf-8" });
+      // This file and the changesets name the old address on purpose: the one to look for, the one that went
+      hits = execFileSync("git", ["grep", "-l", "-E", "nandomunoz(\\\\)?\\.github(\\\\)?\\.io", "--", ".", ":!tests/site-domain.test.js", ":!.changeset"], { cwd: repo, encoding: "utf-8" });
     } catch {
       hits = ""; // git grep exits 1 when nothing matches
     }
