@@ -1,6 +1,6 @@
 LICENSE
 README.md
-dist/agents/luz-accessibility-reviewer.md
+dist/agents/luz-agent-accessibility.md
 dist/data/catalog/classes.json
 dist/data/catalog/custom-elements.json
 dist/data/core/classes.json

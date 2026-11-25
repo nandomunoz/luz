@@ -31,7 +31,7 @@ It reads source files only. It does not check names, labels, alt text, headings 
 `agent` prints an agent definition for a project that uses an AI coding assistant: a read-only accessibility reviewer (it can read, search and list files, and write nothing) for WCAG 2.2 level AA and EN 301 549. It reads source files, so it gives advice from reading code, not test results. Copy it into your project:
 
 ```bash
-npx @luz-ds/check@0.3.2 agent > .claude/agents/luz-accessibility-reviewer.md
+npx @luz-ds/check@0.3.2 agent > .claude/agents/luz-agent-accessibility.md
 ```
 
 The `>` overwrites a file that is already there: use another path, or check the file in first, if you edited your copy. The copy is yours to read before you use it, and anyone who can write to your project can change it.
@@ -67,7 +67,7 @@ Older versions: https://github.com/nandomunoz/luz/blob/main/packages/check/CHANG
 
 ### Check what you write
 
-Run `npx @luz-ds/check@0.3.2 <files>` on every HTML and CSS file you write, and fix what it reports. To copy the accessibility reviewer into your project: `npx @luz-ds/check@0.3.2 agent > .claude/agents/luz-accessibility-reviewer.md`.
+Run `npx @luz-ds/check@0.3.2 <files>` on every HTML and CSS file you write, and fix what it reports. To copy the accessibility reviewer into your project: `npx @luz-ds/check@0.3.2 agent > .claude/agents/luz-agent-accessibility.md`.
 
 <!-- luz:ai-agents:end -->
 

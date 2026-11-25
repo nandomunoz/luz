@@ -21,6 +21,8 @@ import { parseArgs } from "node:util";
 const HERE = dirname(fileURLToPath(import.meta.url));
 const FIELDS = JSON.parse(readFileSync(join(HERE, "../assets/fields.json"), "utf-8"));
 const FACTS = JSON.parse(readFileSync(join(HERE, "../assets/facts.json"), "utf-8"));
+// The stacks a starter page is written for (`page` in the facts): the page is plain HTML, and Astro takes it as a page
+const GENERATED = FACTS.stacks.filter((s) => s.page).map((s) => s.id);
 const LIMITS = FIELDS.limits;
 
 // What a host hands the model must be plain text: no control character, zero-width character, bidi control or tag character
@@ -28,8 +30,6 @@ const RANGES = [[0x00, 0x08], [0x0b, 0x0c], [0x0e, 0x1f], [0x7f, 0x7f], [0x200b,
 const HIDDEN = { test: (text) => [...text].some((ch) => RANGES.some(([a, b]) => ch.codePointAt(0) >= a && ch.codePointAt(0) <= b)) };
 const NAME = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 const MAX_LINES = 40;
-// The stacks a starter page is written for: the page is plain HTML, and Astro takes it as a page
-const GENERATED = ["vanilla", "astro"];
 
 /**
  * The title a person sees when they run init or --help in a terminal: the prism of the mark of LUZ (light coming in
@@ -538,7 +538,7 @@ function runDoctor(dir) {
 
 function runFacts(json) {
   if (json) return `${JSON.stringify(FACTS, null, 2)}\n`;
-  const lines = ["facts:", ...Object.entries(FACTS.versions).map(([pkg, v]) => `  @luz-ds/${pkg} ${v}`), `  kinds: ${FACTS.kinds.join(", ")}`, `  stacks: ${FACTS.stacks.map((s) => s.id).join(", ")}`];
+  const lines = ["facts:", ...Object.entries(FACTS.versions).map(([pkg, v]) => `  @luz-ds/${pkg} ${v}`), `  kinds: ${FACTS.kinds.join(", ")}`, `  stacks: ${FACTS.stacks.map((s) => (s.page ? s.id : `${s.id} (by hand)`)).join(", ")}`];
   return `${lines.join("\n")}\n`;
 }
 
@@ -772,7 +772,7 @@ function skillFiles(places) {
 function agentText({ dryRun, files, filled, unfilled, notes }) {
   const bytes = files.reduce((n, f) => n + f.bytes, 0);
   const total = filled.length + unfilled.length;
-  const out = [`agent add: ${dryRun ? "would write" : "wrote"} ${files.length} file${files.length === 1 ? "" : "s"} (${bytes} bytes); ${filled.length} of ${total} fields filled, ${unfilled.length} still [ADAPT]`];
+  const out = [`agent add: ${dryRun ? "would write" : "wrote"} ${files.length} file${files.length === 1 ? "" : "s"} (${bytes} bytes)${total ? `; ${filled.length} of ${total} fields filled, ${unfilled.length} still [ADAPT]` : ""}`];
   out.push(...files.map((f) => `  ${f.path}`));
   if (filled.length) out.push("filled:", ...filled.map((f) => `  - ${f.field}: ${f.value}`));
   if (unfilled.length) out.push("still [ADAPT], so the agent stops and asks until they are filled:", ...unfilled.map((k) => `  - ${k}`));

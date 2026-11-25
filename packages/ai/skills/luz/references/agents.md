@@ -10,4 +10,4 @@ Offer the one that fits what the person says matters to them. Never offer one th
 
 Each is a base template with fields left to fill. `agent add <name> --for <assistants>` writes it for Claude Code, Gemini CLI or Codex. A field left out stays `[ADAPT: …]`, and the agent stops and asks until it is filled.
 
-- `luz-agent-accessibility` (tools: Read, Grep, Glob): Audits the accessibility (WCAG) of a site made with LUZ by reviewing its markup and styles, and proposes concrete fixes. Use it before shipping UI changes or to review an existing section. Base template that must be adapted to the project before use.
+- `luz-agent-accessibility` (tools: Read, Grep, Glob): Reviews the HTML, CSS and JavaScript of a web project for accessibility against WCAG 2.2 level AA and EN 301 549, reading source files only. Use it when a page or a component is written or changed. It reads your files and writes nothing.

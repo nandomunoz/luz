@@ -163,7 +163,7 @@ export function renderAiSection({ name, manifest, changelog, siteUrl, checkVersi
   out.push("");
 
   out.push("### Check what you write", "");
-  out.push(`Run ${code(`npx @luz-ds/check${pin} <files>`)} on every HTML and CSS file you write, and fix what it reports. To copy the accessibility reviewer into your project: ${code(`npx @luz-ds/check${pin} agent > .claude/agents/luz-accessibility-reviewer.md`)}.`);
+  out.push(`Run ${code(`npx @luz-ds/check${pin} <files>`)} on every HTML and CSS file you write, and fix what it reports. To copy the accessibility reviewer into your project: ${code(`npx @luz-ds/check${pin} agent > .claude/agents/luz-agent-accessibility.md`)}.`);
   // True of check, which the block names: of this package only when this package is check or check has no release either
   if (!released && !(checkVersion && checkVersion !== "0.0.0")) out.push("", `${code("@luz-ds/check")} is not on npm yet: it ships with the first release.`);
   out.push("", END);

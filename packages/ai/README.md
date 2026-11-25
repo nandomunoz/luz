@@ -59,7 +59,7 @@ npx @luz-ds/ai check .claude
 | --- | --- |
 | `init` | Puts this skill where your assistant reads it. |
 | `site new` | Writes the starter page of a kind of site (landing page, blog, app, documentation) for plain HTML or Astro. |
-| `agent list`, `agent add` | Lists the agents of luz-ai (named `luz-agent-<word>`), or writes one for Claude Code, Gemini CLI and Codex, with the fields you give it filled in. A field left out stays `[ADAPT: …]`, and the agent stops and asks until it is filled. |
+| `agent list`, `agent add` | Lists the agents of luz-ai (named `luz-agent-<word>`), or writes one for Claude Code, Gemini CLI and Codex, with the fields you give it filled in (`luz-agent-accessibility` has none: it reads your files as it is). A field left out stays `[ADAPT: …]`, and the agent stops and asks until it is filled. |
 | `doctor` | The project, the assistants it has, the skills and agents it finds, and whether the two copies of a skill agree. |
 | `check` | The front matter and the body of skills and agents: strict YAML, the closed list of fields of each assistant, names, descriptions, hidden characters and references. |
 
@@ -103,7 +103,7 @@ Not released yet: 0.0.0 is the workspace's placeholder; the first release is 0.1
 
 ### Check what you write
 
-Run `npx @luz-ds/check@0.3.2 <files>` on every HTML and CSS file you write, and fix what it reports. To copy the accessibility reviewer into your project: `npx @luz-ds/check@0.3.2 agent > .claude/agents/luz-accessibility-reviewer.md`.
+Run `npx @luz-ds/check@0.3.2 <files>` on every HTML and CSS file you write, and fix what it reports. To copy the accessibility reviewer into your project: `npx @luz-ds/check@0.3.2 agent > .claude/agents/luz-agent-accessibility.md`.
 
 <!-- luz:ai-agents:end -->
 

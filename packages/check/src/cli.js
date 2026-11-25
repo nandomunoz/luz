@@ -42,7 +42,7 @@ import { collect, readLimited } from "./walk.js";
 // dist/data of this package: from src/ and from the bundle in dist/ alike
 const BUNDLED_DATA = fileURLToPath(new URL("../dist/data/", import.meta.url));
 // dist/agents/ of this package: the reviewer `luz-check agent` prints, read when asked
-const BUNDLED_AGENT = fileURLToPath(new URL("../dist/agents/luz-accessibility-reviewer.md", import.meta.url));
+const BUNDLED_AGENT = fileURLToPath(new URL("../dist/agents/luz-agent-accessibility.md", import.meta.url));
 const NO_MANIFEST = "No LUZ manifest to read: the files name LUZ, and neither node_modules/@luz-ds nor the data bundled with luz-check has one; reinstall @luz-ds/check.";
 const STYLE_TAG = /<style\b/i;
 

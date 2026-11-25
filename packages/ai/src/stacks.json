@@ -1,11 +1,11 @@
 {
   "$comment": "The stacks the skill offers, in the order they are offered: where each loads LUZ, and the extensions npx @luz-ds/check reads as HTML (--ext). Read by scripts/build-ai-facts.js.",
   "stacks": [
-    { "id": "vanilla", "name": "Plain HTML", "load": "the tags above, in every page", "ext": "" },
-    { "id": "astro", "name": "Astro", "load": "the `<head>` of the base layout", "ext": ".astro" },
-    { "id": "react", "name": "React (Vite, Next.js)", "load": "`import \"@luz-ds/tokens/css\"`, then core and catalog, in the root layout (`className` for `class`)", "ext": ".jsx,.tsx" },
-    { "id": "vue", "name": "Vue (Vite, Nuxt)", "load": "the imports of `main.js` (Nuxt: `css` in `nuxt.config`)", "ext": ".vue" },
-    { "id": "angular", "name": "Angular", "load": "`styles` in `angular.json`", "ext": "" },
-    { "id": "other", "name": "Other", "load": "the global stylesheets", "ext": "" }
+    { "id": "vanilla", "name": "Plain HTML", "page": true, "load": "the tags above, in every page", "ext": "" },
+    { "id": "astro", "name": "Astro", "page": true, "load": "the `<head>` of the base layout", "ext": ".astro" },
+    { "id": "react", "name": "React (Vite, Next.js)", "page": false, "load": "`import \"@luz-ds/tokens/css\"`, then core and catalog, in the root layout (`className` for `class`)", "ext": ".jsx,.tsx" },
+    { "id": "vue", "name": "Vue (Vite, Nuxt)", "page": false, "load": "the imports of `main.js` (Nuxt: `css` in `nuxt.config`)", "ext": ".vue" },
+    { "id": "angular", "name": "Angular", "page": false, "load": "`styles` in `angular.json`", "ext": "" },
+    { "id": "other", "name": "Other", "page": false, "load": "the global stylesheets", "ext": "" }
   ]
 }

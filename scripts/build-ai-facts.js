@@ -10,7 +10,8 @@
  *                                  {{title}} for the script to fill
  *   references/kinds/<kind>.md     what to ask for that kind of site: its preset (packages/ai/src/kinds), without its skeleton
  *   references/stacks.md           where each stack loads LUZ and which extensions the check reads
- *   references/agents.md           the agents and skills of luz-ai that the skill can add, from their own front matter
+ *   assets/agents/luz-agent-accessibility.md   the reviewer of @luz-ds/check, built from its source (scripts/build-check.js)
+ *   references/agents.md           the agents of luz-ai that the skill can add, from their own front matter
  *
  * A starter is a text for the person's own site, not a page of this repository, so it is `.html.tpl`: nothing here loads it,
  * and the CDN addresses in it are the packages' own (RL-12 reads the `.html` pages of packages/ and apps/).
@@ -22,6 +23,7 @@
 import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { buildAgent } from "./build-check.js";
 import { PUBLISHED } from "./luz-packages.js";
 import { CASCADE, FITS_KINDS, fileKinds, isKindFile, kindPatterns } from "./docs-site/kinds.js";
 import { FILES, catalogComponents, catalogFilesIn, minified } from "./docs-site/snippets.js";
@@ -35,7 +37,7 @@ const readJson = (root, file) => JSON.parse(readFileSync(join(root, file), "utf-
 
 export function buildAiFacts({ root = repo } = {}) {
   const versions = Object.fromEntries(PUBLISHED.map((pkg) => [pkg, readJson(root, `packages/${pkg}/package.json`).version]));
-  const stacks = readJson(root, "packages/ai/src/stacks.json").stacks.map(({ id, name, ext }) => ({ id, name, ext }));
+  const stacks = readJson(root, "packages/ai/src/stacks.json").stacks.map(({ id, name, ext, page }) => ({ id, name, ext, page }));
   return { versions, kinds: [...FITS_KINDS], stacks };
 }
 
@@ -157,6 +159,8 @@ export function buildAiFiles({ root = repo } = {}) {
     files[`${SKILL}/references/kinds/${kind}.md`] = kindReference(kind, root);
   }
   files[`${SKILL}/references/stacks.md`] = stacksReference(root);
+  // The one accessibility agent is the reviewer of @luz-ds/check, from the same source (.claude/agents/accessibility-engineer.md)
+  files[`${SKILL}/assets/agents/luz-agent-accessibility.md`] = buildAgent();
   files[`${SKILL}/references/agents.md`] = agentsReference(root);
   return files;
 }

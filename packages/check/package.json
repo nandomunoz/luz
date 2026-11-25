@@ -8,7 +8,7 @@
     "luz-check": "./dist/luz-check.js"
   },
   "exports": {
-    "./agents/accessibility.md": "./dist/agents/luz-accessibility-reviewer.md",
+    "./agents/accessibility.md": "./dist/agents/luz-agent-accessibility.md",
     "./package.json": "./package.json"
   },
   "files": [

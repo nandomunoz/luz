@@ -2,12 +2,12 @@
   "example": "facts",
   "case": "facts",
   "model": "sonnet",
-  "date": "2026-11-24",
+  "date": "2026-11-25",
   "skillVersion": "0.1.0",
   "turns": [
     {
       "user": "/luz facts",
-      "assistant": "`/luz facts` printed this for the current release:\n\n**Versions**\n- `@luz-ds/tokens` 0.4.1\n- `@luz-ds/core` 0.4.1\n- `@luz-ds/catalog` 0.4.1\n- `@luz-ds/check` 0.3.2\n- `@luz-ds/ai` 0.0.0\n\n**Kinds of site:** landing, blog, app, docs\n\n**Stacks:** vanilla, astro, react, vue, angular, other\n\nThis subcommand only reads, so nothing was written and I started no site.\n\nThe script lists versions but doesn't check them against the npm registry. Confirm there that they are current before you pin them.\n\nTo start a site, run `/luz` or `/luz new <kind>`."
+      "assistant": "`/luz facts` printed this for the current release:\n\n**Versions**\n- `@luz-ds/tokens` 0.4.1\n- `@luz-ds/core` 0.4.1\n- `@luz-ds/catalog` 0.4.1\n- `@luz-ds/check` 0.3.2\n- `@luz-ds/ai` 0.0.0\n\n**Kinds of site:** landing, blog, app, docs\n\n**Stacks**\n- `vanilla` and `astro` get a starter page of their own.\n- `react`, `vue`, `angular` and `other` are marked \"by hand\". They get a plain HTML page, and you move its markup into the framework yourself.\n\nThe command only read this information and wrote no files. Nothing needs checking on your side. To start a site, run `/luz` or `/luz new <kind>`."
     }
   ]
 }

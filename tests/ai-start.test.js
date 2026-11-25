@@ -58,9 +58,9 @@ describe("the data beside the script", () => {
     expect(json(join(skill, "assets/facts.json"))).toEqual(buildAiFacts({ root }));
   });
 
-  it("has every generated file (the facts, a starter page and a reference per kind, the stacks) as the prompts build it", () => {
+  it("has every generated file (the facts, a starter page and a reference per kind, the stacks, the agent) as the generator builds it", () => {
     const files = buildAiFiles({ root });
-    expect(Object.keys(files).length).toBe(11);
+    expect(Object.keys(files).length).toBe(12);
     for (const [file, text] of Object.entries(files)) expect(read(join(root, file)), `${file} is out of step: run node scripts/build-ai-facts.js`).toBe(text);
   });
 

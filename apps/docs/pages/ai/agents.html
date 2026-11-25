@@ -14,7 +14,7 @@ keywords: agent, subagent, accessibility, luz-agent, luz-ai
 
     <section class="docs-block" aria-labelledby="agents">
       <h2 class="docs-chapter__title" id="agents">The agents</h2>
-      <p class="docs-lead">Each agent is a base template with fields left to fill. It reviews and reports; it does not rewrite your files.</p>
+      <p class="docs-lead">The agent asks nothing before it is written: it reads your own files. It reviews and reports; it does not rewrite them. It is the same reviewer that <code>npx @luz-ds/check agent</code> prints.</p>
       <p>The descriptions are the ones in the agent files, so they are in English, whatever the language of this page.</p>
       <!-- luz:agents agents -->
     </section>
@@ -36,5 +36,5 @@ keywords: agent, subagent, accessibility, luz-agent, luz-ai
         </div>
         <pre class="luz-code-block" data-lang="bash" tabindex="0" role="region" aria-label="The command in a terminal"><code id="code-agents-shell">npx @luz-ds/ai agent add luz-agent-accessibility --for claude</code></pre>
       </div>
-      <p><code>--for</code> takes <code>claude</code>, <code>gemini</code> or <code>codex</code>: the command writes the agent in the folder each one reads. A field left out stays as <code>[ADAPT: …]</code>, and the agent stops and asks about it until it is filled. <a href="/docs/ai/commands/#cmd-add">The command <code>/luz add</code></a> shows a whole conversation.</p>
+      <p><code>--for</code> takes <code>claude</code>, <code>gemini</code> or <code>codex</code>: the command writes the agent in the folder each one reads. <a href="/docs/ai/commands/#cmd-add">The command <code>/luz add</code></a> shows a whole conversation.</p>
     </section>

@@ -2,7 +2,7 @@
 title: El agente de /luz
 description: El agente de accesibilidad que /luz puede añadir a un proyecto, con lo que revisa y las herramientas que puede usar.
 keywords: agente, subagente, accesibilidad, luz-agent, luz-ai
-source: c3a21572766d
+source: 7b325d902c90
 reviewed: false
 -->
     <section class="docs-block" aria-labelledby="choose">
@@ -13,7 +13,7 @@ reviewed: false
 
     <section class="docs-block" aria-labelledby="agents">
       <h2 class="docs-chapter__title" id="agents">Los agentes</h2>
-      <p class="docs-lead">Cada agente es una plantilla base con campos por rellenar. Revisa e informa; no reescribe tus archivos.</p>
+      <p class="docs-lead">El agente no pregunta nada antes de escribirse: lee tus propios archivos. Revisa e informa; no los reescribe. Es el mismo revisor que imprime <code>npx @luz-ds/check agent</code>.</p>
       <p>Las descripciones son las de los archivos de los agentes, así que están en inglés, sea cual sea el idioma de esta página.</p>
       <!-- luz:agents agents -->
     </section>
@@ -35,5 +35,5 @@ reviewed: false
         </div>
         <pre class="luz-code-block" data-lang="bash" tabindex="0" role="region" aria-label="El comando en una terminal"><code id="code-agents-shell">npx @luz-ds/ai agent add luz-agent-accessibility --for claude</code></pre>
       </div>
-      <p><code>--for</code> admite <code>claude</code>, <code>gemini</code> o <code>codex</code>: el comando escribe el agente en la carpeta que lee cada uno. Un campo que dejes sin rellenar queda como <code>[ADAPT: …]</code>, y el agente se detiene y te pregunta por él hasta que se rellena. <a href="/docs/ai/commands/#cmd-add">El comando <code>/luz add</code></a> muestra una conversación entera.</p>
+      <p><code>--for</code> admite <code>claude</code>, <code>gemini</code> o <code>codex</code>: el comando escribe el agente en la carpeta que lee cada uno. <a href="/docs/ai/commands/#cmd-add">El comando <code>/luz add</code></a> muestra una conversación entera.</p>
     </section>
