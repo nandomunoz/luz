@@ -86,7 +86,7 @@ describe("a clean tree", () => {
   });
 
   it("with a translation that is current and reviewed by a named reader: exit 0, ✓, and no finding about it", () => {
-    for (const code of ["es", "ar"]) copy.write(probePath(code), translationFile({ source: HASH, reviewed: true, reviewer: "nandovejer" }));
+    for (const code of ["es", "ar"]) copy.write(probePath(code), translationFile({ source: HASH, reviewed: true, reviewer: "nandomunoz" }));
     for (const args of [[], ["--strict"]]) {
       const result = run(args);
       expect(result.status, `${args.join(" ")}\n${result.output}`).toBe(0);
@@ -100,7 +100,7 @@ describe("a catalog pattern page: its `fits-kinds` and `fits` (F5b, decision 71)
   /** The English probe as a pattern page of catalog: front matter keys with a dash, and a sentence of its own. */
   const patternPage = () =>
     `<!-- luz:page\ntitle: ${PROBE.english.title}\ndescription: ${PROBE.english.description}\narea: catalog\ngroup: navigation\norder: 9999\nfits-kinds: landing, app\nfits: the top of a page\ntoc: false\n-->\n${PROBE.english.body}\n`;
-  const translation = (extra) => translationFile({ source: HASH, reviewed: true, reviewer: "nandovejer" }).replace("source:", `${extra}source:`);
+  const translation = (extra) => translationFile({ source: HASH, reviewed: true, reviewer: "nandomunoz" }).replace("source:", `${extra}source:`);
 
   it("reads the English front matter with a key that has a dash, and a translation that has its own `fits`: exit 0 with --strict", () => {
     copy.write(`apps/docs/pages/${PROBE.file}`, patternPage());
@@ -120,7 +120,7 @@ describe("a catalog pattern page: its `fits-kinds` and `fits` (F5b, decision 71)
 
 describe("a stale source", () => {
   it("is listed with the hash the page has and the hash it should have; exit 0 without --strict", () => {
-    copy.write(probePath("es"), translationFile({ source: NOT_THE_HASH, reviewed: true, reviewer: "nandovejer" }));
+    copy.write(probePath("es"), translationFile({ source: NOT_THE_HASH, reviewed: true, reviewer: "nandomunoz" }));
     const result = run();
     const lines = about(result, probePath("es"));
     expect(lines.length, result.output).toBeGreaterThan(0);
@@ -130,8 +130,8 @@ describe("a stale source", () => {
   });
 
   it("fails with --strict, and names only the stale language: the current one is not listed", () => {
-    copy.write(probePath("es"), translationFile({ source: NOT_THE_HASH, reviewed: true, reviewer: "nandovejer" }));
-    copy.write(probePath("ar"), translationFile({ source: HASH, reviewed: true, reviewer: "nandovejer" }));
+    copy.write(probePath("es"), translationFile({ source: NOT_THE_HASH, reviewed: true, reviewer: "nandomunoz" }));
+    copy.write(probePath("ar"), translationFile({ source: HASH, reviewed: true, reviewer: "nandomunoz" }));
     const result = run(["--strict"]);
     expect(result.status, result.output).toBe(1);
     expect(about(result, probePath("es")).some((line) => /stale/i.test(line)), result.output).toBe(true);
@@ -139,7 +139,7 @@ describe("a stale source", () => {
   });
 
   it("is what an edit of the English page leaves behind: the translation was current, then the English text changed", () => {
-    copy.write(probePath("es"), translationFile({ source: HASH, reviewed: true, reviewer: "nandovejer" }));
+    copy.write(probePath("es"), translationFile({ source: HASH, reviewed: true, reviewer: "nandomunoz" }));
     expect(run(["--strict"]).status, "current before the edit").toBe(0);
     const edited = `${PROBE.english.body.replace("A plain sentence", "A plainer sentence")}`;
     copy.write(`apps/docs/pages/${PROBE.file}`, englishProbeFile(edited));
@@ -153,7 +153,7 @@ describe("a stale source", () => {
   it("collapses white space (D5): the same words with other spaces and line breaks are not stale", () => {
     const reflowed = PROBE.english.body.replace("A plain sentence", "A  plain\n  sentence");
     copy.write(`apps/docs/pages/${PROBE.file}`, englishProbeFile(reflowed));
-    copy.write(probePath("es"), translationFile({ source: HASH, reviewed: true, reviewer: "nandovejer" }));
+    copy.write(probePath("es"), translationFile({ source: HASH, reviewed: true, reviewer: "nandomunoz" }));
     const result = run(["--strict"]);
     expect(about(result, probePath("es")), result.output).toEqual([]);
     expect(result.status, result.output).toBe(0);
@@ -164,7 +164,7 @@ describe("an orphan", () => {
   const ORPHAN = "apps/docs/i18n/ar/pages/get-started/no-such-page.html";
 
   it("is listed, not a crash: a translation of a page the English docs do not have; exit 0 without --strict", () => {
-    copy.write(ORPHAN, translationFile({ source: HASH, reviewed: true, reviewer: "nandovejer" }));
+    copy.write(ORPHAN, translationFile({ source: HASH, reviewed: true, reviewer: "nandomunoz" }));
     const result = run();
     expect(about(result, ORPHAN).some((line) => /orphan/i.test(line)), result.output).toBe(true);
     expect(result.status, result.output).toBe(0);
@@ -172,7 +172,7 @@ describe("an orphan", () => {
   });
 
   it("fails with --strict", () => {
-    copy.write(ORPHAN, translationFile({ source: HASH, reviewed: true, reviewer: "nandovejer" }));
+    copy.write(ORPHAN, translationFile({ source: HASH, reviewed: true, reviewer: "nandomunoz" }));
     const result = run(["--strict"]);
     expect(result.status, result.output).toBe(1);
     expect(about(result, ORPHAN).some((line) => /orphan/i.test(line)), result.output).toBe(true);
@@ -204,7 +204,7 @@ describe("a translation that is not reviewed", () => {
   });
 
   it("a reviewed page is not in the list of the unreviewed", () => {
-    copy.write(probePath("es"), translationFile({ source: HASH, reviewed: true, reviewer: "nandovejer" }));
+    copy.write(probePath("es"), translationFile({ source: HASH, reviewed: true, reviewer: "nandomunoz" }));
     copy.write(probePath("ar"), translationFile({ source: HASH, reviewed: false }));
     const result = run();
     expect(about(result, probePath("es")), result.output).toEqual([]);
@@ -223,7 +223,7 @@ describe("a reviewed page without a reviewer", () => {
   });
 
   it("a reviewer on a page that is not reviewed: true is the same error", () => {
-    copy.write(probePath("ar"), translationFile({ source: HASH, reviewed: false, reviewer: "nandovejer" }));
+    copy.write(probePath("ar"), translationFile({ source: HASH, reviewed: false, reviewer: "nandomunoz" }));
     const result = run();
     expect(result.status, result.output).toBe(1);
     expect(about(result, probePath("ar")).some((line) => /reviewer/i.test(line)), result.output).toBe(true);

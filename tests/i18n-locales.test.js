@@ -113,7 +113,7 @@ describe("the checker that the build and this file use", () => {
 
   it("passes English itself, with a $header that names a handle", () => {
     expect(languageProblems(base, EN)).toEqual([]);
-    expect(languageProblems({ $header: { language: "Español", tag: "es", author: "nandovejer", reviewer: "a-reader" }, ...base }, EN)).toEqual([]);
+    expect(languageProblems({ $header: { language: "Español", tag: "es", author: "nandomunoz", reviewer: "a-reader" }, ...base }, EN)).toEqual([]);
   });
 
   it.each([

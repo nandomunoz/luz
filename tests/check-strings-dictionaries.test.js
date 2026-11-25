@@ -194,7 +194,7 @@ describe("check:strings reads the dictionaries of core", () => {
   });
 
   it("$header of a language file is not one of its strings: a header that names handles passes", () => {
-    const header = { language: "Español", tag: "es", author: "nandovejer", reviewer: "a-reader" };
+    const header = { language: "Español", tag: "es", author: "nandomunoz", reviewer: "a-reader" };
     const result = runWith({ [dictionary("es")]: esWith({ $header: header }) });
     expect(about(result, dictionary("es")), result.output).toEqual([]);
     expect(result.status, result.output).toBe(0);

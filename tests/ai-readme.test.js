@@ -329,7 +329,7 @@ describe("renderAiSection({ name, manifest, changelog, siteUrl })", () => {
 
   it("links the changelog on GitHub for older versions whenever a changelog exists", () => {
     for (const changelog of [FIRST_RELEASE, TWO_VERSIONS, QUIET]) {
-      expect(render("core", CORE, changelog)).toMatch(/https:\/\/github\.com\/nandovejer\/luz\/blob\/main\/packages\/core\/CHANGELOG\.md/);
+      expect(render("core", CORE, changelog)).toMatch(/https:\/\/github\.com\/nandomunoz\/luz\/blob\/main\/packages\/core\/CHANGELOG\.md/);
     }
   });
 

@@ -835,9 +835,9 @@ test.describe('Landing page', () => {
 
         const legal = footer(page).locator('p.landing-legal');
         await expect(legal).toHaveText(plain(catalog(lang)['footer.legal']));
-        await expect(legal.locator('a[href="https://github.com/nandovejer/luz/blob/main/LICENSE"]')).toHaveCount(1);
+        await expect(legal.locator('a[href="https://github.com/nandomunoz/luz/blob/main/LICENSE"]')).toHaveCount(1);
         // The author is named, as a link to his GitHub
-        await expect(legal.locator('a[href="https://github.com/nandovejer"]')).toHaveText('Fernando Muñoz');
+        await expect(legal.locator('a[href="https://github.com/nandomunoz"]')).toHaveText('Fernando Muñoz');
       });
     }
 

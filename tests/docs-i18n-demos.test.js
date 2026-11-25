@@ -58,7 +58,7 @@ const spanish = (text) => WORDS[text] ?? text;
 const WIDGET = "components/widget.html";
 const english = pageSource(widgetMeta, widgetBody());
 const translation = ({ own = "", reviewed = true } = {}) =>
-  pageSource({ title: "Widget", description: "Un widget hace una sola cosa.", source: hashOf(widgetBody()), reviewed: String(reviewed), ...(reviewed ? { reviewer: "nandovejer" } : {}) }, widgetBody(spanish, own));
+  pageSource({ title: "Widget", description: "Un widget hace una sola cosa.", source: hashOf(widgetBody()), reviewed: String(reviewed), ...(reviewed ? { reviewer: "nandomunoz" } : {}) }, widgetBody(spanish, own));
 
 /** A fixture with the widget page in English and translated in Spanish and Arabic (`own` goes on the specimen of both). */
 const withWidget = ({ own = "", translated = true } = {}) =>

@@ -141,9 +141,9 @@ describe("a dictionary that breaks the schema fails the build, naming the file a
     ["an at sign", (d) => ({ ...d, copy: "Copiar a@b" }), "copy"],
     // $header goes after ...d: a $header already in es.json must not win over the one under test
     ["a header that names an e-mail", (d) => ({ ...d, $header: { author: "someone@example.com" } }), "header"],
-    ["a header that names an e-mail as its reviewer", (d) => ({ ...d, $header: { author: "nandovejer", reviewer: "a@b.test" } }), "header"],
+    ["a header that names an e-mail as its reviewer", (d) => ({ ...d, $header: { author: "nandomunoz", reviewer: "a@b.test" } }), "header"],
     ["a header whose author is not a GitHub handle", (d) => ({ ...d, $header: { author: "Not A Handle" } }), "header"],
-    ["a header that is not an object", (d) => ({ ...d, $header: "nandovejer" }), "header"],
+    ["a header that is not an object", (d) => ({ ...d, $header: "nandomunoz" }), "header"],
     ["a header with a value that is not a string", (d) => ({ ...d, $header: { author: 7 } }), "header"],
     ["text that is not JSON", () => "export default {};", ""],
     ["a JSON array", () => "[]", ""],
@@ -160,7 +160,7 @@ describe("a dictionary that breaks the schema fails the build, naming the file a
 });
 
 describe("$header, when a language file has one", () => {
-  const HEADER = { language: "Español", tag: "es", author: "nandovejer", reviewer: "a-reader" };
+  const HEADER = { language: "Español", tag: "es", author: "nandomunoz", reviewer: "a-reader" };
   const stripped = stringsOf;
 
   it("is validated (a GitHub handle, never an address) and stripped: the built module has the strings only", async () => {

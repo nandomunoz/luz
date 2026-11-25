@@ -26,7 +26,7 @@ import { faded } from './helpers/settle.js';
 
 const VERSION = JSON.parse(readFileSync(fileURLToPath(new URL('../packages/core/package.json', import.meta.url)), 'utf-8')).version;
 
-const GITHUB = 'https://github.com/nandovejer/luz';
+const GITHUB = 'https://github.com/nandomunoz/luz';
 const HOME = '/';
 const DOCS = '/docs/';
 const COMPONENT = '/docs/components/button/';

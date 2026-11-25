@@ -322,7 +322,7 @@ export const TRANSLATED = {
     "accessibility.html": { reviewed: false },
     "privacy.html": { reviewed: false },
     "get-started/index.html": { reviewed: false },
-    "get-started/install.html": { reviewed: true, reviewer: "nandovejer" },
+    "get-started/install.html": { reviewed: true, reviewer: "nandomunoz" },
     "components/index.html": { reviewed: false },
   },
   ar: {

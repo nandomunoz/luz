@@ -708,7 +708,7 @@ describe("llms-full.txt: the curated text of the pages, from the real site", () 
   it("makes every internal link absolute under the site URL, and none root-absolute", () => {
     const prose = proseOf(full());
     expect(prose).not.toMatch(/\]\(\/docs\//);
-    expect(prose).toMatch(/\]\(https:\/\/nandovejer\.github\.io\/luz\/docs\//);
+    expect(prose).toMatch(/\]\(https:\/\/nandomunoz\.github\.io\/luz\/docs\//);
     expect(proseOf(full(""))).toMatch(/\]\(\/docs\//);
   });
 

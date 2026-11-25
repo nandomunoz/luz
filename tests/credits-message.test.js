@@ -41,7 +41,7 @@ describe("the request for credit", () => {
     expect(license).toMatch(/keep the (?:MIT )?(?:license|licence|copyright) notice|notice (?:must|has to) stay/i);
     expect(license).toMatch(/appreciated/i);
     expect(license).toMatch(/not required/i);
-    expect(license).toContain("https://github.com/nandovejer/luz");
+    expect(license).toContain("https://github.com/nandomunoz/luz");
   });
 
   it("CONTRIBUTING.md, in Licence: a fork keeps the LICENSE and says where it came from", () => {
@@ -63,7 +63,7 @@ describe("the request for credit", () => {
     expect(en).toContain("as long as the notice goes with it");
     expect(es).toContain("siempre que conserves el aviso");
     expect(ar).toContain("ما دام الإشعار يرافقه");
-    for (const text of [en, es, ar]) expect(text).toContain("https://github.com/nandovejer/luz/blob/main/LICENSE");
+    for (const text of [en, es, ar]) expect(text).toContain("https://github.com/nandomunoz/luz/blob/main/LICENSE");
   });
 
   it("the footer does not make the credit a condition: no \"must\" or \"required\" next to it", () => {

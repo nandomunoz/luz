@@ -38,7 +38,7 @@ const read = (path) => readFileSync(join(root, path), "utf-8");
 const json = (path) => JSON.parse(read(path));
 const bytes = (text) => Buffer.byteLength(text, "utf-8");
 const IDS = ["start", "landing", "blog", "app", "docs"];
-const SITE = "https://nandovejer.github.io/luz/";
+const SITE = "https://nandomunoz.github.io/luz/";
 const CDN = "https://cdn.jsdelivr.net/npm/@luz-ds/";
 const MIN_SAVING = 600;
 

@@ -84,7 +84,7 @@ describe("the release gate", () => {
 });
 
 describe("the notes", () => {
-  const url = "https://github.com/nandovejer/luz/issues/new?template=ai-target.yml";
+  const url = "https://github.com/nandomunoz/luz/issues/new?template=ai-target.yml";
 
   it("the issue form asks for the target, the CLI version, the command and the output", () => {
     const form = read(".github/ISSUE_TEMPLATE/ai-target.yml");
