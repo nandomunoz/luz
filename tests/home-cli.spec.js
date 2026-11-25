@@ -50,11 +50,26 @@ const where = (scope) => ({
   pause: (page) => page.locator(`${scope} .landing-cli__pause`),
   asking: (page) => page.locator(`${scope} .landing-cli__choices:not([hidden])`),
 });
-const skill = where('#hero');
+// The hero is four tabs (owner, 2026-11-25; tests/ai-page-tabs.spec.js): Claude's is the session played here
+const skill = where('#hero-claude');
 
 async function open(page, route) {
   await page.goto(route);
   await page.waitForLoadState('load');
+}
+
+/**
+ * The page of the skill, its tab Use Claude open (with JavaScript Install opens first; without it every pane shows).
+ * Opening the tab starts Autoplay (tests/ai-page-tabs.spec.js): it is paused here, so the visitor plays by hand.
+ */
+async function openSkill(page, route) {
+  await open(page, route);
+  const tab = page.locator('#hero a.luz-tab[href="#hero-claude"][role="tab"]');
+  if (!(await tab.count())) return;
+  await tab.click();
+  const stop = page.locator('#hero-claude .landing-cli__auto [data-cli-stop]');
+  if (await stop.isVisible()) await page.locator('#hero-claude .landing-cli__auto').click();
+  await page.locator('#hero-claude .landing-cli__screen > :not([hidden])').first().waitFor();
 }
 
 /**
@@ -205,7 +220,7 @@ for (const [route, lang] of SKILL) {
     test.use({ javaScriptEnabled: false });
 
     test('the session of the default answers shows, still, with no button and no question to answer', async ({ page }) => {
-      await open(page, route);
+      await openSkill(page, route);
       expect(await skill.shown(page).count()).toBeGreaterThanOrEqual(25);
       await expect(skill.next(page)).toBeHidden();
       await expect(skill.cli(page).locator('.landing-cli__choices:visible')).toHaveCount(0);
@@ -221,7 +236,7 @@ for (const [route, lang] of SKILL) {
 
   test.describe(`${route} with JavaScript`, () => {
     test('Enter brings one line at a time, a click in the terminal too, and a question waits for its answer', async ({ page }) => {
-      await open(page, route);
+      await openSkill(page, route);
       await expect(skill.shown(page)).toHaveCount(1);
       await expect(skill.next(page)).toBeVisible();
       await expect(skill.next(page)).toHaveAccessibleName(`Enter ${words['inside.l4.next']}`);
@@ -245,7 +260,7 @@ for (const [route, lang] of SKILL) {
     });
 
     test('the answers pick what follows: a blog in Astro, with the speed agent too, then Play again starts over', async ({ page }) => {
-      await open(page, route);
+      await openSkill(page, route);
       const height = await skill.cli(page).evaluate((el) => el.getBoundingClientRect().height);
       await playThrough(page, { kind: 'blog', stack: 'astro', agent: ['luz-core-web-vitals-optimizer'] });
       const screen = skill.screen(page);
@@ -268,7 +283,7 @@ for (const [route, lang] of SKILL) {
     });
 
     test('the screen is a polite live region, so each new line is read out', async ({ page }) => {
-      await open(page, route);
+      await openSkill(page, route);
       await expect(skill.screen(page)).toHaveAttribute('aria-live', 'polite');
       await expect(skill.screen(page)).not.toHaveAttribute('inert', /.*/);
     });
@@ -276,7 +291,7 @@ for (const [route, lang] of SKILL) {
     for (const scheme of /** @type {const} */ (['light', 'dark'])) {
       test(`axe finds nothing in the hero (${scheme}), with the whole session played`, async ({ page }) => {
         await page.emulateMedia({ colorScheme: scheme, reducedMotion: 'reduce' });
-        await open(page, route);
+        await openSkill(page, route);
         await playThrough(page);
         await faded(page);
         const results = await new AxeBuilder({ page }).include('#hero').analyze();
@@ -292,7 +307,7 @@ for (const [route, lang] of SKILL.filter(([, lang]) => lang !== 'es')) {
   for (const zoom of [100, 400]) {
     test(`${route}: at 320 px${zoom === 400 ? ' and 400 % text' : ''} nothing of the hero leaves the viewport sideways`, async ({ page }) => {
       await page.setViewportSize({ width: 320, height: 800 });
-      await open(page, route);
+      await openSkill(page, route);
       if (zoom === 400) await page.evaluate(() => { document.documentElement.style.fontSize = '400%'; });
       await playThrough(page);
       await page.locator('#hero').scrollIntoViewIfNeeded();

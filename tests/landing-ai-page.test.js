@@ -38,7 +38,7 @@ const sectionOf = (html, id) => {
 };
 const terminalOf = (html) => /<figure class="landing-cli[ "][\s\S]*?<\/figure>/.exec(html)?.[0] ?? "";
 /** The lines of a terminal: the home's loops them, the page of the skill's lets the visitor answer, and both say the same session. */
-const screenOf = (html) => /<div class="landing-cli__screen"[^>]*>([\s\S]*)<\/div>\n<button/.exec(terminalOf(html))?.[1] ?? "";
+const screenOf = (html) => /<div class="landing-cli__screen"[^>]*>([\s\S]*)<\/div>\n<(?:button|figcaption)/.exec(terminalOf(html))?.[1] ?? "";
 
 const agents = readdirSync(join(repo, SKILL, "assets/agents")).filter((n) => n.endsWith(".md")).map((n) => n.slice(0, -3)).sort();
 const skills = readdirSync(join(repo, SKILL, "assets/skills"), { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name).sort();
@@ -56,7 +56,7 @@ describe("the page of the luz skill, /ai/", () => {
     expect(/<title>([^<]*)<\/title>/.exec(html)[1]).toBe(escape(catalog(code)["level.ai.meta.title"]));
   });
 
-  it.each(LANGS)("in %s: the hero's live part is the terminal of the whole session, the visitor answering it, once; the home's is the install, a loop", (code, prefix) => {
+  it.each(LANGS)("in %s: the hero's live part is the terminal of the whole session, the visitor answering it, once per assistant (Claude, Codex, Cursor: owner, 2026-11-25); the home's is the install, a loop", (code, prefix) => {
     const hero = sectionOf(rendered.get(`${prefix}ai/`), "hero");
     expect(hero).toMatch(/^<section class="landing-intro\b/);
     const cli = terminalOf(hero);
@@ -68,7 +68,7 @@ describe("the page of the luz skill, /ai/", () => {
     expect(cli).toMatch(/data-landing-cli>/);
     expect(cli).toContain("landing-cli__next");
     expect(terminalOf(rendered.get(prefix))).toMatch(/data-landing-cli="loop"/);
-    expect(rendered.get(`${prefix}ai/`).match(/data-landing-cli/g)).toHaveLength(1);
+    expect(rendered.get(`${prefix}ai/`).match(/data-landing-cli/g)).toHaveLength(3);
     expect(hero).toMatch(/<a class="luz-btn luz-btn--primary" href="#steps">/);
   });
 

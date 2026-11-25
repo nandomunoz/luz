@@ -50,6 +50,36 @@ describe("the template of level 4 and the terminal the generator writes", () => 
     expect(level4).not.toContain("landing-cli__line");
   });
 
+  it("the skill's page shows it in four tabs, Install and a session for Claude, Codex and Cursor (owner, 2026-11-25), each with its install, its command, its call of the skill and its agents", () => {
+    for (const name of ["cli", "clicodex", "clicursor"]) expect(aiPage.match(new RegExp(`\\{\\{${name}\\}\\}`, "g")), name).toHaveLength(1);
+    const panes = [...aiPage.matchAll(/<div class="luz-tabpanel landing-clitabs__pane" id="hero-([a-z]+)">/g)].map((m) => m[1]);
+    expect(panes).toEqual(["install", "claude", "codex", "cursor"]);
+    const said = (html) => unescape(html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " "));
+    const sessions = { claude: written.cli, codex: written.clicodex, cursor: written.clicursor };
+    const opens = { claude: "claude", codex: "codex", cursor: "cursor-agent" };
+    const calls = { claude: "/luz", codex: "$luz", cursor: "/luz" };
+    for (const [target, html] of Object.entries(sessions)) {
+      const text = said(html);
+      expect(text, target).toContain(`npx @luz-ds/ai init --target ${target}`);
+      expect(text, target).toContain(`$ ${opens[target]} `);
+      expect(text, target).toContain(catalogs.en["inside.cli.ask"].replace("/luz", calls[target]));
+      // What init prints for it, from its own dry run
+      const real = execFileSync(process.execPath, [SCRIPT, "init", "--target", target, "--dry-run"], { cwd: tmpdir(), encoding: "utf-8" }).split("\n");
+      expect(text, target).toContain(real[0].replace("would write", "wrote"));
+      // The foot: Autoplay (hidden labels swap to Pause) and Enter, hidden without JavaScript
+      expect(html, target).toMatch(/<figcaption class="landing-cli__caption landing-cli__foot" hidden>\s*<button class="luz-btn luz-btn--ghost luz-btn--sm landing-cli__auto" type="button">/);
+    }
+    // Codex's agents are its own files (luz-ai agent add --for codex); Cursor gets none, and no question about them
+    const codexAgent = execFileSync(process.execPath, [SCRIPT, "agent", "add", "luz-seo-geo-specialist", "--for", "codex", "--dry-run"], { cwd: tmpdir(), encoding: "utf-8" }).split("\n")[1].trim();
+    expect(written.clicodex).toContain(`<code>${codexAgent}</code>`);
+    expect(written.clicodex).toContain("luz-ai agent add luz-seo-geo-specialist --for codex");
+    expect(written.clicodex).toContain("<code>.agents/skills/luz-landing/</code>");
+    expect(written.clicursor).not.toMatch(/data-ask="agent"|agent add/);
+    expect(said(written.clicursor)).toContain(catalogs.en["inside.cli.adapt.page"]);
+    // The panel of a terminal the visitor answers never turns by itself
+    expect(read("apps/landing/landing.js")).toMatch(/panel\.querySelector\('\[data-landing-cli=""\]'\)\) return;/);
+  });
+
   it("the home's terminal installs the skill for each assistant, one round each: the command, what init prints, then the assistant and the request", () => {
     const install = written.cliinstall;
     expect(install).toMatch(/^<figure class="landing-cli landing-cli--install" dir="ltr" aria-label="[^"]+" data-landing-cli="loop" data-rounds="target=claude target=codex target=gemini target=cursor">/);
