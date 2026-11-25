@@ -108,9 +108,9 @@ describe("the notes", () => {
     expect(read("packages/ai/README.md")).toMatch(/tested only in Claude Code/i);
     expect(read("apps/docs/pages/ai/commands.html")).toMatch(/tested only in Claude Code/i);
     expect(read("apps/docs/i18n/es/pages/ai/commands.html")).toMatch(/solo en Claude Code/i);
-    expect(JSON.parse(read("apps/landing/i18n/en.json"))["level.ai.commands.lead"]).toMatch(/tested only in Claude Code/i);
-    expect(JSON.parse(read("apps/landing/i18n/es.json"))["level.ai.commands.lead"]).toMatch(/solo en Claude Code/i);
-    expect(JSON.parse(read("apps/landing/i18n/ar.json"))["level.ai.commands.lead"]).toContain("Claude Code");
+    expect(JSON.parse(read("apps/landing/i18n/en.json"))["level.ai.assistants.tested"]).toMatch(/tested only in Claude Code/i);
+    expect(JSON.parse(read("apps/landing/i18n/es.json"))["level.ai.assistants.tested"]).toMatch(/solo en Claude Code/i);
+    expect(JSON.parse(read("apps/landing/i18n/ar.json"))["level.ai.assistants.tested"]).toContain("Claude Code");
     if (existsSync(join(root, "packages/ai/tested.json"))) expect(JSON.parse(read("packages/ai/tested.json")).host).toBe("claude-code");
   });
 });
