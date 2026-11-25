@@ -3,8 +3,8 @@
  *
  * For a developer who is deciding whether `@luz-ds/ai` is for their project (owner, 2026-11-25): below the hero and the
  * three steps the page is ordered by what the reader wants, not by the parts of the tool: the assistants it works
- * with (a strip), how to start a site, the agents that look after what every project needs, the skills for the
- * details, how to keep the project in shape, and what you decide (a strip). The tables of commands and of targets
+ * with (a strip), then a section for each element of the skill, in this order (owner, 2026-11-25): its commands, its agents and
+ * the skill itself (what it does in a session), and last what you decide (a strip). The tables of commands and of targets
  * are in /docs/ai/. Everything that is a fact of the package is read from `packages/ai/skills/luz/` and never typed:
  *
  *  - the agents: `assets/agents/*.md`, their `name` and `tools`. An agent with a tool of `acting` (tool-map.json)
@@ -18,6 +18,7 @@
  * with no words fails the build, and words for an agent that is gone are a key no template uses.
  */
 import { readFileSync, readdirSync } from "node:fs";
+import { commandRows } from "./ai-commands.js";
 import { resolve } from "node:path";
 
 const SKILL_DIR = "packages/ai/skills/luz";
@@ -71,12 +72,14 @@ const ICONS = {
   doctor: "M3 12h4l2.5-6 4 12 2.5-6H21",
   validate: "M5 5h14v14H5ZM9 12l2.5 2.5L15.5 9.5",
   "luz-agent-accessibility": "M12 3.5a2 2 0 1 0 0 4 2 2 0 0 0 0-4ZM5 9h14M12 9v5m0 0-3 6m3-6 3 6",
+  add: "M12 5v14M5 12h14",
+  help: "M12 3.5a8.5 8.5 0 1 0 0 17 8.5 8.5 0 0 0 0-17ZM9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 .9-1 1.7M12 17h.01",
   promise: "M12 3.5a8.5 8.5 0 1 0 0 17 8.5 8.5 0 0 0 0-17ZM8.5 12l2.5 2.5 4.5-5",
 };
 
 /**
- * The placeholders of the page: {{aiblocks}} (the assistants' strip, four goals with cards and the strip of what you
- * decide) and the hero's numbers {{naiagents}}, {{naitargets}} and {{ndepsai}}.
+ * The placeholders of the page: {{aiblocks}} (the assistants' strip, a section for each element of the skill, its commands, its
+ * agents and the skill itself, with cards, and the strip of what you decide) and the hero's numbers {{naiagents}}, {{naitargets}} and {{ndepsai}}.
  */
 export function aiSections({ say, root, escapeHtml }) {
   const t = (key) => escapeHtml(say(key));
@@ -114,11 +117,11 @@ export function aiSections({ say, root, escapeHtml }) {
   ].join("\n");
 
   // How a session goes, a card for each phase; the last two are run by the skill itself
-  const start = [
-    card("ask", t("level.ai.start.ask.title"), t("level.ai.start.ask.text"), "", ask("›", code("/luz"))),
-    card("plan", t("level.ai.start.plan.title"), t("level.ai.start.plan.text"), "", ask("›", code(say("inside.cli.go.button")))),
-    card("write", t("level.ai.start.write.title"), t("level.ai.start.write.text"), "", ask("$", code("luz-ai site new --kind landing"))),
-    card("check", t("level.ai.start.check.title"), t("level.ai.start.check.text"), "", ask("$", code("npx @luz-ds/check"))),
+  const phases = [
+    card("ask", t("level.ai.skill.ask.title"), t("level.ai.skill.ask.text"), "", ask("›", code("/luz"))),
+    card("plan", t("level.ai.skill.plan.title"), t("level.ai.skill.plan.text"), "", ask("›", code(say("inside.cli.go.button")))),
+    card("write", t("level.ai.skill.write.title"), t("level.ai.skill.write.text"), "", ask("$", code("luz-ai site new --kind landing"))),
+    card("check", t("level.ai.skill.check.title"), t("level.ai.skill.check.text"), "", ask("$", code("npx @luz-ds/check"))),
   ].join("");
 
   // No agent of the package changes code now: a card for one that does needs its own badge words (and the key level.ai.agents.acts)
@@ -137,11 +140,17 @@ export function aiSections({ say, root, escapeHtml }) {
     )
     .join("");
 
-  // The two commands of the chat that only read, so they never change the project
-  const keep = [
-    card("doctor", t("level.ai.keep.doctor.title"), t("level.ai.keep.doctor.text"), "", ask("›", code("/luz doctor"))),
-    card("validate", t("level.ai.keep.check.title"), t("level.ai.keep.check.text"), "", ask("›", code("/luz check"))),
-  ].join("");
+  // The commands of the chat, a card for each row of the table of SKILL.md: what to type, what it does, and whether it writes
+  const TYPED = { start: "/luz", new: "/luz new landing", add: "/luz add luz-agent-accessibility" };
+  const ICON_OF = { start: "write", new: "write", doctor: "doctor", check: "validate", facts: "plan", agents: "luz-agent-accessibility", add: "add", help: "help" };
+  const commandCards = commandRows(root)
+    .map((row) => {
+      const typed = row.chat.replace(/ [<[].*$/, "");
+      const badge = `<span class="luz-badge ${row.writes ? "luz-badge--primary" : "luz-badge--gray"}">${t(row.writes ? "level.ai.cmd.writes" : "level.ai.cmd.reads")}</span>`;
+      if (!ICON_OF[row.slug]) throw new Error(`scripts/docs-site/ai-page.js: no icon for the command "${row.slug}": add it to ICON_OF`);
+      return card(ICON_OF[row.slug], escapeHtml(typed), t(`level.ai.cmd.${row.slug}`), "", `<p class="landing-ai__meta">${badge}</p>${ask("›", code(TYPED[row.slug] ?? typed))}`, row.writes ? " landing-ai__card--acts" : " landing-ai__card--reads");
+    })
+    .join("");
 
   // What you decide: the guarantees of the skill, in a row of five
   const decide = [
@@ -153,9 +162,10 @@ export function aiSections({ say, root, escapeHtml }) {
   ].join("\n");
 
   const commandsDocs = [{ href: "/docs/ai/commands/", label: t("level.ai.commands.link") }];
+  const skillDocs = [{ href: "/docs/ai/", label: t("level.ai.next.docs") }];
   const agentsDocs = [{ href: "/docs/ai/agents/", label: t("level.ai.agents.link") }];
   return {
-    aiblocks: [works, goal("start", commandsDocs, start), goal("agents", agentsDocs, agentCards), goal("keep", commandsDocs, keep), decide].join("\n"),
+    aiblocks: [works, goal("commands", commandsDocs, commandCards), goal("agents", agentsDocs, agentCards), goal("skill", skillDocs, phases), decide].join("\n"),
     naiagents: String(agents.length),
     naitargets: String(targets.length),
     ndepsai: String(dependencies),
