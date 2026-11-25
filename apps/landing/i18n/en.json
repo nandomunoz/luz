@@ -175,6 +175,8 @@
   "inside.l4.p2.text": "Agents for search, speed, accessibility and AI, picked by what matters to you and filled in from your repo.",
   "inside.l4.p3.name": "It builds with LUZ.",
   "inside.l4.p3.text": "Core and the catalog, the pieces your kind of site needs, and nothing made up.",
+  "inside.l4.install.title": "Installing the LUZ skill",
+  "inside.l4.install.tested": "Tested in Claude Code for now; Codex, Gemini CLI and Cursor come next.",
   "inside.l4.soon": "Coming soon to npm",
   "inside.l4.meanwhile": "Until then, the prompts for each kind of site",
   "inside.l4.next": "Next line",

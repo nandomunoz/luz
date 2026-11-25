@@ -5208,6 +5208,11 @@ home-light:defined ~ .landing-light__nojs {
     padding: 4%;
   }
 
+  /* The title in ASCII is a picture as wide as its letters: it goes, and the word stays for a reader */
+  .landing-cli__art {
+    display: none;
+  }
+
   .landing-cli__title {
     display: none;
   }
@@ -5231,6 +5236,56 @@ home-light:defined ~ .landing-light__nojs {
     block-size: auto;
     flex-wrap: wrap;
   }
+}
+
+/* --------------------------------------------------------------------------
+   The home's terminal (owner, 2026-11-25): a person installing the skill,
+   played by cli.js as a loop. Still (no script, reduced motion) it takes its
+   own height; the copy button sits at the end of the title bar, and a line
+   under the screen says how to aim it at another assistant
+   -------------------------------------------------------------------------- */
+.landing-cli--install .landing-cli__bar .luz-copy-btn {
+  margin-inline-start: auto;
+}
+
+.landing-cli--install .landing-cli__screen {
+  block-size: auto;
+}
+
+/* Playing, it keeps the height of the whole install, so the page never moves */
+.landing-cli--install[data-cli="loop"] .landing-cli__screen {
+  block-size: min(20rem, 70vh);
+}
+
+/* What the person types comes out a character at a time: the line is
+   uncovered from its start, in steps, within the time the loop gives it
+   (cli.js: 1.1 s for a command); only when motion is welcome, and finite */
+@media (prefers-reduced-motion: no-preference) {
+  .landing-cli--install .landing-cli__line--cmd.is-new code,
+  .landing-cli--install .landing-cli__line--you.is-new .landing-cli__you {
+    animation: landing-cli-type var(--luz-duration-lazy) steps(32, end) both;
+  }
+}
+
+@keyframes landing-cli-type {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+
+  to {
+    clip-path: inset(0);
+  }
+}
+
+.landing-cli__caption {
+  padding: var(--luz-space-xs) var(--luz-space-md) var(--luz-space-sm);
+  border-block-start: 1px solid color-mix(in oklab, var(--luz-text-primary) 12%, transparent);
+  color: var(--luz-text-secondary);
+  font-size: var(--luz-text-sm);
+}
+
+.landing-cli__caption:lang(ar) {
+  direction: rtl;
 }
 
 /* ====================== The page of the skill (apps/landing/levels/ai.html) ======================

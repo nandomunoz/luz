@@ -175,6 +175,8 @@
   "inside.l4.p2.text": "وكلاء للبحث والسرعة وإمكانية الوصول والذكاء الاصطناعي، تختارهم حسب ما يهمّك وتملؤهم من مستودعك.",
   "inside.l4.p3.name": "تبني باستخدام LUZ.",
   "inside.l4.p3.text": "Core والكتالوج، القطع التي يحتاجها نوع موقعك، ولا شيء مختلق.",
+  "inside.l4.install.title": "تثبيت مهارة LUZ",
+  "inside.l4.install.tested": "مُختبَر حاليًا في Claude Code؛ وسيُختبَر لاحقًا في Codex وGemini CLI وCursor.",
   "inside.l4.soon": "قريبًا على npm",
   "inside.l4.meanwhile": "حتى ذلك الحين، موجّهات كل نوع من المواقع",
   "inside.l4.next": "السطر التالي",

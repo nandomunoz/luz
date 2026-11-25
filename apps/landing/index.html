@@ -286,19 +286,15 @@ a {
         </div>
       </div>
       </section>
-    <!-- The fourth level: a fake terminal that plays the conversation of the
-         LUZ skill to come (@luz-ds/ai, not published yet), an emulation of a
-         real session: init, the assistant, the kind of site, the stack, what
-         matters (the agents), the plan, go, site new, the check and agent
-         add. The generator (scripts/docs-site/cli-demo.js) writes it from
-         the script's own output; without JavaScript, or with reduced motion,
-         the session of the default answers shows whole. With both,
-         apps/landing/cli.js plays it as an animation that starts over by
-         itself, once it is in view, with a button to pause it and nothing
-         for the visitor to answer (the page of the skill, /ai/, has the
-         interactive one). The screen is inert and hidden from a reader while
-         it plays. Left to right in every language, as a terminal is; each
-         translated phrase is a <bdi> -->
+    <!-- The fourth level: the LUZ skill to come (@luz-ds/ai, not published
+         yet). The words on one side; on the other, a terminal in which a
+         person installs it (owner, 2026-11-25): the command they type, what
+         init prints, then the assistant and the request. The generator
+         (scripts/docs-site/cli-demo.js, {{cliinstall}}) writes it from the
+         script's own output; it stays still, with nothing to answer, and the
+         command has its copy button (hidden until the script shows it). The
+         page of the skill, /ai/, has the terminal of a whole session. Left to
+         right in every language, as a terminal is -->
     <section class="landing-inside landing-inside--flip" id="ai" aria-labelledby="ai-title">
         <div class="landing-inside__copy">
           <p class="landing-inside__eyebrow"><svg aria-hidden="true"><use href="#i0"/></svg><span>{{t:inside.l4.eyebrow}}</span></p>
@@ -312,7 +308,7 @@ a {
           <p class="landing-cli__note"><span class="luz-badge luz-badge--primary">{{t:inside.l4.soon}}</span> <a href="/docs/kinds/">{{t:inside.l4.meanwhile}}</a></p>
           <div class="o-actions"><a class="luz-btn luz-btn--outline" href="{{home}}ai/">{{t:inside.l4.all}}</a></div>
         </div>
-      {{cliloop}}
+        {{cliinstall}}
       </section>
 
 

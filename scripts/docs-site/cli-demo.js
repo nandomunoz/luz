@@ -30,8 +30,18 @@ export const CLI_AGENTS = [
   ["speed", "luz-core-web-vitals-optimizer"],
   ["ai", "luz-ai-auditor"],
 ];
+/**
+ * The assistants the home's terminal installs the skill for, one round each (owner, 2026-11-25): the --target, the
+ * command that opens the assistant, and how the skill is called in it (`luz-ai init --help` says the same).
+ */
+export const CLI_TARGETS = [
+  ["claude", "claude", "/luz"],
+  ["codex", "codex", "$luz"],
+  ["gemini", "gemini", "/luz"],
+  ["cursor", "cursor-agent", "/luz"],
+];
 /** The answers a session starts with, and the one the page shows without JavaScript. */
-export const CLI_DEFAULTS = { kind: "landing", stack: "vanilla", agents: ["luz-seo-geo-specialist", "luz-accessibility-auditor"] };
+export const CLI_DEFAULTS = { kind: "landing", stack: "vanilla", agents: ["luz-seo-geo-specialist", "luz-accessibility-auditor"], target: "claude" };
 /** A skill of luz-ai the session adds, for the kinds of site it is made for. */
 const CLI_SKILLS = { landing: "luz-landing" };
 /** The name of the site in the commands: a name, the same in every language. */
@@ -45,7 +55,7 @@ const facts = new Map();
 /**
  * What the script prints for each step of the session, from its dry runs, all in one Node (memoised by the real path
  * of the script, so a test's copy of the repository, which links packages/, runs them once too).
- * @returns {{ banner: string[], init: string[], site: Record<string, { lines: string[], next: string, links: number, todo: number }>, agents: Record<string, string[]>, skills: Record<string, string> }}
+ * @returns {{ banner: string[], init: string[], inits: Record<string, string[]>, site: Record<string, { lines: string[], next: string, links: number, todo: number }>, agents: Record<string, string[]>, skills: Record<string, string> }}
  */
 export function cliFacts(root) {
   const script = realpathSync(resolve(root, SCRIPT));
@@ -55,6 +65,8 @@ export function cliFacts(root) {
     ...CLI_KINDS.flatMap((kind) => ["vanilla", "astro"].map((stack) => ["site", "new", "--name", SITE_NAME, "--kind", kind, "--stack", stack, "--target", "."])),
     ...CLI_AGENTS.map(([, name]) => ["agent", "add", name, "--for", "claude"]),
     ...Object.values(CLI_SKILLS).map((name) => ["skill", "add", name]),
+    // The other assistants' installs, last, so the runs above keep their places
+    ...CLI_TARGETS.slice(1).map(([target]) => ["init", "--target", target]),
   ].map((args) => [...args, "--dry-run"]);
   // One Node for every dry run (each one would cost a start of its own): the script's main(), its stdout caught
   const child = `const { main } = await import(${JSON.stringify(pathToFileURL(script).href)});
@@ -93,10 +105,14 @@ write(JSON.stringify(out));`;
   }
   const skills = {};
   for (const name of Object.values(CLI_SKILLS)) skills[name] = said(texts[at++].split("\n")[0]);
+  // What init prints for each assistant: its first line and its "next:", as for Claude Code
+  const firstAndNext = (lines) => [said(lines[0]), lines.find((l) => l.startsWith("next: "))];
+  const inits = { claude: firstAndNext(init) };
+  for (const [target] of CLI_TARGETS.slice(1)) inits[target] = firstAndNext(texts[at++].split("\n"));
   // The title the script prints in a terminal (not to a pipe, so not in the dry runs above): read from its source
   const banner = /^const BANNER = (\[[\s\S]*?\]);$/m.exec(readFileSync(script, "utf-8"));
   if (!banner) throw new Error(`${SCRIPT}: no "const BANNER = [ … ];" to show the title of init`);
-  const value = { banner: JSON.parse(banner[1]), init: [said(init[0]), init.find((l) => l.startsWith("next: "))], site, agents, skills };
+  const value = { banner: JSON.parse(banner[1]), init: inits.claude, inits, site, agents, skills };
   facts.set(script, value);
   return value;
 }
@@ -110,10 +126,10 @@ export function matchesDefaults(when) {
   });
 }
 
-/** {{cli}}: the terminal the visitor answers (the page of the skill); {{cliloop}}: the same session as an animation that plays again and again (the home). In the language of `say`. */
+/** {{cli}}: the terminal the visitor answers (the page of the skill); {{cliloop}}: the same session as an animation that plays again and again; {{cliinstall}}: the home's, a person installing the skill. In the language of `say`. */
 export function cliDemo({ say, root, escapeHtml }) {
   const t = (key) => escapeHtml(say(key));
-  const { banner, init, site, agents, skills } = cliFacts(root);
+  const { banner, init, inits, site, agents, skills } = cliFacts(root);
   const esc = escapeHtml;
   const when = (cond) => (cond ? ` data-when="${cond}"${matchesDefaults(cond) ? "" : " hidden"}` : "");
   const span = (cond, inner) => `<span${when(cond)}>${inner}</span>`;
@@ -200,5 +216,30 @@ export function cliDemo({ say, root, escapeHtml }) {
         : `<button class="luz-btn luz-btn--ghost luz-btn--sm landing-cli__next" type="button" hidden><kbd>Enter</kbd> <span data-cli-next>${t("inside.l4.next")}</span><span data-cli-replay hidden>${t("inside.l4.replay")}</span></button>`,
       `</figure>`,
     ].join("\n");
-  return { cli: figure(false), cliloop: figure(true) };
+  // {{cliinstall}}: the home's terminal (owner, 2026-11-25), a person installing the skill, once for each assistant
+  // of CLI_TARGETS: the command they type, what init prints for it (its own lines), then the assistant and the
+  // request, with the skill called as that assistant calls it. Each assistant's lines carry `data-when="target=…"`;
+  // Claude Code's are the ones shown without JavaScript. cli.js plays it as the loop (data-landing-cli="loop"), one
+  // round per assistant (data-rounds), a line at a time, the commands typed out, with a button to pause it (WCAG
+  // 2.2.2); with reduced motion it stands whole. The command has its copy button, in the title bar, outside the
+  // screen the loop takes from a reader; the caption says where the skill is tested
+  const per2 = (make) => CLI_TARGETS.map(make).join("\n");
+  const request = (trigger) => escapeHtml(say("level.ai.steps.2.ask").replace("/luz", trigger));
+  const install = [
+    `<figure class="landing-cli landing-cli--install" dir="ltr" aria-label="${t("inside.l4.install.title")}" data-landing-cli="loop" data-rounds="${CLI_TARGETS.map(([target]) => `target=${target}`).join(" ")}">`,
+    `<div class="landing-cli__bar"><span class="landing-cli__dots" aria-hidden="true"><span></span><span></span><span></span></span><code class="landing-cli__title">~/vejer-books</code><button class="luz-copy-btn" type="button" data-copy-from="home-ai-init" aria-label="${t("level.ai.copy.init")}" hidden>${t("see.copy")}</button></div>`,
+    `<div class="landing-cli__screen" aria-live="polite">`,
+    [
+      per2(([target]) => line("cmd", `${mark("$")}<code${target === "claude" ? ' id="home-ai-init"' : ""}>npx @luz-ds/ai init --target ${target}</code>`, `target=${target}`)),
+      `<div class="landing-cli__line landing-cli__line--banner"><pre class="landing-cli__art" aria-hidden="true">${esc(banner.join("\n"))}</pre><span class="u-sr-only">LUZ</span></div>`,
+      per2(([target]) => inits[target].map((l) => out(l, `target=${target}`)).join("\n")),
+      per2(([target, open]) => cmd(esc(open), `target=${target}`)),
+      per2(([target, , trigger]) => line("you", `${mark("›")}<bdi class="landing-cli__you">${request(trigger)}</bdi>${target === "claude" ? '<span class="landing-cli__caret" aria-hidden="true"></span>' : ""}`, `target=${target}`)),
+    ].join("\n"),
+    `</div>`,
+    `<button class="luz-btn luz-btn--ghost luz-btn--sm landing-cli__pause" type="button" hidden><span data-cli-pause>${t("inside.l4.pause")}</span><span data-cli-play hidden>${t("inside.l4.play")}</span></button>`,
+    `<figcaption class="landing-cli__caption">${t("inside.l4.install.tested")}</figcaption>`,
+    `</figure>`,
+  ].join("\n");
+  return { cli: figure(false), cliloop: figure(true), cliinstall: install };
 }

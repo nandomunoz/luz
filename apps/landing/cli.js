@@ -13,6 +13,8 @@
  *   take the place of Enter, the first one focused; a question with `data-multi` toggles its buttons (aria-pressed)
  *   and goes on with its Continue button. After the last line, the button plays the session again from the start.
  * - On the home (`data-landing-cli="loop"`), nobody answers: the session plays by itself, a line at a time, once it
+ *   is in view. A loop with `data-rounds` ("target=claude target=codex …", the home's install) plays one round per
+ *   value, the lines of that value only; the first is the one shown without JavaScript. The session plays, once it
  *   is in view; at a question its answers show and the animation picks one; at the end it starts over with other
  *   answers, round after round. A button pauses it (WCAG 2.2.2), it stops while it is out of view or the tab is
  *   hidden, and with reduced motion it does not run at all: the session of the default answers stays whole. While it
@@ -41,9 +43,16 @@ function session(cli) {
   const items = screen ? [...screen.children] : [];
   const asks = items.filter((item) => item.matches(".landing-cli__choices"));
 
-  // The default answers are the ones the markup shows without JavaScript: the pressed buttons
+  // The rounds of a loop that has them (data-rounds="target=claude target=codex …"): the first is the default
+  const rounds = (cli.dataset.rounds ?? "").split(/\s+/).filter(Boolean);
+
+  // The default answers are the ones the markup shows without JavaScript: the pressed buttons, and the first round
   const defaults = () => {
     const answers = { agent: new Set() };
+    if (rounds.length) {
+      const [key, value] = rounds[0].split("=");
+      answers[key] = value;
+    }
     for (const ask of asks) {
       for (const button of ask.querySelectorAll("[data-value]")) {
         button.dataset.default ??= button.getAttribute("aria-pressed");
@@ -60,6 +69,7 @@ function session(cli) {
     screen,
     items,
     asks,
+    rounds,
     answers: defaults(),
     shown: new Set(),
     answered: new Set(),
@@ -264,6 +274,11 @@ function playByItself(cli) {
   const startOver = () => {
     round += 1;
     s.reset();
+    // A loop with rounds (the home's install, one per assistant) takes the next one
+    if (s.rounds.length) {
+      const [key, value] = s.rounds[round % s.rounds.length].split("=");
+      s.answers[key] = value;
+    }
     show();
   };
 
