@@ -5360,25 +5360,91 @@ home-light:defined ~ .landing-light__nojs {
   margin: 0;
 }
 
-/* A table scrolls inside its panel on a narrow screen, from the keyboard too */
-.landing-ai__scroll {
-  overflow-x: auto;
+/* Below the steps the page is ordered by goal (owner, 2026-11-25): a strip of the assistants, four sections of cards
+   with an icon, a title and the sentence you say or the command that runs, and a strip of what you decide */
+.landing-ai-works {
+  display: grid;
+  justify-items: center;
+  gap: var(--luz-space-xs);
+  text-align: center;
 }
 
-.landing-ai__table {
-  inline-size: 100%;
+.landing-ai-works__title {
+  margin: 0;
+  font-family: var(--luz-font-sans);
+  font-size: var(--luz-text-sm);
+  font-weight: 600;
+  color: var(--luz-text-secondary);
+}
+
+.landing-ai-works__list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--luz-space-xs) var(--luz-space-md);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--luz-font-sans);
+  font-weight: 600;
+  color: var(--luz-text-primary);
+}
+
+.landing-ai-works__note {
+  margin: 0;
+  max-inline-size: 40rem;
+  font-size: var(--luz-text-sm);
+  color: var(--luz-text-secondary);
+}
+
+.landing-ai-goal {
+  display: grid;
+  gap: var(--luz-space-lg);
+  min-inline-size: 0;
+  scroll-margin-block-start: var(--luz-space-2xl);
+}
+
+.landing-ai-goal__head {
+  display: grid;
+  justify-items: start;
+  gap: var(--luz-space-xs);
+  max-inline-size: 44rem;
+}
+
+.landing-ai-goal__head > * {
   margin: 0;
 }
 
-.landing-ai__table th[scope="row"] {
-  white-space: nowrap;
+.landing-ai__icon {
+  inline-size: 1.75rem;
+  block-size: 1.75rem;
+  fill: none;
+  stroke: var(--luz-brand-primary);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .landing-ai__card {
-  grid-template-rows: auto 1fr auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--luz-space-xs);
 }
 
+.landing-ai__card .landing-card__title {
+  font-size: var(--luz-text-base);
+}
+
+.landing-ai__id {
+  margin: 0;
+  font-size: var(--luz-text-xs);
+  color: var(--luz-text-secondary);
+}
+
+/* The text takes the room, so what you say sits at the foot of every card of a row */
 .landing-ai__text {
+  flex: 1;
   margin: 0;
   font-size: var(--luz-text-sm);
   color: var(--luz-text-secondary);
@@ -5394,9 +5460,72 @@ home-light:defined ~ .landing-light__nojs {
   color: var(--luz-text-secondary);
 }
 
-.landing-ai__limits {
-  display: grid;
-  gap: var(--luz-space-sm);
+/* At 400 % text nothing keeps to one line: a badge, a link and the hosts wrap inside their card (WCAG 1.4.10) */
+.landing-ai__card > *,
+.landing-ai-goal__head > * {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+
+.landing-ai__meta > *,
+.landing-ai-goal__head .landing-block__link {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  white-space: normal;
+}
+
+.landing-ai__ask {
+  display: flex;
+  gap: var(--luz-space-xs);
+  align-self: stretch;
+  min-inline-size: 0;
   margin: 0;
-  padding-inline-start: var(--luz-space-lg);
+  padding: var(--luz-space-xs) var(--luz-space-sm);
+  border-radius: var(--luz-radius-sm);
+  background: color-mix(in oklab, var(--luz-text-primary) 6%, var(--luz-surface-page));
+  font-size: var(--luz-text-sm);
+}
+
+.landing-ai__ask code {
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+}
+
+.landing-ai__mark {
+  color: var(--luz-brand-primary);
+  font-family: var(--luz-font-mono);
+}
+
+.landing-ai-decide {
+  display: grid;
+  gap: var(--luz-space-md);
+  /* A share of the width caps it at 400 % text, as the panels do; at any usual size the token is the smaller */
+  padding: min(var(--luz-space-lg), 5%);
+  border: 1px solid var(--luz-divider);
+  border-radius: var(--luz-radius-md);
+  background: color-mix(in oklab, var(--luz-brand-primary) 5%, var(--luz-surface-page));
+}
+
+.landing-ai-decide > * {
+  margin: 0;
+}
+
+.landing-ai-decide__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  gap: var(--luz-space-md);
+  padding: 0;
+  list-style: none;
+}
+
+.landing-ai-decide__list > li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: var(--luz-space-xs);
+  font-size: var(--luz-text-sm);
+}
+
+.landing-ai-decide .landing-ai__icon {
+  stroke: var(--luz-color-success);
 }

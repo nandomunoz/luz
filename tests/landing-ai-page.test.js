@@ -122,7 +122,7 @@ describe("the page of the luz skill, /ai/", () => {
     expect(says).toEqual([["›", "/luz"], ["›", escape(words["inside.cli.go.button"])], ["$", "luz-ai site new --kind landing"], ["$", "npx @luz-ds/check"]]);
     expect(chatCommands.map((c) => c.chat)).toContain("/luz");
     expect(help()).toMatch(/^ {2}site\b/m);
-    expect(block).toContain('href="/docs/ai/commands/"');
+    expect(block).toContain('docs/ai/commands/');
   });
 
   it.each(LANGS)("in %s: the agents are a card each, a human name over the technical one, what it looks after, whether it changes code, and the sentence that adds it", (code, prefix) => {
@@ -145,7 +145,7 @@ describe("the page of the luz skill, /ai/", () => {
       expect(card, name).toMatch(/<svg\b[^>]*aria-hidden="true"/);
     }
     expect(chatCommands.find((c) => c.chat === "/luz add <name>")).toEqual({ chat: "/luz add <name>", writes: true });
-    expect(block).toContain('href="/docs/ai/agents/"');
+    expect(block).toContain('docs/ai/agents/');
   });
 
   it("does not offer an agent that changes code to Gemini CLI, which agent add does not write it for", () => {

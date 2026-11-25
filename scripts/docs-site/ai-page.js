@@ -1,9 +1,11 @@
 /**
  * LUZ — the page of the luz skill (apps/landing/levels/ai.html, route /ai/).
  *
- * For a developer who does not yet know what `@luz-ds/ai` gives: what the skill does, the agents and skills it can
- * add to a project, the assistants it installs itself for, and what it never does. Everything that is a fact of the
- * package is read from `packages/ai/skills/luz/` and never typed:
+ * For a developer who is deciding whether `@luz-ds/ai` is for their project (owner, 2026-11-25): below the hero and the
+ * three steps the page is ordered by what the reader wants, not by the parts of the tool: the assistants it works
+ * with (a strip), how to start a site, the agents that look after what every project needs, the skills for the
+ * details, how to keep the project in shape, and what you decide (a strip). The tables of commands and of targets
+ * are in /docs/ai/. Everything that is a fact of the package is read from `packages/ai/skills/luz/` and never typed:
  *
  *  - the agents: `assets/agents/*.md`, their `name` and `tools`. An agent with a tool of `acting` (tool-map.json)
  *    changes code; the others only read and propose. An acting tool with no verified name for Gemini CLI leaves the
@@ -13,17 +15,13 @@
  *    starts with a shebang, which the bundle of vite.config.js cannot import);
  *  - the hero's numbers: agents, skills, assistants and the dependencies of `packages/ai/package.json`.
  *
- * The words are the landing's catalogs (`level.ai.*`): a key per agent, per skill and per command, so a new agent
+ * The words are the landing's catalogs (`level.ai.*`): a title and a text per agent and per skill, so a new agent
  * with no words fails the build, and words for an agent that is gone are a key no template uses.
  */
 import { readFileSync, readdirSync } from "node:fs";
 import { resolve } from "node:path";
-import { commandRows } from "./ai-commands.js";
 
 const SKILL_DIR = "packages/ai/skills/luz";
-
-/** The commands the page explains, in the order a person meets them; each is a command of `luz-ai --help`. */
-export const AI_COMMANDS = ["init", "site new", "agent add", "skill add", "doctor", "check"];
 
 /** The assistant each target of `init` is for: names of products, not words to translate (agents-md is the catalog's). */
 const ASSISTANTS = { claude: "Claude Code", codex: "Codex", gemini: "Gemini CLI", cursor: "Cursor" };
@@ -69,65 +67,106 @@ export function aiFacts(root) {
   return { agents, skills, targets, dependencies };
 }
 
+/** Stroke icons of the cards (24 x 24, drawn like the home's): a path for each piece of the page. */
+const ICONS = {
+  ask: "M4.5 5h15v10.5H10L6 19v-3.5H4.5Z",
+  plan: "M5 6h14M5 12h14M5 18h9",
+  write: "M7 3.5h7l4 4V20.5H7ZM14 3.5v4h4",
+  check: "M12 3.5a8.5 8.5 0 1 0 0 17 8.5 8.5 0 0 0 0-17ZM8.5 12l2.5 2.5 4.5-5",
+  doctor: "M3 12h4l2.5-6 4 12 2.5-6H21",
+  validate: "M5 5h14v14H5ZM9 12l2.5 2.5L15.5 9.5",
+  "luz-seo-geo-specialist": "M11 5a6 6 0 1 0 0 12 6 6 0 0 0 0-12ZM20 20l-4.2-4.2",
+  "luz-accessibility-auditor": "M12 3.5a2 2 0 1 0 0 4 2 2 0 0 0 0-4ZM5 9h14M12 9v5m0 0-3 6m3-6 3 6",
+  "luz-core-web-vitals-optimizer": "M13 3 5 13.5h6L10 21l8-10.5h-6Z",
+  "luz-ai-auditor": "M12 3.5 5 6v5.5c0 4.2 3 7.4 7 9 4-1.6 7-4.8 7-9V6ZM9 12l2.2 2.2L15 10",
+  "luz-landing": "M4 5h16v14H4ZM4 10h16M9 10v9",
+  "luz-readme": "M5 4.5h10.5a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3ZM5 17a3 3 0 0 1 3-3h10.5",
+  promise: "M12 3.5a8.5 8.5 0 1 0 0 17 8.5 8.5 0 0 0 0-17ZM8.5 12l2.5 2.5 4.5-5",
+};
+
 /**
- * The placeholders of the page: {{aiblocks}} (five blocks in the sides of the home, `block` is levelBlock() of
- * site.js) and the hero's numbers {{naiagents}}, {{naiskills}}, {{naitargets}} and {{ndepsai}}.
+ * The placeholders of the page: {{aiblocks}} (the assistants' strip, four goals with cards and the strip of what you
+ * decide) and the hero's numbers {{naiagents}}, {{naiskills}}, {{naitargets}} and {{ndepsai}}.
  */
-export function aiSections({ say, root, block, escapeHtml }) {
+export function aiSections({ say, root, escapeHtml }) {
   const t = (key) => escapeHtml(say(key));
   const { agents, skills, targets, dependencies } = aiFacts(root);
   const code = (text) => `<code>${escapeHtml(text)}</code>`;
-  const docs = [{ href: "/docs/ai/#skill", label: t("level.ai.docs"), count: "" }];
+  const icon = (id) => {
+    if (!ICONS[id]) throw new Error(`scripts/docs-site/ai-page.js: no icon for "${id}": add its path to ICONS`);
+    return `<svg class="landing-ai__icon" viewBox="0 0 24 24" aria-hidden="true"><path d="${ICONS[id]}"/></svg>`;
+  };
+  // What you say to the assistant (›) or what the skill runs ($), under the card's text: the sentence or the command, not a word to translate
+  const ask = (sign, inner) => `<p class="landing-ai__ask"><span class="landing-ai__mark" aria-hidden="true">${sign}</span> ${inner}</p>`;
+  const card = (id, title, text, extra, foot, mod = "") =>
+    `<article class="landing-card landing-ai__card${mod}">${icon(id)}<p class="landing-card__title">${title}</p>${extra}<p class="landing-ai__text">${text}</p>${foot}</article>`;
+  const goal = (id, links, cards) =>
+    [
+      `<section class="landing-ai-goal" id="a-${id}" aria-labelledby="a-${id}-title">`,
+      `  <div class="landing-ai-goal__head">`,
+      `    <h2 class="landing-inside__title" id="a-${id}-title">${t(`level.ai.${id}.title`)}</h2>`,
+      `    <p class="landing-inside__lead">${t(`level.ai.${id}.lead`)}</p>`,
+      links.length ? `    <ul class="landing-block__groups">${links.map((l) => `<li><a class="landing-block__link" href="${l.href}">${l.label}</a></li>`).join("")}</ul>` : "",
+      `  </div>`,
+      `  <div class="landing-cards landing-ai__cards">${cards}</div>`,
+      `</section>`,
+    ]
+      .filter(Boolean)
+      .join("\n");
 
-  const chat = [
-    `<table class="luz-table landing-ai__table">`,
-    `<thead><tr><th scope="col">${t("level.ai.does.command")}</th><th scope="col">${t("level.ai.does.what")}</th><th scope="col">${t("level.ai.commands.writes")}</th></tr></thead>`,
-    `<tbody>${commandRows(root).map((r) => `<tr><th scope="row">${code(r.chat)}</th><td>${t(`level.ai.chat.${r.slug}`)}</td><td>${t(r.writes ? "level.ai.commands.yes" : "level.ai.commands.no")}</td></tr>`).join("")}</tbody>`,
-    `</table>`,
-  ].join("");
-  const commandsDocs = [{ href: "/docs/ai/commands/", label: t("level.ai.commands.link"), count: "" }];
+  // The assistants it installs itself for, by name (no logos: they are not ours, nor MIT), and where it is tested
+  const works = [
+    `<section class="landing-ai-works" id="a-assistants" aria-labelledby="a-assistants-title">`,
+    `  <h2 class="landing-ai-works__title" id="a-assistants-title">${t("level.ai.assistants.title")}</h2>`,
+    `  <ul class="landing-ai-works__list">${targets.map((x) => `<li>${x.assistant ? `<bdi>${x.assistant}</bdi>` : t("level.ai.assistants.agents-md")}</li>`).join("")}</ul>`,
+    `  <p class="landing-ai-works__note">${t("level.ai.assistants.tested")}</p>`,
+    `</section>`,
+  ].join("\n");
 
-  const commands = [
-    `<table class="luz-table landing-ai__table">`,
-    `<thead><tr><th scope="col">${t("level.ai.does.command")}</th><th scope="col">${t("level.ai.does.what")}</th></tr></thead>`,
-    `<tbody>${AI_COMMANDS.map((c) => `<tr><th scope="row">${code(c)}</th><td>${t(`level.ai.command.${c.replace(" ", "-")}`)}</td></tr>`).join("")}</tbody>`,
-    `</table>`,
+  // How a session goes, a card for each phase; the last two are run by the skill itself
+  const start = [
+    card("ask", t("level.ai.start.ask.title"), t("level.ai.start.ask.text"), "", ask("›", code("/luz"))),
+    card("plan", t("level.ai.start.plan.title"), t("level.ai.start.plan.text"), "", ask("›", code(say("inside.cli.go.button")))),
+    card("write", t("level.ai.start.write.title"), t("level.ai.start.write.text"), "", ask("$", code("luz-ai site new --kind landing"))),
+    card("check", t("level.ai.start.check.title"), t("level.ai.start.check.text"), "", ask("$", code("npx @luz-ds/check"))),
   ].join("");
 
   const agentCards = agents
-    .map(
-      (a) =>
-        `<article class="landing-card landing-ai__card landing-ai__card--${a.acts ? "acts" : "reads"}">` +
-        `<p class="landing-card__title">${code(a.name)}</p>` +
-        `<p class="landing-ai__text">${t(`level.ai.agent.${a.name}`)}</p>` +
-        `<p class="landing-ai__meta"><span class="luz-badge${a.acts ? " luz-badge--primary" : " luz-badge--gray"}">${t(a.acts ? "level.ai.agents.acts" : "level.ai.agents.reads")}</span> <span>${t("level.ai.agents.for")} ${a.hosts.map((h) => `<bdi>${h}</bdi>`).join(" · ")}</span></p>` +
-        `</article>`,
+    .map((a) =>
+      card(
+        a.name,
+        t(`level.ai.agent.${a.name}.title`),
+        t(`level.ai.agent.${a.name}.text`),
+        `<p class="landing-ai__id">${code(a.name)}</p>`,
+        `<p class="landing-ai__meta"><span class="luz-badge${a.acts ? " luz-badge--primary" : " luz-badge--gray"}">${t(a.acts ? "level.ai.agents.acts" : "level.ai.agents.reads")}</span> <span>${t("level.ai.agents.for")} ${a.hosts.map((h) => `<bdi>${h}</bdi>`).join(" · ")}</span></p>${ask("›", code(`/luz add ${a.name}`))}`,
+        ` landing-ai__card--${a.acts ? "acts" : "reads"}`,
+      ),
     )
     .join("");
 
   const skillCards = skills
-    .map((s) => `<article class="landing-card landing-ai__card"><p class="landing-card__title">${code(s)}</p><p class="landing-ai__text">${t(`level.ai.skill.${s}`)}</p><p class="landing-ai__meta">${code(`skill add ${s}`)}</p></article>`)
+    .map((s) => card(s, t(`level.ai.skill.${s}.title`), t(`level.ai.skill.${s}.text`), `<p class="landing-ai__id">${code(s)}</p>`, ask("›", code(`/luz add ${s}`))))
     .join("");
 
-  const assistants = [
-    `<table class="luz-table landing-ai__table">`,
-    `<thead><tr><th scope="col">--target</th><th scope="col">${t("level.ai.assistants.who")}</th><th scope="col">${t("level.ai.assistants.where")}</th></tr></thead>`,
-    `<tbody>${targets.map((x) => `<tr><th scope="row">${code(x.id)}</th><td>${x.assistant ? `<bdi>${x.assistant}</bdi>` : t("level.ai.assistants.agents-md")}</td><td>${code(x.folder)}</td></tr>`).join("")}</tbody>`,
-    `</table>`,
+  // The two commands of the chat that only read, so they never change the project
+  const keep = [
+    card("doctor", t("level.ai.keep.doctor.title"), t("level.ai.keep.doctor.text"), "", ask("›", code("/luz doctor"))),
+    card("validate", t("level.ai.keep.check.title"), t("level.ai.keep.check.text"), "", ask("›", code("/luz check"))),
   ].join("");
 
-  const limits = `<ul class="landing-ai__limits">${[1, 2, 3, 4, 5].map((n) => `<li>${t(`level.ai.limits.${n}`)}</li>`).join("")}</ul>`;
+  // What you decide: the guarantees of the skill, in a row of five
+  const decide = [
+    `<section class="landing-ai-decide" id="a-decide" aria-labelledby="a-decide-title">`,
+    `  <h2 class="landing-inside__title" id="a-decide-title">${t("level.ai.limits.title")}</h2>`,
+    `  <p class="landing-inside__lead">${t("level.ai.limits.lead")}</p>`,
+    `  <ul class="landing-ai-decide__list">${[1, 2, 3, 4, 5].map((n) => `<li>${icon("promise")}<span>${t(`level.ai.limits.${n}`)}</span></li>`).join("")}</ul>`,
+    `</section>`,
+  ].join("\n");
 
-  const BLOCKS = [
-    ["commands", `<div class="landing-ai__scroll" tabindex="0" role="region" aria-label="${t("level.ai.commands.title")}">${chat}</div>`, commandsDocs],
-    ["does", `<div class="landing-ai__scroll" tabindex="0" role="region" aria-label="${t("level.ai.does.command")}">${commands}</div>`, docs],
-    ["agents", `<div class="landing-cards">${agentCards}</div>`, []],
-    ["skills", `<div class="landing-cards">${skillCards}</div>`, []],
-    ["assistants", `<div class="landing-ai__scroll" tabindex="0" role="region" aria-label="${t("level.ai.assistants.who")}">${assistants}</div>`, docs],
-    ["limits", limits, []],
-  ];
+  const commandsDocs = [{ href: "/docs/ai/commands/", label: t("level.ai.commands.link") }];
+  const agentsDocs = [{ href: "/docs/ai/agents/", label: t("level.ai.agents.link") }];
   return {
-    aiblocks: BLOCKS.map(([id, panel, links], i) => block({ i, id, anchor: "a", wide: true, title: t(`level.ai.${id}.title`), lead: t(`level.ai.${id}.lead`), links, panel })).join("\n"),
+    aiblocks: [works, goal("start", commandsDocs, start), goal("agents", agentsDocs, agentCards), goal("skills", agentsDocs, skillCards), goal("keep", commandsDocs, keep), decide].join("\n"),
     naiagents: String(agents.length),
     naiskills: String(skills.length),
     naitargets: String(targets.length),

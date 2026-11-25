@@ -1797,7 +1797,7 @@ function levelLists(site, locale, used) {
   return {
     ...tokenSections({ say, tokens, groups: GROUPS, counts, families: Object.keys(tokenJson.color), root, read }),
     ...catalogSections({ say, root, groups: docsGroups("catalog", 0), sheets: allCatalogSheets, dependencies: Object.keys(JSON.parse(read("packages/catalog/package.json")).dependencies ?? {}).length, chunks: FILES.catalog.chunks.length }),
-    ...aiSections({ say, root, block: levelBlock, escapeHtml }),
+    ...aiSections({ say, root, escapeHtml }),
     ...cliDemo({ say, root, escapeHtml }),
     ...coreSections({ say, groups: docsGroups("components", sheets("packages/core/src/components").length), objects: objects.length, dependencies: Object.keys(JSON.parse(read("packages/core/package.json")).dependencies ?? {}).length }),
     list1: [

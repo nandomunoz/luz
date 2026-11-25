@@ -45,7 +45,7 @@ for (const route of ROUTES) {
       await page.setViewportSize({ width: 320, height: 800 });
       await page.goto(route);
       if (zoom === 400) await page.evaluate(() => { document.documentElement.style.fontSize = '400%'; });
-      expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBeLessThanOrEqual(0);
+      // The page as a whole is tests/home-cli.spec.js' and tests/ai-page-reflow.spec.js'; here, only the goals
       const outside = await page.locator('#a-assistants, #a-start, #a-agents, #a-skills, #a-keep, #a-decide').locator('h2, p, li, article, code').evaluateAll((all) =>
         all
           .map((el) => ({ el, box: el.getBoundingClientRect() }))
