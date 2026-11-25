@@ -75,6 +75,25 @@ describe("the agents of luz-ai", () => {
     expect(text).toMatch(/never change the stance yourself/);
   });
 
+  it("optimiza names the files it never edits, keeps its edit gated on a list the user approved, and does not contradict itself", () => {
+    const text = agent("luz-agent-optimiza");
+    expect(text).toMatch(/Never edit[^\n]*\.claude\/[^\n]*AGENTS\.md[^\n]*\.github\/[^\n]*package\.json[^\n]*lockfile/);
+    expect(text).toMatch(/first answer is only the list[^\n]*stop/i);
+    expect(text).toMatch(/quote(s|d)? the list/i);
+    // cache headers are a change to the server, which it does not make unless asked
+    expect(text).not.toMatch(/cache headers\./);
+    // an element added after the scan needs its chunk imported by hand (AGENTS.md)
+    expect(text).not.toMatch(/do not import every chunk by hand/);
+    // no shell is true in Claude Code only: the text says where it is not
+    expect(text).toMatch(/no shell in Claude Code/);
+  });
+
+  it("agent add writes optimiza for Codex with a note that the file cannot limit its tools, so the sandbox of the session does", () => {
+    const out = execFileSync(process.execPath, [join(root, "packages/ai/skills/luz/scripts/luz.mjs"), "agent", "add", "luz-agent-optimiza", "--for", "codex", "--dir", join(root, "node_modules/.cache/luz-agent-codex-test"), "--dry-run"], { encoding: "utf-8" });
+    expect(out).toMatch(/luz-agent-optimiza for codex: the agent's file cannot limit its tools/);
+    expect(out).toMatch(/set the sandbox of the session/);
+  });
+
   it("lint passes every agent of the package", () => {
     const out = execFileSync(process.execPath, [join(root, "packages/ai/skills/luz/scripts/luz.mjs"), "lint", "--json", join(root, AGENTS)], { encoding: "utf-8" });
     expect(JSON.parse(out).problems).toEqual([]);
