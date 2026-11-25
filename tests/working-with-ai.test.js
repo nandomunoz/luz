@@ -43,7 +43,7 @@
  *                    of the rules that block and the second of the ones that
  *                    warn; each rule id of messages.js once; the severity is
  *                    the word `block` or `warn` of the registry.
- *     agent          `npx @luz-ds/check agent > .claude/agents/luz-accessibility-reviewer.md`,
+ *     agent          `npx @luz-ds/check agent > .claude/agents/luz-agent-accessibility.md`,
  *                    the three tools of the published file, read-only, that the
  *                    `>` overwrites a file, and that it does not use assistive
  *                    technology.
@@ -114,7 +114,7 @@ const CHECK = JSON.parse(readFileSync(join(import.meta.dirname, "..", "packages"
 const PROMPT =
   `Use LUZ for the markup. Read ${SITE_URL}llms.txt first and use only the classes in each package's classes.json. ` +
   `After you write HTML or CSS, run \`npx @luz-ds/check@${CHECK}\` on the files and fix every finding before you answer.`;
-const AGENT_COMMAND = `npx @luz-ds/check@${CHECK} agent > .claude/agents/luz-accessibility-reviewer.md`;
+const AGENT_COMMAND = `npx @luz-ds/check@${CHECK} agent > .claude/agents/luz-agent-accessibility.md`;
 const NOT_TESTED = "/docs/accessibility/#h-a11y-not-tested";
 const STATEMENT_BULLET =
   "The accessibility reviewer that @luz-ds/check prints, and luz-check itself. They read source files and give advice; " +

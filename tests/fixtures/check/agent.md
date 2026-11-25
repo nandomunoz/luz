@@ -1,5 +1,5 @@
 ---
-name: luz-accessibility-reviewer
+name: luz-agent-accessibility
 description: Reviews the HTML, CSS and JavaScript of a web project for accessibility against WCAG 2.2 level AA and EN 301 549, reading source files only. Use it when a page or a component is written or changed. It reads your files and writes nothing.
 tools: Read, Grep, Glob
 ---

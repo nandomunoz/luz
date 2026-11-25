@@ -71,7 +71,7 @@ describe("@luz-ds/check: package.json", () => {
     expect(exports, "an exports map").toBeTypeOf("object");
     expect(exports["./package.json"]).toBe("./package.json");
     expect(Object.keys(exports).filter((key) => !["./package.json", "./agents/accessibility.md"].includes(key))).toEqual([]);
-    if ("./agents/accessibility.md" in exports) expect(exports["./agents/accessibility.md"]).toBe("./dist/agents/luz-accessibility-reviewer.md");
+    if ("./agents/accessibility.md" in exports) expect(exports["./agents/accessibility.md"]).toBe("./dist/agents/luz-agent-accessibility.md");
   });
 
   it("ships dist and LICENSE, and has no side effects to keep", () => {

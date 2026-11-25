@@ -708,6 +708,18 @@ describe("the agents of luz-ai", () => {
   const list = (kind) => JSON.parse(run([kind, "list", "--json"]).out);
   const bodyOf = (text) => text.replace(/^---\n[\s\S]*?\n---\n+/, "").trim();
   const add = (d, name, flags = []) => run(["agent", "add", name, "--dir", d, "--json", ...flags]);
+  // The agent of the package has no field to fill, so the mechanics of fields are tried on a copy of the skill with a template that has them
+  let templateScript;
+  const template = () => {
+    if (!templateScript) {
+      const copy = join(dir(), "luz");
+      cpSync(skill, copy, { recursive: true });
+      cpSync(join(root, "tests/fixtures/ai/luz-agent-template.md"), join(copy, "assets/agents/luz-agent-template.md"));
+      templateScript = join(copy, "scripts/luz.mjs");
+    }
+    return templateScript;
+  };
+  const tadd = (d, flags = [], extra = ["--json"]) => spawnSync(process.execPath, [template(), "agent", "add", "luz-agent-template", "--dir", d, ...extra, ...flags], { encoding: "utf-8" });
 
   it("are named luz-agent-<word>, one clear word for what each looks after, kept here and passing the check", () => {
     expect(list("agent").map((a) => a.name)).toEqual(AGENTS);
@@ -723,20 +735,20 @@ describe("the agents of luz-ai", () => {
     expect(run(["--help"]).out).not.toMatch(/\bskill {5}/);
   });
 
-  it("knows what LUZ already does, and leaves what the person must answer as a field", () => {
-    const text = read(join(assets, "agents/luz-agent-accessibility.md"));
-    expect(text).toMatch(/## What LUZ already does/);
-    expect(text).toContain("@luz-ds/check");
+  it("is the reviewer of @luz-ds/check, built from the same source, so there is one accessibility agent and not two", async () => {
+    const { buildAgent } = await import("../scripts/build-check.js");
+    expect(read(join(assets, "agents/luz-agent-accessibility.md"))).toBe(buildAgent());
+    expect(list("agent").find((a) => a.name === "luz-agent-accessibility").fields).toEqual([]);
   });
 
-  it("have every agent a startup rule that stops while a field is left, and every field a hint", () => {
+  it("has a startup rule that stops while a field is left, in every agent that has a field", () => {
+    const text = read(join(root, "tests/fixtures/ai/luz-agent-template.md"));
+    expect(text).toMatch(/Startup rule/);
+    expect(text).toMatch(/stop and tell the user which fields are missing/);
     for (const a of AGENTS) {
-      const text = read(join(assets, "agents", `${a}.md`));
-      expect(text, a).toMatch(/Startup rule/);
-      expect(text, a).toMatch(/\[ADAPT: \.\.\.\]/);
-      expect(text, a).toMatch(/stop and tell the user which fields are missing/);
+      const own = read(join(assets, "agents", `${a}.md`));
+      if (/\[ADAPT: /.test(own)) expect(own, a).toMatch(/stop and tell the user which fields are missing/);
     }
-    for (const a of list("agent")) expect(a.fields.length, a.name).toBeGreaterThan(5);
   });
 
   it("have a way in the catalogue for what the person says matters, and every name in it exists", () => {
@@ -787,43 +799,38 @@ describe("the agents of luz-ai", () => {
 
   it("fills the fields it is given, one plain line each, and leaves the rest [ADAPT], the stop rule untouched", () => {
     const d = dir();
-    const r = add(d, "luz-agent-accessibility", ["--for", "claude", "--set", "Target conformance level=WCAG 2.2 AA", "--set", "Site languages=English and Arabic"]);
-    const out = JSON.parse(r.out);
+    const r = tadd(d, ["--for", "claude", "--set", "Target conformance level=WCAG 2.2 AA", "--set", "Site languages=English and Arabic"]);
+    expect(r.status, r.stderr).toBe(0);
+    const out = JSON.parse(r.stdout);
     expect(out.filled.map((f) => f.field)).toEqual(["Target conformance level", "Site languages"]);
-    expect(out.unfilled).toHaveLength(5);
-    const text = read(join(d, ".claude/agents/luz-agent-accessibility.md"));
+    expect(out.unfilled).toHaveLength(6);
+    const text = read(join(d, ".claude/agents/luz-agent-template.md"));
     expect(text).toContain("- Target conformance level: WCAG 2.2 AA\n");
     expect(text).toContain("- Site languages: English and Arabic\n");
-    expect((text.match(/\[ADAPT: [^\n]*\]\n/g) ?? []).length).toBe(5);
-    // Only the filled lines differ from the package's text
-    const was = bodyOf(read(join(assets, "agents/luz-agent-accessibility.md"))).split("\n");
+    expect((text.match(/\[ADAPT: [^\n]*\]\n/g) ?? []).length).toBe(6);
+    const was = bodyOf(read(join(root, "tests/fixtures/ai/luz-agent-template.md"))).split("\n");
     const now = bodyOf(text).split("\n");
     expect(now.length).toBe(was.length);
     expect(now.filter((l, i) => l !== was[i])).toEqual(["- Target conformance level: WCAG 2.2 AA", "- Site languages: English and Arabic"]);
-    expect(text).toMatch(/If it still contains\n?\s*`\[ADAPT: \.\.\.\]`|`\[ADAPT: \.\.\.\]` placeholders, stop/);
   });
 
   it("fills a field under a parent by Parent/Label", () => {
-    const copy = join(dir(), "luz");
-    cpSync(skill, copy, { recursive: true });
-    const source = read(join(assets, "agents/luz-agent-accessibility.md"));
-    writeFileSync(join(copy, "assets/agents/luz-agent-nested.md"), source.replace("name: luz-agent-accessibility", "name: luz-agent-nested").replace("- Audit scope:", "- Commands:\n  - Build: [ADAPT: the command that builds the site]\n- Audit scope:"));
     const d = dir();
-    const r = spawnSync(process.execPath, [join(copy, "scripts/luz.mjs"), "agent", "add", "luz-agent-nested", "--for", "claude", "--dir", d, "--set", "Commands/Build=npm run build", "--json"], { encoding: "utf-8" });
+    const r = tadd(d, ["--for", "claude", "--set", "Commands/Build=npm run build"]);
     expect(r.status, r.stderr).toBe(0);
     expect(JSON.parse(r.stdout).filled).toEqual([{ field: "Commands/Build", value: "npm run build" }]);
-    expect(read(join(d, ".claude/agents/luz-agent-nested.md"))).toContain("  - Build: npm run build\n");
+    expect(read(join(d, ".claude/agents/luz-agent-template.md"))).toContain("  - Build: npm run build\n");
   });
 
   it("refuses a field that is not the agent's, and a value that is not one plain line", () => {
-    const bad = (extra) => add(dir(), "luz-agent-accessibility", ["--for", "claude", ...extra]);
-    expect(bad(["--set", "Nothing=x"]).code).toBe(2);
-    expect(bad(["--set", "Audit scope"]).code).toBe(2);
-    expect(bad(["--set", "Audit scope=one\ntwo"]).code).toBe(2);
-    expect(bad(["--set", "Audit scope=a\u202Eb"]).code).toBe(2);
-    expect(bad(["--set", "Audit scope=[ADAPT: more]"]).code).toBe(2);
-    expect(bad(["--set", `Audit scope=${"x".repeat(301)}`]).code).toBe(2);
-    expect(bad(["--set", `Audit scope=${"x".repeat(300)}`]).code).toBe(0);
+    const bad = (extra) => tadd(dir(), ["--for", "claude", ...extra]).status;
+    expect(bad(["--set", "Nothing=x"])).toBe(2);
+    expect(bad(["--set", "Audit scope"])).toBe(2);
+    expect(bad(["--set", "Audit scope=one\ntwo"])).toBe(2);
+    expect(bad(["--set", "Audit scope=a\u202Eb"])).toBe(2);
+    expect(bad(["--set", "Audit scope=[ADAPT: more]"])).toBe(2);
+    expect(bad(["--set", `Audit scope=${"x".repeat(301)}`])).toBe(2);
+    expect(bad(["--set", `Audit scope=${"x".repeat(300)}`])).toBe(0);
   });
 
   it("asks for what is missing, says which, and never overwrites without --force", () => {
@@ -841,15 +848,15 @@ describe("the agents of luz-ai", () => {
 
   it("writes nothing with --dry-run and prints the files, the fields filled and the fields left", () => {
     const d = dir();
-    const r = run(["agent", "add", "luz-agent-accessibility", "--for", "claude,codex", "--dir", d, "--set", "Audit scope=src", "--dry-run"]);
-    expect(r.code).toBe(0);
+    const r = tadd(d, ["--for", "claude,codex", "--set", "Audit scope=src", "--dry-run"], []);
+    expect(r.status, r.stderr).toBe(0);
     expect(readdirSync(d)).toEqual([]);
-    expect(r.out.split("\n")[0]).toMatch(/would write 2 files .* 1 of 7 fields filled, 6 still \[ADAPT\]/);
-    expect(r.out).toContain("Audit scope: src");
-    expect(r.out).toContain("the agent stops and asks");
-    expect(r.out).toMatch(/note: .*codex/);
-    expect(r.out.length).toBeLessThan(3000);
-    const json = JSON.parse(run(["agent", "add", "luz-agent-accessibility", "--for", "claude", "--dir", d, "--dry-run", "--json"]).out);
+    expect(r.stdout.split("\n")[0]).toMatch(/would write 2 files .* 1 of 8 fields filled, 7 still \[ADAPT\]/);
+    expect(r.stdout).toContain("Audit scope: src");
+    expect(r.stdout).toContain("the agent stops and asks");
+    expect(r.stdout).toMatch(/note: .*codex/);
+    expect(r.stdout.length).toBeLessThan(3000);
+    const json = JSON.parse(tadd(d, ["--for", "claude", "--dry-run"]).stdout);
     expect(json.files[0].content).toContain("[ADAPT:");
   });
 
