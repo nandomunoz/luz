@@ -10,10 +10,9 @@
  *  - the agents: `assets/agents/*.md`, their `name` and `tools`. An agent with a tool of `acting` (tool-map.json)
  *    changes code; the others only read and propose. An acting tool with no verified name for Gemini CLI leaves the
  *    agent out of Gemini CLI, as `agent add` does;
- *  - the skills: `assets/skills/<name>/SKILL.md`;
  *  - the assistants: `INIT_TARGETS` of the script, with the folder each one reads (read from its text: the script
  *    starts with a shebang, which the bundle of vite.config.js cannot import);
- *  - the hero's numbers: agents, skills, assistants and the dependencies of `packages/ai/package.json`.
+ *  - the hero's numbers: agents, assistants and the dependencies of `packages/ai/package.json`.
  *
  * The words are the landing's catalogs (`level.ai.*`): a title and a text per agent and per skill, so a new agent
  * with no words fails the build, and words for an agent that is gone are a key no template uses.
@@ -55,16 +54,12 @@ export function aiFacts(root) {
       const gemini = !tools.some((t) => map.acting.includes(t) && !map.gemini[t]);
       return { name: fields.name, tools, acts, hosts: AGENT_HOSTS.filter((h) => h !== "Gemini CLI" || gemini) };
     });
-  const skills = readdirSync(resolve(dir, "assets/skills"), { withFileTypes: true })
-    .filter((e) => e.isDirectory())
-    .map((e) => frontMatter(readFileSync(resolve(dir, "assets/skills", e.name, "SKILL.md"), "utf-8"), `${SKILL_DIR}/assets/skills/${e.name}/SKILL.md`).name)
-    .sort();
   const line = /^const INIT_TARGETS = (\{.*\});$/m.exec(readFileSync(resolve(dir, "scripts/luz.mjs"), "utf-8"));
   if (!line) throw new Error(`${SKILL_DIR}/scripts/luz.mjs: no line "const INIT_TARGETS = {…};" to read the assistants of init from`);
   const INIT_TARGETS = JSON.parse(line[1].replace(/([{,]\s*)([a-z]+):/g, '$1"$2":'));
   const targets = Object.entries(INIT_TARGETS).map(([id, folders]) => ({ id, assistant: ASSISTANTS[id] ?? null, folder: folders[0] ?? "AGENTS.md" }));
   const dependencies = Object.keys(JSON.parse(readFileSync(resolve(root, "packages/ai/package.json"), "utf-8")).dependencies ?? {}).length;
-  return { agents, skills, targets, dependencies };
+  return { agents, targets, dependencies };
 }
 
 /** Stroke icons of the cards (24 x 24, drawn like the home's): a path for each piece of the page. */
@@ -75,22 +70,17 @@ const ICONS = {
   check: "M12 3.5a8.5 8.5 0 1 0 0 17 8.5 8.5 0 0 0 0-17ZM8.5 12l2.5 2.5 4.5-5",
   doctor: "M3 12h4l2.5-6 4 12 2.5-6H21",
   validate: "M5 5h14v14H5ZM9 12l2.5 2.5L15.5 9.5",
-  "luz-seo-geo-specialist": "M11 5a6 6 0 1 0 0 12 6 6 0 0 0 0-12ZM20 20l-4.2-4.2",
-  "luz-accessibility-auditor": "M12 3.5a2 2 0 1 0 0 4 2 2 0 0 0 0-4ZM5 9h14M12 9v5m0 0-3 6m3-6 3 6",
-  "luz-core-web-vitals-optimizer": "M13 3 5 13.5h6L10 21l8-10.5h-6Z",
-  "luz-ai-auditor": "M12 3.5 5 6v5.5c0 4.2 3 7.4 7 9 4-1.6 7-4.8 7-9V6ZM9 12l2.2 2.2L15 10",
-  "luz-landing": "M4 5h16v14H4ZM4 10h16M9 10v9",
-  "luz-readme": "M5 4.5h10.5a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3ZM5 17a3 3 0 0 1 3-3h10.5",
+  "luz-agent-accessibility": "M12 3.5a2 2 0 1 0 0 4 2 2 0 0 0 0-4ZM5 9h14M12 9v5m0 0-3 6m3-6 3 6",
   promise: "M12 3.5a8.5 8.5 0 1 0 0 17 8.5 8.5 0 0 0 0-17ZM8.5 12l2.5 2.5 4.5-5",
 };
 
 /**
  * The placeholders of the page: {{aiblocks}} (the assistants' strip, four goals with cards and the strip of what you
- * decide) and the hero's numbers {{naiagents}}, {{naiskills}}, {{naitargets}} and {{ndepsai}}.
+ * decide) and the hero's numbers {{naiagents}}, {{naitargets}} and {{ndepsai}}.
  */
 export function aiSections({ say, root, escapeHtml }) {
   const t = (key) => escapeHtml(say(key));
-  const { agents, skills, targets, dependencies } = aiFacts(root);
+  const { agents, targets, dependencies } = aiFacts(root);
   const code = (text) => `<code>${escapeHtml(text)}</code>`;
   const icon = (id) => {
     if (!ICONS[id]) throw new Error(`scripts/docs-site/ai-page.js: no icon for "${id}": add its path to ICONS`);
@@ -131,6 +121,9 @@ export function aiSections({ say, root, escapeHtml }) {
     card("check", t("level.ai.start.check.title"), t("level.ai.start.check.text"), "", ask("$", code("npx @luz-ds/check"))),
   ].join("");
 
+  // No agent of the package changes code now: a card for one that does needs its own badge words (and the key level.ai.agents.acts)
+  const acting = agents.find((a) => a.acts);
+  if (acting) throw new Error(`${acting.name} changes code: add its badge to the card of the agents (scripts/docs-site/ai-page.js) and the key level.ai.agents.acts to the catalogs`);
   const agentCards = agents
     .map((a) =>
       card(
@@ -138,14 +131,10 @@ export function aiSections({ say, root, escapeHtml }) {
         t(`level.ai.agent.${a.name}.title`),
         t(`level.ai.agent.${a.name}.text`),
         `<p class="landing-ai__id">${code(a.name)}</p>`,
-        `<p class="landing-ai__meta"><span class="luz-badge${a.acts ? " luz-badge--primary" : " luz-badge--gray"}">${t(a.acts ? "level.ai.agents.acts" : "level.ai.agents.reads")}</span> <span>${t("level.ai.agents.for")} ${a.hosts.map((h) => `<bdi>${h}</bdi>`).join(" · ")}</span></p>${ask("›", code(`/luz add ${a.name}`))}`,
-        ` landing-ai__card--${a.acts ? "acts" : "reads"}`,
+        `<p class="landing-ai__meta"><span class="luz-badge luz-badge--gray">${t("level.ai.agents.reads")}</span> <span>${t("level.ai.agents.for")} ${a.hosts.map((h) => `<bdi>${h}</bdi>`).join(" · ")}</span></p>${ask("›", code(`/luz add ${a.name}`))}`,
+        ` landing-ai__card--reads`,
       ),
     )
-    .join("");
-
-  const skillCards = skills
-    .map((s) => card(s, t(`level.ai.skill.${s}.title`), t(`level.ai.skill.${s}.text`), `<p class="landing-ai__id">${code(s)}</p>`, ask("›", code(`/luz add ${s}`))))
     .join("");
 
   // The two commands of the chat that only read, so they never change the project
@@ -166,9 +155,8 @@ export function aiSections({ say, root, escapeHtml }) {
   const commandsDocs = [{ href: "/docs/ai/commands/", label: t("level.ai.commands.link") }];
   const agentsDocs = [{ href: "/docs/ai/agents/", label: t("level.ai.agents.link") }];
   return {
-    aiblocks: [works, goal("start", commandsDocs, start), goal("agents", agentsDocs, agentCards), goal("skills", agentsDocs, skillCards), goal("keep", commandsDocs, keep), decide].join("\n"),
+    aiblocks: [works, goal("start", commandsDocs, start), goal("agents", agentsDocs, agentCards), goal("keep", commandsDocs, keep), decide].join("\n"),
     naiagents: String(agents.length),
-    naiskills: String(skills.length),
     naitargets: String(targets.length),
     ndepsai: String(dependencies),
   };

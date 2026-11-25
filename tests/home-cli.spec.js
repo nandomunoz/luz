@@ -14,7 +14,7 @@
  * THE PAGE OF THE SKILL (/ai/, /es/ai/, /ar/ai/) lets the visitor answer, in its hero:
  *   - the first line shows, Enter on the button brings the next one, a click in the terminal does too; a question
  *     shows its buttons in the place of Enter, the first focused; the answer picks the lines that follow (a blog in
- *     Astro, the speed agent too); the last line turns the button into Play again; the terminal keeps its height;
+ *     Astro, the accessibility agent); the last line turns the button into Play again; the terminal keeps its height;
  *   - axe passes with the whole session played, and reflow holds.
  *
  * The sources are tests/home-cli.test.js.
@@ -259,18 +259,17 @@ for (const [route, lang] of SKILL) {
       expect(await skill.cli(page).evaluate((el) => el.getBoundingClientRect().height), 'the terminal keeps its height').toBeCloseTo(height, 0);
     });
 
-    test('the answers pick what follows: a blog in Astro, with the speed agent too, then Play again starts over', async ({ page }) => {
+    test('the answers pick what follows: a blog in Astro, with the accessibility agent, then Play again starts over', async ({ page }) => {
       await openSkill(page, route);
       const height = await skill.cli(page).evaluate((el) => el.getBoundingClientRect().height);
-      await playThrough(page, { kind: 'blog', stack: 'astro', agent: ['luz-core-web-vitals-optimizer'] });
+      await playThrough(page, { kind: 'blog', stack: 'astro', agent: ['luz-agent-accessibility'] });
       const screen = skill.screen(page);
       await expect(screen).toContainText('--kind blog --stack astro');
       await expect(screen).toContainText('src/pages/index.astro');
       await expect(screen).toContainText('--ext .astro');
-      await expect(screen).toContainText('agent add luz-core-web-vitals-optimizer');
-      await expect(screen).toContainText('agent add luz-seo-geo-specialist');
+      await expect(screen).toContainText('agent add luz-agent-accessibility');
       const said = await screen.innerText();
-      expect(said).not.toContain('skill add luz-landing');
+      expect(said).not.toContain('skill add');
       expect(said).not.toContain('--kind landing');
       await expect(skill.next(page)).toHaveAccessibleName(`Enter ${words['inside.l4.replay']}`);
       expect(await skill.cli(page).evaluate((el) => el.getBoundingClientRect().height), 'the terminal keeps its height').toBeCloseTo(height, 0);
@@ -279,7 +278,7 @@ for (const [route, lang] of SKILL) {
       await expect(skill.shown(page)).toHaveCount(1);
       await expect(skill.next(page)).toHaveAccessibleName(`Enter ${words['inside.l4.next']}`);
       await expect(skill.cli(page).locator('[data-ask="kind"] [aria-pressed="true"]')).toHaveAttribute('data-value', 'landing');
-      await expect(skill.cli(page).locator('[data-ask="agent"] [aria-pressed="true"]')).toHaveCount(2);
+      await expect(skill.cli(page).locator('[data-ask="agent"] [aria-pressed="true"]')).toHaveCount(1);
     });
 
     test('the screen is a polite live region, so each new line is read out', async ({ page }) => {

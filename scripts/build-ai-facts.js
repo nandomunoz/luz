@@ -125,21 +125,15 @@ function frontOf(text) {
 
 // What the person says matters to them, and the agent for it: the choice the skill offers. The names are checked
 // against the agents the package has (tests/ai-start.test.js), so an agent renamed or removed fails there.
-const BY_NEED = [
-  ["Found by search engines and by AI assistants", "luz-seo-geo-specialist"],
-  ["Usable by everyone, with a keyboard, a screen reader or a small screen", "luz-accessibility-auditor"],
-  ["Fast on a phone", "luz-core-web-vitals-optimizer"],
-  ["The site has an AI feature (a chatbot, an assistant, AI search); a site with none does not need it", "luz-ai-auditor"],
-];
+const BY_NEED = [["Usable by everyone, with a keyboard, a screen reader or a small screen", "luz-agent-accessibility"]];
 
 function agentsReference(root) {
   const dir = join(root, SKILL, "assets");
   const agents = readdirSync(join(dir, "agents")).filter((f) => f.endsWith(".md")).sort().map((f) => frontOf(readFileSync(join(dir, "agents", f), "utf-8")));
-  const skills = readdirSync(join(dir, "skills"), { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => frontOf(readFileSync(join(dir, "skills", e.name, "SKILL.md"), "utf-8")));
   return [
-    "# The agents and skills of luz-ai",
+    "# The agents of luz-ai",
     "",
-    "Offer the ones that fit what the person says matters to them, the recommended first. Never offer one they do not need. `agent list` gives the fields of each agent.",
+    "Offer the one that fits what the person says matters to them. Never offer one they do not need. `agent list` gives the fields of each agent. Every agent is named `luz-agent-<word>`, the word being what it looks after.",
     "",
     "## By what matters to the person",
     "",
@@ -150,12 +144,6 @@ function agentsReference(root) {
     "Each is a base template with fields left to fill. `agent add <name> --for <assistants>` writes it for Claude Code, Gemini CLI or Codex. A field left out stays `[ADAPT: …]`, and the agent stops and asks until it is filled.",
     "",
     ...agents.map((a) => `- \`${a.name}\` (tools: ${a.tools}): ${a.description}`),
-    "",
-    "## Skills",
-    "",
-    "`skill add <name>` writes the skill folder in `.agents/skills` and in `.claude/skills`.",
-    "",
-    ...skills.map((s) => `- \`${s.name}\`: ${s.description}`),
     "",
   ].join("\n");
 }

@@ -2,7 +2,7 @@
 /**
  * luz.mjs: the one executable of the luz skill.
  *
- * It reads and reports; `init`, `site new`, `agent add` and `skill add` write: only the files they name, under the folder
+ * It reads and reports; `init`, `site new` and `agent add` write: only the files they name, under the folder
  * it is given, and never one that exists unless --force says so. It never asks a question, never reaches the
  * network and runs no program. It finds its own data from its own path, so it works from any folder.
  *
@@ -49,7 +49,7 @@ const BANNER = [
 /** The banner and a blank line, or nothing when stdout is not a terminal. */
 const banner = (tty) => (tty ? `${BANNER.join("\n")}\n\n` : "");
 
-const HELP = `luz-ai: starts a site with LUZ and checks the skills and subagents of a project. Only init, site new, agent add and skill add write.
+const HELP = `luz-ai: starts a site with LUZ and checks the skills and subagents of a project. Only init, site new and agent add write.
 
 Usage:
   luz-ai <command> [options]
@@ -58,7 +58,6 @@ Commands:
   init      put this skill where an assistant reads it (--target claude, codex, gemini, cursor or agents-md)
   site new  write the starter page of a kind of site and a stack (--dry-run shows it first)
   agent     list the agents of luz-ai, or add one to a project for Claude Code, Gemini CLI or Codex
-  skill     list the skills of luz-ai, or add one to a project (.agents/skills and .claude/skills)
   facts     the versions, the kinds of site and the stacks of this release
   doctor    the project, the assistants it has and whether their skills and agents pass check
   check     the front matter and the body of skills (SKILL.md) and subagents (.md)
@@ -139,19 +138,6 @@ agent that needs one it lacks is not written for gemini; Codex cannot limit tool
 
 Example:
   luz-ai agent add luz-accessibility-auditor --for claude,codex --set "Target conformance level=WCAG 2.2 AA" --dry-run
-`;
-
-const HELP_SKILL = `luz-ai skill: the skills of luz-ai.
-
-Usage:
-  luz-ai skill list [--json]
-  luz-ai skill add <name> [--dir <folder>] [--dry-run] [--force] [--json]
-
-It writes the skill folder in .agents/skills and in .claude/skills of the project, the same files in both.
-Nothing is overwritten without --force.
-
-Example:
-  luz-ai skill add luz-readme --dir . --dry-run
 `;
 
 const HELP_FACTS = `luz-ai facts: the versions of the LUZ packages, the kinds of site and the stacks of this release.
@@ -540,7 +526,7 @@ function runDoctor(dir) {
       const a = tree(join(first, entry.name));
       const b = tree(join(second, entry.name));
       const differ = [...new Set([...a.keys(), ...b.keys()])].filter((k) => a.get(k) !== b.get(k));
-      if (differ.length) warnings.push(`${entry.name} is not the same in ${SKILL_PLACES[0]} and ${SKILL_PLACES[1]} (${differ.slice(0, 3).join(", ")}${differ.length > 3 ? ", …" : ""}): run skill add ${entry.name} --force`);
+      if (differ.length) warnings.push(`${entry.name} is not the same in ${SKILL_PLACES[0]} and ${SKILL_PLACES[1]} (${differ.slice(0, 3).join(", ")}${differ.length > 3 ? ", …" : ""}): run init --target claude,codex --force`);
     }
   }
   const { checked, problems: found } = runCheck([], dir);
@@ -621,8 +607,6 @@ const ADAPT = /^\[ADAPT:\s*(.*)\]$/;
 const agentNames = () => readdirSync(join(ASSETS, "agents")).filter((f) => f.endsWith(".md")).map((f) => f.slice(0, -3)).sort();
 // This skill adds itself too: its folder is the name of its parent, and its evals stay behind
 const SELF = basename(join(HERE, ".."));
-const skillNames = () => [...readdirSync(join(ASSETS, "skills"), { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name), SELF].sort();
-const skillRoot = (name) => (name === SELF ? join(HERE, "..") : join(ASSETS, "skills", name));
 // What the skill carries when it adds itself: these, and no file or folder that starts with a dot. Nothing else in its
 // folder (evals, a stray .env, node_modules) goes into a person's project
 const CARRIES = ["SKILL.md", "agents", "assets", "references", "scripts"];
@@ -748,13 +732,6 @@ function listAgents() {
   });
 }
 
-function listSkills() {
-  return skillNames().map((name) => {
-    const { data } = parseFront(split(readFileSync(join(skillRoot(name), "SKILL.md"), "utf-8")).front, []);
-    return { name, description: data.description };
-  });
-}
-
 function runAgentAdd(values, name) {
   if (!name) return { error: `an agent is missing. Example: luz-ai agent add ${agentNames()[0]} --for claude --dir . --dry-run (agents: ${agentNames().join(", ")})` };
   if (!agentNames().includes(name)) return { error: `"${name}" is not an agent (${agentNames().join(", ")})` };
@@ -780,25 +757,16 @@ function runAgentAdd(values, name) {
   return { report: { ok: true, dryRun: Boolean(values["dry-run"]), files: written.files, filled: filled.filled.map((key) => ({ field: key, value: sets[key] })), unfilled: filled.unfilled, notes } };
 }
 
-/** The files of a skill in each of `places`, the same in all. */
-function skillFiles(name, places) {
-  const root = skillRoot(name);
+/** The files of this skill in each of `places`, the same in all. */
+function skillFiles(places) {
+  const root = join(HERE, "..");
   const rels = readdirSync(root, { recursive: true, withFileTypes: true })
     .filter((e) => e.isFile())
     .map((e) => relative(root, join(e.parentPath, e.name)).split(sep).join("/"))
     .filter((rel) => !rel.split("/").some((part) => part.startsWith(".")))
-    .filter((rel) => name !== SELF || CARRIES.includes(rel.split("/")[0]))
+    .filter((rel) => CARRIES.includes(rel.split("/")[0]))
     .sort();
-  return places.flatMap((place) => rels.map((rel) => ({ path: `${place}/${name}/${rel}`, content: readFileSync(join(root, rel), "utf-8") })));
-}
-
-function runSkillAdd(values, name) {
-  if (!name) return { error: `a skill is missing. Example: luz-ai skill add ${skillNames()[0]} --dir . --dry-run (skills: ${skillNames().join(", ")})` };
-  if (!skillNames().includes(name)) return { error: `"${name}" is not a skill (${skillNames().join(", ")})` };
-  const files = skillFiles(name, SKILL_PLACES);
-  const written = writeFiles(values.dir ?? ".", files, { dryRun: Boolean(values["dry-run"]), force: values.force });
-  if (written.error) return written;
-  return { report: { ok: true, dryRun: Boolean(values["dry-run"]), files: written.files, places: SKILL_PLACES } };
+  return places.flatMap((place) => rels.map((rel) => ({ path: `${place}/${SELF}/${rel}`, content: readFileSync(join(root, rel), "utf-8") })));
 }
 
 function agentText({ dryRun, files, filled, unfilled, notes }) {
@@ -810,12 +778,6 @@ function agentText({ dryRun, files, filled, unfilled, notes }) {
   if (unfilled.length) out.push("still [ADAPT], so the agent stops and asks until they are filled:", ...unfilled.map((k) => `  - ${k}`));
   out.push(...notes.map((n) => `note: ${n}`));
   return `${out.join("\n")}\n`;
-}
-
-function skillText({ dryRun, files }) {
-  const bytes = files.reduce((n, f) => n + f.bytes, 0);
-  const rows = files.map((f) => `  ${f.path}`);
-  return `${[`skill add: ${dryRun ? "would write" : "wrote"} ${files.length} files (${bytes} bytes)`, ...rows.slice(0, MAX_LINES), ...(rows.length > MAX_LINES ? [`  … and ${rows.length - MAX_LINES} more (use --json)`] : [])].join("\n")}\n`;
 }
 
 function listText(kind, items) {
@@ -849,7 +811,7 @@ function runInit(values) {
   const bad = targets.find((t) => !(t in INIT_TARGETS));
   if (bad) return { error: `--target "${bad}" is not one of ${Object.keys(INIT_TARGETS).join(", ")}` };
   const places = [...new Set(targets.flatMap((t) => INIT_TARGETS[t]))];
-  const files = places.length ? skillFiles(SELF, places) : [];
+  const files = places.length ? skillFiles(places) : [];
   const notes = [];
   const agentsMd = join(resolve(values.dir ?? "."), "AGENTS.md");
   if (targets.includes("agents-md")) {
@@ -892,8 +854,8 @@ function show(text) {
 export function main(argv, { tty = Boolean(process.stdout.isTTY) } = {}) {
   const [command, ...rest] = argv;
   if (command === "--help" || command === "-h") return show(banner(tty) + HELP);
-  if (!command) return usage("a command is missing (init, site new, agent, skill, facts, doctor or check)", true);
-  if (!["init", "site", "agent", "skill", "facts", "doctor", "check"].includes(command)) return usage(`"${command}" is not a command (init, site new, agent, skill, facts, doctor, check)`, true);
+  if (!command) return usage("a command is missing (init, site new, agent, facts, doctor or check)", true);
+  if (!["init", "site", "agent", "facts", "doctor", "check"].includes(command)) return usage(`"${command}" is not a command (init, site new, agent, facts, doctor, check)`, true);
   let args;
   try {
     args = parseArgs({
@@ -923,7 +885,7 @@ export function main(argv, { tty = Boolean(process.stdout.isTTY) } = {}) {
     const v = values[flag];
     if (v !== undefined && (/[\r\n]/.test(v) || HIDDEN.test(v) || v.startsWith("-"))) return usage(`--${flag} is a path on one line, with no control or hidden character, and not starting with "-"`);
   }
-  if (values.help) return show({ init: HELP_INIT, site: HELP_SITE, agent: HELP_AGENT, skill: HELP_SKILL, facts: HELP_FACTS, doctor: HELP_DOCTOR, check: HELP_CHECK }[command]);
+  if (values.help) return show({ init: HELP_INIT, site: HELP_SITE, agent: HELP_AGENT, facts: HELP_FACTS, doctor: HELP_DOCTOR, check: HELP_CHECK }[command]);
   if (command === "init") {
     if (positionals.length) return usage("init takes no word: use --target");
     const { error, report } = runInit(values);
@@ -938,20 +900,20 @@ export function main(argv, { tty = Boolean(process.stdout.isTTY) } = {}) {
     process.stdout.write(values.json ? `${JSON.stringify(report, null, 2)}\n` : siteText(report));
     return 0;
   }
-  if (command === "agent" || command === "skill") {
+  if (command === "agent") {
     const [verb, name, ...extra] = positionals;
-    if (!["list", "add"].includes(verb) || extra.length || (verb === "list" && name)) return usage(`"${command}" takes list, or add and a name`);
+    if (!["list", "add"].includes(verb) || extra.length || (verb === "list" && name)) return usage(`"agent" takes list, or add and a name`);
     const json = (data) => process.stdout.write(`${JSON.stringify(data, null, 2)}\n`);
     if (verb === "list") {
-      const items = command === "agent" ? listAgents() : listSkills();
+      const items = listAgents();
       if (values.json) json(items);
-      else process.stdout.write(listText(command, items));
+      else process.stdout.write(listText("agent", items));
       return 0;
     }
-    const { error, report } = command === "agent" ? runAgentAdd(values, name) : runSkillAdd(values, name);
+    const { error, report } = runAgentAdd(values, name);
     if (error) return usage(error);
     if (values.json) json(report);
-    else process.stdout.write(command === "agent" ? agentText(report) : skillText(report));
+    else process.stdout.write(agentText(report));
     return 0;
   }
   if (command === "facts") return show(runFacts(values.json));

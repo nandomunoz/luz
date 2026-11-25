@@ -1,6 +1,6 @@
 # @luz-ds/ai
 
-The luz skill for AI assistants. It asks what you want to make with LUZ, writes a starter page that [`@luz-ds/check`](https://www.npmjs.com/package/@luz-ds/check) reads without a finding, and finishes it with you. It can also add the agents and skills of luz-ai (accessibility, SEO, Core Web Vitals, AI features, a README, a landing page) to your project. It is a tool, not a stylesheet: it loads nothing in a page.
+The luz skill for AI assistants. It asks what you want to make with LUZ, writes a starter page that [`@luz-ds/check`](https://www.npmjs.com/package/@luz-ds/check) reads without a finding, and finishes it with you. It can also add the accessibility agent of luz-ai, `luz-agent-accessibility`, to your project. It is a tool, not a stylesheet: it loads nothing in a page.
 
 > **Beta, version 0.x.** This package has its own version, apart from tokens, core and catalog. Pin an exact version and read the changelog before you upgrade.
 
@@ -37,12 +37,11 @@ The skill is tested only in Claude Code. The other assistants get it written fro
 | `/luz doctor` | The project, its assistants, and the skills and agents it has. | no |
 | `/luz check [path]` | The front matter of the skills and agents of the project, or of the path. | no |
 | `/luz facts` | The versions, the kinds of site and the stacks of this release. | no |
-| `/luz agents` | The agents of luz-ai. | no |
-| `/luz skills` | The skills of luz-ai. | no |
-| `/luz add <name>` | Adds the agent or the skill you name, after asking its fields. | yes, after "go" |
+| `/luz agents` | The agent of luz-ai. | no |
+| `/luz add <name>` | Adds the agent you name, after asking its fields. | yes, after "go" |
 | `/luz help` | This table. | no |
 
-Each one has a real conversation, and what the script prints, on https://luzds.com/docs/ai/commands/. `/luz-readme` and `/luz-landing` are skills of their own, and `init` runs only in a terminal.
+Each one has a real conversation, and what the script prints, on https://luzds.com/docs/ai/commands/. `init` runs only in a terminal.
 
 ## The script
 
@@ -51,8 +50,7 @@ The skill's one executable is the command `luz-ai`. The skill runs it for you, a
 ```bash
 npx @luz-ds/ai site new --name "Acme" --kind landing --stack vanilla --target ./acme --dry-run
 npx @luz-ds/ai agent list
-npx @luz-ds/ai agent add luz-accessibility-auditor --for claude,codex --set "Target conformance level=WCAG 2.2 AA" --dry-run
-npx @luz-ds/ai skill add luz-readme --dry-run
+npx @luz-ds/ai agent add luz-agent-accessibility --for claude,codex --set "Target conformance level=WCAG 2.2 AA" --dry-run
 npx @luz-ds/ai doctor
 npx @luz-ds/ai check .claude
 ```
@@ -61,12 +59,11 @@ npx @luz-ds/ai check .claude
 | --- | --- |
 | `init` | Puts this skill where your assistant reads it. |
 | `site new` | Writes the starter page of a kind of site (landing page, blog, app, documentation) for plain HTML or Astro. |
-| `agent list`, `agent add` | Lists the four agents of luz-ai, or writes one for Claude Code, Gemini CLI and Codex, with the fields you give it filled in. A field left out stays `[ADAPT: …]`, and the agent stops and asks until it is filled. |
-| `skill list`, `skill add` | Lists the skills, or copies one into `.agents/skills` and `.claude/skills`. |
+| `agent list`, `agent add` | Lists the agents of luz-ai (named `luz-agent-<word>`), or writes one for Claude Code, Gemini CLI and Codex, with the fields you give it filled in. A field left out stays `[ADAPT: …]`, and the agent stops and asks until it is filled. |
 | `doctor` | The project, the assistants it has, the skills and agents it finds, and whether the two copies of a skill agree. |
 | `check` | The front matter and the body of skills and agents: strict YAML, the closed list of fields of each assistant, names, descriptions, hidden characters and references. |
 
-Every command takes `--help`, and `--json` prints one JSON object. Only `init`, `site new`, `agent add` and `skill add` write, only the files they name, and never over a file that exists unless `--force` says so, nor through a symbolic link.
+Every command takes `--help`, and `--json` prints one JSON object. Only `init`, `site new` and `agent add` write, only the files they name, and never over a file that exists unless `--force` says so, nor through a symbolic link.
 
 | Exit code | Meaning |
 | --- | --- |
@@ -80,11 +77,8 @@ It makes no network request, runs no program and installs nothing. It does not d
 
 Loading LUZ from a CDN sends your visitors' IP addresses to the CDN. If you do not want that, install from npm and serve the files from your own server.
 
-The starter pages load LUZ from a CDN, as the prompts of the site do, so tell the person who publishes the site.
-
 LUZ is not affiliated with Anthropic, OpenAI, Google or Anysphere (Cursor). Claude Code, Codex, Gemini CLI and Cursor are named only to say which files each reads; their names belong to their owners.
 
-Gemini CLI has no verified name here for every tool, so the one agent that needs to edit files and run commands (`luz-core-web-vitals-optimizer`) is written for Claude Code and Codex only.
 
 <!-- luz:ai-agents:start -->
 ## For AI agents

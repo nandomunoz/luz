@@ -23,13 +23,8 @@ const SCRIPT = "packages/ai/skills/luz/scripts/luz.mjs";
 export const CLI_KINDS = ["landing", "blog", "app", "docs"];
 /** The stacks of the second: the two the script writes a page for, and React, which moves the markup of the plain page. */
 export const CLI_STACKS = ["vanilla", "astro", "react"];
-/** The third question: what matters, each answer the agent of luz-ai that looks after it. */
-export const CLI_AGENTS = [
-  ["seo", "luz-seo-geo-specialist"],
-  ["a11y", "luz-accessibility-auditor"],
-  ["speed", "luz-core-web-vitals-optimizer"],
-  ["ai", "luz-ai-auditor"],
-];
+/** The third question: what matters, each answer the agent of luz-ai that looks after it (one for now: accessibility). */
+export const CLI_AGENTS = [["a11y", "luz-agent-accessibility"]];
 /**
  * The assistants the home's terminal installs the skill for, one round each (owner, 2026-11-25): the --target, the
  * command that opens the assistant, and how the skill is called in it (`luz-ai init --help` says the same).
@@ -42,18 +37,16 @@ export const CLI_TARGETS = [
 ];
 /**
  * The assistants of the tabs of the skill's page (owner, 2026-11-25), one session each: the --target, the command that
- * opens it, how the skill is called, the folder of the skills it reads, and the --for of its agents (none for Cursor:
+ * opens it, how the skill is called, and the --for of its agents (none for Cursor:
  * `luz-ai agent add --help` writes agents for claude, gemini and codex only, so its session asks nothing about them).
  */
 export const CLI_HANDS = [
-  { target: "claude", open: "claude", trigger: "/luz", skills: ".claude/skills", agents: "claude" },
-  { target: "codex", open: "codex", trigger: "$luz", skills: ".agents/skills", agents: "codex" },
-  { target: "cursor", open: "cursor-agent", trigger: "/luz", skills: ".agents/skills", agents: null },
+  { target: "claude", open: "claude", trigger: "/luz", agents: "claude" },
+  { target: "codex", open: "codex", trigger: "$luz", agents: "codex" },
+  { target: "cursor", open: "cursor-agent", trigger: "/luz", agents: null },
 ];
 /** The answers a session starts with, and the one the page shows without JavaScript. */
-export const CLI_DEFAULTS = { kind: "landing", stack: "vanilla", agents: ["luz-seo-geo-specialist", "luz-accessibility-auditor"], target: "claude" };
-/** A skill of luz-ai the session adds, for the kinds of site it is made for. */
-const CLI_SKILLS = { landing: "luz-landing" };
+export const CLI_DEFAULTS = { kind: "landing", stack: "vanilla", agents: ["luz-agent-accessibility"], target: "claude" };
 /** The name of the site in the commands: a name, the same in every language. */
 const SITE_NAME = "Vejer Books";
 
@@ -65,7 +58,7 @@ const facts = new Map();
 /**
  * What the script prints for each step of the session, from its dry runs, all in one Node (memoised by the real path
  * of the script, so a test's copy of the repository, which links packages/, runs them once too).
- * @returns {{ banner: string[], init: string[], inits: Record<string, string[]>, site: Record<string, { lines: string[], next: string, links: number, todo: number }>, agents: Record<string, string[]>, skills: Record<string, string> }}
+ * @returns {{ banner: string[], init: string[], inits: Record<string, string[]>, site: Record<string, { lines: string[], next: string, links: number, todo: number }>, agents: Record<string, string[]> }}
  */
 export function cliFacts(root) {
   const script = realpathSync(resolve(root, SCRIPT));
@@ -74,7 +67,6 @@ export function cliFacts(root) {
     ["init", "--target", "claude"],
     ...CLI_KINDS.flatMap((kind) => ["vanilla", "astro"].map((stack) => ["site", "new", "--name", SITE_NAME, "--kind", kind, "--stack", stack, "--target", "."])),
     ...CLI_AGENTS.map(([, name]) => ["agent", "add", name, "--for", "claude"]),
-    ...Object.values(CLI_SKILLS).map((name) => ["skill", "add", name]),
     // The other assistants' installs, last, so the runs above keep their places
     ...CLI_TARGETS.slice(1).map(([target]) => ["init", "--target", target]),
     // The agents for the other assistants of the tabs, after those
@@ -116,8 +108,6 @@ write(JSON.stringify(out));`;
     const lines = texts[at++].split("\n");
     agents.claude[name] = [said(lines[0]), lines[1]];
   }
-  const skills = {};
-  for (const name of Object.values(CLI_SKILLS)) skills[name] = said(texts[at++].split("\n")[0]);
   // What init prints for each assistant: its first line and its "next:", as for Claude Code
   const firstAndNext = (lines) => [said(lines[0]), lines.find((l) => l.startsWith("next: "))];
   const inits = { claude: firstAndNext(init) };
@@ -132,7 +122,7 @@ write(JSON.stringify(out));`;
   // The title the script prints in a terminal (not to a pipe, so not in the dry runs above): read from its source
   const banner = /^const BANNER = (\[[\s\S]*?\]);$/m.exec(readFileSync(script, "utf-8"));
   if (!banner) throw new Error(`${SCRIPT}: no "const BANNER = [ … ];" to show the title of init`);
-  const value = { banner: JSON.parse(banner[1]), init: inits.claude, inits, site, agents, skills };
+  const value = { banner: JSON.parse(banner[1]), init: inits.claude, inits, site, agents };
   facts.set(script, value);
   return value;
 }
@@ -149,7 +139,7 @@ export function matchesDefaults(when) {
 /** {{cli}}, {{clicodex}}, {{clicursor}}: the terminal the visitor answers, one per tab of the page of the skill; {{cliinstall}}: the home's, a person installing the skill. In the language of `say`. */
 export function cliDemo({ say, root, escapeHtml }) {
   const t = (key) => escapeHtml(say(key));
-  const { banner, inits, site, agents, skills } = cliFacts(root);
+  const { banner, inits, site, agents } = cliFacts(root);
   const esc = escapeHtml;
   const when = (cond) => (cond ? ` data-when="${cond}"${matchesDefaults(cond) ? "" : " hidden"}` : "");
   const span = (cond, inner) => `<span${when(cond)}>${inner}</span>`;
@@ -171,7 +161,7 @@ export function cliDemo({ say, root, escapeHtml }) {
   const agentWord = (key) => t(`inside.cli.${key}`);
 
   // One session per assistant of CLI_HANDS: its install, its command, its call of the skill, its folders and agents
-  const sessionOf = ({ target, open, trigger, skills: skillDir, agents: agentsFor }) => [
+  const sessionOf = ({ target, open, trigger, agents: agentsFor }) => [
     // Install the skill, then open the assistant and ask
     cmd(`npx @luz-ds/ai init --target ${target}`),
     // The title init prints in a terminal: the mark and the word in ASCII, read out as the word
@@ -201,7 +191,6 @@ export function cliDemo({ say, root, escapeHtml }) {
     skill(t("inside.cli.plan")),
     item(`<code>${per(CLI_STACKS, (s) => span(`stack=${s}`, esc(site[`landing/${written(s)}`].file)))}</code> <bdi class="landing-cli__why">${t("inside.cli.plan.page")} ${per(CLI_KINDS, (k) => span(`kind=${k}`, kindName(k)))}</bdi>`),
     item(`<bdi class="landing-cli__why">${t("inside.cli.plan.react")}</bdi>`, "stack=react"),
-    per(Object.entries(CLI_SKILLS), ([k, name]) => item(`<code>${skillDir}/${name}/</code> <bdi class="landing-cli__why">${t("inside.cli.plan.skill")}</bdi>`, `kind=${k}`)),
     agentsFor ? per(CLI_AGENTS, ([, name]) => item(`<code>${esc(agents[agentsFor][name][1].trim())}</code> <bdi class="landing-cli__why">${t("inside.cli.plan.agent")}</bdi>`, `agent=${name}`)) : "",
     item(`<code>npx @luz-ds/check</code> <bdi class="landing-cli__why">${t("inside.cli.plan.check")}</bdi>`),
     skill(t("inside.cli.go")),
@@ -213,8 +202,7 @@ export function cliDemo({ say, root, escapeHtml }) {
     per(CLI_KINDS, (k) => per(["vanilla", "astro"], (s) => cmd(esc(site[`${k}/${s}`].next), `kind=${k} stack=${s}`))),
     cmd(esc(site["landing/vanilla"].next), "stack=react"),
     out(`✓ 0 blocking and 0 warnings in 1 file`),
-    // It adds the skill and the agents
-    per(Object.entries(CLI_SKILLS), ([k, name]) => cmd(`luz-ai skill add ${name}`, `kind=${k}`) + out(skills[name], `kind=${k}`)),
+    // It adds the agents
     agentsFor ? per(CLI_AGENTS, ([, name]) => cmd(`luz-ai agent add ${name} --for ${agentsFor}`, `agent=${name}`) + agents[agentsFor][name].map((l) => out(l, `agent=${name}`)).join("")) : "",
     skill(t(agentsFor ? "inside.cli.adapt" : "inside.cli.adapt.page")),
     // Done

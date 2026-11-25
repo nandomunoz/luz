@@ -62,7 +62,7 @@ for (const [route, lang] of SKILL) {
       expect(said).toContain(`$ ${open}`);
       expect(said).toContain(words['inside.cli.ask'].replace('/luz', trigger));
       if (agents) {
-        expect(said).toContain(`agent add luz-seo-geo-specialist ${agents}`);
+        expect(said).toContain(`agent add luz-agent-accessibility ${agents}`);
         await expect(cli.locator('[data-ask="agent"]')).toHaveCount(1);
       } else {
         expect(said).not.toContain('agent add');

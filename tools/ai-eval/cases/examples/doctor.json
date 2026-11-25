@@ -2,12 +2,12 @@
   "example": "doctor",
   "case": "doctor",
   "model": "sonnet",
-  "date": "2026-11-24",
+  "date": "2026-11-25",
   "skillVersion": "0.1.0",
   "turns": [
     {
       "user": "/luz doctor",
-      "assistant": "**`/luz doctor` result:** 0 problems, 0 warnings, 1 file checked.\n\nThe script printed only that summary. It didn't list any assistants, skills or agents for this project, so I can't say the project has any. I didn't write or change anything.\n\nA person still needs to check two things:\n- Which file was checked. The output doesn't name it.\n- Whether the project has the skills and agents you expect. `doctor` didn't list any.\n\nTo start a site, run `/luz`. To see what luz-ai offers, run `/luz agents` or `/luz skills`."
+      "assistant": "`/luz doctor` finished with no problems and no warnings. It checked 1 file.\n\nThe script printed only that summary, so I can't tell you which file it checked. It also listed no skills or agents for the project, so I won't claim the project has any.\n\nThe script can't tell you whether the front matter says what you intend, so that part is yours to review. `doctor` only reads, so it wrote nothing.\n\nTo start a site, run `/luz` or `/luz new <landing, blog, app or docs>`."
     }
   ]
 }

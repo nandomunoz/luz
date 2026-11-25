@@ -30,8 +30,7 @@ const TERMINAL = {
   check: ["check", "."],
   facts: ["facts"],
   agents: ["agent", "list"],
-  skills: ["skill", "list"],
-  add: ["skill", "add", "luz-readme", "--dir", ".", "--dry-run"],
+  add: ["agent", "add", "luz-agent-accessibility", "--for", "claude", "--dir", ".", "--dry-run"],
   help: ["--help"],
 };
 

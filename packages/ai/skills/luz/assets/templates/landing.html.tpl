@@ -29,7 +29,7 @@
  <header class="luz-site-header o-sticky">
   <div class="o-container o-container--inline o-row">
    <button class="luz-nav-toggle" type="button" popovertarget="site-nav" aria-label="Menu"><span class="luz-nav-toggle__bar"></span><span class="luz-nav-toggle__bar"></span><span class="luz-nav-toggle__bar"></span></button>
-   <a class="luz-site-header__brand" href="./">Acme Stock</a>
+   <a class="luz-site-header__brand" href="./">…</a>
    <nav class="luz-navbar" id="site-nav" aria-label="Main" popover>
     <ul class="luz-navbar__list"><li><a class="luz-navbar__link" href="./" aria-current="page">Product</a></li></ul>
    </nav>
@@ -40,7 +40,7 @@
    <div class="luz-hero__copy">
     <h1 class="luz-hero__title" id="hero-title">…</h1>
     <p class="luz-hero__lead">…</p>
-    <div class="o-actions"><a class="luz-btn luz-btn--primary" href="trial/">Start free trial</a></div>
+    <div class="o-actions"><a class="luz-btn luz-btn--primary" href="…">…</a></div>
    </div>
    <div class="luz-hero__media"><div class="luz-image luz-image--4x3"><img src="shop.jpg" width="1280" height="960" alt="…"></div></div>
   </section>
@@ -51,6 +51,6 @@
    </ul>
   </section>
  </main>
- <footer class="luz-site-footer"><div class="o-container o-container--inline o-row"><p>Acme Inc.</p></div></footer>
+ <footer class="luz-site-footer"><div class="o-container o-container--inline o-row"><p>…</p></div></footer>
 </body>
 </html>

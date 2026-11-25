@@ -284,7 +284,7 @@ describe("triggers with decoys", () => {
 describe("agents with seeded faults", () => {
   it("each fixture seeds known faults with a pattern each, and has clean parts that must not be flagged", async () => {
     const { AGENT_CASES } = await lab("agents.js");
-    expect(AGENT_CASES.map((c) => c.agent)).toContain("luz-accessibility-auditor");
+    expect(AGENT_CASES.map((c) => c.agent)).toContain("luz-agent-accessibility");
     for (const c of AGENT_CASES) {
       expect(c.faults.length, c.agent).toBeGreaterThanOrEqual(3);
       expect(read(`packages/ai/skills/luz/assets/agents/${c.agent}.md`).length).toBeGreaterThan(0);
@@ -321,7 +321,7 @@ describe("the command", () => {
     expect(r.stdout).toMatch(/nothing was run/);
     expect(sh(["triggers", "--dry-run"]).stdout).toMatch(/queries/);
     expect(sh(["triggers", "--dry-run", "--match", "luz-check rule"]).stdout).toMatch(/plan: 1 queries/);
-    expect(sh(["agents", "--dry-run"]).stdout).toMatch(/luz-accessibility-auditor/);
+    expect(sh(["agents", "--dry-run"]).stdout).toMatch(/luz-agent-accessibility/);
     expect(sh(["nope"]).status).toBe(2);
   });
 
@@ -391,7 +391,7 @@ out({ type: "result", subtype: "success", is_error: false, session_id: "S1", tot
     const out = mk();
     const r = sh(["agents", "--out", out]);
     const rows = JSON.parse(readFileSync(join(out, "agents.json"), "utf-8"));
-    expect(rows.map((x) => x.agent)).toEqual(["luz-accessibility-auditor", "luz-seo-geo-specialist", "luz-core-web-vitals-optimizer", "luz-ai-auditor"]);
+    expect(rows.map((x) => x.agent)).toEqual(["luz-agent-accessibility"]);
     for (const x of rows) expect(x.recall, x.agent).toBeGreaterThanOrEqual(0.75);
     expect(r.stdout).toContain("recall");
   }, 60000);
@@ -475,10 +475,10 @@ describe("hardening from the auditor of phase 4", () => {
     expect(r.status).toBe(2);
   });
 
-  it("the rules named in the skill-fix and in the checks run to R9, and the fake key says it is fake", () => {
+  it("the rules named in the skill-fix and in the checks run to R9, and no fixture carries a real-looking key", () => {
     expect(read(".claude/skills/skill-fix/SKILL.md")).not.toMatch(/R1…R8/);
     expect(read("tools/ai-eval/src/checks.js")).not.toMatch(/R1…R8/);
-    expect(read("tools/ai-eval/src/agents.js")).toContain("sk-FAKE-");
+    expect(read("tools/ai-eval/src/agents.js")).not.toMatch(/sk-(?!FAKE-)[A-Za-z0-9]{10,}/);
   });
 });
 

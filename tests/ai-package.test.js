@@ -140,7 +140,7 @@ describe("the README", () => {
   it("leads with /luz: the commands of the chat, one row for each subcommand of SKILL.md, and the page that shows them", () => {
     const skillMd = read("packages/ai/skills/luz/SKILL.md");
     const chat = [...skillMd.matchAll(/^\| `(\/luz[^`]*)` \|/gm)].map((m) => m[1]);
-    expect(chat.length).toBe(9);
+    expect(chat.length).toBe(8);
     expect(readme.indexOf("## The commands")).toBeGreaterThan(0);
     expect(readme.indexOf("## The commands")).toBeLessThan(readme.indexOf("## The script"));
     for (const c of chat) expect(readme, c).toContain(`| \`${c}\` |`);
@@ -151,7 +151,7 @@ describe("the README", () => {
   it("names every command of the script, and its exit codes", () => {
     const help = spawnSync(process.execPath, [join(root, "packages/ai/skills/luz/scripts/luz.mjs"), "--help"], { encoding: "utf-8" }).stdout;
     for (const c of ["init", "site new", "agent", "skill", "doctor", "check"]) expect(help, c).toContain(c);
-    for (const c of ["`init`", "`site new`", "`agent list`, `agent add`", "`skill list`, `skill add`", "`doctor`", "`check`"]) expect(readme, c).toContain(c);
+    for (const c of ["`init`", "`site new`", "`agent list`, `agent add`", "`doctor`", "`check`"]) expect(readme, c).toContain(c);
     for (const code of ["| 0 |", "| 1 |", "| 2 |"]) expect(readme, code).toContain(code);
   });
 

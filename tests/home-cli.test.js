@@ -1,5 +1,5 @@
 /**
- * The sources of the home's fourth level, "Your whole site, from a conversation" (.claude/plans/luz-ai-skill.md,
+ * The sources of the home's fourth level, "Your first page, from a conversation" (.claude/plans/luz-ai-skill.md,
  * part A, and the owner on 2026-11-24): the terminal of the luz skill, an emulation of a real session in which
  * the visitor answers. The rendered page is tests/home-cli.spec.js; here the template, the generator
  * (scripts/docs-site/cli-demo.js), the script, the stylesheet and the catalogs:
@@ -70,10 +70,9 @@ describe("the template of level 4 and the terminal the generator writes", () => 
       expect(html, target).toMatch(/<figcaption class="landing-cli__caption landing-cli__foot" hidden>\s*<button class="luz-btn luz-btn--ghost luz-btn--sm landing-cli__auto" type="button">/);
     }
     // Codex's agents are its own files (luz-ai agent add --for codex); Cursor gets none, and no question about them
-    const codexAgent = execFileSync(process.execPath, [SCRIPT, "agent", "add", "luz-seo-geo-specialist", "--for", "codex", "--dry-run"], { cwd: tmpdir(), encoding: "utf-8" }).split("\n")[1].trim();
+    const codexAgent = execFileSync(process.execPath, [SCRIPT, "agent", "add", "luz-agent-accessibility", "--for", "codex", "--dry-run"], { cwd: tmpdir(), encoding: "utf-8" }).split("\n")[1].trim();
     expect(written.clicodex).toContain(`<code>${codexAgent}</code>`);
-    expect(written.clicodex).toContain("luz-ai agent add luz-seo-geo-specialist --for codex");
-    expect(written.clicodex).toContain("<code>.agents/skills/luz-landing/</code>");
+    expect(written.clicodex).toContain("luz-ai agent add luz-agent-accessibility --for codex");
     expect(written.clicursor).not.toMatch(/data-ask="agent"|agent add/);
     expect(said(written.clicursor)).toContain(catalogs.en["inside.cli.adapt.page"]);
     // The panel of a terminal the visitor answers never turns by itself
@@ -138,7 +137,7 @@ describe("the template of level 4 and the terminal the generator writes", () => 
     for (const { when, hidden } of conditioned) expect(hidden, when).toBe(!matchesDefaults(when));
     expect(conditioned.some(({ when }) => when.includes("kind=blog"))).toBe(true);
     expect(conditioned.some(({ when }) => when.includes("stack=astro"))).toBe(true);
-    expect(conditioned.some(({ when }) => when === "agent=luz-ai-auditor")).toBe(true);
+    expect(conditioned.some(({ when }) => when === "agent=luz-agent-accessibility")).toBe(true);
   });
 
   it("prints what the script prints: each output line is a line of its dry run, said as written", () => {
@@ -147,7 +146,6 @@ describe("the template of level 4 and the terminal the generator writes", () => 
       run("init", "--target", "claude"),
       ...CLI_KINDS.flatMap((k) => ["vanilla", "astro"].map((s) => run("site", "new", "--name", "Vejer Books", "--kind", k, "--stack", s, "--target", ".").replace(/^--- /m, "  "))),
       ...CLI_AGENTS.map(([, name]) => run("agent", "add", name, "--for", "claude")),
-      run("skill", "add", "luz-landing"),
     ].join("\n");
     const outs = [...terminal.matchAll(/<p class="landing-cli__line landing-cli__line--out"[^>]*><samp>([^<]*)<\/samp><\/p>/g)].map((m) => unescape(m[1]));
     expect(outs.length).toBeGreaterThan(20);
@@ -339,6 +337,6 @@ describe("the catalogs, in en, es and ar", () => {
 
   it("name no layer in the eyebrow (the skill picks tokens, core or the catalog), and the title is a conversation", () => {
     for (const lang of LANGS) expect(catalogs[lang]["inside.l4.eyebrow"], lang).not.toMatch(/\+/);
-    expect(catalogs.en["inside.l4.title"].replace(/<[^>]*>/g, "")).toBe("Your whole site, from a conversation");
+    expect(catalogs.en["inside.l4.title"].replace(/<[^>]*>/g, "")).toBe("Your first page, from a conversation");
   });
 });

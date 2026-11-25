@@ -9,7 +9,7 @@ import { readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { BY_NEED } from "../scripts/build-ai-facts.js";
-import { agentRows, fillAgentMarkers, skillRows } from "../scripts/docs-site/ai-agents.js";
+import { agentRows, fillAgentMarkers } from "../scripts/docs-site/ai-agents.js";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (p) => readFileSync(join(root, p), "utf-8");
@@ -17,17 +17,13 @@ const strings = (lang) => JSON.parse(read(`apps/docs/i18n/${lang}/strings.json`)
 const site = { t: (key) => strings("en")[key] ?? key };
 
 describe("the rows come from the files of the package", () => {
-  it("are the four agents, each with its name, what it reviews and its tools, read from its front matter", () => {
+  it("are the agents, each named luz-agent-<word>, with its name, what it reviews and its tools, read from its front matter", () => {
     const rows = agentRows(root);
-    expect(rows.map((r) => r.name)).toEqual(["luz-accessibility-auditor", "luz-ai-auditor", "luz-core-web-vitals-optimizer", "luz-seo-geo-specialist"]);
+    expect(rows.map((r) => r.name)).toEqual(["luz-agent-accessibility"]);
     for (const r of rows) {
       expect(r.description.length, r.name).toBeGreaterThan(20);
       expect(r.tools, r.name).toMatch(/^[A-Za-z, ]+$/);
     }
-  });
-
-  it("are the two skills, luz-landing and luz-readme", () => {
-    expect(skillRows(root).map((r) => r.name)).toEqual(["luz-landing", "luz-readme"]);
   });
 
   it("have a sentence of what matters to the person, in English and Spanish, for each agent of BY_NEED", () => {
@@ -44,17 +40,17 @@ describe("the page", () => {
     expect(read("apps/docs/i18n/es/pages/ai/agents.html")).toMatch(/^reviewed: false$/m);
   });
 
-  it("writes the three tables at its three markers, and each marker once", () => {
-    const html = fillAgentMarkers("<!-- luz:agents needs -->\n<!-- luz:agents agents -->\n<!-- luz:agents skills -->\n", site, { root });
+  it("writes the two tables at its two markers, and each marker once", () => {
+    const html = fillAgentMarkers("<!-- luz:agents needs -->\n<!-- luz:agents agents -->\n", site, { root });
     for (const [, name] of BY_NEED) expect(html, name).toContain(`<code>${name}</code>`);
-    expect(html).toContain("luz-readme");
+    expect(html).not.toContain("luz-readme");
     expect(html).not.toContain("<!-- luz:agents");
     expect(() => fillAgentMarkers("<!-- luz:agents agents -->\n", site, { root })).toThrow(/needs/);
     expect(() => fillAgentMarkers("<!-- luz:agents nope -->\n", site, { root })).toThrow(/nope/);
-    expect(() => fillAgentMarkers("<!-- luz:agents needs -->\n<!-- luz:agents needs -->\n<!-- luz:agents agents -->\n<!-- luz:agents skills -->\n", site, { root })).toThrow(/twice/);
+    expect(() => fillAgentMarkers("<!-- luz:agents needs -->\n<!-- luz:agents needs -->\n<!-- luz:agents agents -->\n", site, { root })).toThrow(/twice/);
   });
 
   it("says the descriptions are English, whatever the language of the page", () => {
-    expect(fillAgentMarkers("<!-- luz:agents needs -->\n<!-- luz:agents agents -->\n<!-- luz:agents skills -->\n", site, { root })).toMatch(/lang="en"/);
+    expect(fillAgentMarkers("<!-- luz:agents needs -->\n<!-- luz:agents agents -->\n", site, { root })).toMatch(/lang="en"/);
   });
 });

@@ -464,7 +464,7 @@ describe("site new", () => {
     for (const bad of ["a\nrm -rf ~", "a\u202Eb", "--config=x", "-x"]) {
       expect(run(flags(bad)).code, JSON.stringify(bad)).toBe(2);
       expect(run(["init", "--target", "claude", "--dir", bad, "--dry-run"]).code, JSON.stringify(bad)).toBe(2);
-      expect(run(["agent", "add", "luz-ai-auditor", "--for", "claude", "--dir", bad, "--dry-run"]).code, JSON.stringify(bad)).toBe(2);
+      expect(run(["agent", "add", "luz-agent-accessibility", "--for", "claude", "--dir", bad, "--dry-run"]).code, JSON.stringify(bad)).toBe(2);
     }
     expect(run(flags(join(dir(), "a b")), tmpdir()).code).toBe(0);
   });
@@ -553,8 +553,8 @@ describe("the skill as /luz <subcommand>: the router and the rule IDs (owner, 20
     expect(section("Subcommands")).toContain("$ARGUMENTS");
   });
 
-  it("has a row for each subcommand: none, new, doctor, check, facts, agents, skills, add and help", () => {
-    expect(rows().map((r) => r.chat.replace(/^\/luz ?/, "").split(" ")[0])).toEqual(["", "new", "doctor", "check", "facts", "agents", "skills", "add", "help"]);
+  it("has a row for each subcommand: none, new, doctor, check, facts, agents, add and help", () => {
+    expect(rows().map((r) => r.chat.replace(/^\/luz ?/, "").split(" ")[0])).toEqual(["", "new", "doctor", "check", "facts", "agents", "add", "help"]);
   });
 
   it("takes the kinds of `new` from the facts, never typed twice", () => {
@@ -570,9 +570,9 @@ describe("the skill as /luz <subcommand>: the router and the rule IDs (owner, 20
     for (const c of used) expect(help, c).toContain(c.split(" ")[0]);
   });
 
-  it("writes nothing for doctor, check, facts, agents, skills and help, and writes only after \"go\" for the rest", () => {
+  it("writes nothing for doctor, check, facts, agents and help, and writes only after \"go\" for the rest", () => {
     const by = Object.fromEntries(rows().map((r) => [r.chat.replace(/^\/luz ?/, "").split(" ")[0], r.writes]));
-    for (const c of ["doctor", "check", "facts", "agents", "skills", "help"]) expect(by[c], c).toBe("no");
+    for (const c of ["doctor", "check", "facts", "agents", "help"]) expect(by[c], c).toBe("no");
     for (const c of ["", "new", "add"]) expect(by[c], c).toBe("yes");
     expect(section("Subcommands")).toMatch(/"go"/);
   });
@@ -582,8 +582,9 @@ describe("the skill as /luz <subcommand>: the router and the rule IDs (owner, 20
     expect(section("Subcommands")).toMatch(/never guess/i);
   });
 
-  it("names the other two skills and the terminal-only command", () => {
-    for (const w of ["/luz-readme", "/luz-landing", "init"]) expect(section("Subcommands"), w).toContain(w);
+  it("names the terminal-only command, and no skill of its own: there is none", () => {
+    expect(section("Subcommands")).toContain("init");
+    expect(section("Subcommands")).not.toMatch(/\/luz-readme|\/luz-landing|skill add|skill list/);
   });
 
   it("works from the person's message when the assistant substitutes no $ARGUMENTS", () => {
@@ -701,36 +702,31 @@ describe("init: the /luz command of each assistant (owner, 2026-11-24)", () => {
   });
 });
 
-describe("luz-readme: ai-tells.md is the project's own text (F-1, owner, 2026-11-24)", () => {
-  const file = join(skill, "assets/skills/luz-readme/references/ai-tells.md");
-
-  it("names no work it adapts: no humanizer, no Wikipedia guide, no other skill, no licence it would need", () => {
-    const text = read(file);
-    expect(text).not.toMatch(/blader|humanizer|wikipedia|wikiproject|write-readme|good-readme|CC BY|Creative Commons|prior art/i);
-  });
-
-  it("is still named by the skill and keeps its link to anatomy.md", () => {
-    expect(read(join(skill, "assets/skills/luz-readme/SKILL.md"))).toContain("references/ai-tells.md");
-    expect(read(file)).toContain("(anatomy.md)");
-    expect(existsSync(join(dirname(file), "anatomy.md"))).toBe(true);
-  });
-});
-
-describe("the agents and skills of luz-ai", () => {
+describe("the agents of luz-ai", () => {
   const assets = join(skill, "assets");
-  const AGENTS = ["luz-accessibility-auditor", "luz-ai-auditor", "luz-core-web-vitals-optimizer", "luz-seo-geo-specialist"];
-  const SKILLS = ["luz-landing", "luz-readme"];
+  const AGENTS = ["luz-agent-accessibility"];
   const list = (kind) => JSON.parse(run([kind, "list", "--json"]).out);
   const bodyOf = (text) => text.replace(/^---\n[\s\S]*?\n---\n+/, "").trim();
   const add = (d, name, flags = []) => run(["agent", "add", name, "--dir", d, "--json", ...flags]);
 
-  it("are the four agents and two skills of the repository luz-ai, kept here and passing the check", () => {
+  it("are named luz-agent-<word>, one clear word for what each looks after, kept here and passing the check", () => {
     expect(list("agent").map((a) => a.name)).toEqual(AGENTS);
-    // luz adds itself too, so it is the first the list names
-    expect(list("skill").map((s) => s.name)).toEqual(["luz", ...SKILLS]);
-    const r = run(["check", "--json", join(assets, "agents"), join(assets, "skills")]);
+    for (const a of AGENTS) expect(a, a).toMatch(/^luz-agent-[a-z]+$/);
+    expect(existsSync(join(assets, "skills"))).toBe(false);
+    const r = run(["check", "--json", join(assets, "agents")]);
     expect(JSON.parse(r.out).problems).toEqual([]);
-    expect(JSON.parse(r.out).checked.length).toBe(6);
+    expect(JSON.parse(r.out).checked.length).toBe(1);
+  });
+
+  it("has no skill subcommand: the agents are all it adds, and the skill installs itself with init", () => {
+    expect(run(["skill", "list"]).code).toBe(2);
+    expect(run(["--help"]).out).not.toMatch(/\bskill {5}/);
+  });
+
+  it("knows what LUZ already does, and leaves what the person must answer as a field", () => {
+    const text = read(join(assets, "agents/luz-agent-accessibility.md"));
+    expect(text).toMatch(/## What LUZ already does/);
+    expect(text).toContain("@luz-ds/check");
   });
 
   it("have every agent a startup rule that stops while a field is left, and every field a hint", () => {
@@ -746,22 +742,22 @@ describe("the agents and skills of luz-ai", () => {
   it("have a way in the catalogue for what the person says matters, and every name in it exists", () => {
     const catalogue = read(join(skill, "references/agents.md"));
     for (const [, name] of BY_NEED) expect(AGENTS, name).toContain(name);
-    for (const name of [...AGENTS, ...SKILLS]) expect(catalogue, name).toContain(`\`${name}\``);
+    for (const name of AGENTS) expect(catalogue, name).toContain(`\`${name}\``);
   });
 
   it("writes one agent for each assistant: the same instructions, the front matter or keys that assistant reads, each passing check", () => {
     const d = dir();
-    const r = add(d, "luz-accessibility-auditor", ["--for", "claude,gemini,codex"]);
+    const r = add(d, "luz-agent-accessibility", ["--for", "claude,gemini,codex"]);
     expect(r.code, r.err).toBe(0);
-    const source = bodyOf(read(join(assets, "agents/luz-accessibility-auditor.md")));
-    const claude = read(join(d, ".claude/agents/luz-accessibility-auditor.md"));
-    const gemini = read(join(d, ".gemini/agents/luz-accessibility-auditor.md"));
-    const codex = read(join(d, ".codex/agents/luz-accessibility-auditor.toml"));
+    const source = bodyOf(read(join(assets, "agents/luz-agent-accessibility.md")));
+    const claude = read(join(d, ".claude/agents/luz-agent-accessibility.md"));
+    const gemini = read(join(d, ".gemini/agents/luz-agent-accessibility.md"));
+    const codex = read(join(d, ".codex/agents/luz-agent-accessibility.toml"));
     expect(bodyOf(claude)).toBe(source);
     expect(bodyOf(gemini)).toBe(source);
     expect(claude).toMatch(/^tools: Read, Grep, Glob$/m);
     expect(gemini).toMatch(/^tools:\n {2}- read_file\n {2}- grep_search\n---/m);
-    expect(codex).toMatch(/^name = "luz-accessibility-auditor"$/m);
+    expect(codex).toMatch(/^name = "luz-agent-accessibility"$/m);
     expect(codex).toContain(`developer_instructions = ${"'".repeat(3)}\n${source}\n${"'".repeat(3)}\n`);
     const c = run(["check", "--json"], d);
     expect(JSON.parse(c.out).problems).toEqual([]);
@@ -772,31 +768,35 @@ describe("the agents and skills of luz-ai", () => {
     const d = dir();
     const rows = list("agent");
     for (const a of rows) expect(add(d, a.name, ["--for", a.for.join(",")]).code, a.name).toBe(0);
-    expect(rows.find((a) => a.name === "luz-core-web-vitals-optimizer").for).toEqual(["claude", "codex"]);
-    expect(rows.find((a) => a.name === "luz-seo-geo-specialist").for).toEqual(["claude", "gemini", "codex"]);
+    expect(rows.find((a) => a.name === "luz-agent-accessibility").for).toEqual(["claude", "gemini", "codex"]);
     expect(JSON.parse(run(["check", "--json"], d).out).problems).toEqual([]);
   });
 
   it("refuses an agent for Gemini CLI when it needs a tool Gemini CLI has no verified name for, and writes nothing", () => {
+    // None of the agents of the package edits files now, so the rule is tried on a copy of the skill with one that does
+    const copy = join(dir(), "luz");
+    cpSync(skill, copy, { recursive: true });
+    const source = read(join(assets, "agents/luz-agent-accessibility.md"));
+    writeFileSync(join(copy, "assets/agents/luz-agent-editor.md"), source.replace("name: luz-agent-accessibility", "name: luz-agent-editor").replace("tools: Read, Grep, Glob", "tools: Read, Edit, Grep, Glob"));
     const d = dir();
-    const r = add(d, "luz-core-web-vitals-optimizer", ["--for", "claude,gemini"]);
-    expect(r.code).toBe(2);
-    expect(r.err).toMatch(/Edit/);
+    const r = spawnSync(process.execPath, [join(copy, "scripts/luz.mjs"), "agent", "add", "luz-agent-editor", "--for", "claude,gemini", "--dir", d], { encoding: "utf-8" });
+    expect(r.status).toBe(2);
+    expect(r.stderr).toMatch(/Edit/);
     expect(readdirSync(d)).toEqual([]);
   });
 
   it("fills the fields it is given, one plain line each, and leaves the rest [ADAPT], the stop rule untouched", () => {
     const d = dir();
-    const r = add(d, "luz-accessibility-auditor", ["--for", "claude", "--set", "Target conformance level=WCAG 2.2 AA", "--set", "Site languages=English and Arabic"]);
+    const r = add(d, "luz-agent-accessibility", ["--for", "claude", "--set", "Target conformance level=WCAG 2.2 AA", "--set", "Site languages=English and Arabic"]);
     const out = JSON.parse(r.out);
     expect(out.filled.map((f) => f.field)).toEqual(["Target conformance level", "Site languages"]);
     expect(out.unfilled).toHaveLength(5);
-    const text = read(join(d, ".claude/agents/luz-accessibility-auditor.md"));
+    const text = read(join(d, ".claude/agents/luz-agent-accessibility.md"));
     expect(text).toContain("- Target conformance level: WCAG 2.2 AA\n");
     expect(text).toContain("- Site languages: English and Arabic\n");
     expect((text.match(/\[ADAPT: [^\n]*\]\n/g) ?? []).length).toBe(5);
     // Only the filled lines differ from the package's text
-    const was = bodyOf(read(join(assets, "agents/luz-accessibility-auditor.md"))).split("\n");
+    const was = bodyOf(read(join(assets, "agents/luz-agent-accessibility.md"))).split("\n");
     const now = bodyOf(text).split("\n");
     expect(now.length).toBe(was.length);
     expect(now.filter((l, i) => l !== was[i])).toEqual(["- Target conformance level: WCAG 2.2 AA", "- Site languages: English and Arabic"]);
@@ -804,14 +804,19 @@ describe("the agents and skills of luz-ai", () => {
   });
 
   it("fills a field under a parent by Parent/Label", () => {
+    const copy = join(dir(), "luz");
+    cpSync(skill, copy, { recursive: true });
+    const source = read(join(assets, "agents/luz-agent-accessibility.md"));
+    writeFileSync(join(copy, "assets/agents/luz-agent-nested.md"), source.replace("name: luz-agent-accessibility", "name: luz-agent-nested").replace("- Audit scope:", "- Commands:\n  - Build: [ADAPT: the command that builds the site]\n- Audit scope:"));
     const d = dir();
-    const r = add(d, "luz-core-web-vitals-optimizer", ["--for", "claude", "--set", "Commands/Build=npm run build"]);
-    expect(JSON.parse(r.out).filled).toEqual([{ field: "Commands/Build", value: "npm run build" }]);
-    expect(read(join(d, ".claude/agents/luz-core-web-vitals-optimizer.md"))).toContain("  - Build: npm run build\n");
+    const r = spawnSync(process.execPath, [join(copy, "scripts/luz.mjs"), "agent", "add", "luz-agent-nested", "--for", "claude", "--dir", d, "--set", "Commands/Build=npm run build", "--json"], { encoding: "utf-8" });
+    expect(r.status, r.stderr).toBe(0);
+    expect(JSON.parse(r.stdout).filled).toEqual([{ field: "Commands/Build", value: "npm run build" }]);
+    expect(read(join(d, ".claude/agents/luz-agent-nested.md"))).toContain("  - Build: npm run build\n");
   });
 
   it("refuses a field that is not the agent's, and a value that is not one plain line", () => {
-    const bad = (extra) => add(dir(), "luz-accessibility-auditor", ["--for", "claude", ...extra]);
+    const bad = (extra) => add(dir(), "luz-agent-accessibility", ["--for", "claude", ...extra]);
     expect(bad(["--set", "Nothing=x"]).code).toBe(2);
     expect(bad(["--set", "Audit scope"]).code).toBe(2);
     expect(bad(["--set", "Audit scope=one\ntwo"]).code).toBe(2);
@@ -824,69 +829,53 @@ describe("the agents and skills of luz-ai", () => {
   it("asks for what is missing, says which, and never overwrites without --force", () => {
     expect(run(["agent", "add"]).code).toBe(2);
     expect(run(["agent", "add", "luz-nothing", "--for", "claude"]).code).toBe(2);
-    const noFor = run(["agent", "add", "luz-ai-auditor"]);
+    const noFor = run(["agent", "add", "luz-agent-accessibility"]);
     expect(noFor.code).toBe(2);
     expect(noFor.err).toContain("--for");
-    expect(add(dir(), "luz-ai-auditor", ["--for", "cursor"]).code).toBe(2);
-    const d = dir({ ".claude/agents/luz-ai-auditor.md": "mine\n" });
-    expect(add(d, "luz-ai-auditor", ["--for", "claude"]).code).toBe(2);
-    expect(read(join(d, ".claude/agents/luz-ai-auditor.md"))).toBe("mine\n");
-    expect(add(d, "luz-ai-auditor", ["--for", "claude", "--force"]).code).toBe(0);
+    expect(add(dir(), "luz-agent-accessibility", ["--for", "cursor"]).code).toBe(2);
+    const d = dir({ ".claude/agents/luz-agent-accessibility.md": "mine\n" });
+    expect(add(d, "luz-agent-accessibility", ["--for", "claude"]).code).toBe(2);
+    expect(read(join(d, ".claude/agents/luz-agent-accessibility.md"))).toBe("mine\n");
+    expect(add(d, "luz-agent-accessibility", ["--for", "claude", "--force"]).code).toBe(0);
   });
 
   it("writes nothing with --dry-run and prints the files, the fields filled and the fields left", () => {
     const d = dir();
-    const r = run(["agent", "add", "luz-ai-auditor", "--for", "claude,codex", "--dir", d, "--set", "Audit scope=src", "--dry-run"]);
+    const r = run(["agent", "add", "luz-agent-accessibility", "--for", "claude,codex", "--dir", d, "--set", "Audit scope=src", "--dry-run"]);
     expect(r.code).toBe(0);
     expect(readdirSync(d)).toEqual([]);
-    expect(r.out.split("\n")[0]).toMatch(/would write 2 files .* 1 of 10 fields filled, 9 still \[ADAPT\]/);
+    expect(r.out.split("\n")[0]).toMatch(/would write 2 files .* 1 of 7 fields filled, 6 still \[ADAPT\]/);
     expect(r.out).toContain("Audit scope: src");
     expect(r.out).toContain("the agent stops and asks");
     expect(r.out).toMatch(/note: .*codex/);
     expect(r.out.length).toBeLessThan(3000);
-    const json = JSON.parse(run(["agent", "add", "luz-ai-auditor", "--for", "claude", "--dir", d, "--dry-run", "--json"]).out);
+    const json = JSON.parse(run(["agent", "add", "luz-agent-accessibility", "--for", "claude", "--dir", d, "--dry-run", "--json"]).out);
     expect(json.files[0].content).toContain("[ADAPT:");
-  });
-
-  it("adds a skill as the same folder in .agents/skills and .claude/skills, and never overwrites without --force", () => {
-    const d = dir();
-    const r = run(["skill", "add", "luz-readme", "--dir", d, "--json"]);
-    expect(r.code, r.err).toBe(0);
-    const rel = (base) => readdirSync(join(d, base, "luz-readme"), { recursive: true }).sort();
-    expect(rel(".agents/skills")).toEqual(rel(".claude/skills"));
-    expect(rel(".agents/skills")).toEqual(expect.arrayContaining(["SKILL.md", "references", "references/anatomy.md"]));
-    for (const f of rel(".agents/skills").filter((x) => x.endsWith(".md"))) expect(read(join(d, ".agents/skills/luz-readme", f))).toBe(read(join(d, ".claude/skills/luz-readme", f)));
-    expect(JSON.parse(run(["check", "--json"], d).out).problems).toEqual([]);
-    expect(run(["skill", "add", "luz-readme", "--dir", d]).code).toBe(2);
-    expect(run(["skill", "add", "luz-readme", "--dir", d, "--force"]).code).toBe(0);
-    expect(run(["skill", "add", "luz-nothing", "--dir", d]).code).toBe(2);
-    expect(run(["skill", "add"]).code).toBe(2);
   });
 
   it("never writes through a symbolic link, which a cloned repository may have at .claude", () => {
     const outside = dir();
     const d = dir();
     symlinkSync(outside, join(d, ".claude"));
-    const r = add(d, "luz-ai-auditor", ["--for", "claude"]);
+    const r = add(d, "luz-agent-accessibility", ["--for", "claude"]);
     expect(r.code).toBe(2);
     expect(r.err).toMatch(/symbolic link/);
     expect(readdirSync(outside)).toEqual([]);
     const dangling = dir();
     mkdirSync(join(dangling, ".claude/agents"), { recursive: true });
-    symlinkSync(join(outside, "nothing.md"), join(dangling, ".claude/agents/luz-ai-auditor.md"));
-    expect(add(dangling, "luz-ai-auditor", ["--for", "claude", "--force"]).code).toBe(2);
+    symlinkSync(join(outside, "nothing.md"), join(dangling, ".claude/agents/luz-agent-accessibility.md"));
+    expect(add(dangling, "luz-agent-accessibility", ["--for", "claude", "--force"]).code).toBe(2);
     expect(readdirSync(outside)).toEqual([]);
   });
 
   it("does not read a field called __proto__ or constructor as one", () => {
-    expect(add(dir(), "luz-ai-auditor", ["--for", "claude", "--set", "__proto__=x"]).code).toBe(2);
-    expect(add(dir(), "luz-ai-auditor", ["--for", "claude", "--set", "constructor=x"]).code).toBe(2);
+    expect(add(dir(), "luz-agent-accessibility", ["--for", "claude", "--set", "__proto__=x"]).code).toBe(2);
+    expect(add(dir(), "luz-agent-accessibility", ["--for", "claude", "--set", "constructor=x"]).code).toBe(2);
   });
 
   it("takes only list or add after the noun", () => {
     expect(run(["agent"]).code).toBe(2);
     expect(run(["agent", "remove", "x"]).code).toBe(2);
-    expect(run(["skill", "list", "extra"]).code).toBe(2);
   });
 });
 
@@ -971,11 +960,11 @@ describe("portability", () => {
 
   it("installs itself, as the same folder in .agents/skills and .claude/skills, with the evals left behind", () => {
     const d = dir();
-    const r = run(["skill", "add", "luz", "--dir", d, "--json"]);
+    const r = run(["init", "--target", "claude,codex", "--dir", d, "--json"]);
     expect(r.code, r.err).toBe(0);
     const tree = (base) => readdirSync(join(d, base, "luz"), { recursive: true }).sort();
     expect(tree(".agents/skills")).toEqual(tree(".claude/skills"));
-    expect(tree(".agents/skills")).toEqual(expect.arrayContaining(["SKILL.md", "agents/openai.yaml", "scripts/luz.mjs", "assets/agents/luz-ai-auditor.md", "references/levels.md"]));
+    expect(tree(".agents/skills")).toEqual(expect.arrayContaining(["SKILL.md", "agents/openai.yaml", "scripts/luz.mjs", "assets/agents/luz-agent-accessibility.md", "references/levels.md"]));
     expect(tree(".agents/skills").some((f) => f.startsWith("evals"))).toBe(false);
     expect(read(join(d, ".agents/skills/luz/SKILL.md"))).toBe(read(join(skill, "SKILL.md")));
   });
@@ -988,7 +977,7 @@ describe("portability", () => {
       writeFileSync(join(copy, path), text);
     }
     const d = dir();
-    const r = spawnSync(process.execPath, [join(copy, "scripts/luz.mjs"), "skill", "add", "luz", "--dir", d], { encoding: "utf-8" });
+    const r = spawnSync(process.execPath, [join(copy, "scripts/luz.mjs"), "init", "--target", "claude", "--dir", d], { encoding: "utf-8" });
     expect(r.status, r.stderr).toBe(0);
     const files = readdirSync(join(d, ".claude/skills/luz"), { recursive: true });
     for (const bad of [".env", "notes.txt", "node_modules", ".git", "references/.DS_Store"]) expect(files.some((f) => f === bad || f.startsWith(`${bad}/`)), bad).toBe(false);
@@ -997,36 +986,29 @@ describe("portability", () => {
 
   it("works from the copy it installed: from any folder, with nothing of the repository", () => {
     const d = dir();
-    run(["skill", "add", "luz", "--dir", d]);
+    run(["init", "--target", "claude", "--dir", d]);
     const copy = join(d, ".claude/skills/luz/scripts/luz.mjs");
     const go = (args, cwd) => spawnSync(process.execPath, [copy, ...args], { cwd, encoding: "utf-8", stdio: ["ignore", "pipe", "pipe"] });
     expect(go(["doctor", "--dir", d], tmpdir()).status).toBe(0);
     const site = join(d, "site");
     expect(go(["site", "new", "--name", "X", "--kind", "docs", "--stack", "vanilla", "--target", site], tmpdir()).status).toBe(0);
     expect(existsSync(join(site, "index.html"))).toBe(true);
-    const agent = go(["agent", "add", "luz-ai-auditor", "--for", "claude,codex", "--dir", d], tmpdir());
+    const agent = go(["agent", "add", "luz-agent-accessibility", "--for", "claude,codex", "--dir", d], tmpdir());
     expect(agent.status, agent.stderr).toBe(0);
-    expect(existsSync(join(d, ".codex/agents/luz-ai-auditor.toml"))).toBe(true);
+    expect(existsSync(join(d, ".codex/agents/luz-agent-accessibility.toml"))).toBe(true);
   });
 
   it("warns, and does not fail, when the two copies of a skill have drifted apart, and says how to put them right", () => {
     const d = dir();
-    run(["skill", "add", "luz-readme", "--dir", d]);
+    run(["init", "--target", "claude,codex", "--dir", d]);
     expect(JSON.parse(run(["doctor", "--json", "--dir", d]).out).warnings).toEqual([]);
-    writeFileSync(join(d, ".claude/skills/luz-readme/SKILL.md"), `${read(join(d, ".claude/skills/luz-readme/SKILL.md"))}\nextra\n`);
+    writeFileSync(join(d, ".claude/skills/luz/SKILL.md"), `${read(join(d, ".claude/skills/luz/SKILL.md"))}\nextra\n`);
     const r = run(["doctor", "--json", "--dir", d]);
     expect(r.code).toBe(0);
     const warning = JSON.parse(r.out).warnings.join(" ");
-    expect(warning).toMatch(/luz-readme is not the same in \.agents\/skills and \.claude\/skills/);
-    expect(warning).toContain("skill add luz-readme --force");
+    expect(warning).toMatch(/luz is not the same in \.agents\/skills and \.claude\/skills/);
   });
 
-  it("writes the skill to .claude/skills because Claude Code does not document .agents/skills", () => {
-    const d = dir();
-    run(["skill", "add", "luz-readme", "--dir", d]);
-    expect(existsSync(join(d, ".claude/skills/luz-readme/SKILL.md"))).toBe(true);
-    expect(existsSync(join(d, ".agents/skills/luz-readme/SKILL.md"))).toBe(true);
-  });
 });
 
 describe("the title of luz-ai: the prism of the mark and the word LUZ, as text, at one height (owner, 2026-11-24)", () => {

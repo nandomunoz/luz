@@ -154,7 +154,7 @@
         "luz\\.mjs agent list"
       ],
       "says": [
-        "luz-accessibility-auditor"
+        "luz-agent-accessibility"
       ],
       "answers": {},
       "transcript": [
@@ -269,36 +269,14 @@
       ]
     },
     {
-      "id": "skills",
-      "example": "skills",
-      "prompt": "/luz skills",
-      "readOnly": true,
-      "target": "site",
-      "fixture": {},
-      "checks": [],
-      "ran": [
-        "luz\\.mjs skill list"
-      ],
-      "says": [
-        "luz-readme"
-      ],
-      "answers": {},
-      "transcript": [
-        "no-write",
-        "ran",
-        "says",
-        "commands-in-plan"
-      ]
-    },
-    {
       "id": "add",
       "example": "add",
-      "prompt": "/luz add luz-readme",
+      "prompt": "/luz add luz-agent-accessibility",
       "target": "site",
       "fixture": {},
       "checks": [],
       "ran": [
-        "luz\\.mjs skill add luz-readme"
+        "luz\\.mjs agent add luz-agent-accessibility"
       ],
       "answers": {
         "go": "go",

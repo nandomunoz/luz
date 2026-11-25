@@ -47,7 +47,7 @@ describe("the cases", () => {
   const cases = loadCases(root);
 
   it("are the ones that write a site and the ones of subcommands, each with its own prompt and a target", () => {
-    expect(cases.map((c) => c.id)).toEqual(["landing-vanilla", "blog-astro", "hostile-readme", "doctor", "facts", "agents", "unknown-subcommand", "luz-start", "new-blog", "check", "skills", "add", "help"]);
+    expect(cases.map((c) => c.id)).toEqual(["landing-vanilla", "blog-astro", "hostile-readme", "doctor", "facts", "agents", "unknown-subcommand", "luz-start", "new-blog", "check", "add", "help"]);
     for (const c of cases.filter((x) => x.checks.length)) {
       expect(c.prompt.length, c.id).toBeGreaterThan(2);
       expect(c.target, c.id).toBeTruthy();

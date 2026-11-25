@@ -25,8 +25,8 @@ Go through each list on the page the check cannot see. If you have a helper for 
 
 ## Legal pages (the person decides, a lawyer confirms)
 
-- Who publishes the site: a name, an address and a way to contact them, in the footer or a page linked from it (in Spain, art. 10 of the LSSI-CE, if the site is a business activity).
-- A form or any data you collect: who is responsible, what for and who receives it (art. 13 of the GDPR), next to the form.
+- Who publishes the site: a name, an address and a way to contact them, in the footer or a page linked from it. Some countries require it for a business: ask the person to check.
+- A form or any data you collect: who is responsible, what for and who receives it, next to the form. Ask the person to check what the law of their country requires.
 - Anything the page stores in the browser or loads from another origin: say what it is, and ask the person whether it needs a notice or consent. Do not write a cookie banner, a privacy policy or a legal notice on your own.
 - Say that none of this is legal advice and that you did not check it.
 

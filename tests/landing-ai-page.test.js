@@ -2,11 +2,11 @@
  * The page of the luz skill, /ai/ (owner, 2026-11-23): a page like the catalog's, with a hero whose live part is
  * the home's terminal, how to install and use the skill, and below them what the reader gains, ordered by goal
  * (owner, 2026-11-25): the assistants it works with, how to start a site, the agents that look after what a project
- * needs, the skills for the details, how to keep it in shape, and what you decide. The tables of commands are in
+ * needs, how to keep it in shape, and what you decide. The tables of commands are in
  * /docs/ai/. The home's fourth level has a button to it.
  *
  * Every fact of the package is read from packages/ai/skills/luz/ and never typed (scripts/docs-site/ai-page.js):
- * a new agent or skill needs its words in the catalogs, and the page names exactly what the skill carries.
+ * a new agent needs its words in the catalogs, and the page names exactly what the skill carries.
  */
 import { execFileSync } from "node:child_process";
 import { readFileSync, readdirSync } from "node:fs";
@@ -43,7 +43,6 @@ const terminalOf = (html) => /<figure class="landing-cli[ "][\s\S]*?<\/figure>/.
 const screenOf = (html) => /<div class="landing-cli__screen"[^>]*>([\s\S]*)<\/div>\n<(?:button|figcaption)/.exec(terminalOf(html))?.[1] ?? "";
 
 const agents = readdirSync(join(repo, SKILL, "assets/agents")).filter((n) => n.endsWith(".md")).map((n) => n.slice(0, -3)).sort();
-const skills = readdirSync(join(repo, SKILL, "assets/skills"), { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name).sort();
 
 describe("the page of the luz skill, /ai/", () => {
   it("is a route of the site in every language, with no broken link and no catalog key left over", () => {
@@ -74,10 +73,10 @@ describe("the page of the luz skill, /ai/", () => {
     expect(hero).toMatch(/<a class="luz-btn luz-btn--primary" href="#steps">/);
   });
 
-  it.each(LANGS)("in %s: the hero's numbers are the package's: agents, skills, ways to install and dependencies", (code, prefix) => {
+  it.each(LANGS)("in %s: the hero's numbers are the package's: agents, ways to install and dependencies", (code, prefix) => {
     const facts = aiFacts(repo);
     const numbers = [...sectionOf(rendered.get(`${prefix}ai/`), "hero").matchAll(/<li><strong>([^<]*)<\/strong>/g)].map((m) => m[1]);
-    expect(numbers).toEqual([agents.length, skills.length, facts.targets.length, 0].map(String));
+    expect(numbers).toEqual([agents.length, facts.targets.length, 0].map(String));
   });
 
   it("installs and uses the skill in three steps, with commands the skill has", () => {
@@ -95,10 +94,10 @@ describe("the page of the luz skill, /ai/", () => {
   const cards = (block) => [...block.matchAll(/<article\b[\s\S]*?<\/article>/g)].map((m) => m[0]);
   const titleOf = (card) => /<p class="landing-card__title">([^<]*)<\/p>/.exec(card)?.[1];
 
-  it("has the assistants' strip, then a section for each goal (start, agents, skills, keep) and the strip of what you decide, in that order, with no table", () => {
+  it("has the assistants' strip, then a section for each goal (start, agents, keep) and the strip of what you decide, in that order, with no table", () => {
     for (const [, prefix] of LANGS) {
       const html = rendered.get(`${prefix}ai/`);
-      expect([...html.matchAll(/<section\b[^>]*\sid="(a-[a-z]+)"/g)].map((m) => m[1])).toEqual(["a-assistants", "a-start", "a-agents", "a-skills", "a-keep", "a-decide"]);
+      expect([...html.matchAll(/<section\b[^>]*\sid="(a-[a-z]+)"/g)].map((m) => m[1])).toEqual(["a-assistants", "a-start", "a-agents", "a-keep", "a-decide"]);
       // The two tables of commands and the one of assistants are in /docs/ai/ now, not here
       expect(html, prefix).not.toMatch(/<table\b/);
       expect(html, prefix).not.toContain("--target</th>");
@@ -154,21 +153,6 @@ describe("the page of the luz skill, /ai/", () => {
     }
   });
 
-  it.each(LANGS)("in %s: the skills are a card each, a human name, what they help with and the sentence that adds them", (code, prefix) => {
-    const block = sectionOf(rendered.get(`${prefix}ai/`), "a-skills");
-    const words = catalog(code);
-    const list = cards(block);
-    expect(list).toHaveLength(skills.length);
-    for (const name of skills) {
-      const card = list.find((c) => c.includes(`<code>${name}</code>`));
-      expect(card, name).toBeDefined();
-      expect(card.split(`<code>${name}</code>`).length - 1, name).toBe(1);
-      expect(titleOf(card)).toBe(escape(words[`level.ai.skill.${name}.title`]));
-      expect(card).toContain(escape(words[`level.ai.skill.${name}.text`]));
-      expect(card).toContain(`<code>/luz add ${name}</code>`);
-    }
-  });
-
   it.each(LANGS)("in %s: the section to keep it in shape is doctor and check, the two that only read", (code, prefix) => {
     const block = sectionOf(rendered.get(`${prefix}ai/`), "a-keep");
     const words = catalog(code);
@@ -187,11 +171,11 @@ describe("the page of the luz skill, /ai/", () => {
     expect(block).toContain(escape(words["level.ai.limits.title"]));
   });
 
-  it("has the words of every agent and skill in the three languages, and none for one that is gone", () => {
+  it("has the words of every agent in the three languages, and none for one that is gone", () => {
     for (const [code] of LANGS) {
       const words = catalog(code);
-      const keys = Object.keys(words).filter((k) => /^level\.ai\.(agent|skill)\.[a-z-]+\.(title|text)$/.test(k));
-      const expected = [...agents.map((n) => `level.ai.agent.${n}`), ...skills.map((n) => `level.ai.skill.${n}`)].flatMap((k) => [`${k}.title`, `${k}.text`]);
+      const keys = Object.keys(words).filter((k) => /^level\.ai\.agent\.[a-z-]+\.(title|text)$/.test(k));
+      const expected = agents.map((n) => `level.ai.agent.${n}`).flatMap((k) => [`${k}.title`, `${k}.text`]);
       expect(keys.sort(), code).toEqual(expected.sort());
     }
   });
