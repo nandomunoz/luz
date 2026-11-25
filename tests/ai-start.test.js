@@ -705,7 +705,7 @@ describe("init: the /luz command of each assistant (owner, 2026-11-24)", () => {
 
 describe("the agents of luz-ai", () => {
   const assets = join(skill, "assets");
-  const AGENTS = ["luz-agent-accessibility"];
+  const AGENTS = ["luz-agent-accessibility", "luz-agent-legal", "luz-agent-optimiza", "luz-agent-seogeo", "luz-agent-ux"];
   const list = (kind) => JSON.parse(run([kind, "list", "--json"]).out);
   const bodyOf = (text) => text.replace(/^---\n[\s\S]*?\n---\n+/, "").trim();
   const add = (d, name, flags = []) => run(["agent", "add", name, "--dir", d, "--json", ...flags]);
@@ -728,7 +728,7 @@ describe("the agents of luz-ai", () => {
     expect(existsSync(join(assets, "skills"))).toBe(false);
     const r = run(["lint", "--json", join(assets, "agents")]);
     expect(JSON.parse(r.out).problems).toEqual([]);
-    expect(JSON.parse(r.out).checked.length).toBe(1);
+    expect(JSON.parse(r.out).checked.length).toBe(AGENTS.length);
   });
 
   it("has no skill subcommand: the agents are all it adds, and the skill installs itself with init", () => {

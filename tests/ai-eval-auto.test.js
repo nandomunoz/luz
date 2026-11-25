@@ -284,7 +284,7 @@ describe("triggers with decoys", () => {
 describe("agents with seeded faults", () => {
   it("each fixture seeds known faults with a pattern each, and has clean parts that must not be flagged", async () => {
     const { AGENT_CASES } = await lab("agents.js");
-    expect(AGENT_CASES.map((c) => c.agent)).toContain("luz-agent-accessibility");
+    expect(AGENT_CASES.map((c) => c.agent).sort()).toEqual(["luz-agent-accessibility", "luz-agent-legal", "luz-agent-optimiza", "luz-agent-seogeo", "luz-agent-ux"]);
     for (const c of AGENT_CASES) {
       expect(c.faults.length, c.agent).toBeGreaterThanOrEqual(3);
       expect(read(`packages/ai/skills/luz/assets/agents/${c.agent}.md`).length).toBeGreaterThan(0);
@@ -348,7 +348,7 @@ out({ type: "rate_limit_event", rate_limit_info: { status: "allowed", unifiedWin
 if (prompt.startsWith("PERSON")) text(prompt.includes("first message") ? '{"reply":"I want a landing page"}' : '{"done":true}');
 else if (prompt.startsWith("JUDGE")) text('{"verdicts":[{"rule":"R2","ok":true},{"rule":"R9","ok":false,"turn":0,"reason":"touched a file"}]}');
 else if (a.includes("--max-turns") && a.includes("Skill")) { if (/LUZ|luz/.test(prompt)) tool("Skill", { skill: "luz" }); text("ok"); }
-else if (prompt.includes("agent to audit")) text("The img has no alt. The html has no lang. The div acts as a button with no keyboard role. No meta description and no h1; the title is generic. The script is render-blocking; no width or height; the LCP image needs priority. The key is exposed; no disclosure; prompt injection.");
+else if (prompt.includes("agent to audit")) text("The img has no alt. The html has no lang. The div acts as a button with no keyboard role. No meta description and no h1; the title is generic. The script is render-blocking; no width or height; the LCP image needs priority. The analytics cookie is set with no consent; no privacy notice next to the form; no site notice names the publisher. The fields use a placeholder as their label; the Submit button is vague; the click here link text says nothing.");
 else { tool("Skill", { skill: "luz" }); text("Which stack?"); }
 out({ type: "result", subtype: "success", is_error: false, session_id: "S1", total_cost_usd: 0, usage: { input_tokens: 1, output_tokens: 1 } });
 `,
@@ -391,7 +391,7 @@ out({ type: "result", subtype: "success", is_error: false, session_id: "S1", tot
     const out = mk();
     const r = sh(["agents", "--out", out]);
     const rows = JSON.parse(readFileSync(join(out, "agents.json"), "utf-8"));
-    expect(rows.map((x) => x.agent)).toEqual(["luz-agent-accessibility"]);
+    expect(rows.map((x) => x.agent)).toEqual(["luz-agent-accessibility", "luz-agent-seogeo", "luz-agent-optimiza", "luz-agent-legal", "luz-agent-ux"]);
     for (const x of rows) expect(x.recall, x.agent).toBeGreaterThanOrEqual(0.75);
     expect(r.stdout).toContain("recall");
   }, 60000);

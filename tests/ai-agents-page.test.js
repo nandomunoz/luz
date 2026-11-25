@@ -19,7 +19,7 @@ const site = { t: (key) => strings("en")[key] ?? key };
 describe("the rows come from the files of the package", () => {
   it("are the agents, each named luz-agent-<word>, with its name, what it reviews and its tools, read from its front matter", () => {
     const rows = agentRows(root);
-    expect(rows.map((r) => r.name)).toEqual(["luz-agent-accessibility"]);
+    expect(rows.map((r) => r.name)).toEqual(["luz-agent-accessibility", "luz-agent-legal", "luz-agent-optimiza", "luz-agent-seogeo", "luz-agent-ux"]);
     for (const r of rows) {
       expect(r.description.length, r.name).toBeGreaterThan(20);
       expect(r.tools, r.name).toMatch(/^[A-Za-z, ]+$/);

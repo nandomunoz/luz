@@ -157,6 +157,36 @@ describe("the page of the luz skill, /ai/", () => {
     expect(block).toContain('docs/ai/agents/');
   });
 
+  it.each(LANGS)("in %s: an agent that changes code says so in its badge, and the ones that read say they read", (code, prefix) => {
+    const block = sectionOf(rendered.get(`${prefix}ai/`), "a-agents");
+    const words = catalog(code);
+    const facts = aiFacts(repo).agents;
+    expect(facts.filter((a) => a.acts).map((a) => a.name)).toEqual(["luz-agent-optimiza"]);
+    for (const a of facts) {
+      const card = cards(block).find((c) => c.includes(`<code>${a.name}</code>`));
+      const badge = a.acts ? `<span class="luz-badge luz-badge--primary">${escape(words["level.ai.agents.acts"])}</span>` : `<span class="luz-badge luz-badge--gray">${escape(words["level.ai.agents.reads"])}</span>`;
+      expect(card, a.name).toContain(badge);
+      expect(card.includes("<bdi>Gemini CLI</bdi>"), a.name).toBe(!a.acts);
+    }
+  });
+
+  it.each(LANGS)("in %s: below the strip of assistants, a list of links takes the reader to each section of the page", (code, prefix) => {
+    const html = rendered.get(`${prefix}ai/`);
+    const words = catalog(code);
+    const nav = /<nav class="landing-ai-toc" aria-label="([^"]*)">([\s\S]*?)<\/nav>/.exec(html);
+    expect(nav, code).not.toBeNull();
+    expect(nav[1]).toBe(escape(words["level.ai.toc.label"]));
+    const links = [...nav[2].matchAll(/<a href="#(a-[a-z]+)">([^<]*)<\/a>/g)].map((m) => [m[1], m[2]]);
+    expect(links).toEqual([
+      ["a-commands", escape(words["level.ai.commands.title"])],
+      ["a-agents", escape(words["level.ai.agents.title"])],
+      ["a-skill", escape(words["level.ai.skill.title"])],
+      ["a-decide", escape(words["level.ai.limits.title"])],
+    ]);
+    expect(html.indexOf('class="landing-ai-toc"')).toBeGreaterThan(html.indexOf('id="a-assistants"'));
+    expect(html.indexOf('class="landing-ai-toc"')).toBeLessThan(html.indexOf('id="a-commands"'));
+  });
+
   it("does not offer an agent that changes code to Gemini CLI, which agent add does not write it for", () => {
     for (const agent of aiFacts(repo).agents) {
       expect(agent.hosts.includes("Gemini CLI"), agent.name).toBe(!agent.acts);
@@ -173,7 +203,12 @@ describe("the page of the luz skill, /ai/", () => {
     const list = cards(block);
     expect(list).toHaveLength(rows.length);
     expect(rows.length).toBeGreaterThanOrEqual(8);
-    rows.forEach((row, i) => {
+    // Two groups (owner, 2026-11-25: the page again): the commands that write, after your go, then the ones that only read
+    const groups = [...block.matchAll(/<div class="landing-ai-group" id="(a-commands-[a-z]+)">\s*<h3 class="landing-ai-group__title" id="\1-title">([^<]*)<\/h3>([\s\S]*?)<\/div>\s*<\/div>/g)];
+    expect(groups.map((g) => [g[1], g[2]])).toEqual([["a-commands-writes", escape(words["level.ai.commands.writes"])], ["a-commands-reads", escape(words["level.ai.commands.reads"])]]);
+    expect(cards(groups[0][3]).map(titleOf)).toEqual(rows.filter((r) => r.writes).map((r) => escape(shortOf(r.chat))));
+    expect(cards(groups[1][3]).map(titleOf)).toEqual(rows.filter((r) => !r.writes).map((r) => escape(shortOf(r.chat))));
+    [...rows.filter((r) => r.writes), ...rows.filter((r) => !r.writes)].forEach((row, i) => {
       const card = list[i];
       expect(titleOf(card), row.slug).toBe(escape(shortOf(row.chat)));
       expect(card, row.slug).toContain(escape(words[`level.ai.cmd.${row.slug}`]));

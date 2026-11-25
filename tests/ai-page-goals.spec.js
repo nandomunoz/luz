@@ -18,7 +18,7 @@ import AxeBuilder from '@axe-core/playwright';
 const ROUTES = ['/ai/', '/es/ai/', '/ar/ai/'];
 const GOALS = [
   ['a-commands', 8],
-  ['a-agents', 1],
+  ['a-agents', 5],
   ['a-skill', 4],
 ];
 

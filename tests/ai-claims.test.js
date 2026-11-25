@@ -25,10 +25,11 @@ describe("the skill says what it does", () => {
     }
   });
 
-  it("no agent is sold as legal, and only the accessibility agent is left", () => {
-    expect(en["level.ai.agents.lead"]).not.toMatch(/\blaw\b|legal/i);
+  it("the legal agent is sold as a review, never as legal advice, and the agents are the five of the package", () => {
+    expect(en["level.ai.agent.luz-agent-legal.text"]).toMatch(/not legal advice/);
+    expect(en["level.ai.agents.lead"]).not.toMatch(/complian|legal advice/i);
     const agents = new Set(Object.keys(en).filter((k) => /^level\.ai\.agent\.luz-/.test(k)).map((k) => k.split(".")[3]));
-    expect([...agents]).toEqual(["luz-agent-accessibility"]);
+    expect([...agents].sort()).toEqual(["luz-agent-accessibility", "luz-agent-legal", "luz-agent-optimiza", "luz-agent-seogeo", "luz-agent-ux"]);
   });
 
   it("the agents reference does not call the agent a template with fields to fill: it has none", () => {
