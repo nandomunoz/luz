@@ -97,16 +97,16 @@
   --luz-brand-fill-hover: #8f510a;
   --luz-brand-fill-active: #6f3f08;
 
-  /* Sidebar */
-  --luz-sidebar-bg: #2e2416;
-  --luz-sidebar-text: #ecdcbf;
-  --luz-sidebar-text-hover: #fff;
-  --luz-sidebar-hover: #3e3120;
-  --luz-sidebar-active-bg: #f2c174;
-  --luz-sidebar-active-text: #1f170c;
-  --luz-sidebar-border: #433522;
-  --luz-sidebar-label: #c2ab84;
-  --luz-sidebar-logo-bg: #f2c174;
+  /* Sidebar: the page of the moment */
+  --luz-sidebar-bg: #fbf6ea;
+  --luz-sidebar-text: #2a2218;
+  --luz-sidebar-text-hover: #2a2218;
+  --luz-sidebar-hover: #f5ecd8;
+  --luz-sidebar-active-bg: #ae630c;
+  --luz-sidebar-active-text: #fff;
+  --luz-sidebar-border: #eadab4;
+  --luz-sidebar-label: #6d6153;
+  --luz-sidebar-logo-bg: #ae630c;
 
 
   /* Inputs */
@@ -174,16 +174,16 @@
   --luz-brand-fill-hover: #8c3212;
   --luz-brand-fill-active: #6e270e;
 
-  /* Sidebar */
-  --luz-sidebar-bg: #331a10;
-  --luz-sidebar-text: #f1d5c2;
-  --luz-sidebar-text-hover: #fff;
-  --luz-sidebar-hover: #47271a;
-  --luz-sidebar-active-bg: #f4a77c;
-  --luz-sidebar-active-text: #2a120a;
-  --luz-sidebar-border: #4c2b1d;
-  --luz-sidebar-label: #cc9d82;
-  --luz-sidebar-logo-bg: #f4a77c;
+  /* Sidebar: the page of the moment */
+  --luz-sidebar-bg: #fcefe2;
+  --luz-sidebar-text: #33190e;
+  --luz-sidebar-text-hover: #33190e;
+  --luz-sidebar-hover: #f7e4d2;
+  --luz-sidebar-active-bg: #ad3f17;
+  --luz-sidebar-active-text: #fff;
+  --luz-sidebar-border: #e8c4a2;
+  --luz-sidebar-label: #7a4d38;
+  --luz-sidebar-logo-bg: #ad3f17;
 
 
   /* Inputs */
