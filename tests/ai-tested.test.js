@@ -31,12 +31,23 @@ describe("tested.json: what a green release pass writes", () => {
     expect(t).toEqual({ host: "claude-code", cli: "2.1.331", model: "opus", skillVersion: "0.2.0", packageVersion: "0.4.1", date: "2026-11-24", cases: ["a", "b"] });
   });
 
-  it("refuses a run that is not the release layer, not a script run, or not all green", async () => {
+  it("refuses a run that is not the release layer, not a script run, or with too many cases red", async () => {
     const { makeTested } = await lab("tested.js");
     const o = { skillVersion: "1", packageVersion: "1", cli: "1" };
     expect(() => makeTested(green({ meta: { layer: "full", model: "sonnet", mode: "script", caseIds: [] } }), o)).toThrow(/release layer/);
     expect(() => makeTested(green({ meta: { layer: "release", model: "opus", mode: "auto", caseIds: [] } }), o)).toThrow(/script/);
     expect(() => makeTested(green({ cases: { a: { status: "fail", runs: [] } } }), o)).toThrow(/did not pass/);
+  });
+
+  it("takes a pass with a few cases red: 9 of 10 is written with the case that failed, 8 of 10 is not", async () => {
+    const { makeTested } = await lab("tested.js");
+    const o = { skillVersion: "1", packageVersion: "1", cli: "1", now: new Date("2026-11-25T10:00:00Z") };
+    const cases = (red) => Object.fromEntries(Array.from({ length: 10 }, (_, i) => [`c${i}`, { status: i < red ? "fail" : "pass", runs: [] }]));
+    const t = makeTested(green({ cases: cases(1) }), o);
+    expect(t.cases).toHaveLength(10);
+    expect(t.failed).toEqual(["c0"]);
+    expect(makeTested(green({ cases: cases(0) }), o).failed).toEqual([]);
+    expect(() => makeTested(green({ cases: cases(2) }), o)).toThrow(/did not pass/);
   });
 
   it("the command writes it next to the package and refuses without a release run", () => {
@@ -68,7 +79,15 @@ describe("the release gate", () => {
     expect(checkAiTested(repo({ tested: ok }))).toEqual([]);
   });
 
-  it("fails with no tested.json, with another package or skill version, with a stale example and with a model that is not the release layer's", async () => {
+  it("only warns: the lab informs and the deterministic tests are the gate, so the command exits 0 with a problem unless --strict is given", () => {
+    const d = repo({});
+    const run = (flags = []) => spawnSync(process.execPath, [join(root, "scripts/check-ai-tested.js"), "--root", d, ...flags], { encoding: "utf-8" });
+    expect(run().status).toBe(0);
+    expect(run().stderr).toMatch(/^check:ai-tested: !/m);
+    expect(run(["--strict"]).status).toBe(1);
+  });
+
+  it("lists a problem with no tested.json, with another package or skill version, with a stale example and with a model that is not the release layer's", async () => {
     const { checkAiTested } = await gate();
     expect(checkAiTested(repo({}))[0]).toMatch(/tested\.json/);
     expect(checkAiTested(repo({ tested: { ...ok, packageVersion: "0.4.0" } })).join(" ")).toMatch(/package/);
@@ -77,9 +96,10 @@ describe("the release gate", () => {
     expect(checkAiTested(repo({ tested: { ...ok, model: "haiku" } })).join(" ")).toMatch(/opus/);
   });
 
-  it("is a step of qa-release and a script of the root package", () => {
+  it("is a step of qa-release that never blocks, and a script of the root package", () => {
     expect(JSON.parse(read("package.json")).scripts["check:ai-tested"]).toBe("node scripts/check-ai-tested.js");
     expect(read("scripts/qa-release.js")).toMatch(/check:ai-tested/);
+    expect(read("scripts/qa-release.js")).not.toMatch(/check:ai-tested[^\n]*--strict/);
   });
 });
 
