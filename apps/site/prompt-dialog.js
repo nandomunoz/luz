@@ -65,7 +65,7 @@ function load(href) {
  * @luz-ds on the CDN. Any other URL stays text (a prompt is text addressed to
  * a model; the reader follows only what the site itself published).
  */
-const ADDRESS = /https:\/\/(?:nandovejer\.github\.io\/luz\/|cdn\.jsdelivr\.net\/npm\/@luz-ds\/)[^\s<>"`]*/;
+const ADDRESS = /https:\/\/(?:nandomunoz\.github\.io\/luz\/|cdn\.jsdelivr\.net\/npm\/@luz-ds\/)[^\s<>"`]*/;
 /** A phrase in straight quotes, like a string in a source file. */
 const SAID = /"[^"\n]{1,60}"/;
 const TOKENS = new RegExp(`(${ADDRESS.source})|(${SAID.source})`, "g");

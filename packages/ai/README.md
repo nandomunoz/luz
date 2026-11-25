@@ -28,7 +28,7 @@ The folders are the ones each assistant documents. Claude Code reads `.claude/sk
 
 Type `/luz` in your assistant, with a subcommand or without. A word that is not in the table gets the table, never a guess.
 
-The skill is tested only in Claude Code. The other assistants get it written from their own documentation; if one of them fails, [tell us](https://github.com/nandovejer/luz/issues/new?template=ai-target.yml).
+The skill is tested only in Claude Code. The other assistants get it written from their own documentation; if one of them fails, [tell us](https://github.com/nandomunoz/luz/issues/new?template=ai-target.yml).
 
 | In the chat | What it does | Writes |
 | --- | --- | --- |
@@ -42,7 +42,7 @@ The skill is tested only in Claude Code. The other assistants get it written fro
 | `/luz add <name>` | Adds the agent or the skill you name, after asking its fields. | yes, after "go" |
 | `/luz help` | This table. | no |
 
-Each one has a real conversation, and what the script prints, on https://nandovejer.github.io/luz/docs/get-started/ai-commands/. `/luz-readme` and `/luz-landing` are skills of their own, and `init` runs only in a terminal.
+Each one has a real conversation, and what the script prints, on https://nandomunoz.github.io/luz/docs/get-started/ai-commands/. `/luz-readme` and `/luz-landing` are skills of their own, and `init` runs only in a terminal.
 
 ## The script
 
@@ -99,9 +99,9 @@ Not released yet: 0.0.0 is the workspace's placeholder; the first release is 0.1
 
 1. `README.md` in this package: what the command does and its exit codes.
 2. `npx @luz-ds/ai@0.0.0 --help`: the command's options, from the version you run.
-3. https://nandovejer.github.io/luz/llms.txt: the index of the documentation, short enough for a small context.
-4. https://nandovejer.github.io/luz/llms-full.txt: the same pages in full.
-5. https://nandovejer.github.io/luz/examples/: one standalone page of markup for each component and pattern.
+3. https://nandomunoz.github.io/luz/llms.txt: the index of the documentation, short enough for a small context.
+4. https://nandomunoz.github.io/luz/llms-full.txt: the same pages in full.
+5. https://nandomunoz.github.io/luz/examples/: one standalone page of markup for each component and pattern.
 
 ### Load order
 

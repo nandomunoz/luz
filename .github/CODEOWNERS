@@ -1,62 +1,62 @@
 # LUZ Design System — Code Owners
 
 # Default owner for all files in the repository
-* @nandovejer
+* @nandomunoz
 
 # CI/CD and GitHub configuration
-.github/workflows/      @nandovejer
-.github/                @nandovejer
+.github/workflows/      @nandomunoz
+.github/                @nandomunoz
 
 # Design tokens (base layer)
-packages/tokens/        @nandovejer
-scripts/build-tokens.js @nandovejer
+packages/tokens/        @nandomunoz
+scripts/build-tokens.js @nandomunoz
 
 # Core design system (builds on tokens)
-packages/core/          @nandovejer
-scripts/build-core.js   @nandovejer
+packages/core/          @nandomunoz
+scripts/build-core.js   @nandomunoz
 # A language file runs on every page that declares its language: reviewed on its own line
-packages/core/src/i18n* @nandovejer
+packages/core/src/i18n* @nandomunoz
 
 # Catalog layer (builds on core)
-packages/catalog/      @nandovejer
-scripts/build-catalog.js @nandovejer
+packages/catalog/      @nandomunoz
+scripts/build-catalog.js @nandomunoz
 
 # The shared builder of catalog
-scripts/build-package.js @nandovejer
+scripts/build-package.js @nandomunoz
 
 # Dev tools (published, no CSS; own version, out of the fixed group)
-packages/check/          @nandovejer
-scripts/build-check.js   @nandovejer
+packages/check/          @nandomunoz
+scripts/build-check.js   @nandomunoz
 
 # Build and configuration
-scripts/                @nandovejer
-package.json            @nandovejer
-pnpm-workspace.yaml     @nandovejer
+scripts/                @nandomunoz
+package.json            @nandomunoz
+pnpm-workspace.yaml     @nandomunoz
 
 # Documentation
-*.md                    @nandovejer
-docs/                   @nandovejer
-apps/docs/              @nandovejer
+*.md                    @nandomunoz
+docs/                   @nandomunoz
+apps/docs/              @nandomunoz
 # The docs site generator writes every published page, its CSP and its links
-scripts/docs-site/      @nandovejer
-apps/docs/_layouts/     @nandovejer
-apps/docs/_partials/    @nandovejer
-apps/site/              @nandovejer
-apps/landing/           @nandovejer
+scripts/docs-site/      @nandomunoz
+apps/docs/_layouts/     @nandomunoz
+apps/docs/_partials/    @nandomunoz
+apps/site/              @nandomunoz
+apps/landing/           @nandomunoz
 
 # Linting and testing configuration
-eslint.config.js        @nandovejer
-stylelint.config.js     @nandovejer
-vitest.config.js        @nandovejer
-playwright.config.js    @nandovejer
+eslint.config.js        @nandomunoz
+stylelint.config.js     @nandomunoz
+vitest.config.js        @nandomunoz
+playwright.config.js    @nandomunoz
 
 # The prompt-injection sentinel, its shell hook and its cases: a weaker copy protects nothing
-.claude/agents/prompt-injection-auditor.md   @nandovejer
-.claude/agents/security-auditor.md           @nandovejer
-.claude/hooks/injection-auditor-bash.js      @nandovejer
-.claude/settings.json                        @nandovejer
-.claude/evals/                               @nandovejer
+.claude/agents/prompt-injection-auditor.md   @nandomunoz
+.claude/agents/security-auditor.md           @nandomunoz
+.claude/hooks/injection-auditor-bash.js      @nandomunoz
+.claude/settings.json                        @nandomunoz
+.claude/evals/                               @nandomunoz
 
 # The legal auditor, its read-only shell hook and its cases: a weaker copy protects nothing
-.claude/agents/legal-auditor.md              @nandovejer
-.claude/hooks/legal-auditor-bash.js          @nandovejer
+.claude/agents/legal-auditor.md              @nandomunoz
+.claude/hooks/legal-auditor-bash.js          @nandomunoz

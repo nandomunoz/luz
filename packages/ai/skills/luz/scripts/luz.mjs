@@ -860,7 +860,7 @@ function runInit(values) {
   for (const t of targets) if (INIT_COMMANDS[t]) files.push(INIT_COMMANDS[t]);
   // Only Claude Code is run through the lab; the others are written from their documentation
   const untested = targets.filter((t) => t !== "claude");
-  if (untested.length) notes.push(`tested only in Claude Code: ${untested.join(", ")} ${untested.length === 1 ? "follows" : "follow"} its documentation and has not been run. If it does not work, tell us: https://github.com/nandovejer/luz/issues/new?template=ai-target.yml`);
+  if (untested.length) notes.push(`tested only in Claude Code: ${untested.join(", ")} ${untested.length === 1 ? "follows" : "follow"} its documentation and has not been run. If it does not work, tell us: https://github.com/nandomunoz/luz/issues/new?template=ai-target.yml`);
   if (targets.includes("cursor") && !targets.includes("claude")) notes.push("Cursor also reads .claude/skills, so a project that has the skill in both folders may show it twice there");
   const written = writeFiles(values.dir ?? ".", files, { dryRun: Boolean(values["dry-run"]), force: values.force });
   if (written.error) return written;

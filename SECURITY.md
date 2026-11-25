@@ -6,7 +6,7 @@
 
 If you discover a security vulnerability in LUZ Design System, please report it privately:
 
-- **GitHub Security Advisory:** https://github.com/nandovejer/luz/security/advisories/new
+- **GitHub Security Advisory:** https://github.com/nandomunoz/luz/security/advisories/new
 
 **Include in your report:**
 - Description of the vulnerability
@@ -221,9 +221,9 @@ Before each release:
 
 ## Contact
 
-**Security Maintainer:** @nandovejer  
-**Private reports:** https://github.com/nandovejer/luz/security/advisories/new  
-**GitHub Issues:** https://github.com/nandovejer/luz/issues
+**Security Maintainer:** @nandomunoz  
+**Private reports:** https://github.com/nandomunoz/luz/security/advisories/new  
+**GitHub Issues:** https://github.com/nandomunoz/luz/issues
 
 For non-security questions, use [CONTRIBUTING.md](./CONTRIBUTING.md) or GitHub discussions.
 
