@@ -57,8 +57,11 @@ const areaOfRoute = (route) => site.byRoute.get(route).meta.area;
 const indexRoute = (area, root = "") => `${root}/docs/${area.slug}/`;
 /** The pages an area lists under its link: its pages but its index. */
 const listedOf = (area) => order.filter((p) => p.meta.area === area.id && p.route !== indexRoute(area)).map((p) => p.route);
-const areasWithPages = site.areas.filter((a) => listedOf(a).length > 0);
-const areasWithout = site.areas.filter((a) => listedOf(a).length === 0);
+// An area nested in another (the HTML elements, in Catalog) has no fold of its own: its pages are a group in the fold of its host
+const folded = site.areas.filter((a) => !a.nestIn);
+const hostOf = (area) => (area?.nestIn ? site.areas.find((a) => a.id === area.nestIn) : area);
+const areasWithPages = folded.filter((a) => listedOf(a).length > 0 || site.areas.some((n) => n.nestIn === a.id));
+const areasWithout = folded.filter((a) => !areasWithPages.includes(a));
 
 const listIn = (tree) => query(tree, "ul.docs-nav");
 /** The `li` children of ul.docs-nav, one per area, in order. */
@@ -70,7 +73,7 @@ const openFolds = (tree) => foldsOf(tree).filter((d) => d.attrs.has("open"));
 describe("the real areas this test relies on", () => {
   it("has areas with pages and at least one area without (Accessibility is its own index)", () => {
     // Seven areas since F5b: landing, cms, app and documentation are groups of Catalog now
-    expect(areasWithPages.map((a) => a.id)).toEqual(["get-started", "ai", "tokens", "components", "catalog", "html"]);
+    expect(areasWithPages.map((a) => a.id)).toEqual(["get-started", "ai", "tokens", "components", "catalog"]);
     expect(areasWithout.map((a) => a.id)).toContain("accessibility");
   });
 });
@@ -178,9 +181,9 @@ describe("one name, one open fold: the area of the current page", () => {
     expect(current.map((a) => a.attrs.get("href"))).toEqual(["/docs/components/button/"]);
   });
 
-  it("opens HTML elements and only it on /docs/html/forms/", () => {
+  it("opens Catalog, which lists the HTML elements, and only it on /docs/html/forms/", () => {
     const open = openFolds(treeOf("/docs/html/forms/"));
-    expect(open.map((d) => query(d.parent, "a.docs-nav__area").attrs.get("id"))).toEqual(["a-html"]);
+    expect(open.map((d) => query(d.parent, "a.docs-nav__area").attrs.get("id"))).toEqual(["a-catalog"]);
   });
 
   it("opens no fold on the docs home (the hub has no area), while every fold is there, closed", () => {
@@ -193,7 +196,7 @@ describe("one name, one open fold: the area of the current page", () => {
     for (const p of site.pages) {
       const tree = treeOf(p.route);
       const open = openFolds(tree).map((d) => query(d.parent, "a.docs-nav__area").attrs.get("id"));
-      const area = site.areas.find((a) => a.id === p.meta.area);
+      const area = hostOf(site.areas.find((a) => a.id === p.meta.area));
       const expected = area && areasWithPages.includes(area) ? [`a-${area.id}`] : [];
       expect(open, p.route).toEqual(expected);
     }
@@ -227,21 +230,24 @@ describe("the marks and the pages across the folds", () => {
         continue;
       }
       const isIndex = p.route === indexRoute(area);
+      // A nested area has no area link: its index is a link of the group inside the fold of its host, and the host's is "true"
+      const nested = Boolean(area.nestIn);
+      const host = hostOf(area);
       expect(at("page").map((a) => a.attrs.get("href")), `${p.route} page`).toEqual([p.route]);
-      expect(at("true").map((a) => a.attrs.get("href")), `${p.route} true`).toEqual(isIndex ? [] : [indexRoute(area)]);
+      expect(at("true").map((a) => a.attrs.get("href")), `${p.route} true`).toEqual(isIndex && !nested ? [] : [indexRoute(host)]);
       const mark = at("page")[0];
-      if (isIndex) {
+      if (isIndex && !nested) {
         expect(findAll(listIn(tree), (n) => n.name === "details").some((d) => isInside(mark, d)), `${p.route}: an area index is marked on the area link, outside the fold`).toBe(false);
       } else {
         const fold = foldsOf(tree).find((d) => isInside(mark, d));
         expect(fold?.attrs.has("open"), `${p.route}: the current page is inside an open fold`).toBe(true);
-        expect(at("true").every((a) => !foldsOf(tree).some((d) => isInside(a, d))), `${p.route}: the area link is outside the fold`).toBe(true);
+        if (!nested) expect(at("true").every((a) => !foldsOf(tree).some((d) => isInside(a, d))), `${p.route}: the area link is outside the fold`).toBe(true);
       }
     }
   });
 
   it("lists every page of the site once across the folds, in reading order, and every area index once as an area link", () => {
-    const indexes = new Set(site.areas.map((a) => indexRoute(a)));
+    const indexes = new Set(folded.map((a) => indexRoute(a)));
     const expected = orderRoutes.filter((r) => !indexes.has(r) && areaOfRoute(r) !== "hub" && site.areas.some((a) => a.id === areaOfRoute(r)));
     for (const p of site.pages) {
       const tree = treeOf(p.route);
@@ -249,7 +255,7 @@ describe("the marks and the pages across the folds", () => {
       expect(hrefs, `${p.route}: every page, once, in the order of the folds`).toEqual(expected);
       expect(new Set(hrefs).size, `${p.route}: no page twice`).toBe(hrefs.length);
       const areas = queryAll(listIn(tree), "a.docs-nav__area").map((a) => a.attrs.get("href"));
-      expect(areas, `${p.route}: the area links`).toEqual(site.areas.map((a) => indexRoute(a)));
+      expect(areas, `${p.route}: the area links`).toEqual(folded.map((a) => indexRoute(a)));
     }
   });
 
@@ -320,12 +326,12 @@ describe("the same folds in Spanish (real) and Arabic (a stand-in copy of the do
         const open = (route) => openFolds(tree(route)).map((d) => query(d.parent, "a.docs-nav__area").attrs.get("id"));
         expect(open("/docs/")).toEqual([]);
         expect(open("/docs/components/button/")).toEqual(["a-components"]);
-        expect(open("/docs/html/forms/")).toEqual(["a-html"]);
+        expect(open("/docs/html/forms/")).toEqual(["a-catalog"]);
         expect(open("/docs/tokens/color/")).toEqual(["a-tokens"]);
       });
 
       it("lists every page once across the folds, in reading order, and marks the current page and its area", () => {
-        const indexes = new Set(site.areas.map((a) => indexRoute(a)));
+        const indexes = new Set(folded.map((a) => indexRoute(a)));
         const expected = orderRoutes.filter((r) => !indexes.has(r) && areaOfRoute(r) !== "hub" && site.areas.some((a) => a.id === areaOfRoute(r)));
         const t = tree("/docs/html/forms/");
         const hrefs = foldsOf(t).flatMap((d) => queryAll(d, "a").map((a) => a.attrs.get("href")));
@@ -333,7 +339,8 @@ describe("the same folds in Spanish (real) and Arabic (a stand-in copy of the do
         const links = findAll(listIn(t), (n) => n.name === "a");
         const at = (value) => links.filter((a) => a.attrs.get("aria-current") === value).map((a) => a.attrs.get("href"));
         expect(at("page")).toEqual([`${root}/docs/html/forms/`]);
-        expect(at("true")).toEqual([`${root}/docs/html/`]);
+        // The HTML elements are a group in the fold of Catalog: the link of Catalog is the one marked "true"
+        expect(at("true")).toEqual([`${root}/docs/catalog/`]);
       });
 
       it("says lang=\"en\" for the pages not translated, on the list when the whole list is English, and keeps the folds in the language", () => {

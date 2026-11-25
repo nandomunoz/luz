@@ -596,8 +596,10 @@ describe("the LUZ docs site", () => {
       const area = site.areas.find((a) => a.id === page?.meta.area);
       expect(current, route).toEqual(area ? [route] : []);
       const parents = links.filter((a) => a.attrs.get("aria-current") === "true").map((a) => a.attrs.get("href"));
-      // No area is nested in another: the area link is marked "true" unless the page is the area index
-      expect(parents, route).toEqual(area ? (route !== `/docs/${area.slug}/` ? [`/docs/${area.slug}/`] : []) : []);
+      // The area link is marked "true" unless the page is the area index; a page of an area nested in another (the HTML elements,
+      // in Catalog) marks the link of the area it is nested in, and the index of a nested area is a link of the group, not an area link
+      const host = area?.nestIn ? site.areas.find((a) => a.id === area.nestIn) : area;
+      expect(parents, route).toEqual(host ? (route !== `/docs/${host.slug}/` ? [`/docs/${host.slug}/`] : []) : []);
       expect(links.filter((a) => (a.attrs.get("class") ?? "").includes("is-active")), route).toEqual([]);
       // Flat: not only the current area's pages, every page of every area
       const hrefs = links.map((a) => a.attrs.get("href"));
