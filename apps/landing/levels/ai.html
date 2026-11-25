@@ -21,7 +21,45 @@
           </ul>
         </div>
         <div class="landing-intro__stage landing-ai__stage">
-          {{cli}}
+          <!-- Four tabs (owner, 2026-11-25): Install, npm and the usual commands, as the home's; then the session the
+               visitor answers, once for each assistant (scripts/docs-site/cli-demo.js, CLI_HANDS). They do not turn
+               by themselves: a visitor answering a terminal is never moved to another (landing.js) -->
+          <div class="landing-panel landing-clitabs">
+            <nav class="luz-tabs luz-tabs--pill" aria-label="{{t:inside.l4.tabs}}">
+              <a class="luz-tab" href="#hero-install"><svg class="ic" aria-hidden="true"><use href="#i4"/></svg><span>{{t:inside.tab.install}}</span></a>
+              <a class="luz-tab" href="#hero-claude"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 5h15v10.5H10L6 19v-3.5H4.5Z"/></svg><span>{{t:level.ai.tab.claude}}</span></a>
+              <a class="luz-tab" href="#hero-codex"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 5h15v10.5H10L6 19v-3.5H4.5Z"/></svg><span>{{t:level.ai.tab.codex}}</span></a>
+              <a class="luz-tab" href="#hero-cursor"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 5h15v10.5H10L6 19v-3.5H4.5Z"/></svg><span>{{t:level.ai.tab.cursor}}</span></a>
+            </nav>
+            <div class="luz-tabpanel landing-clitabs__pane" id="hero-install">
+              <div class="landing-install">
+                <div class="landing-install__bar">
+                  <span class="landing-install__label">{{t:inside.install.npm}}</span>
+                  <button class="luz-copy-btn" type="button" data-copy-from="hero-npm" aria-label="{{t:inside.copy.npm}}" hidden>{{t:see.copy}}</button>
+                </div>
+                <pre class="luz-code-block" data-lang="bash" dir="ltr" tabindex="0" role="region" aria-label="{{t:inside.install.npm}}"><code id="hero-npm">npx @luz-ds/ai init</code></pre>
+              </div>
+              <div class="landing-install">
+                <div class="landing-install__bar">
+                  <span class="landing-install__label">{{t:inside.l4.commands}}</span>
+                </div>
+                <pre class="luz-code-block" data-lang="shell" dir="ltr" tabindex="0" role="region" aria-label="{{t:inside.l4.commands}}"><code>luz-ai site new --kind landing
+luz-ai skill add luz-landing
+luz-ai agent add luz-seo-geo-specialist
+luz-ai doctor
+npx @luz-ds/check</code></pre>
+              </div>
+            </div>
+            <div class="luz-tabpanel landing-clitabs__pane" id="hero-claude">
+              {{cli}}
+            </div>
+            <div class="luz-tabpanel landing-clitabs__pane" id="hero-codex">
+              {{clicodex}}
+            </div>
+            <div class="luz-tabpanel landing-clitabs__pane" id="hero-cursor">
+              {{clicursor}}
+            </div>
+          </div>
         </div>
       </section>
 

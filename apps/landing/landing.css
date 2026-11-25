@@ -5290,9 +5290,17 @@ home-light:defined ~ .landing-light__nojs {
 
 /* Level 4's panel (.landing-panel: its frame, and its tabs that turn by
    themselves): its panes take their own height, and a gap under the tabs */
+/* The room under the tabs is the nav's margin, not a gap: a closed pane (hidden until-found) is still a row of the
+   grid, and a gap around each would push the open one down by its place among them */
 .landing-clitabs {
-  gap: var(--luz-space-sm);
+  gap: 0;
   align-self: start;
+}
+
+/* The four tabs of the page of the skill wrap on a narrow screen instead of scrolling out of it (WCAG 1.4.10) */
+.landing-clitabs > .luz-tabs {
+  flex-wrap: wrap;
+  margin-block-end: var(--luz-space-sm);
 }
 
 /* Only the open tab: a closed one is hidden (until-found), which this must not undo */
@@ -5326,9 +5334,14 @@ home-light:defined ~ .landing-light__nojs {
 }
 
 /* The pause button in the foot sits in its row, at the end: none of the margin it has under a screen */
-.landing-cli__caption .landing-cli__pause {
+.landing-cli__caption :is(.landing-cli__pause, .landing-cli__auto, .landing-cli__next) {
   flex-shrink: 0;
   margin: 0;
+}
+
+/* The foot of the terminal the visitor answers (the page of the skill): Autoplay at the start, Enter at the end */
+.landing-cli__foot .landing-cli__next {
+  margin-inline-start: auto;
 }
 
 /* ====================== The page of the skill (apps/landing/levels/ai.html) ======================

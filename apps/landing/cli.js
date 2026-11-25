@@ -12,6 +12,10 @@
  *   presses). A question comes with its answers (`.landing-cli__choices`, the item after it) and waits: its buttons
  *   take the place of Enter, the first one focused; a question with `data-multi` toggles its buttons (aria-pressed)
  *   and goes on with its Continue button. After the last line, the button plays the session again from the start.
+ *   The foot has a second button, Autoplay: the session goes on by itself, a line at a time, at a question the
+ *   pressed answers, and over again at the end, until it is pressed again (Pause; WCAG 2.2.2). It waits while the
+ *   terminal is out of view (a closed tab) or the browser tab is hidden, and never moves the focus. In a tab, opening
+ *   it starts Autoplay and leaving it pauses it (not with reduced motion: then only the button starts it).
  * - On the home (`data-landing-cli="loop"`), nobody answers: the session plays by itself, a line at a time, once it
  *   is in view. A loop with `data-rounds` ("target=claude target=codex …", the home's install) plays one round per
  *   value, the lines of that value only; the first is the one shown without JavaScript. The session plays, once it
@@ -129,6 +133,11 @@ function playByHand(cli) {
   const again = next.querySelector("[data-cli-replay]");
   let waiting = null;
 
+  // The focus moves with the session only when it is in the terminal already (never while it plays by itself)
+  let playing = false;
+  const focus = (el) => !playing && cli.contains(document.activeElement) && el?.focus({ preventScroll: true });
+  let last = null;
+
   const step = () => {
     if (waiting) return;
     const item = s.upcoming();
@@ -136,13 +145,14 @@ function playByHand(cli) {
       restart();
       return;
     }
+    last = item;
     // A question comes with its answers: the buttons show with it, in the place of Enter
     const ask = s.reveal(item);
     if (ask) {
       waiting = ask;
       // Out of sight and out of the focus order, but keeping its room: the terminal keeps its height
       cli.dataset.waiting = "";
-      waiting.querySelector("button")?.focus({ preventScroll: true });
+      focus(waiting.querySelector("button"));
     }
     const done = !waiting && !s.upcoming();
     label.hidden = done;
@@ -153,7 +163,7 @@ function playByHand(cli) {
     s.answered.add(ask);
     waiting = null;
     delete cli.dataset.waiting;
-    next.focus({ preventScroll: true });
+    focus(next);
     step();
   };
 
@@ -189,6 +199,47 @@ function playByHand(cli) {
     next.focus({ preventScroll: true });
     step();
   });
+  // Autoplay: the next line after the time the last one lingers; a question, its pressed answers, after a look
+  const auto = cli.querySelector(".landing-cli__auto");
+  let inView = false;
+  let timer = 0;
+  const tick = () => {
+    clearTimeout(timer);
+    if (!playing || !inView || document.hidden) return;
+    const wait = waiting ? LOOK_AT_THE_ANSWERS : !s.upcoming() ? PAUSE_AT_END : last ? lingers(last) : 0;
+    timer = setTimeout(() => {
+      if (waiting) answer(waiting);
+      else step();
+      tick();
+    }, wait);
+  };
+  if (auto) {
+    const [labelAuto, labelStop] = [auto.querySelector("[data-cli-auto]"), auto.querySelector("[data-cli-stop]")];
+    const play = (on) => {
+      playing = on;
+      labelAuto.hidden = playing;
+      labelStop.hidden = !playing;
+      tick();
+    };
+    auto.addEventListener("click", () => play(!playing));
+    // In a tab (the page of the skill, owner 2026-11-25): opening it plays the session by itself, leaving it pauses
+    // it. With reduced motion opening it starts nothing; Autoplay is still there to press
+    const pane = cli.closest(".luz-tabpanel");
+    if (pane) {
+      const still = window.matchMedia("(prefers-reduced-motion: reduce)");
+      new MutationObserver(() => play(!pane.hidden && !still.matches)).observe(pane, { attributes: true, attributeFilter: ["hidden"] });
+    }
+    new IntersectionObserver(([entry]) => {
+      inView = entry.isIntersecting;
+      tick();
+    }).observe(cli);
+    document.addEventListener("visibilitychange", tick);
+  }
+  // A line brought by hand starts the wait of autoplay over
+  next.addEventListener("click", tick);
+
+  const foot = cli.querySelector(".landing-cli__foot");
+  if (foot) foot.hidden = false;
   next.hidden = false;
   // The screen scrolls now, so it takes the focus, and the keyboard scrolls it back to an earlier line
   s.screen.tabIndex = 0;

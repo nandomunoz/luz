@@ -40,6 +40,16 @@ export const CLI_TARGETS = [
   ["gemini", "gemini", "/luz"],
   ["cursor", "cursor-agent", "/luz"],
 ];
+/**
+ * The assistants of the tabs of the skill's page (owner, 2026-11-25), one session each: the --target, the command that
+ * opens it, how the skill is called, the folder of the skills it reads, and the --for of its agents (none for Cursor:
+ * `luz-ai agent add --help` writes agents for claude, gemini and codex only, so its session asks nothing about them).
+ */
+export const CLI_HANDS = [
+  { target: "claude", open: "claude", trigger: "/luz", skills: ".claude/skills", agents: "claude" },
+  { target: "codex", open: "codex", trigger: "$luz", skills: ".agents/skills", agents: "codex" },
+  { target: "cursor", open: "cursor-agent", trigger: "/luz", skills: ".agents/skills", agents: null },
+];
 /** The answers a session starts with, and the one the page shows without JavaScript. */
 export const CLI_DEFAULTS = { kind: "landing", stack: "vanilla", agents: ["luz-seo-geo-specialist", "luz-accessibility-auditor"], target: "claude" };
 /** A skill of luz-ai the session adds, for the kinds of site it is made for. */
@@ -67,6 +77,8 @@ export function cliFacts(root) {
     ...Object.values(CLI_SKILLS).map((name) => ["skill", "add", name]),
     // The other assistants' installs, last, so the runs above keep their places
     ...CLI_TARGETS.slice(1).map(([target]) => ["init", "--target", target]),
+    // The agents for the other assistants of the tabs, after those
+    ...CLI_HANDS.filter((h) => h.agents && h.agents !== "claude").flatMap((h) => CLI_AGENTS.map(([, name]) => ["agent", "add", name, "--for", h.agents])),
   ].map((args) => [...args, "--dry-run"]);
   // One Node for every dry run (each one would cost a start of its own): the script's main(), its stdout caught
   const child = `const { main } = await import(${JSON.stringify(pathToFileURL(script).href)});
@@ -98,10 +110,11 @@ write(JSON.stringify(out));`;
       };
     }
   }
-  const agents = {};
+  // agents[for][name]: what `agent add <name> --for <for>` prints, its first line and the file it writes
+  const agents = { claude: {} };
   for (const [, name] of CLI_AGENTS) {
     const lines = texts[at++].split("\n");
-    agents[name] = [said(lines[0]), lines[1]];
+    agents.claude[name] = [said(lines[0]), lines[1]];
   }
   const skills = {};
   for (const name of Object.values(CLI_SKILLS)) skills[name] = said(texts[at++].split("\n")[0]);
@@ -109,6 +122,13 @@ write(JSON.stringify(out));`;
   const firstAndNext = (lines) => [said(lines[0]), lines.find((l) => l.startsWith("next: "))];
   const inits = { claude: firstAndNext(init) };
   for (const [target] of CLI_TARGETS.slice(1)) inits[target] = firstAndNext(texts[at++].split("\n"));
+  for (const h of CLI_HANDS.filter((h) => h.agents && h.agents !== "claude")) {
+    agents[h.agents] = {};
+    for (const [, name] of CLI_AGENTS) {
+      const lines = texts[at++].split("\n");
+      agents[h.agents][name] = [said(lines[0]), lines[1]];
+    }
+  }
   // The title the script prints in a terminal (not to a pipe, so not in the dry runs above): read from its source
   const banner = /^const BANNER = (\[[\s\S]*?\]);$/m.exec(readFileSync(script, "utf-8"));
   if (!banner) throw new Error(`${SCRIPT}: no "const BANNER = [ … ];" to show the title of init`);
@@ -126,10 +146,10 @@ export function matchesDefaults(when) {
   });
 }
 
-/** {{cli}}: the terminal the visitor answers (the page of the skill); {{cliinstall}}: the home's, a person installing the skill. In the language of `say`. */
+/** {{cli}}, {{clicodex}}, {{clicursor}}: the terminal the visitor answers, one per tab of the page of the skill; {{cliinstall}}: the home's, a person installing the skill. In the language of `say`. */
 export function cliDemo({ say, root, escapeHtml }) {
   const t = (key) => escapeHtml(say(key));
-  const { banner, init, inits, site, agents, skills } = cliFacts(root);
+  const { banner, inits, site, agents, skills } = cliFacts(root);
   const esc = escapeHtml;
   const when = (cond) => (cond ? ` data-when="${cond}"${matchesDefaults(cond) ? "" : " hidden"}` : "");
   const span = (cond, inner) => `<span${when(cond)}>${inner}</span>`;
@@ -150,15 +170,16 @@ export function cliDemo({ say, root, escapeHtml }) {
     `<div class="landing-cli__choices" role="group" aria-label="${label}" data-ask="${ask}"${multi ? " data-multi" : ""} hidden>${buttons}${multi ? `<button class="landing-cli__choice landing-cli__choice--done" type="button" data-done>${t("inside.cli.continue")}</button>` : ""}</div>`;
   const agentWord = (key) => t(`inside.cli.${key}`);
 
-  const lines = [
+  // One session per assistant of CLI_HANDS: its install, its command, its call of the skill, its folders and agents
+  const sessionOf = ({ target, open, trigger, skills: skillDir, agents: agentsFor }) => [
     // Install the skill, then open the assistant and ask
-    cmd("npx @luz-ds/ai init --target claude"),
+    cmd(`npx @luz-ds/ai init --target ${target}`),
     // The title init prints in a terminal: the mark and the word in ASCII, read out as the word
     // (a <pre>, whose spaces the page's compaction keeps)
     `<div class="landing-cli__line landing-cli__line--banner"><pre class="landing-cli__art" aria-hidden="true">${esc(banner.join("\n"))}</pre><span class="u-sr-only">LUZ</span></div>`,
-    ...init.map((l) => out(l)),
-    cmd("claude"),
-    you(t("inside.cli.ask")),
+    ...inits[target].map((l) => out(l)),
+    cmd(esc(open)),
+    you(escapeHtml(say("inside.cli.ask").replace("/luz", trigger))),
     skill(t("inside.cli.read")),
     // First question: the kind of site
     skill(t("inside.cli.kind")),
@@ -168,16 +189,20 @@ export function cliDemo({ say, root, escapeHtml }) {
     skill(t("inside.cli.stack")),
     choices("stack", t("inside.cli.stack"), CLI_STACKS.map((s, i) => choice("stack", s, `${stackName(s)}${i ? "" : rec}`, s === CLI_DEFAULTS.stack)).join("")),
     per(CLI_STACKS, (s) => you(stackName(s), `stack=${s}`)),
-    // Third: what matters, which picks the agents
-    skill(t("inside.cli.agents")),
-    choices("agent", t("inside.cli.agents"), CLI_AGENTS.map(([key, name]) => choice("agent", name, agentWord(key), CLI_DEFAULTS.agents.includes(name))).join(""), true),
-    you(`${CLI_AGENTS.map(([key, name]) => span(`agent=${name}`, `<span class="landing-cli__pick">${agentWord(key)}</span>`)).join("")}<span data-when-none="agent"${CLI_DEFAULTS.agents.length ? " hidden" : ""}>${t("inside.cli.none")}</span>`),
+    // Third: what matters, which picks the agents (not for an assistant luz-ai writes no agents for)
+    ...(agentsFor
+      ? [
+          skill(t("inside.cli.agents")),
+          choices("agent", t("inside.cli.agents"), CLI_AGENTS.map(([key, name]) => choice("agent", name, agentWord(key), CLI_DEFAULTS.agents.includes(name))).join(""), true),
+          you(`${CLI_AGENTS.map(([key, name]) => span(`agent=${name}`, `<span class="landing-cli__pick">${agentWord(key)}</span>`)).join("")}<span data-when-none="agent"${CLI_DEFAULTS.agents.length ? " hidden" : ""}>${t("inside.cli.none")}</span>`),
+        ]
+      : []),
     // The plan, and nothing written before go
     skill(t("inside.cli.plan")),
     item(`<code>${per(CLI_STACKS, (s) => span(`stack=${s}`, esc(site[`landing/${written(s)}`].file)))}</code> <bdi class="landing-cli__why">${t("inside.cli.plan.page")} ${per(CLI_KINDS, (k) => span(`kind=${k}`, kindName(k)))}</bdi>`),
     item(`<bdi class="landing-cli__why">${t("inside.cli.plan.react")}</bdi>`, "stack=react"),
-    per(Object.entries(CLI_SKILLS), ([k, name]) => item(`<code>.claude/skills/${name}/</code> <bdi class="landing-cli__why">${t("inside.cli.plan.skill")}</bdi>`, `kind=${k}`)),
-    per(CLI_AGENTS, ([, name]) => item(`<code>.claude/agents/${name}.md</code> <bdi class="landing-cli__why">${t("inside.cli.plan.agent")}</bdi>`, `agent=${name}`)),
+    per(Object.entries(CLI_SKILLS), ([k, name]) => item(`<code>${skillDir}/${name}/</code> <bdi class="landing-cli__why">${t("inside.cli.plan.skill")}</bdi>`, `kind=${k}`)),
+    agentsFor ? per(CLI_AGENTS, ([, name]) => item(`<code>${esc(agents[agentsFor][name][1].trim())}</code> <bdi class="landing-cli__why">${t("inside.cli.plan.agent")}</bdi>`, `agent=${name}`)) : "",
     item(`<code>npx @luz-ds/check</code> <bdi class="landing-cli__why">${t("inside.cli.plan.check")}</bdi>`),
     skill(t("inside.cli.go")),
     choices("go", t("inside.cli.go"), choice("go", "go", t("inside.cli.go.button"), true)),
@@ -190,8 +215,8 @@ export function cliDemo({ say, root, escapeHtml }) {
     out(`✓ 0 blocking and 0 warnings in 1 file`),
     // It adds the skill and the agents
     per(Object.entries(CLI_SKILLS), ([k, name]) => cmd(`luz-ai skill add ${name}`, `kind=${k}`) + out(skills[name], `kind=${k}`)),
-    per(CLI_AGENTS, ([, name]) => cmd(`luz-ai agent add ${name} --for claude`, `agent=${name}`) + agents[name].map((l) => out(l, `agent=${name}`)).join("")),
-    skill(t("inside.cli.adapt")),
+    agentsFor ? per(CLI_AGENTS, ([, name]) => cmd(`luz-ai agent add ${name} --for ${agentsFor}`, `agent=${name}`) + agents[agentsFor][name].map((l) => out(l, `agent=${name}`)).join("")) : "",
+    skill(t(agentsFor ? "inside.cli.adapt" : "inside.cli.adapt.page")),
     // Done
     line(
       "end",
@@ -203,16 +228,22 @@ export function cliDemo({ say, root, escapeHtml }) {
       )}<span class="landing-cli__caret" aria-hidden="true"></span>`,
     ),
   ];
-  // {{cli}}: the page of the skill's, answered by the visitor
-  const figure = [
+  // {{cli}} and the others: the page of the skill's, answered by the visitor, one per assistant
+  const figure = (hand) => [
     `<figure class="landing-cli" dir="ltr" aria-label="${t("inside.l4.panel")}" data-landing-cli>`,
     `<div class="landing-cli__bar" aria-hidden="true"><span class="landing-cli__dots"><span></span><span></span><span></span></span><code class="landing-cli__title">~/vejer-books</code></div>`,
     `<div class="landing-cli__screen" aria-live="polite">`,
-    lines.join("\n"),
+    sessionOf(hand).filter(Boolean).join("\n"),
     `</div>`,
+    // The foot, as the home's (owner, 2026-11-25): the button that plays it by itself or pauses it, and Enter. Hidden
+    // without JavaScript, where the session stands whole and there is nothing to press
+    `<figcaption class="landing-cli__caption landing-cli__foot" hidden>`,
+    `<button class="luz-btn luz-btn--ghost luz-btn--sm landing-cli__auto" type="button"><span data-cli-auto>${t("inside.l4.autoplay")}</span><span data-cli-stop hidden>${t("inside.l4.pause")}</span></button>`,
     `<button class="luz-btn luz-btn--ghost luz-btn--sm landing-cli__next" type="button" hidden><kbd>Enter</kbd> <span data-cli-next>${t("inside.l4.next")}</span><span data-cli-replay hidden>${t("inside.l4.replay")}</span></button>`,
+    `</figcaption>`,
     `</figure>`,
   ].join("\n");
+  const [claude, codex, cursor] = CLI_HANDS.map(figure);
   // {{cliinstall}}: the home's terminal (owner, 2026-11-25), a person installing the skill, once for each assistant
   // of CLI_TARGETS: the command they type, what init prints for it (its own lines), then the assistant and the
   // request, with the skill called as that assistant calls it. Each assistant's lines carry `data-when="target=…"`;
@@ -238,5 +269,5 @@ export function cliDemo({ say, root, escapeHtml }) {
     `<figcaption class="landing-cli__caption"><span class="landing-cli__tested">${t("inside.l4.install.tested")}</span><button class="luz-btn luz-btn--ghost luz-btn--sm landing-cli__pause" type="button" hidden><span data-cli-pause>${t("inside.l4.pause")}</span><span data-cli-play hidden>${t("inside.l4.play")}</span></button></figcaption>`,
     `</figure>`,
   ].join("\n");
-  return { cli: figure, cliinstall: install };
+  return { cli: claude, clicodex: codex, clicursor: cursor, cliinstall: install };
 }

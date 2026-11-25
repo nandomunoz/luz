@@ -125,10 +125,10 @@ const PLACEHOLDERS = new Set([
   "list1", "list2", "list3", "tokendemo", "tokenlooks", "tokenblocks", "ntokens", "nmodes", "ndeps",
   "coredemo", "coreblocks", "ncomponents", "nobjects", "ndepscore",
   "catalogdemo", "catalogblocks", "catalogsheets", "ncatalog", "nchunks", "ndepscatalog",
-  "aiblocks", "naiagents", "naiskills", "naitargets", "ndepsai", "cli", "cliinstall",
+  "aiblocks", "naiagents", "naiskills", "naitargets", "ndepsai", "cli", "clicodex", "clicursor", "cliinstall",
 ]);
 /** Values inserted as HTML, not escaped. Only the generator produces them. */
-const RAW_VALUES = new Set(["content", "nav", "pagehead", "rail", "endnav", "pagefoot", "generated", "alternates", "langswitch", "langlinks", "endir", "notice", "contentattrs", "list1", "list2", "list3", "tokendemo", "tokenblocks", "coredemo", "coreblocks", "catalogdemo", "catalogblocks", "catalogsheets", "aiblocks", "cli", "cliinstall"]);
+const RAW_VALUES = new Set(["content", "nav", "pagehead", "rail", "endnav", "pagefoot", "generated", "alternates", "langswitch", "langlinks", "endir", "notice", "contentattrs", "list1", "list2", "list3", "tokendemo", "tokenblocks", "coredemo", "coreblocks", "catalogdemo", "catalogblocks", "catalogsheets", "aiblocks", "cli", "clicodex", "clicursor", "cliinstall"]);
 
 /** Where the home page's languages live, from the repository root. */
 export const I18N_DIR = "apps/landing/i18n";

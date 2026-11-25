@@ -135,7 +135,8 @@ const RESUME_AFTER = 3000;
 function initTabCycle(panel) {
   const still = window.matchMedia("(prefers-reduced-motion: reduce)");
   const tabs = [...panel.querySelectorAll('.luz-tab[role="tab"]')];
-  if (still.matches || tabs.length < 2) return;
+  // A panel with a terminal the visitor answers (the page of the skill) never turns: nobody is moved off a session
+  if (still.matches || tabs.length < 2 || panel.querySelector('[data-landing-cli=""]')) return;
   let visible = false;
   let held = false;
   let stopped = false;
