@@ -1,5 +1,5 @@
 {
-  "$comment": "The stacks the prompts offer, in the order they are offered: where each loads LUZ, and the extensions npx @luz-ds/check reads as HTML (--ext). Read by scripts/docs-site/prompts.js.",
+  "$comment": "The stacks the skill offers, in the order they are offered: where each loads LUZ, and the extensions npx @luz-ds/check reads as HTML (--ext). Read by scripts/build-ai-facts.js.",
   "stacks": [
     { "id": "vanilla", "name": "Plain HTML", "load": "the tags above, in every page", "ext": "" },
     { "id": "astro", "name": "Astro", "load": "the `<head>` of the base layout", "ext": ".astro" },

@@ -4,16 +4,16 @@
  * What the skill knows about this release is read from the repository and never typed. Under
  * `packages/ai/skills/luz/`:
  *
- *   assets/facts.json              the versions of the packages, the kinds of site and the stacks the prompts offer
- *   assets/templates/<kind>.html.tpl a starter page per kind of site: the head (the stylesheets and scripts the prompt of
- *                                  that kind links, in its order) and the skeleton of its preset, with {{lang}} and
+ *   assets/facts.json              the versions of the packages, the kinds of site and the stacks the skill offers
+ *   assets/templates/<kind>.html.tpl a starter page per kind of site: the head (the stylesheets and scripts of the kind,
+ *                                  in the order of the cascade) and the skeleton of its preset, with {{lang}} and
  *                                  {{title}} for the script to fill
- *   references/kinds/<kind>.md     what to ask for that kind of site: the preset of the prompt, without its skeleton
+ *   references/kinds/<kind>.md     what to ask for that kind of site: its preset (packages/ai/src/kinds), without its skeleton
  *   references/stacks.md           where each stack loads LUZ and which extensions the check reads
  *   references/agents.md           the agents and skills of luz-ai that the skill can add, from their own front matter
  *
  * A starter is a text for the person's own site, not a page of this repository, so it is `.html.tpl`: nothing here loads it,
- * and the CDN addresses in it are the ones the prompts print (RL-12 reads the `.html` pages of packages/ and apps/).
+ * and the CDN addresses in it are the packages' own (RL-12 reads the `.html` pages of packages/ and apps/).
  *
  * `tests/ai-start.test.js` fails when a file is not what this builds.
  *
@@ -23,8 +23,8 @@ import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { PUBLISHED } from "./luz-packages.js";
-import { FITS_KINDS } from "./docs-site/kinds.js";
-import { assemblePrompt } from "./docs-site/prompts.js";
+import { CASCADE, FITS_KINDS, fileKinds, isKindFile, kindPatterns } from "./docs-site/kinds.js";
+import { FILES, catalogComponents, catalogFilesIn, minified } from "./docs-site/snippets.js";
 
 const repo = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const SKILL = "packages/ai/skills/luz";
@@ -35,24 +35,52 @@ const readJson = (root, file) => JSON.parse(readFileSync(join(root, file), "utf-
 
 export function buildAiFacts({ root = repo } = {}) {
   const versions = Object.fromEntries(PUBLISHED.map((pkg) => [pkg, readJson(root, `packages/${pkg}/package.json`).version]));
-  const stacks = readJson(root, "apps/site/prompts/stacks.json").stacks.map(({ id, name, ext }) => ({ id, name, ext }));
+  const stacks = readJson(root, "packages/ai/src/stacks.json").stacks.map(({ id, name, ext }) => ({ id, name, ext }));
   return { versions, kinds: [...FITS_KINDS], stacks };
 }
 
-/** The section of a prompt about its kind of site, from its heading to the next one. */
-function kindSection(prompt) {
-  const start = prompt.indexOf("\n## The kind of site:");
-  const end = prompt.indexOf("\n## ", start + 1);
-  return prompt.slice(start + 1, end).trimEnd();
+const CDN = "https://cdn.jsdelivr.net/npm";
+const BASE = ["tokens", "core", "catalog"];
+const versionOf = (root, pkg) => readJson(root, `packages/${pkg}/package.json`).version;
+
+/** The text of the preset of a kind, with the one placeholder it has resolved, from its own file. */
+function kindSection(kind, root) {
+  const catalogFile = readJson(root, "packages/catalog/dist/classes.json").classes.find((c) => c.name === "luz-nav-toggle")?.files?.[0];
+  if (!catalogFile) throw new Error("build-ai-facts: no classes.json lists a file for luz-nav-toggle, which the presets name");
+  const text = readFileSync(join(root, "packages/ai/src/kinds", `${kind}.md`), "utf-8").trim().replace(/\{\{nav-toggle-css\}\}/g, catalogFile);
+  const left = text.search(/\{\{|\}\}/);
+  if (left !== -1) throw new Error(`build-ai-facts: a placeholder is left in packages/ai/src/kinds/${kind}.md, line ${text.slice(0, left).split("\n").length}`);
+  const end = text.indexOf("\n## ", 1);
+  return (end === -1 ? text : text.slice(0, end)).trimEnd();
 }
 
 const FENCE = /```html\n([\s\S]*?)\n```/;
 
+/**
+ * The tags of a starter page's head: tokens, core and the catalog files of the kind (what its preset names, the base of
+ * every starter and the patterns that fit the kind), in the order of the cascade, then the scripts of the packages.
+ */
+function headLinks(kind, root) {
+  const at = (pkg) => `@luz-ds/${pkg}@${versionOf(root, pkg)}`;
+  const components = catalogComponents({ root });
+  const kinds = fileKinds(root);
+  const { base } = readJson(root, "packages/ai/src/starter.json");
+  const preset = readFileSync(join(root, "packages/ai/src/kinds", `${kind}.md`), "utf-8");
+  const own = kindPatterns(kind, root, components).files;
+  const place = (file) => CASCADE.indexOf(file.replace(/^components\/|\.css$/g, ""));
+  const catalogFiles = [...new Set([...[...base, ...catalogFilesIn(preset, components).filter((file) => !isKindFile(file, kinds))].sort(), ...own])].sort((a, b) => place(a) - place(b));
+  const stylesheets = (pkg) => (pkg === "catalog" ? catalogFiles.map(minified) : [FILES[pkg].css]);
+  return [
+    ...BASE.flatMap((pkg) => stylesheets(pkg).map((file) => `<link rel="stylesheet" href="${CDN}/${at(pkg)}/dist/${file}">`)),
+    ...BASE.filter((pkg) => FILES[pkg].js).map((pkg) => `<script type="module" src="${CDN}/${at(pkg)}/dist/${FILES[pkg].js}"></script>`),
+  ];
+}
+
 /** One starter page per kind. */
-function template(prompt) {
-  const links = prompt.split("\n").filter((l) => /^<link rel="stylesheet" href="https:\/\/cdn\.jsdelivr\.net\/npm\/@luz-ds\/[^"]+">$/.test(l) || /^<script type="module" src="https:\/\/cdn\.jsdelivr\.net\/npm\/@luz-ds\/[^"]+"><\/script>$/.test(l));
-  const body = kindSection(prompt).match(FENCE)?.[1];
-  if (!links.length || !body) throw new Error("build-ai-facts: a prompt has no links or no skeleton to start a page from");
+function template(kind, root) {
+  const links = headLinks(kind, root);
+  const body = kindSection(kind, root).match(FENCE)?.[1];
+  if (!links.length || !body) throw new Error("build-ai-facts: a preset has no links or no skeleton to start a page from");
   return [
     "<!doctype html>",
     '<html lang="{{lang}}">',
@@ -70,15 +98,15 @@ function template(prompt) {
   ].join("\n");
 }
 
-/** What to ask for a kind of site: its section of the prompt, the skeleton replaced by the file that holds it. */
-function kindReference(kind, prompt) {
-  const section = kindSection(prompt).replace(FENCE, `The skeleton of the page is \`assets/templates/${kind}.html.tpl\`: \`site new --kind ${kind}\` writes it, and you fill it in.`);
+/** What to ask for a kind of site: its preset, the skeleton replaced by the file that holds it. */
+function kindReference(kind, root) {
+  const section = kindSection(kind, root).replace(FENCE, `The skeleton of the page is \`assets/templates/${kind}.html.tpl\`: \`site new --kind ${kind}\` writes it, and you fill it in.`);
   return `${section}\n`;
 }
 
 function stacksReference(root) {
-  const rows = readJson(root, "apps/site/prompts/stacks.json").stacks.map((s) => {
-    // The prompt points at the tags it prints; here they are the starter page's
+  const rows = readJson(root, "packages/ai/src/stacks.json").stacks.map((s) => {
+    // A stack's text points at the tags of a page; here they are the starter page's
     const load = s.load.replace("the tags above, in every page", "the `<link>` and `<script>` tags of the starter page, in every page");
     return `- ${s.name} (\`${s.id}\`): ${load}.${s.ext ? ` Check it with \`--ext ${s.ext}\`.` : ""}`;
   });
@@ -137,9 +165,8 @@ export function buildAiFiles({ root = repo } = {}) {
   const facts = buildAiFacts({ root });
   const files = { [FACTS_FILE]: `${JSON.stringify(facts, null, 2)}\n` };
   for (const kind of facts.kinds) {
-    const prompt = assemblePrompt(kind, { root });
-    files[`${SKILL}/assets/templates/${kind}.html.tpl`] = template(prompt);
-    files[`${SKILL}/references/kinds/${kind}.md`] = kindReference(kind, prompt);
+    files[`${SKILL}/assets/templates/${kind}.html.tpl`] = template(kind, root);
+    files[`${SKILL}/references/kinds/${kind}.md`] = kindReference(kind, root);
   }
   files[`${SKILL}/references/stacks.md`] = stacksReference(root);
   files[`${SKILL}/references/agents.md`] = agentsReference(root);

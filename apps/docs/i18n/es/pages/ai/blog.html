@@ -1,14 +1,11 @@
 <!-- luz:page
 title: Blog o periódico
-description: Un blog o un periódico, con cualquier CMS: un prompt para un LLM y recetas para su cabecera, cabecera de página, tarjetas de artículo, cabecera de artículo, índice y pie de página.
+description: Un blog o un periódico, con cualquier CMS: recetas para su cabecera, cabecera de página, tarjetas de artículo, cabecera de artículo, índice y pie de página.
 keywords: blog, periódico, revista, artículos, entradas, sitio estático
-source: 31209832e262
+source: 3153b422fe19
 reviewed: false
 -->
     <div class="docs-block" id="k-blog">
-      <p>Pega el prompt en cualquier LLM. Te pregunta por tu blog y tu CMS en rondas cortas, te enseña el plan y no escribe nada hasta que dices "go".</p>
-      <p><a class="luz-btn luz-btn--primary site-prompt-open" href="/prompts/blog.txt" data-prompt-open data-prompt-title="El prompt para un blog">Abrir el prompt</a></p>
-      <!-- luz:include prompt-dialog -->
       <p>O constrúyelo tú con las recetas de abajo. Sirve con cualquier CMS o generador de sitios estáticos: cada receta es el HTML de una de sus plantillas y el CMS pone el texto. Usan solo las clases de core, del catálogo y de cms; <a href="/docs/get-started/#site-kinds">Instalar LUZ</a> indica los archivos que debes cargar.</p>
       <div class="docs-block">
         <h2 id="header">Cabecera</h2>
@@ -97,7 +94,7 @@ reviewed: false
       <div class="docs-block">
         <h2 id="post-card">Tarjeta de artículo</h2>
         <p>Un artículo en una lista: una imagen, su sección, el título, una línea de resumen y la fecha. Es la <a href="/docs/components/card/">tarjeta</a> de core, sin CSS propio. El enlace del título convierte toda la tarjeta en un solo enlace, con una sola parada de tabulación; la sección es una <a href="/docs/components/tag/">etiqueta</a>, no un segundo enlace.</p>
-        <p>Una lista de artículos es la <a href="/docs/catalog/post-list/">lista de artículos</a>, un <code>&lt;ul&gt;</code> que ajusta columnas de 16rem o más; el marcado de abajo también funciona sobre <code>.o-grid--auto</code>. Más tarjetas, los artículos relacionados y el recuadro del autor están en las <a href="/docs/kinds/blog/">plantillas de CMS</a>.</p>
+        <p>Una lista de artículos es la <a href="/docs/catalog/post-list/">lista de artículos</a>, un <code>&lt;ul&gt;</code> que ajusta columnas de 16rem o más; el marcado de abajo también funciona sobre <code>.o-grid--auto</code>. Más tarjetas, los artículos relacionados y el recuadro del autor están en las <a href="/docs/ai/blog/">plantillas de CMS</a>.</p>
         <div class="docs-example" data-docs-specimen>
           <div class="docs-demo__stage">
             <ul class="o-grid o-grid--auto">

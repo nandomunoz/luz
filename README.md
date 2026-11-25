@@ -184,7 +184,7 @@ Every component has a page in the documentation with a live example, the markup 
 
 LUZ is plain HTML and CSS, so an AI coding agent can write it when it knows which names exist. Give it this: read [`llms.txt`](https://luzds.com/llms.txt) first, use only the classes in the `classes.json` of each package, and run `npx @luz-ds/check@0.3.2` on every HTML and CSS file it writes.
 
-What an agent can read, what the check reports and what it does not do are on [Working with AI](https://luzds.com/docs/get-started/ai/). The same page has a prompt you can paste.
+What an agent can read, what the check reports and what it does not do are on [Working with AI](https://luzds.com/docs/ai/). The same area has the `/luz` skill, its commands and its agents.
 
 ## Accessibility
 

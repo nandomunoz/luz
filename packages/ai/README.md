@@ -42,7 +42,7 @@ The skill is tested only in Claude Code. The other assistants get it written fro
 | `/luz add <name>` | Adds the agent or the skill you name, after asking its fields. | yes, after "go" |
 | `/luz help` | This table. | no |
 
-Each one has a real conversation, and what the script prints, on https://luzds.com/docs/get-started/ai-commands/. `/luz-readme` and `/luz-landing` are skills of their own, and `init` runs only in a terminal.
+Each one has a real conversation, and what the script prints, on https://luzds.com/docs/ai/commands/. `/luz-readme` and `/luz-landing` are skills of their own, and `init` runs only in a terminal.
 
 ## The script
 

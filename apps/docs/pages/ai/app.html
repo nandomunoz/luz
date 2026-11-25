@@ -1,20 +1,17 @@
 <!-- luz:page
-title: Aplicación web
-description: Una aplicación web: un prompt para un LLM y recetas para su estructura con barra lateral, su cabecera y su panel de control.
-keywords: aplicación web, app, administración, backoffice, saas
-source: 2f46b68175f1
-reviewed: false
+title: Web application
+description: A web application: recipes for its shell with a sidebar, its header and its dashboard.
+area: ai
+order: 5
+keywords: web app, admin, back office, saas
 -->
     <div class="docs-block" id="k-app">
-      <p>Pega el prompt en cualquier LLM. Te pregunta por tu aplicación en rondas cortas, te enseña el plan y no escribe nada hasta que dices "go".</p>
-      <p><a class="luz-btn luz-btn--primary site-prompt-open" href="/prompts/app.txt" data-prompt-open data-prompt-title="El prompt para una app">Abrir el prompt</a></p>
-      <!-- luz:include prompt-dialog -->
-      <p>O constrúyela tú con las recetas de abajo. Usan solo las clases de core, del catálogo y de app; <a href="/docs/get-started/#site-kinds">Instalar LUZ</a> indica los archivos que debes cargar. El <code>&lt;h1&gt;</code> de la vista y su acción principal están en el panel de control, nunca en la barra: la barra contiene lo que es igual en todas las vistas.</p>
+      <p>Build it yourself from the recipes below. They use the classes of core, the catalog and app only; <a href="/docs/get-started/#site-kinds">Install LUZ</a> lists the files to load. The view's <code>&lt;h1&gt;</code> and its main action are in the dashboard, never in the bar: the bar holds what is the same in every view.</p>
       <div class="docs-block">
-        <h2 id="shell">Estructura con barra lateral</h2>
-        <p>La página entera: el enlace para saltar al contenido y, después, la <a href="/docs/catalog/sidebar/">barra lateral</a> de catalog junto a <code>.o-main</code>, que contiene la cabecera y la vista. <code>.o-shell</code> coloca la barra lateral en una columna a partir de 769 px de ventana y, por debajo, la convierte en un cajón que abre el botón de menú, sin script. Los patrones de <a href="/docs/kinds/app/">App</a> van dentro.</p>
-        <p>La estructura es la página entera, así que no tiene un ejemplo dentro de esta: esta página está construida sobre ella. Estrecha la ventana por debajo de 769 px y la barra lateral pasa a ser un cajón tras el botón de menú.</p>
-        <p>El script de catalog, si lo cargas, marca el enlace actual de la barra lateral y cierra el cajón cuando se sigue un enlace.</p>
+        <h2 id="shell">Shell with a sidebar</h2>
+        <p>The whole page: the skip link, then the catalog's <a href="/docs/catalog/sidebar/">sidebar</a> beside <code>.o-main</code>, which holds the header and the view. <code>.o-shell</code> puts the sidebar in a column from 769 px of window, and makes it a drawer that the menu button opens below that, with no script. The <a href="/docs/ai/app/">App</a> patterns go inside it.</p>
+        <p>The shell is the whole page, so it has no example inside this one: this page is built on it. Make the window narrower than 769 px and the sidebar becomes a drawer behind the menu button.</p>
+        <p>The catalog's script, if you load it, marks the current link of the sidebar and closes the drawer when a link is followed.</p>
         <div class="docs-snippet">
           <div class="docs-snippet__bar">
             <span class="docs-snippet__lang">HTML</span>
@@ -40,8 +37,8 @@ reviewed: false
         </div>
       </div>
       <div class="docs-block">
-        <h2 id="header">Cabecera</h2>
-        <p>La barra de la parte superior de cada vista: el botón de menú, el nombre del producto y la cuenta. Es la <a href="/docs/catalog/app-bar/">cabecera de app</a>, dentro de <code>.o-main</code>, junto a la barra lateral. La búsqueda es el <code>&lt;luz-search&gt;</code> del catálogo: omítela si no cargas el catálogo.</p>
+        <h2 id="header">Header</h2>
+        <p>The bar at the top of every view: the menu button, the name of the product and the account. It is the <a href="/docs/catalog/app-bar/">app header</a>, in <code>.o-main</code> beside the sidebar. The search is the catalog's <code>&lt;luz-search&gt;</code>: leave it out if you do not load the catalog.</p>
         <div class="docs-example" data-docs-specimen>
           <div class="docs-demo__stage">
             <header class="luz-app-bar">
@@ -91,8 +88,8 @@ reviewed: false
         </div>
       </div>
       <div class="docs-block">
-        <h2 id="dashboard">Panel de control</h2>
-        <p>Una vista: una fila de título con el <code>&lt;h1&gt;</code> de la vista y sus acciones, y después paneles en una cuadrícula que responde al espacio de la vista, no al de la ventana. Es el <a href="/docs/catalog/dashboard/">panel de control</a>, sobre el <code>&lt;main&gt;</code>. Cada panel es una tarjeta que empieza con su encabezado; el más importante puede ocupar el espacio de dos columnas.</p>
+        <h2 id="dashboard">Dashboard</h2>
+        <p>A view: a title row with the view's <code>&lt;h1&gt;</code> and its actions, then panels in a grid that answers to the room of the view, not the window's. It is the <a href="/docs/catalog/dashboard/">dashboard</a>, on the <code>&lt;main&gt;</code>. Each panel is a card that starts with its heading; the most important one can take the room of two columns.</p>
         <div class="docs-example" data-docs-specimen>
           <div class="docs-demo__stage">
             <div class="luz-dashboard">
@@ -148,8 +145,8 @@ reviewed: false
         </div>
       </div>
       <div class="docs-block">
-        <h2 id="charts">Datos en un panel</h2>
-        <p>Un panel que muestra datos contiene una de cinco piezas, cada una sobre un texto, una lista o una tabla nativa que se queda en la página: la <a href="/docs/catalog/bar-list/">lista de barras</a> compara unos pocos valores en una escala, el <a href="/docs/catalog/column-chart/">gráfico de columnas</a> compara valores que tienen un orden, la <a href="/docs/catalog/stacked-bar/">barra apilada</a> muestra cómo se reparte un todo, el <a href="/docs/catalog/ring/">anillo</a> muestra un valor frente a su meta y el <a href="/docs/catalog/heat-map/">mapa de calor</a> muestra dónde una cuadrícula es alta o baja. Ponla en la tarjeta de un panel, después de su encabezado, y enlaza después de <code>luz.css</code> la hoja de estilos de cada una que uses. Los números y los títulos son tuyos.</p>
+        <h2 id="charts">Data in a panel</h2>
+        <p>A panel that shows data holds one of five pieces, each over text, a native list or a table that stays in the page: the <a href="/docs/catalog/bar-list/">bar list</a> compares a few values on one scale, the <a href="/docs/catalog/column-chart/">column chart</a> compares values that have an order, the <a href="/docs/catalog/stacked-bar/">stacked bar</a> shows how a whole is split, the <a href="/docs/catalog/ring/">ring</a> shows one value against its goal and the <a href="/docs/catalog/heat-map/">heat map</a> shows where a grid is high or low. Put one in the card of a panel, after its heading, and link the stylesheet of each one you use after <code>luz.css</code>. The numbers and the titles are yours.</p>
         <div class="docs-example" data-docs-specimen>
           <div class="docs-demo__stage">
             <div class="luz-dashboard">
@@ -190,8 +187,8 @@ reviewed: false
         </div>
       </div>
       <div class="docs-block">
-        <h2 id="empty">Vista vacía</h2>
-        <p>Una vista que aún no tiene nada, sobre el <a href="/docs/catalog/dashboard/">panel de control</a>: un panel ancho que dice qué falta y qué hacer, con la acción. La fila de título conserva su lugar, de modo que la vista no salta cuando llega el primer panel. La acción del panel es la única acción principal de la vista: omítela de la fila de título mientras la tenga el panel.</p>
+        <h2 id="empty">Empty view</h2>
+        <p>A view with nothing in it yet, on the <a href="/docs/catalog/dashboard/">dashboard</a>: one wide panel that says what is missing and what to do, with the action. The title row keeps its place, so the view does not jump when the first panel arrives. The action in the panel is the view's one primary action: leave it out of the title row while the panel holds it.</p>
         <div class="docs-example" data-docs-specimen>
           <div class="docs-demo__stage">
             <div class="luz-dashboard">

@@ -1,0 +1,46 @@
+<!-- luz:page
+title: The agents and skills of /luz
+description: The four review agents and the two skills that /luz can add to a project, each with what it reviews and the tools it may use.
+area: ai
+order: 2
+generate: ai-agents
+keywords: agent, subagent, skill, accessibility, seo, geo, core web vitals, luz-ai
+-->
+    <section class="docs-block" aria-labelledby="choose">
+      <h2 class="docs-chapter__title" id="choose">Choose by what matters</h2>
+      <p class="docs-lead">Tell <code>/luz</code> what matters to you and it offers the agent that fits, the recommended one first. It never offers one you do not need: a site with no AI feature does not need the AI auditor.</p>
+      <!-- luz:agents needs -->
+    </section>
+
+    <section class="docs-block" aria-labelledby="agents">
+      <h2 class="docs-chapter__title" id="agents">The agents</h2>
+      <p class="docs-lead">Each agent is a base template with fields left to fill. It reviews and reports; it does not rewrite your files.</p>
+      <p>The descriptions are the ones in the agent files, so they are in English, whatever the language of this page.</p>
+      <!-- luz:agents agents -->
+    </section>
+
+    <section class="docs-block" aria-labelledby="skills">
+      <h2 class="docs-chapter__title" id="skills">The skills</h2>
+      <p class="docs-lead">A skill is a command of its own, with its references, that you type in your assistant like <code>/luz</code>.</p>
+      <!-- luz:agents skills -->
+    </section>
+
+    <section class="docs-block" aria-labelledby="add">
+      <h2 class="docs-chapter__title" id="add">Add one to your project</h2>
+      <p class="docs-lead">Ask in the chat, or run the same command in a terminal.</p>
+      <div class="docs-snippet">
+        <div class="docs-snippet__bar">
+          <span class="docs-snippet__lang">Chat</span>
+          <button class="luz-copy-btn" type="button" data-copy-from="code-agents-chat" aria-label="Copy the command">Copy</button>
+        </div>
+        <pre class="luz-code-block" data-lang="text" tabindex="0" role="region" aria-label="The command in the chat"><code id="code-agents-chat">/luz add luz-seo-geo-specialist</code></pre>
+      </div>
+      <div class="docs-snippet">
+        <div class="docs-snippet__bar">
+          <span class="docs-snippet__lang">Shell</span>
+          <button class="luz-copy-btn" type="button" data-copy-from="code-agents-shell" aria-label="Copy the command">Copy</button>
+        </div>
+        <pre class="luz-code-block" data-lang="bash" tabindex="0" role="region" aria-label="The command in a terminal"><code id="code-agents-shell">npx @luz-ds/ai agent add luz-seo-geo-specialist --for claude</code></pre>
+      </div>
+      <p><code>--for</code> takes <code>claude</code>, <code>gemini</code> or <code>codex</code>: the command writes the agent in the folder each one reads. A field left out stays as <code>[ADAPT: …]</code>, and the agent stops and asks about it until it is filled. <a href="/docs/ai/commands/#cmd-add">The command <code>/luz add</code></a> shows a whole conversation.</p>
+    </section>

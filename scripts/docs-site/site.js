@@ -47,6 +47,7 @@ import { panel as structureBlock } from "./catalog-blocks/structure.js";
 import { CASCADE, FITS_KINDS, fileKinds, fitsKindsOf, isKindFile, kindPatterns } from "./kinds.js";
 import { fillAiMarkers } from "./ai.js";
 import { fillCommandMarkers } from "./ai-commands.js";
+import { fillAgentMarkers } from "./ai-agents.js";
 import { aiSections } from "./ai-page.js";
 import { cliDemo } from "./cli-demo.js";
 import { DEBUG_FILE, DEBUG_ROUTE, hasDebugPage, renderDebug } from "./debug.js";
@@ -101,7 +102,7 @@ const FRONT_MATTER = {
   lead: { default: "true" },
   // A block the generator writes after the content: "gallery", "a-z" or "snippets"; "notfound" (the
   // 404) one block per other docs language; "ai" writes its tables where the content has
-  // `<!-- luz:ai files -->` and `<!-- luz:ai rules -->`; "ai-commands" writes the commands of the luz skill at `<!-- luz:commands -->`
+  // `<!-- luz:ai files -->` and `<!-- luz:ai rules -->`; "ai-commands" writes the commands of the luz skill at `<!-- luz:commands -->`, "ai-agents" its agents and skills at `<!-- luz:agents needs|agents|skills -->`
   generate: { default: "" },
 };
 
@@ -175,7 +176,7 @@ const isCatalogPattern = ({ area, group }) => PACKAGE_AREAS.has(area) && group !
  */
 const AREA_KIND = {
   "get-started": "Get started",
-  kinds: "Kind of site",
+  ai: "AI",
   components: "Component",
   tokens: "Token page",
   catalog: "Catalog pattern",
@@ -294,7 +295,7 @@ export function parseFrontMatter(source, file, areas = null) {
   }
   if (!["h2", "h2,h3", "false"].includes(meta.toc)) throw new Error(`${file}: toc is "h2", "h2,h3" or "false"`);
   if (!["", "controls"].includes(meta.parts)) throw new Error(`${file}: parts is "controls" or empty`);
-  if (!["", "gallery", "a-z", "snippets", "ai", "ai-commands", "notfound"].includes(meta.generate)) throw new Error(`${file}: generate is "gallery", "a-z", "snippets", "ai", "ai-commands" or "notfound"`);
+  if (!["", "gallery", "a-z", "snippets", "ai", "ai-commands", "ai-agents", "notfound"].includes(meta.generate)) throw new Error(`${file}: generate is "gallery", "a-z", "snippets", "ai", "ai-commands", "ai-agents" or "notfound"`);
   if (meta.group && !NAME.test(meta.group)) throw new Error(`${file}: group "${meta.group}" is not a valid name`);
   // "Fits best" (decision 71): both keys on a pattern page of catalog, on no other page
   const fitsPage = isCatalogPattern(meta);
@@ -720,7 +721,7 @@ function chipsOf(site, page) {
  * of site a catalog pattern fits best, then one sentence. The kinds are
  * written as the reader says them (`kind.<id>` of the strings: blog, not
  * cms), `any` as "any site". On the page each kind links to its page of
- * /docs/kinds/<kind>/ in the language of the view; on the card of the
+ * /docs/ai/<kind>/ in the language of the view; on the card of the
  * gallery, whose link is the whole card, they are plain words. The kinds come
  * from the English page in every language; the sentence from the page's own,
  * which is English on a page that is not translated yet (`lang="en"`).
@@ -732,7 +733,7 @@ export function renderFits(site, page, { links = true } = {}) {
   const t = !links && page.fallback ? englishT() : tOf(site);
   const root = docsRootOf(site);
   const kinds = fitsKindsOf(english.meta["fits-kinds"]).map((kind) =>
-    kind === "any" ? say(t, "fits.any") : links ? link(`${root}kinds/${kind}/`, t(`kind.${kind}`)) : say(t, `kind.${kind}`),
+    kind === "any" ? say(t, "fits.any") : links ? link(`${root}ai/${kind}/`, t(`kind.${kind}`)) : say(t, `kind.${kind}`),
   );
   const sentence = links ? `<span${enAttr(site, page)}>${escapeHtml(page.meta.fits)}</span>` : escapeHtml(page.meta.fits);
   return `${say(t, "fits.label")} ${kinds.join(", ")} — ${sentence}`;
@@ -1501,7 +1502,7 @@ function renderPageIn(page, site, options) {
   const strings = { locale, used: options.used };
   const expanded = expand(page.body, { file: page.file, firstLine: page.bodyLine, partial: reader.partial, current, placeholders: false, ...strings });
   // "ai" is written inside the content, at its two markers, so it is known to the table of contents
-  const filled = withComponentLinks(page.meta.generate === "ai" ? fillAiMarkers(expanded, site, { file: page.file }) : page.meta.generate === "ai-commands" ? fillCommandMarkers(expanded, site, { file: page.file }) : expanded, page, site, options);
+  const filled = withComponentLinks(page.meta.generate === "ai" ? fillAiMarkers(expanded, site, { file: page.file }) : page.meta.generate === "ai-commands" ? fillCommandMarkers(expanded, site, { file: page.file }) : page.meta.generate === "ai-agents" ? fillAgentMarkers(expanded, site, { file: page.file }) : expanded, page, site, options);
   // `<!-- luz:generated -->` in the content puts the generated block where it stands, once
   const block = renderGenerated(page, site, options);
   const marked = filled.includes(GENERATED_MARKER);

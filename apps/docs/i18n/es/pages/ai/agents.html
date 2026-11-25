@@ -1,0 +1,45 @@
+<!-- luz:page
+title: Los agentes y las skills de /luz
+description: Los cuatro agentes de revisión y las dos skills que /luz puede añadir a un proyecto, cada uno con lo que revisa y las herramientas que puede usar.
+keywords: agente, subagente, skill, accesibilidad, seo, geo, core web vitals, luz-ai
+source: e1ee613548db
+reviewed: false
+-->
+    <section class="docs-block" aria-labelledby="choose">
+      <h2 class="docs-chapter__title" id="choose">Elige por lo que te importa</h2>
+      <p class="docs-lead">Dile a <code>/luz</code> lo que te importa y te ofrece el agente que encaja, el recomendado primero. Nunca ofrece uno que no necesitas: un sitio sin función de IA no necesita el auditor de IA.</p>
+      <!-- luz:agents needs -->
+    </section>
+
+    <section class="docs-block" aria-labelledby="agents">
+      <h2 class="docs-chapter__title" id="agents">Los agentes</h2>
+      <p class="docs-lead">Cada agente es una plantilla base con campos por rellenar. Revisa e informa; no reescribe tus archivos.</p>
+      <p>Las descripciones son las de los archivos de los agentes, así que están en inglés, sea cual sea el idioma de esta página.</p>
+      <!-- luz:agents agents -->
+    </section>
+
+    <section class="docs-block" aria-labelledby="skills">
+      <h2 class="docs-chapter__title" id="skills">Las skills</h2>
+      <p class="docs-lead">Una skill es un comando propio, con sus referencias, que escribes en tu asistente como <code>/luz</code>.</p>
+      <!-- luz:agents skills -->
+    </section>
+
+    <section class="docs-block" aria-labelledby="add">
+      <h2 class="docs-chapter__title" id="add">Añade uno a tu proyecto</h2>
+      <p class="docs-lead">Pídelo en el chat o ejecuta el mismo comando en una terminal.</p>
+      <div class="docs-snippet">
+        <div class="docs-snippet__bar">
+          <span class="docs-snippet__lang">Chat</span>
+          <button class="luz-copy-btn" type="button" data-copy-from="code-agents-chat" aria-label="Copiar el comando">Copiar</button>
+        </div>
+        <pre class="luz-code-block" data-lang="text" tabindex="0" role="region" aria-label="El comando en el chat"><code id="code-agents-chat">/luz add luz-seo-geo-specialist</code></pre>
+      </div>
+      <div class="docs-snippet">
+        <div class="docs-snippet__bar">
+          <span class="docs-snippet__lang">Shell</span>
+          <button class="luz-copy-btn" type="button" data-copy-from="code-agents-shell" aria-label="Copiar el comando">Copiar</button>
+        </div>
+        <pre class="luz-code-block" data-lang="bash" tabindex="0" role="region" aria-label="El comando en una terminal"><code id="code-agents-shell">npx @luz-ds/ai agent add luz-seo-geo-specialist --for claude</code></pre>
+      </div>
+      <p><code>--for</code> admite <code>claude</code>, <code>gemini</code> o <code>codex</code>: el comando escribe el agente en la carpeta que lee cada uno. Un campo que dejes sin rellenar queda como <code>[ADAPT: …]</code>, y el agente se detiene y te pregunta por él hasta que se rellena. <a href="/docs/ai/commands/#cmd-add">El comando <code>/luz add</code></a> muestra una conversación entera.</p>
+    </section>

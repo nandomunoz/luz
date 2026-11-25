@@ -42,3 +42,6 @@
 - name: post-merge-failure
   color: b60205
   description: The whole UI suite failed on main after a merge; opened by post-merge.yml
+- name: ai-target
+  color: 5319e7
+  description: The luz skill in an assistant other than Claude Code

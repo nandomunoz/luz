@@ -1,19 +1,16 @@
 <!-- luz:page
-title: Documentation site
-description: A documentation site: a prompt for an LLM, and recipes for its shell, page head, rail, example, do and don't, pager and page foot.
-area: kinds
-order: 4
-keywords: docs, guides, manual, reference, handbook, knowledge base
+title: Sitio de documentación
+description: Un sitio de documentación: recetas para su estructura, cabecera de página, índice lateral, ejemplo, qué hacer y qué no, navegación entre páginas y pie de página.
+keywords: docs, guías, manual, referencia, documentación, base de conocimiento
+source: c6887784b4ae
+reviewed: false
 -->
     <div class="docs-block" id="k-docs">
-      <p>Paste the prompt into any LLM. It asks about your documentation in short rounds, shows you the plan and writes nothing until you say "go".</p>
-      <p><a class="luz-btn luz-btn--primary site-prompt-open" href="/prompts/docs.txt" data-prompt-open data-prompt-title="The prompt for a documentation site">Open the prompt</a></p>
-      <!-- luz:include prompt-dialog -->
-      <p>Or build it yourself from the recipes below. They use the classes of core, the catalog and docs only; <a href="/docs/get-started/#site-kinds">Install LUZ</a> lists the files to load. The page you are reading is made of them.</p>
+      <p>O constrúyelo tú con las recetas de abajo. Usan solo las clases de core, del catálogo y de docs; <a href="/docs/get-started/#site-kinds">Instalar LUZ</a> indica los archivos que debes cargar. La página que estás leyendo está hecha con ellas.</p>
       <div class="docs-block">
-        <h2 id="shell">Shell</h2>
-        <p>The whole page: the header, the sidebar, the rail, the content and the footer, in the order a keyboard reaches them. The skip link goes to the content, past the sidebar and the rail. The <a href="/docs/catalog/docs-layout/">shell</a> is three columns from 80rem, two from 60rem and one below, with the rail above the content when there is no third column.</p>
-        <p>It has no example inside this page, as it is the whole page: this one is built on it. Resize the window to see its columns.</p>
+        <h2 id="shell">Estructura</h2>
+        <p>La página entera: la cabecera, la barra lateral, el índice lateral, el contenido y el pie de página, en el orden en que los alcanza el teclado. El enlace para saltar al contenido pasa por encima de la barra lateral y del índice lateral. La <a href="/docs/catalog/docs-layout/">estructura de página</a> tiene tres columnas a partir de 80rem, dos a partir de 60rem y una por debajo, con el índice lateral sobre el contenido cuando no hay tercera columna.</p>
+        <p>No tiene un ejemplo dentro de esta página, porque es la página entera: esta está construida sobre ella. Cambia el tamaño de la ventana para ver sus columnas.</p>
         <div class="docs-snippet">
           <div class="docs-snippet__bar">
             <span class="docs-snippet__lang">HTML</span>
@@ -36,8 +33,8 @@ keywords: docs, guides, manual, reference, handbook, knowledge base
         </div>
       </div>
       <div class="docs-block">
-        <h2 id="page-head">Page head</h2>
-        <p>The first child of the content: where the page sits, its <code>&lt;h1&gt;</code>, one sentence on what it lets the reader do, and a few facts as chips. It is the <a href="/docs/catalog/doc-header/">page head</a>.</p>
+        <h2 id="page-head">Cabecera de página</h2>
+        <p>Lo primero del contenido: dónde está la página, su <code>&lt;h1&gt;</code>, una frase sobre lo que permite hacer a quien lee y unos datos como etiquetas. Es la <a href="/docs/catalog/doc-header/">cabecera de página</a>.</p>
         <div class="docs-example" data-docs-specimen>
           <div class="docs-demo__stage" inert aria-hidden="true">
             <header class="luz-doc-header">
@@ -70,8 +67,8 @@ keywords: docs, guides, manual, reference, handbook, knowledge base
         </div>
       </div>
       <div class="docs-block">
-        <h2 id="rail">Rail</h2>
-        <p>"On this page" and the actions on the page, beside the content from 80rem and above it below: the <a href="/docs/catalog/page-rail/">rail</a>, a direct child of the shell, between the sidebar and the content. The rail of this page is a live one. A link of the list also carries the catalog's <code>.luz-sidebar__link</code>, so the catalog's script marks the section in view as you scroll.</p>
+        <h2 id="rail">Índice lateral</h2>
+        <p>«En esta página» y las acciones de la página, junto al contenido a partir de 80rem y sobre él por debajo: el <a href="/docs/catalog/page-rail/">índice lateral</a>, hijo directo de la estructura de página, entre la barra lateral y el contenido. El índice lateral de esta página es uno real. Un enlace de la lista lleva además <code>.luz-sidebar__link</code> de catalog, así que el script de catalog marca la sección visible mientras te desplazas.</p>
         <div class="docs-snippet">
           <div class="docs-snippet__bar">
             <span class="docs-snippet__lang">HTML</span>
@@ -97,8 +94,8 @@ keywords: docs, guides, manual, reference, handbook, knowledge base
         </div>
       </div>
       <div class="docs-block">
-        <h2 id="example">Example</h2>
-        <p>A live preview with the markup that makes it under it: the <a href="/docs/catalog/example/">example</a>. The code is optional.</p>
+        <h2 id="example">Ejemplo</h2>
+        <p>Una vista previa real con el marcado que la produce debajo: el <a href="/docs/catalog/example/">ejemplo</a>. El código es opcional.</p>
         <div class="docs-example" data-docs-specimen>
           <div class="docs-demo__stage">
             <figure class="luz-example">
@@ -131,8 +128,8 @@ keywords: docs, guides, manual, reference, handbook, knowledge base
         </div>
       </div>
       <div class="docs-block">
-        <h2 id="do-dont">Do and don't</h2>
-        <p>A pair that shows the right way and the wrong one, the Do first: the <a href="/docs/catalog/do-dont/">do and don't</a>. Each is a figure whose caption says why. The word, the mark before it and the frame say which is which, so the colour is never the only cue.</p>
+        <h2 id="do-dont">Qué hacer y qué no</h2>
+        <p>Una pareja que muestra la forma correcta y la incorrecta, primero la correcta: <a href="/docs/catalog/do-dont/">qué hacer y qué no</a>. Cada una es una figura cuyo pie explica el motivo. La palabra, la marca que la precede y el marco indican cuál es cuál, así que el color nunca es la única señal.</p>
         <div class="docs-example" data-docs-specimen>
           <div class="docs-demo__stage">
             <div class="luz-do-dont">
@@ -173,8 +170,8 @@ keywords: docs, guides, manual, reference, handbook, knowledge base
         </div>
       </div>
       <div class="docs-block">
-        <h2 id="pager">Pager</h2>
-        <p>The links to the previous page and the next, at the end of the content: the <a href="/docs/catalog/pager/">pager</a>. On the first page of a sequence, leave Previous out; on the last, Next.</p>
+        <h2 id="pager">Navegación entre páginas</h2>
+        <p>Los enlaces a la página anterior y a la siguiente, al final del contenido: la <a href="/docs/catalog/pager/">navegación entre páginas</a>. En la primera página de una secuencia, omite «Anterior»; en la última, «Siguiente».</p>
         <div class="docs-example" data-docs-specimen>
           <div class="docs-demo__stage">
             <nav aria-label="Previous and next page, example">
@@ -200,8 +197,8 @@ keywords: docs, guides, manual, reference, handbook, knowledge base
         </div>
       </div>
       <div class="docs-block">
-        <h2 id="page-foot">Page foot</h2>
-        <p>When the page was last changed, and where to edit it or report a problem, in small print after the pager: the <a href="/docs/catalog/page-footer/">page foot</a>.</p>
+        <h2 id="page-foot">Pie de página</h2>
+        <p>Cuándo se cambió la página por última vez y dónde editarla o informar de un problema, en letra pequeña tras la navegación entre páginas: el <a href="/docs/catalog/page-footer/">pie de página</a>.</p>
         <div class="docs-example" data-docs-specimen>
           <div class="docs-demo__stage">
             <p class="luz-page-footer">Last updated <time datetime="2026-10-17">17 October 2026</time> · <a href="#page-foot">Edit this page</a> · <a href="#page-foot">Report a problem</a></p>

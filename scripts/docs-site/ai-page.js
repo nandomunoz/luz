@@ -77,7 +77,7 @@ export function aiSections({ say, root, block, escapeHtml }) {
   const t = (key) => escapeHtml(say(key));
   const { agents, skills, targets, dependencies } = aiFacts(root);
   const code = (text) => `<code>${escapeHtml(text)}</code>`;
-  const docs = [{ href: "/docs/get-started/ai/#skill", label: t("level.ai.docs"), count: "" }];
+  const docs = [{ href: "/docs/ai/#skill", label: t("level.ai.docs"), count: "" }];
 
   const chat = [
     `<table class="luz-table landing-ai__table">`,
@@ -85,7 +85,7 @@ export function aiSections({ say, root, block, escapeHtml }) {
     `<tbody>${commandRows(root).map((r) => `<tr><th scope="row">${code(r.chat)}</th><td>${t(`level.ai.chat.${r.slug}`)}</td><td>${t(r.writes ? "level.ai.commands.yes" : "level.ai.commands.no")}</td></tr>`).join("")}</tbody>`,
     `</table>`,
   ].join("");
-  const commandsDocs = [{ href: "/docs/get-started/ai-commands/", label: t("level.ai.commands.link"), count: "" }];
+  const commandsDocs = [{ href: "/docs/ai/commands/", label: t("level.ai.commands.link"), count: "" }];
 
   const commands = [
     `<table class="luz-table landing-ai__table">`,

@@ -322,7 +322,7 @@ export const SITE_URL = "https://luzds.com/";
 // Where a finding sends the reader: a route of the docs site and a fragment
 // that is an id on it. The rules table of "Working with AI" (step 13) is the
 // page for the rules that have no page of their own.
-const AI = "docs/get-started/ai/#rules";
+const AI = "docs/ai/#rules";
 const READ = "docs/get-started/how-to-read/";
 const DOCS = {
   "parse/error": AI,

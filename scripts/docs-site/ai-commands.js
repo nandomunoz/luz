@@ -1,5 +1,5 @@
 /**
- * LUZ docs site: the page of the commands of the luz skill (`get-started/ai-commands`, `generate: ai-commands`). Development
+ * LUZ docs site: the page of the commands of the luz skill (`ai/commands`, `generate: ai-commands`). Development
  * tooling, nothing here ships. Nothing on the page is typed: its marker `<!-- luz:commands -->` becomes
  *   - the table of the commands, read from the Subcommands table of `packages/ai/skills/luz/SKILL.md`;
  *   - one section for each of them (and for an unknown subcommand and a file that gives orders), with what it does and whether

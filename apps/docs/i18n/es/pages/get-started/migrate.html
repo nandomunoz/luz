@@ -2,7 +2,7 @@
 title: Migra un proyecto a LUZ
 description: Pasa a LUZ un proyecto que tiene su propio CSS, una página cada vez y en cinco pasos. Una IA hace el trabajo mecánico; tú decides y compruebas.
 keywords: migrar, refactor, proyecto existente, css antiguo, bootstrap
-source: 987b51bac5c6
+source: 94847f6da51b
 reviewed: false
 -->
     <section class="docs-block" id="overview" aria-labelledby="overview-title">
@@ -18,7 +18,7 @@ reviewed: false
         <li><strong>Haz un inventario.</strong> Pide a la IA que liste las páginas o las plantillas, los componentes del framework antiguo y cuántas veces se usa cada uno, el JavaScript que depende de clases o de marcado (modales, menús, pestañas, validación) y cada <code>!important</code>. Corrige la lista: es el mapa de la migración.</li>
         <li><strong>Haz capturas.</strong> Una de cada página en los estados que importan: claro y oscuro, móvil y escritorio, un formulario con error, un modal abierto. Sin ellas no sabes qué has roto.</li>
         <li><strong>Escribe pruebas de humo.</strong> Si el proyecto no tiene tests, pide a la IA unos pocos sobre lo que no puede romperse: el formulario envía, el menú abre, el inicio de sesión funciona. Las ejecutas tú.</li>
-        <li><strong>Escribe una vez cuándo una página está hecha.</strong> La página no carga ninguna clase ni script del framework antiguo, <a href="/docs/get-started/ai/#check"><code>luz-check</code></a> y una comprobación de accesibilidad salen limpios, las capturas coinciden salvo lo que has decidido cambiar, y las pruebas de humo pasan.</li>
+        <li><strong>Escribe una vez cuándo una página está hecha.</strong> La página no carga ninguna clase ni script del framework antiguo, <a href="/docs/ai/#check"><code>luz-check</code></a> y una comprobación de accesibilidad salen limpios, las capturas coinciden salvo lo que has decidido cambiar, y las pruebas de humo pasan.</li>
       </ol>
     </section>
 
@@ -62,7 +62,7 @@ reviewed: false
       <h3 class="docs-subhead" id="step-4">Paso 4: página a página</h3>
       <p>Elige el orden, de las páginas simples a las complejas, con las páginas que comparten plantilla juntas. Migra las partes compartidas (cabecera, pie de página, menú) una sola vez, después de las páginas simples y antes de las complejas, para no tener dos cabeceras durante meses. Con cada página, repite el mismo bucle:</p>
       <ol>
-        <li>La IA, con <a href="/docs/get-started/ai/">el prompt de LUZ</a>, mete la página en la región, quita las clases del framework antiguo, deja el HTML semántico y añade una clase de LUZ solo donde el HTML no basta. Quitar es más seguro que añadir.</li>
+        <li>La IA, con <a href="/docs/ai/">la skill <code>/luz</code></a>, mete la página en la región, quita las clases del framework antiguo, deja el HTML semántico y añade una clase de LUZ solo donde el HTML no basta. Quitar es más seguro que añadir.</li>
         <li>Ejecuta <code>npx @luz-ds/check@0.3.2</code> y una comprobación de accesibilidad, y te enseña qué ha cambiado y qué queda, nunca el archivo entero reescrito.</li>
         <li>Tú lees el diff y las capturas, y pasas las pruebas de humo.</li>
         <li>Un commit por página, para poder revertir una página y no un mes.</li>
@@ -115,7 +115,7 @@ reviewed: false
       <h2 class="docs-chapter__title" id="next-title">Siguientes pasos</h2>
       <ul>
         <li><a href="/docs/get-started/#existing-project">Carga luz.conditional.css</a> para un proyecto que ya tiene diseño.</li>
-        <li><a href="/docs/get-started/ai/">Trabaja con IA</a>: los prompts, y el verificador que revisa lo que escribe la IA.</li>
+        <li><a href="/docs/ai/">Trabaja con IA</a>: la skill, sus comandos y el verificador que revisa lo que escribe la IA.</li>
         <li><a href="/docs/html/#html-change">Cambia los estilos por defecto</a> que LUZ da a los elementos sin clase.</li>
       </ul>
     </section>

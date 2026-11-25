@@ -5193,33 +5193,8 @@ home-light:defined ~ .landing-light__nojs {
   }
 }
 
-/* "Coming soon to npm": a label, not a count, so it gets room at the sides and
-   capitals (text-transform keeps the words in the catalog as written) */
-.landing-cli__note .luz-badge {
-  padding: var(--luz-space-2xs) var(--luz-space-md);
-  font-size: var(--luz-text-xs);
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-/* core's badge is centred by trimming the text box: the label keeps that, and
-   its height is the capitals plus an even room above and below */
-@supports (text-box: trim-both cap alphabetic) {
-  .landing-cli__note .luz-badge {
-    padding-block: calc((1.5rem - 1cap) / 2);
-  }
-}
-
-/* Arabic has no capitals, and spacing its letters would unjoin them */
-.landing-cli__note .luz-badge:lang(ar) {
-  letter-spacing: normal;
-}
-
-/* Arabic has no letters in the mono stack: its phrases in the terminal and
-   the badge under the words take the page's sans, the code stays mono */
-.landing-cli bdi:lang(ar),
-.landing-cli__note .luz-badge:lang(ar) {
+/* Arabic has no letters in the mono stack: its phrases in the terminal take the page's sans, the code stays mono */
+.landing-cli bdi:lang(ar) {
   font-family: var(--luz-font-sans);
 }
 

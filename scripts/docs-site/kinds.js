@@ -42,7 +42,7 @@ export const CASCADE = [
 /**
  * The kinds of site a catalog page may name in `fits-kinds` (decision 71), as
  * the reader says them: a blog, not cms. `any` is the other value, and stands
- * alone. The ids of the prompts and of /docs/kinds/<kind>/ are these.
+ * alone. The ids of the prompts and of /docs/ai/<kind>/ are these.
  */
 export const FITS_KINDS = ["landing", "blog", "app", "docs"];
 

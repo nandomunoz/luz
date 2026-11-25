@@ -37,9 +37,6 @@
  *   curated text for an AI agent, from the same scan; written at the root of
  *   the build, served as plain text in dev (root-absolute links there,
  *   absolute under the site URL in the pages build).
- * - /prompts/<kind>.txt (prompts.js): the five prompts for AI, assembled from
- *   apps/site/prompts/; written at the root of the build, served as plain
- *   text in dev; their links are always the published site's.
  * - examples/ and manifests/ (ai.js): a standalone page per docs page with a
  *   "Copy the markup" section, the CSS and JS they load from relative files
  *   beside them, and the manifests of every package. Written by the build
@@ -81,7 +78,6 @@ import { localize } from "./docs-i18n.js";
 import { DEBUG_FILE, DEBUG_ROUTE, hasDebugPage, renderDebug } from "./debug.js";
 import { HUMANS_FILE, HUMANS_ROUTE, MANIFESTO_FILE, MANIFESTO_ROUTE, ROBOTS_FILE, ROBOTS_ROUTE } from "./manifesto.js";
 import { PACKAGES } from "../luz-packages.js";
-import { promptFiles } from "./prompts.js";
 import { MOVED, renderRedirect } from "./redirect.js";
 import { AI_ROUTES, exampleAssets, exampleDocuments, manifestAssets, renderLlmsFull, renderLlmsTxt, renderPageMarkdown } from "./ai.js";
 import { SITE_URL } from "./i18n.js";
@@ -252,8 +248,8 @@ export function docsSite({ repoRoot, relative: relativeUrls, outRoot, pagesBase 
       byFile: new Map(list.map((d) => [d.file, d])),
       virtual: new Map(list.filter((d) => d.virtual).map((d) => [resolve(repoRoot, d.file), d])),
       markdown,
-      // The routes a link may point at: the documents, their Markdown and the prompts for AI, made relative in the pages build
-      routes: new Set([...list.map((d) => d.route), ...markdown.keys(), ...promptFiles({ root: repoRoot }).keys()]),
+      // The routes a link may point at: the documents and their Markdown, made relative in the pages build
+      routes: new Set([...list.map((d) => d.route), ...markdown.keys()]),
     };
     return derived;
   };
@@ -301,7 +297,6 @@ export function docsSite({ repoRoot, relative: relativeUrls, outRoot, pagesBase 
     return new Map([
       [AI_ROUTES.llms, () => renderLlmsTxt(scan(), options)],
       [AI_ROUTES.llmsFull, () => renderLlmsFull(scan(), options)],
-      ...promptFiles({ root: repoRoot }),
       // humans.txt (humanstxt.org): who makes the site, a file of apps/site served as it is
       ...(existsSync(resolve(repoRoot, HUMANS_FILE)) ? [[HUMANS_ROUTE, () => readFileSync(resolve(repoRoot, HUMANS_FILE), "utf-8")]] : []),
       // robots.txt: every crawler may read every page; files of apps/site served as they are
@@ -448,7 +443,7 @@ export function docsSite({ repoRoot, relative: relativeUrls, outRoot, pagesBase 
             return next();
           }
         }
-        // llms.txt, llms-full.txt and the prompts: generated, never a file (SEC-PLG-6)
+        // llms.txt and llms-full.txt: generated, never a file (SEC-PLG-6)
         const ai = aiFiles().get(path);
         if (ai) {
           try {
