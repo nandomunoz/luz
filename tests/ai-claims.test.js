@@ -31,6 +31,12 @@ describe("the skill says what it does", () => {
     expect([...agents]).toEqual(["luz-agent-accessibility"]);
   });
 
+  it("the agents reference does not call the agent a template with fields to fill: it has none", () => {
+    const ref = read(`${SKILL}/references/agents.md`);
+    expect(ref).not.toMatch(/base template|with fields left to fill/);
+    expect(ref).toMatch(/no field is written as it is/);
+  });
+
   it("the limits name the exception: --force overwrites, the check is downloaded with npx", () => {
     expect(en["level.ai.limits.2"]).toMatch(/unless/);
     expect(en["level.ai.limits.3"]).toMatch(/script/);
