@@ -104,6 +104,20 @@ test.describe('the FAQ of the home: the content', () => {
 });
 
 test.describe('the FAQ of the home: the layout', () => {
+  for (const width of [360, 1280]) {
+    test(`at ${width} px the line to the rest of the questions stands well apart from the last group (owner, 2026-11-25)`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto('/es/');
+      const gap = await page.evaluate(() => {
+        const last = /** @type {Element} */ (document.querySelector('#faq .luz-faq__group:last-of-type')).getBoundingClientRect();
+        const more = /** @type {Element} */ (document.querySelector('#faq .luz-faq__more')).getBoundingClientRect();
+        const rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
+        return (more.top - last.bottom) / rem;
+      });
+      expect(gap, 'at least 3 rem between them').toBeGreaterThanOrEqual(3);
+    });
+  }
+
   const geometry = (page) => page.evaluate(() => {
     const box = (selector) => document.querySelector(selector)?.getBoundingClientRect().toJSON();
     const head = document.querySelector('#faq .landing-faq__head');
