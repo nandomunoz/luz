@@ -63,9 +63,6 @@ const codeOf = (html, id) => {
 
 const numberOf = (text) => Number(text.replace(/[^0-9.]/g, ""));
 
-/** The element names and classes of a node and of everything under it, in order: its shape. */
-const shapeOf = (node) => [node, ...descendants(node)].map((n) => `${n.name}${classesOf(n).map((c) => `.${c}`).join("")}`);
-
 describe("the page of the bar list has a second example, In cells", () => {
   it("is an h3 of the Example section, after the first example and before Known issues, once", () => {
     const body = english();

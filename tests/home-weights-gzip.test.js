@@ -18,7 +18,7 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { BASE } from "../scripts/luz-packages.js";
 import { ANY_SITE, PATTERNS } from "./helpers/catalog-names.js";
-import { findAll, parse, query, queryAll, textOf } from "./helpers/html-dom.js";
+import { findAll, parse, queryAll, textOf } from "./helpers/html-dom.js";
 
 const repo = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (path) => readFileSync(join(repo, path), "utf-8");
