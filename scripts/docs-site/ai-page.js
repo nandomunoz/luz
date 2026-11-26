@@ -127,12 +127,14 @@ export function aiSections({ say, root, escapeHtml }) {
       `  </div>`,
     ].filter(Boolean);
 
-  // Where it works (owner, 2026-11-26): no assistant by name, since not every one is tested; it is written in open formats, for
-  // any harness
+  // What the skill is, in short lines that move across the window (owner, 2026-11-26): no assistant by name, since not every one is
+  // tested. The script doubles the list for the loop and shows the pause button; with less motion or without it, the lines wrap
+  const MARQUEE_LINES = 10;
+  const lines = Array.from({ length: MARQUEE_LINES }, (_, i) => `<li>${t(`level.ai.marquee.${i + 1}`)}</li>`);
   const works = [
     `<section class="landing-ai-works" id="a-assistants" aria-labelledby="a-assistants-title">`,
-    `  <h2 class="landing-ai-works__title" id="a-assistants-title">${t("level.ai.assistants.title")}</h2>`,
-    `  <p class="landing-ai-works__note">${t("level.ai.assistants.note")}</p>`,
+    `  <h2 class="u-sr-only" id="a-assistants-title">${t("level.ai.assistants.title")}</h2>`,
+    `  <div class="landing-marquee"><div class="landing-marquee__track"><ul class="landing-marquee__list">${lines.join("")}</ul></div><button class="landing-marquee__pause" type="button" aria-pressed="false" aria-label="${t("level.ai.marquee.pause")}" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path class="landing-marquee__icon-pause" d="M9 6v12M15 6v12"/><path class="landing-marquee__icon-play" d="M8 5.5v13l10-6.5Z"/></svg></button></div>`,
     `</section>`,
   ].join("\n");
 

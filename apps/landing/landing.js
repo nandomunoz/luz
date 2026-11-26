@@ -95,6 +95,31 @@ function initCopyCommands() {
  * landing.css) and the box's icon moves (is-loading). Without <luz-theme-mode> (no site module) the buttons
  * stay hidden.
  */
+/**
+ * The marquee of the page of the skill: the list is doubled for a seamless loop (the copy hidden from everyone), and the pause
+ * button shows (WCAG 2.2.2). Nothing moves where the reader asks for less motion, nor without this script: the lines wrap.
+ */
+function initMarquee() {
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  for (const marquee of document.querySelectorAll(".landing-marquee")) {
+    const track = marquee.querySelector(".landing-marquee__track");
+    const list = track?.querySelector(".landing-marquee__list");
+    const pause = marquee.querySelector(".landing-marquee__pause");
+    if (!list || !pause) continue;
+    const copy = list.cloneNode(true);
+    copy.setAttribute("aria-hidden", "true");
+    copy.inert = true;
+    track.append(copy);
+    marquee.classList.add("is-moving");
+    pause.hidden = false;
+    pause.addEventListener("click", () => {
+      const paused = pause.getAttribute("aria-pressed") !== "true";
+      pause.setAttribute("aria-pressed", String(paused));
+      marquee.classList.toggle("is-paused", paused);
+    });
+  }
+}
+
 function initModes() {
   const modes = document.querySelector("luz-theme-mode");
   const buttons = [...document.querySelectorAll("[data-apply-mode]")];
@@ -249,6 +274,7 @@ initDayBand();
 initSiteHeader();
 initCopy();
 initCopyCommands();
+initMarquee();
 initModes();
 initCli();
 // The panels of "What's inside": install, code and result; level 4's, install and use

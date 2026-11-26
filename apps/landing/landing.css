@@ -5369,47 +5369,177 @@ home-light:defined ~ .landing-light__nojs {
 }
 
 .landing-ai-works {
-  display: grid;
-  justify-items: center;
-  gap: var(--luz-space-xs);
-  text-align: center;
+  min-inline-size: 0;
 }
 
-.landing-ai-works__title {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--luz-space-sm);
+/* The marquee: the width of the window, from edge to edge (the root clips the sideways overflow it would cause). Without the
+   script, or with less motion, the lines wrap, centred; with it they move, the list doubled, and stop on hover, focus or pause */
+html:has(.landing-marquee) {
+  overflow-x: clip;
+}
+
+.landing-marquee {
+  position: relative;
+  inline-size: 100vw;
+  margin-inline-start: calc(50% - 50vw);
+  padding-block: var(--luz-space-md);
+  border-block: 1px solid var(--luz-divider);
+  --landing-marquee-bg: color-mix(in oklab, var(--luz-brand-primary) 5%, var(--luz-surface-page));
+  background: var(--landing-marquee-bg);
+  overflow: clip;
+}
+
+.landing-marquee__track {
+  display: flex;
+  justify-content: center;
+}
+
+.landing-marquee__list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--luz-space-xs) var(--luz-space-xl);
   margin: 0;
+  padding: 0 var(--luz-space-md);
+  list-style: none;
   font-family: var(--luz-font-sans);
   font-size: var(--luz-text-lg);
   font-weight: 600;
   color: var(--luz-text-primary);
 }
 
-/* A short line of the brand on each side of the title ties the strip and the links into one block */
-.landing-ai-works__title::before,
-.landing-ai-works__title::after {
-  content: "";
-  inline-size: var(--luz-space-xl);
-  block-size: 2px;
-  border-radius: var(--luz-radius-full);
-  background-color: var(--luz-brand-primary);
+/* A small star of the brand before each line */
+.landing-marquee__list li {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--luz-space-xl);
+  white-space: nowrap;
 }
 
-/* On a phone the title wraps, and the lines would stand apart from it */
-@media (max-width: 640px) {
-  .landing-ai-works__title::before,
-  .landing-ai-works__title::after {
-    content: none;
+.landing-marquee__list li::before {
+  content: "✦";
+  color: var(--luz-brand-primary);
+  font-size: var(--luz-text-sm);
+}
+
+.landing-marquee__pause {
+  position: absolute;
+  z-index: 2;
+  inset-block-start: 50%;
+  inset-inline-end: var(--luz-space-md);
+  display: inline-grid;
+  place-items: center;
+  inline-size: 2.75rem;
+  block-size: 2.75rem;
+  translate: 0 -50%;
+  padding: 0;
+  border: 1px solid var(--luz-divider);
+  border-radius: var(--luz-radius-full);
+  background: var(--luz-surface-page);
+  color: var(--luz-text-primary);
+  cursor: pointer;
+}
+
+.landing-marquee__pause[hidden] {
+  display: none;
+}
+
+.landing-marquee__pause:hover {
+  border-color: var(--luz-brand-primary);
+  color: var(--luz-brand-primary);
+}
+
+.landing-marquee__pause:focus-visible {
+  outline: 2px solid var(--luz-focus-ring);
+  outline-offset: 2px;
+}
+
+.landing-marquee__pause svg {
+  inline-size: 1.25rem;
+  block-size: 1.25rem;
+  fill: none;
+  stroke: currentcolor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.landing-marquee__icon-play,
+.landing-marquee__pause[aria-pressed="true"] .landing-marquee__icon-pause {
+  display: none;
+}
+
+.landing-marquee__pause[aria-pressed="true"] .landing-marquee__icon-play {
+  display: inline;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .landing-marquee.is-moving .landing-marquee__track {
+    justify-content: flex-start;
+    inline-size: max-content;
+    /* A slow loop: about a minute for the whole list, from the token of the slowest motion */
+    animation: landing-marquee calc(var(--luz-duration-lazy) * 75) linear infinite;
+  }
+
+  .landing-marquee.is-moving .landing-marquee__list {
+    flex-wrap: nowrap;
+    padding-inline: 0 var(--luz-space-xl);
+  }
+
+  /* The lines fade in and out at the edges, rather than being cut: the band's colour to transparent, under the pause button */
+  .landing-marquee.is-moving::before,
+  .landing-marquee.is-moving::after {
+    content: "";
+    position: absolute;
+    inset-block: 0;
+    z-index: 1;
+    inline-size: 8%;
+    background-image: linear-gradient(to right, var(--landing-marquee-bg), transparent);
+    pointer-events: none;
+  }
+
+  .landing-marquee.is-moving::before {
+    inset-inline-start: 0;
+  }
+
+  .landing-marquee.is-moving::after {
+    inset-inline-end: 0;
+    background-image: linear-gradient(to left, var(--landing-marquee-bg), transparent);
+  }
+
+  .landing-marquee.is-moving:hover .landing-marquee__track,
+  .landing-marquee.is-moving:focus-within .landing-marquee__track,
+  .landing-marquee.is-paused .landing-marquee__track {
+    animation-play-state: paused;
   }
 }
 
-.landing-ai-works__note {
-  margin: 0;
-  max-inline-size: 52rem;
-  font-size: var(--luz-text-base);
-  color: var(--luz-text-secondary);
+@keyframes landing-marquee {
+  to {
+    translate: -50% 0;
+  }
 }
+
+/* In a right-to-left page the track overflows to the left: it moves right, so the lines come in reading order */
+@keyframes landing-marquee-rtl {
+  to {
+    translate: 50% 0;
+  }
+}
+
+:dir(rtl) .landing-marquee.is-moving .landing-marquee__track {
+  animation-name: landing-marquee-rtl;
+}
+
+/* In a right-to-left page the start is on the right: the fades turn round */
+:dir(rtl) .landing-marquee.is-moving::before {
+  background-image: linear-gradient(to left, var(--landing-marquee-bg), transparent);
+}
+
+:dir(rtl) .landing-marquee.is-moving::after {
+  background-image: linear-gradient(to right, var(--landing-marquee-bg), transparent);
+}
+
 
 .landing-ai-goal {
   display: grid;
@@ -5462,7 +5592,8 @@ home-light:defined ~ .landing-light__nojs {
   }
 
   .landing-ai-goal,
-  .landing-ai-works {
+  .landing-ai-works,
+  .landing-ai-decide {
     scroll-margin-block-start: 6rem;
   }
 }

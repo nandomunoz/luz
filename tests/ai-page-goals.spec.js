@@ -123,10 +123,10 @@ for (const route of ROUTES) {
       await page.setViewportSize({ width: 320, height: 800 });
       await page.goto(route);
       if (zoom === 400) await page.evaluate(() => { document.documentElement.style.fontSize = '400%'; });
-      // The marquee's own copy of its list runs off the window by design, and is hidden from everyone
+      // A moving marquee runs off the window by design, clipped by its box (tests/ai-page-marquee.spec.js); still, it wraps
       const outside = await page.locator(SECTIONS).locator('h2, h3, p, li, article, code, pre, summary').evaluateAll((all) =>
         all
-          .filter((el) => !el.closest('[aria-hidden="true"], .u-sr-only'))
+          .filter((el) => !el.closest('[aria-hidden="true"], .u-sr-only, .landing-marquee.is-moving'))
           .map((el) => ({ el, box: el.getBoundingClientRect() }))
           .filter(({ box }) => box.width > 0 && (box.right > window.innerWidth + 0.5 || box.left < -0.5))
           .map(({ el, box }) => `${el.localName}.${el.className} spans ${Math.round(box.left)}-${Math.round(box.right)}`),

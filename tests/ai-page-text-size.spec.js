@@ -33,7 +33,7 @@ for (const route of ROUTES) {
 
     test('the sentences of the cards and the strips are 16 px', async ({ page }) => {
       await page.goto(route);
-      for (const selector of ['.landing-ai__text', '.landing-ai-decide__list > li', '.landing-ai-works__title', '.landing-ai-works__note']) {
+      for (const selector of ['.landing-ai__text', '.landing-ai-decide__list > li', '.landing-marquee__list li']) {
         const sizes = await page.locator(selector).evaluateAll((all) => all.map((el) => parseFloat(getComputedStyle(el).fontSize)));
         expect(sizes.length, selector).toBeGreaterThan(0);
         for (const px of sizes) expect(px, selector).toBeGreaterThanOrEqual(15.99);
