@@ -124,6 +124,14 @@ describe("the three of 2026-11-26: translate, meta and license", () => {
     }
   });
 
+  it("readme holds the same fences as the others: go first, nothing fetched, only the commands of its plan (git log, git remote), away from the files of the assistant and of the pipeline", () => {
+    const text = fileOf("luz-readme");
+    expect(text).toMatch(/"adelante", "vamos", "hazlo"/);
+    expect(text).toMatch(/Never touch `\.claude\/`, `AGENTS\.md`, `CLAUDE\.md`, `\.github\/`/);
+    expect(text).toMatch(/No `curl`, no `wget`, no `fetch`/);
+    expect(text).toMatch(/run only the commands the plan named/i);
+  });
+
   it("translate marks its work as pending and never as reviewed, keeps the code and the figures, and stops at legal text", () => {
     const text = fileOf("luz-translate");
     expect(text).toMatch(/you never mark it so/);
