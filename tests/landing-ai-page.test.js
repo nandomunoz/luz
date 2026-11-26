@@ -85,7 +85,7 @@ describe("the page of the luz skill, /ai/", () => {
 
   const help = () => execFileSync(process.execPath, [join(repo, SKILL, "scripts/luz.mjs"), "--help"], { encoding: "utf-8" });
   const optionsOf = (block) => [...block.matchAll(/<article class="landing-card landing-ai-option[^"]*" id="([^"]*)">([\s\S]*?)<\/article>/g)].map((m) => ({ id: m[1], html: m[2], recommended: m[0].includes("landing-ai-option--recommended") }));
-  const commandsOf = (html) => [...html.matchAll(/<code id="[^"]*">([^<]*)<\/code>/g)].map((m) => m[1]);
+  const commandsOf = (html) => [...html.matchAll(/<p class="landing-ai__ask" data-copy="([^"]*)"><code>\1<\/code><\/p>/g)].map((m) => m[1]);
 
   it.each(LANGS)("in %s: Install it offers three choices, everything (recommended, first), the minimum and piece by piece, one command each, and says once that it is the terminal", (code, prefix) => {
     const html = rendered.get(`${prefix}ai/`);
@@ -129,8 +129,9 @@ describe("the page of the luz skill, /ai/", () => {
     expect(options[2].html).toContain('href="#a-agents"');
     expect(options[2].html).toContain('href="#a-skills"');
     for (const [, command] of block.matchAll(/npx @luz-ds\/ai ([a-z]+)/g)) expect(help(), command).toMatch(new RegExp(`^  ${command}\\b`, "m"));
-    // Every command has its copy button, and the other assistants are named once, under the cards
-    expect(block.match(/<button class="luz-copy-btn" type="button" data-copy-from="/g)).toHaveLength(4);
+    // Every command is a line that copies itself, as on the cards (owner, 2026-11-26), under a label; no bar with a copy button
+    expect(block.match(/<div class="landing-ai-option__cmd"><p class="landing-ai__label">[^<]+<\/p><p class="landing-ai__ask" data-copy=/g)).toHaveLength(4);
+    expect(block).not.toContain("luz-copy-btn");
     expect(block).toContain(escape(words["level.ai.install.note"]));
     // No label on every line: the lead says where to type
     expect(block).not.toContain("landing-ai__where");
@@ -142,11 +143,11 @@ describe("the page of the luz skill, /ai/", () => {
   const cards = (block) => [...block.matchAll(/<article\b[\s\S]*?<\/article>/g)].map((m) => m[0]);
   const titleOf = (card) => /<p class="landing-card__title">([^<]*)<\/p>/.exec(card)?.[1];
 
-  it("has install it, then the strip of where it works, use it, the agents, the small skills and the strip of what you decide, in that order, with no table", () => {
+  it("has the strip of where it works, then install it, use it, the agents, the small skills and the strip of what you decide, in that order, with no table", () => {
     for (const [, prefix] of LANGS) {
       const html = rendered.get(`${prefix}ai/`);
-      // The strip of where it works sits under install (owner, 2026-11-26)
-      expect([...html.matchAll(/<section\b[^>]*\sid="(a-[a-z]+)"/g)].map((m) => m[1])).toEqual(["a-install", "a-assistants", "a-use", "a-agents", "a-skills", "a-decide"]);
+      // The strip of where it works sits above the links (owner, 2026-11-26)
+      expect([...html.matchAll(/<section\b[^>]*\sid="(a-[a-z]+)"/g)].map((m) => m[1])).toEqual(["a-assistants", "a-install", "a-use", "a-agents", "a-skills", "a-decide"]);
       expect(html, prefix).not.toMatch(/<table\b/);
       expect(html, prefix).not.toContain("--target</th>");
     }
@@ -162,7 +163,8 @@ describe("the page of the luz skill, /ai/", () => {
   });
 
   it.each(LANGS)("in %s: the strip of where it works names no assistant (owner, 2026-11-26: not every one is tested), only that it works in any harness, in open formats", (code, prefix) => {
-    const block = sectionOf(rendered.get(`${prefix}ai/`), "a-assistants");
+    const strip = sectionOf(rendered.get(`${prefix}ai/`), "a-assistants");
+    const block = strip.slice(0, strip.indexOf("</section>"));
     const words = catalog(code);
     expect(block).toContain(escape(words["level.ai.assistants.title"]));
     expect(block).toContain(escape(words["level.ai.assistants.note"]));

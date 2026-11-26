@@ -28,7 +28,7 @@ for (const route of ROUTES) {
     await expect(options.nth(1).locator('.landing-ai-option__flag')).toBeVisible();
     for (const option of await options.all()) {
       await expect(option.locator('h3')).toBeVisible();
-      await expect(option.locator('pre code').first()).toBeVisible();
+      await expect(option.locator('.landing-ai__ask code').first()).toBeVisible();
     }
   });
 
@@ -44,7 +44,7 @@ for (const route of ROUTES) {
     expect(Math.abs(first.top - last.top)).toBeLessThan(2);
     expect(Math.abs(first.bottom - last.bottom)).toBeLessThan(2);
     // A command is one line: it never breaks in the middle of a flag
-    const lines = await page.locator('#a-install pre.luz-code-block code').evaluateAll((all) => all.map((el) => Math.round(el.getBoundingClientRect().height / parseFloat(getComputedStyle(el).lineHeight))));
+    const lines = await page.locator('#a-install .landing-ai__ask code').evaluateAll((all) => all.map((el) => Math.round(el.getBoundingClientRect().height / parseFloat(getComputedStyle(el).lineHeight))));
     expect(lines).toEqual([1, 1, 1, 1]);
     for (const selector of ['#a-agents article', '#a-skills article']) {
       const row = await page.locator(selector).evaluateAll((all) => {

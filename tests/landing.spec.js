@@ -624,9 +624,11 @@ test.describe('Landing page', () => {
           const [a, b] = cols.map((c) => c.getBoundingClientRect().height);
           const short = cols[a <= b ? 0 : 1];
           const header = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--site-header-h')) || 0;
-          // Halfway into the difference of heights: the short one has stuck, the section has not ended
+          // Halfway into the difference of heights past where the short one sticks: it has stuck, the section has not ended
+          // (measured from its own sticky top, so a short difference of heights still leaves it room to stick)
           const top = el.getBoundingClientRect().top + window.scrollY;
-          window.scrollTo({ top: top + Math.abs(a - b) / 2, behavior: 'instant' });
+          const stick = parseFloat(getComputedStyle(short).top) || 0;
+          window.scrollTo({ top: top - stick + Math.abs(a - b) / 2, behavior: 'instant' });
           await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
           return { styles, diff: Math.abs(a - b), shortTop: short.getBoundingClientRect().top, sectionTop: el.getBoundingClientRect().top, header };
         });

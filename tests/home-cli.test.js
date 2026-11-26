@@ -335,8 +335,9 @@ describe("the catalogs, in en, es and ar", () => {
     }
   });
 
-  it("name no layer in the eyebrow (the skill picks tokens, core or the catalog), and the title is a conversation", () => {
+  it("name no layer in the eyebrow (the skill picks tokens, core or the catalog), and the title says LUZ in your AI model, with AI marked (owner, 2026-11-26)", () => {
     for (const lang of LANGS) expect(catalogs[lang]["inside.l4.eyebrow"], lang).not.toMatch(/\+/);
-    expect(catalogs.en["inside.l4.title"].replace(/<[^>]*>/g, "")).toBe("Your first page, from a conversation");
+    expect(catalogs.en["inside.l4.title"].replace(/<[^>]*>/g, "")).toBe("LUZ in your AI model");
+    for (const lang of LANGS) expect(catalogs[lang]["inside.l4.title"], lang).toContain('<span class="landing-mark">AI</span>');
   });
 });
