@@ -141,6 +141,9 @@ describe("the page of the luz skill, /ai/", () => {
 
   const chatCommands = [...read(`${SKILL}/SKILL.md`).matchAll(/^\| `(\/luz[^`]*)` \|[^|]*\|[^|]*\| ([^|]*) \|$/gm)].map((m) => ({ chat: m[1], writes: /^yes/.test(m[2].trim()) }));
   const cards = (block) => [...block.matchAll(/<article\b[\s\S]*?<\/article>/g)].map((m) => m[0]);
+  /** The small grey icon of what a card does: its words as the title (hover) and as a hidden text (screen readers). */
+  const kindOf = (words) => `title="${escape(words)}"><svg class="landing-ai__kind-icon" viewBox="0 0 24 24" aria-hidden="true">`;
+  const kindText = (words) => `<span class="u-sr-only">${escape(words)}</span></span>`;
   const titleOf = (card) => /<p class="landing-card__title">([^<]*)<\/p>/.exec(card)?.[1];
 
   it("has the strip of where it works, then install it, use it, the agents, the small skills and the strip of what you decide, in that order, with no table", () => {
@@ -192,9 +195,9 @@ describe("the page of the luz skill, /ai/", () => {
       const card = list.find((c) => c.includes(`<code class="landing-ai__name">${name}</code>`));
       expect(card, name).toBeDefined();
       const at = (needle) => card.indexOf(needle);
+      expect(at("landing-ai__kind")).toBeLessThan(at("landing-card__title"));
       expect(at("landing-card__title")).toBeLessThan(at("landing-ai__name"));
-      expect(at("landing-ai__name")).toBeLessThan(at("landing-ai__badge"));
-      expect(at("landing-ai__badge")).toBeLessThan(at("landing-ai__text"));
+      expect(at("landing-ai__name")).toBeLessThan(at("landing-ai__text"));
       expect(at("landing-ai__text")).toBeLessThan(at("landing-ai__label"));
       const human = words[`level.ai.agent.${name}.title`];
       expect(human).not.toContain("luz-");
@@ -228,7 +231,9 @@ describe("the page of the luz skill, /ai/", () => {
       expect(card, name).toBeDefined();
       expect(titleOf(card), name).toBe(escape(words[`level.ai.skills.${name}.title`]));
       expect(card).toContain(escape(words[`level.ai.skills.${name}.text`]));
-      expect(card).toContain(`<span class="luz-badge luz-badge--gray landing-ai__badge">${escape(words["level.ai.skills.badge"])}</span>`);
+      expect(card).toContain(kindOf(words["level.ai.skills.badge"]));
+      expect(card).toContain(kindText(words["level.ai.skills.badge"]));
+      expect(card).not.toContain("luz-badge");
       expect(askOf(card), name).toEqual([escape(words["level.ai.ask"]), escape(words["level.ai.skills.use"].replace("{name}", name))]);
       // A click copies the command of the skill, not "<what you want>" (owner, 2026-11-26)
       expect(copyOf(card), name).toBe(`/${name}`);
@@ -250,16 +255,17 @@ describe("the page of the luz skill, /ai/", () => {
     }
   });
 
-  it.each(LANGS)("in %s: an agent that changes code says so in its badge, and the ones that read say they read", (code, prefix) => {
+  it.each(LANGS)("in %s: an agent that changes code says so in its small icon, and the ones that read say they read", (code, prefix) => {
     const block = sectionOf(rendered.get(`${prefix}ai/`), "a-agents");
     const words = catalog(code);
     const facts = aiFacts(repo).agents;
     expect(facts.filter((a) => a.acts).map((a) => a.name)).toEqual(["luz-agent-optimiza"]);
     for (const a of facts) {
       const card = cards(block).find((c) => c.includes(`<code class="landing-ai__name">${a.name}</code>`));
-      // Every badge of the page is the grey one (owner, 2026-11-26): the words tell what a card does, not a colour
-      const badge = `<span class="luz-badge luz-badge--gray landing-ai__badge">${escape(words[a.acts ? "level.ai.agents.acts" : "level.ai.agents.reads"])}</span>`;
-      expect(card, a.name).toContain(badge);
+      // A small grey icon beside the blue one says it (owner, 2026-11-26), its words in its title and a hidden text; no badge
+      expect(card, a.name).toContain(kindOf(words[a.acts ? "level.ai.agents.acts" : "level.ai.agents.reads"]));
+      expect(card, a.name).toContain(kindText(words[a.acts ? "level.ai.agents.acts" : "level.ai.agents.reads"]));
+      expect(card, a.name).not.toContain("luz-badge");
       // No line says which assistants it is written for (owner, 2026-11-26): `agent add` says it, and refuses one it cannot write
       expect(card, a.name).not.toMatch(/<bdi>|landing-ai__meta/);
     }
