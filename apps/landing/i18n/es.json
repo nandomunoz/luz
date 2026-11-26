@@ -456,7 +456,7 @@
   "level.ai.commands.title": "Úsalo en el chat",
   "level.ai.commands.lead": "Escríbelos en tu asistente cuando luz ya está instalada. Los que escriben esperan tu adelante; /luz magic es el adelante.",
   "level.ai.install.title": "Instalar y desinstalar",
-  "level.ai.install.lead": "Pon en tu proyecto lo que necesites y quita lo que no. En tu terminal o en tu chat, las palabras son las mismas. Nunca se escribe sobre un archivo que ya tienes, y los agentes y las skills son copias tuyas.",
+  "level.ai.install.lead": "Pon en tu proyecto lo que necesites y quita lo que no. La mayoría funcionan igual en tu terminal y en tu chat; init es solo para la terminal. Nunca se escribe sobre un archivo que ya tienes, y los agentes y las skills son copias tuyas.",
   "level.ai.install.init": "Pone solo la skill en tu proyecto: lo mínimo, que es /luz.",
   "level.ai.install.all": "Pone todo: /luz, los cinco agentes y las skills pequeñas. Quita las que no necesites.",
   "level.ai.where.chat": "En el chat",

@@ -113,7 +113,8 @@ describe("the Magic section of SKILL.md", () => {
 
   it("writes only into a folder that does not exist yet, never with --force and never over a file", () => {
     expect(text).toMatch(/a folder that does not exist yet/);
-    expect(text).toMatch(/Never `--force`/);
+    expect(text).toMatch(/The script refuses `--force`, a folder that exists and a missing `--target`/);
+    expect(text).toMatch(/never work around it/);
     expect(text).toMatch(/never a file of the project/i);
   });
 
@@ -157,7 +158,7 @@ describe("the lab and the pages", () => {
     expect(Object.values(c.fixture).join("\n")).toMatch(/\/luz magic /);
     expect(c.prompt).not.toMatch(/magic/);
     expect(c.transcript).toEqual(expect.arrayContaining(["no-write", "ran"]));
-    expect(c.checks).toContain("fixture-unchanged");
+    expect(c.checks).toEqual([]);
   });
 
   it("has the words of the command in the landing (en, es, ar) and in the docs (en, es)", () => {

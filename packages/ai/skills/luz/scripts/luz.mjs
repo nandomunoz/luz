@@ -2,8 +2,8 @@
 /**
  * luz.mjs: the one executable of the luz skill.
  *
- * It reads and reports; `init`, `site new`, `agent add` and `skill add` write: only the files they name, under the folder
- * it is given, and never one that exists unless --force says so. It never asks a question, never reaches the
+ * It reads and reports; `init`, `site new` (and `magic`, the same), `agent add`, `skill add` and `remove` write or delete: only the files
+ * they name, under the folder it is given, and never over one that exists unless --force says so (`magic` never takes it). It never asks a question, never reaches the
  * network and runs no program. It finds its own data from its own path, so it works from any folder.
  *
  *   luz-ai doctor [--dir <folder>] [--json]
@@ -883,6 +883,16 @@ function listText(kind, items) {
 
 const AGENT_PLACES = { claude: (n) => `.claude/agents/${n}.md`, gemini: (n) => `.gemini/agents/${n}.md`, codex: (n) => `.codex/agents/${n}.toml` };
 
+/** A regular file: not a link, not a folder, so a folder in the place of a file is never read as one. */
+const isFile = (path) => {
+  try {
+    const s = lstatSync(path);
+    return s.isFile();
+  } catch {
+    return false;
+  }
+};
+
 /** The files of a folder, relative to it, or none if it is not a real folder. */
 function filesOf(folder) {
   if (!existsSync(folder) || isLink(folder) || !statSync(folder).isDirectory()) return null;
@@ -893,7 +903,7 @@ function filesOf(folder) {
 function changedFolder(folder, packaged) {
   return packaged.some(({ rel, content }) => {
     const file = join(folder, ...rel.split("/"));
-    return !existsSync(file) || isLink(file) || readFileSync(file, "utf-8") !== content;
+    return !isFile(file) || readFileSync(file, "utf-8") !== content;
   });
 }
 
@@ -916,7 +926,7 @@ function runList(dir) {
   const pieces = [
     // /luz is written by init into the folder of its assistant, which can be any of the two
     { ...folderPiece(SELF, "skill", luzPackaged), name: "luz" },
-    ...agentNames().map((name) => ({ name, kind: "agent", places: Object.values(AGENT_PLACES).map((f) => f(name)).filter((rel) => existsSync(join(base, rel)) && !isLink(join(base, rel))), changed: false })),
+    ...agentNames().map((name) => ({ name, kind: "agent", places: Object.values(AGENT_PLACES).map((f) => f(name)).filter((rel) => isFile(join(base, rel))), changed: false })),
     ...skillNames().map((name) => folderPiece(name, "skill", packagedFolder(join(ASSETS, "skills", name)))),
   ];
   return { ok: true, dir: base, pieces };
@@ -929,8 +939,21 @@ function listPiecesText({ pieces }) {
   return `${out.join("\n")}\n`;
 }
 
+/** Takes a folder away only after seeing it empty, so the recursive option has nothing to take. */
+function removeIfEmpty(dir) {
+  if (existsSync(dir) && !isLink(dir) && statSync(dir).isDirectory() && readdirSync(dir).length === 0) rmSync(dir, { recursive: true });
+}
+
+/** The front matter of an agent file: the lines between the first two `---`, or none. */
+function frontOf(text) {
+  const lines = text.split("\n");
+  if (lines[0].trim() !== "---") return "";
+  const end = lines.indexOf("---", 1);
+  return end === -1 ? "" : lines.slice(1, end).join("\n");
+}
+
 /** What `remove` deletes: the files luz-ai wrote of one piece, and what it leaves. */
-function planRemove(dir, name) {
+function planRemove(dir, name, force) {
   const base = resolve(dir);
   const files = [];
   const notes = [];
@@ -953,8 +976,13 @@ function planRemove(dir, name) {
       }
       const file = join(base, rel);
       if (!existsSync(file)) continue;
+      if (!isFile(file)) {
+        notes.push(`${rel} is not a file: left as it is`);
+        continue;
+      }
       const text = readFileSync(file, "utf-8");
-      const ours = rel.endsWith(".toml") ? new RegExp(`^name = "${name}"$`, "m").test(text) : new RegExp(`^name: ${name}$`, "m").test(text);
+      // The name must be the one of its front matter (or the top key of a Codex file), not a line somewhere in its body
+      const ours = rel.endsWith(".toml") ? new RegExp(`^name = "${name}"$`, "m").test(text.split("developer_instructions")[0]) : new RegExp(`^name: ${name}$`, "m").test(frontOf(text));
       if (ours) files.push(rel);
       else notes.push(`${rel} is not luz-ai's (its name is not ${name}): left as it is`);
     }
@@ -967,11 +995,14 @@ function planRemove(dir, name) {
       }
       const folder = join(base, place, name);
       if (filesOf(folder) === null) continue;
-      const packaged = new Set(packagedFolder(join(ASSETS, "skills", name)).map((f) => f.rel));
-      const present = filesOf(folder);
-      for (const rel of present) if (packaged.has(rel)) files.push(`${place}/${name}/${rel}`);
-      const stay = present.filter((rel) => !packaged.has(rel));
-      if (stay.length) notes.push(`${place}/${name} keeps ${stay.join(", ")}, which is not luz-ai's: the folder stays`);
+      const packaged = new Map(packagedFolder(join(ASSETS, "skills", name)).map((f) => [f.rel, f.content]));
+      for (const rel of filesOf(folder)) {
+        if (!packaged.has(rel)) continue;
+        const file = join(folder, ...rel.split("/"));
+        // A file the person changed after luz-ai wrote it is theirs now: it stays unless --force says so
+        if (!force && readFileSync(file, "utf-8") !== packaged.get(rel)) notes.push(`${place}/${name}/${rel} was changed after luz-ai wrote it: left in place (--force removes it)`);
+        else files.push(`${place}/${name}/${rel}`);
+      }
     }
   }
   return { base, files, notes, links };
@@ -981,15 +1012,18 @@ function runRemove(values, name) {
   if (!name) return { error: `a name is missing. Example: luz-ai remove ${agentNames()[0]} --dry-run (agents: ${agentNames().join(", ")}; skills: ${skillNames().join(", ")})` };
   if (name === "luz" || name === SELF) return { error: `"${name}" is the skill that runs this command: remove it by hand, folder by folder, or leave it` };
   if (!agentNames().includes(name) && !skillNames().includes(name)) return { error: `"${name}" is not an agent or a skill (agents: ${agentNames().join(", ")}; skills: ${skillNames().join(", ")})` };
-  const { base, files, notes, links } = planRemove(values.dir ?? ".", name);
+  const { base, files, notes, links } = planRemove(values.dir ?? ".", name, Boolean(values.force));
   if (links.length) return { error: `${links[0]} is a symbolic link: nothing was removed` };
   const dryRun = Boolean(values["dry-run"]);
   if (!dryRun) {
     for (const rel of files) rmSync(join(base, rel));
-    // A folder luz-ai made is taken away when nothing of the person's is in it
-    for (const place of SKILL_PLACES) {
-      const folder = join(base, place, name);
-      if (skillNames().includes(name) && filesOf(folder)?.length === 0) rmSync(folder, { recursive: true });
+    // The folders luz-ai made are taken away when nothing of the person's is left in them, the deepest first
+    if (skillNames().includes(name)) {
+      const dirs = new Set(packagedFolder(join(ASSETS, "skills", name)).flatMap((f) => f.rel.split("/").slice(0, -1).map((_, i, parts) => parts.slice(0, parts.length - i).join("/"))));
+      for (const place of SKILL_PLACES) {
+        for (const sub of [...dirs].sort((a, b) => b.length - a.length)) removeIfEmpty(join(base, place, name, ...sub.split("/")));
+        removeIfEmpty(join(base, place, name));
+      }
     }
   }
   return { report: { ok: true, dryRun, name, files: files.map((rel) => ({ path: join(values.dir ?? ".", rel), bytes: 0 })), notes } };
@@ -1088,6 +1122,8 @@ function show(text) {
 const ALIASES = { new: ["site", "new"], magic: ["site", "new"], agents: ["agent", "list"], skills: ["skill", "list"] };
 
 export function main(argv, { tty = Boolean(process.stdout.isTTY) } = {}) {
+  // `magic` is `site new` for /luz magic, where nobody sees a plan first: so its limits are enforced here, not only said in SKILL.md
+  const magic = argv[0] === "magic";
   if (ALIASES[argv[0]]) argv = [...ALIASES[argv[0]], ...argv.slice(1)];
   // `add` adds what its name says: a skill when the name is one of the skills, an agent otherwise (and an agent says if it is neither)
   else if (argv[0] === "add") argv = [argv.slice(1).some((a) => skillNames().includes(a)) ? "skill" : "agent", "add", ...argv.slice(1)];
@@ -1127,6 +1163,11 @@ export function main(argv, { tty = Boolean(process.stdout.isTTY) } = {}) {
   }
   if (values.help) return show({ init: HELP_INIT, site: HELP_SITE, agent: HELP_AGENT, skill: HELP_SKILL, facts: HELP_FACTS, doctor: HELP_DOCTOR, lint: HELP_LINT, list: HELP_LIST, remove: HELP_REMOVE }[command]);
   if (values.all && command !== "init") return usage("--all is only for init");
+  if (magic && !values.help) {
+    if (values.force) return usage("magic never takes --force: it writes only into a folder that does not exist yet");
+    if (!values.target) return usage("--target is missing: magic writes only into a folder that does not exist yet, so it needs the folder it will make. Example: luz-ai magic --name Acme --kind landing --stack vanilla --target ./acme");
+    if (existsSync(resolve(values.target)) || isLink(resolve(values.target))) return usage(`${resolve(values.target)} exists: magic writes only into a folder that does not exist yet`);
+  }
   if (command === "list" || command === "remove") {
     const base = resolve(values.dir ?? ".");
     if (!existsSync(base)) return usage(`${base} was not found`);

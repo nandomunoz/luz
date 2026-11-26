@@ -456,7 +456,7 @@
   "level.ai.commands.title": "Use it in the chat",
   "level.ai.commands.lead": "Type these in your assistant once luz is installed. The ones that write wait for your go; /luz magic is the go.",
   "level.ai.install.title": "Install and uninstall",
-  "level.ai.install.lead": "Put in your project what you need and take out what you do not. In your terminal or in your chat, the words are the same. Nothing is written over a file you have, and the agents and skills are copies you own.",
+  "level.ai.install.lead": "Put in your project what you need and take out what you do not. Most of these work the same in your terminal and in your chat; init is only for the terminal. Nothing is written over a file you have, and the agents and skills are copies you own.",
   "level.ai.install.init": "Puts only the skill in your project: the minimum, which is /luz.",
   "level.ai.install.all": "Puts everything: /luz, the five agents and the small skills. Take out the ones you do not need.",
   "level.ai.where.chat": "In the chat",

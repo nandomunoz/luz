@@ -101,7 +101,7 @@ npx @luz-ds/ai lint .claude
 | `doctor` | The project, the assistants it has, the skills and agents it finds, and whether the two copies of a skill agree. |
 | `lint` | The front matter and the body of skills and agents: strict YAML, names, descriptions, hidden characters and references. A field that the list of an assistant does not know is a warning, never a failure: the lists were read at their sources on a date. |
 
-Every command takes `--help`, and `--json` prints one JSON object. Only `init`, `new`, `add` and `remove` write (`site new`, `agent list`, `agent add`, `skill list` and `skill add` are their long forms), only the files they name, and never over a file that exists unless `--force` says so, nor through a symbolic link.
+Every command takes `--help`, and `--json` prints one JSON object. Only `init`, `new`, `magic`, `add` and `remove` write (`site new`, `agent list`, `agent add`, `skill list` and `skill add` are their long forms), only the files they name, and never over a file that exists unless `--force` says so, nor through a symbolic link.
 
 | Exit code | Meaning |
 | --- | --- |
