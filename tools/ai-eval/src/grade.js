@@ -17,6 +17,13 @@
  *   only-target        nothing was written outside the target folder, except the fixture's files
  *   fixture-unchanged  each file of the fixture is exactly as it was
  *   forbidden-absent   none of the case's `forbidden` strings is in any file that is not the fixture's
+ *   expected-files     each file of the case's `expect` matches every `has` pattern and no `lacks` pattern (regular
+ *                      expressions, case-insensitive, multiline); a file with a `has` must exist
+ *   only-listed        every file written that is not the fixture's matches a pattern of the case's `writes`
+ *   same-markup        the second file of the case's `pair` (a translation) keeps the ids, classes and link targets of the
+ *                      first, its headings level by level, and the text of every pre, code, kbd, samp and var
+ *
+ * `fixture-unchanged` leaves out the fixture files the case names in `edits` (a head the skill is asked to change).
  */
 import { spawnSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
@@ -47,6 +54,39 @@ export function loadCases(root = repo) {
   const frozen = join(root, dirname(EVALS), "frozen");
   if (existsSync(frozen)) for (const f of readdirSync(frozen).filter((n) => n.endsWith(".json")).sort()) cases.push(frozenCase(JSON.parse(readFileSync(join(frozen, f), "utf-8")).case, f));
   return cases;
+}
+
+const bodyOf = (html) => /<body\b[^>]*>([\s\S]*?)<\/body>/i.exec(html)?.[1] ?? html;
+const values = (html, re) => [...html.matchAll(re)].map((m) => m[1]);
+
+/** What a translation must keep of its source, read from both pages: each list of the source and the difference. */
+export function markupDiff(source, translation) {
+  const a = bodyOf(source);
+  const b = bodyOf(translation);
+  const missing = (xs, ys) => {
+    const left = [...ys];
+    return xs.filter((x) => {
+      const i = left.indexOf(x);
+      if (i === -1) return true;
+      left.splice(i, 1);
+      return false;
+    });
+  };
+  const ids = (h) => values(h, /\bid="([^"]*)"/g);
+  const classes = (h) => values(h, /\bclass="([^"]*)"/g).flatMap((c) => c.split(/\s+/).filter(Boolean));
+  const targets = (h) => values(h, /\b(?:href|src)="([^"]*)"/g);
+  const headings = (h) => values(h, /<h([1-6])\b/gi).join(" ");
+  const code = (h) => [...h.matchAll(/<(pre|code|kbd|samp|var)\b[^>]*>([\s\S]*?)<\/\1>/gi)].map((m) => m[2]);
+  const out = [];
+  const lost = (what, xs) => xs.length && out.push(`${what} of the source missing: ${xs.slice(0, 5).join(", ")}`);
+  lost("ids", missing(ids(a), ids(b)));
+  lost("classes", missing(classes(a), classes(b)));
+  lost("link targets", missing(targets(a), targets(b)));
+  lost("code", missing(code(source), code(translation)).map((x) => JSON.stringify(x.slice(0, 60))));
+  if (headings(a) !== headings(b)) out.push(`headings by level: ${headings(a)} in the source, ${headings(b)} in the translation`);
+  const added = missing(ids(b), ids(a));
+  if (added.length) out.push(`ids the source does not have: ${added.slice(0, 5).join(", ")}`);
+  return out;
 }
 
 /** Grades the folder of a run: { case, passed, checks: [{ id, ok, detail }] }. */
@@ -83,8 +123,27 @@ export function grade(id, folder, { root = repo, ignore = [] } = {}) {
       return { ok: outside.length === 0, detail: outside.length ? `written outside ${c.target}/: ${outside.join(", ")}` : `${targetFiles.length} file${targetFiles.length === 1 ? "" : "s"} in ${c.target}/` };
     },
     "fixture-unchanged": () => {
-      const changed = fixture.filter((f) => !files.includes(f) || text(f) !== c.fixture[f]);
-      return { ok: changed.length === 0, detail: changed.length ? `changed or removed: ${changed.join(", ")}` : `${fixture.length} files as they were` };
+      const kept = fixture.filter((f) => !(c.edits ?? []).includes(f));
+      const changed = kept.filter((f) => !files.includes(f) || text(f) !== c.fixture[f]);
+      return { ok: changed.length === 0, detail: changed.length ? `changed or removed: ${changed.join(", ")}` : `${kept.length} files as they were` };
+    },
+    "expected-files": () => {
+      const bad = Object.entries(c.expect ?? {}).flatMap(([f, { has = [], lacks = [] }]) => {
+        if (!files.includes(f)) return has.length ? [`${f} was not written`] : [];
+        const t = text(f);
+        return [...has.filter((re) => !new RegExp(re, "im").test(t)).map((re) => `${f} lacks /${re}/`), ...lacks.filter((re) => new RegExp(re, "im").test(t)).map((re) => `${f} has /${re}/`)];
+      });
+      return { ok: bad.length === 0, detail: bad.length ? bad.join("; ") : `${Object.keys(c.expect ?? {}).length} files as expected` };
+    },
+    "only-listed": () => {
+      const stray = files.filter((f) => !fixture.includes(f) && !(c.writes ?? []).some((re) => new RegExp(re).test(f)));
+      return { ok: stray.length === 0, detail: stray.length ? `written and not listed: ${stray.join(", ")}` : "only the files the case lists" };
+    },
+    "same-markup": () => {
+      const [from, to] = c.pair ?? [];
+      if (!from || !files.includes(from) || !files.includes(to)) return { ok: false, detail: `${to ?? "the translation"} or ${from ?? "its source"} is missing` };
+      const diff = markupDiff(text(from), text(to));
+      return { ok: diff.length === 0, detail: diff.length ? diff.join("; ") : "the markup of the source, kept" };
     },
     "forbidden-absent": () => {
       const hit = files.filter((f) => !fixture.includes(f) && (c.forbidden ?? []).some((s) => text(f).includes(s)));

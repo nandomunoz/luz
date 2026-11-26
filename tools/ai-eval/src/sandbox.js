@@ -2,7 +2,7 @@
  * The sandbox of a run: a folder made from the case's fixture with the skill installed as a person installs it, a clean
  * config of the assistant (only the credentials, copied), and a PATH where `luz-check` and `npx` reach the checker of this
  * repository and nothing on the network. `claudeArgs` is the whole command: print mode, no prompts, project settings only,
- * a closed list of tools, no web.
+ * a closed list of tools, no web. A case may name small skills or agents to add after the skill (`install`).
  */
 import { spawnSync } from "node:child_process";
 import { chmodSync, copyFileSync, existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
@@ -33,9 +33,27 @@ export const keepFilter = (path) => !path.split("/").some((part) => part.startsW
 
 export const defaultCredentials = () => join(process.env.CLAUDE_CONFIG_DIR ?? join(homedir(), ".claude"), ".credentials.json");
 
+/**
+ * The pieces of luz-ai a case adds after the skill (`install`): each a small skill (`assets/skills/<name>/SKILL.md`) or an
+ * agent (`assets/agents/<name>.md`) that the package ships, added by its own script as a person adds it. A name is checked
+ * against those folders before anything is made, so it can never be a flag or a path.
+ */
+export function installCommands(caseDef, root) {
+  const install = caseDef.install ?? [];
+  if (!Array.isArray(install)) throw new Error(`${caseDef.id}: install is a list of names of luz-ai`);
+  const assets = join(root, "packages/ai/skills/luz/assets");
+  return install.map((name) => {
+    if (typeof name !== "string" || !/^luz-[a-z0-9-]+$/.test(name)) throw new Error(`${caseDef.id}: install names ${JSON.stringify(name)}, which is not a name of luz-ai`);
+    if (existsSync(join(assets, "skills", name, "SKILL.md"))) return ["skill", "add", name];
+    if (existsSync(join(assets, "agents", `${name}.md`))) return ["agent", "add", name, "--for", "claude"];
+    throw new Error(`${caseDef.id}: install names ${name}, which luz-ai does not ship as a skill or an agent`);
+  });
+}
+
 export function createSandbox({ caseDef, root, credentials = defaultCredentials(), tmpRoot = tmpdir() }) {
   const fixture = caseDef.fixture ?? {};
   for (const path of Object.keys(fixture)) if (unsafeFixture(path) || path.startsWith("/")) throw new Error(`${caseDef.id}: the fixture file ${path} would run in the session of the person running the lab`);
+  const extra = installCommands(caseDef, root);
   const dir = mkdtempSync(join(tmpRoot, "luz-lab-run-"));
   const configDir = mkdtempSync(join(tmpRoot, "luz-lab-config-"));
   const binDir = mkdtempSync(join(tmpRoot, "luz-lab-bin-"));
@@ -46,8 +64,13 @@ export function createSandbox({ caseDef, root, credentials = defaultCredentials(
       mkdirSync(dirname(join(dir, path)), { recursive: true });
       writeFileSync(join(dir, path), text);
     }
-    const r = spawnSync(process.execPath, [join(root, "packages/ai/skills/luz/scripts/luz.mjs"), "init", "--target", "claude", "--dir", dir], { encoding: "utf-8" });
+    const script = join(root, "packages/ai/skills/luz/scripts/luz.mjs");
+    const r = spawnSync(process.execPath, [script, "init", "--target", "claude", "--dir", dir], { encoding: "utf-8" });
     if (r.status !== 0) throw new Error(`the skill could not be installed for the run: ${r.stderr}`);
+    for (const args of extra) {
+      const a = spawnSync(process.execPath, [script, ...args, "--dir", dir], { encoding: "utf-8" });
+      if (a.status !== 0) throw new Error(`${args[2]} could not be installed for the run: ${a.stderr}`);
+    }
     if (credentials && existsSync(credentials)) {
       copyFileSync(credentials, join(configDir, ".credentials.json"));
       chmodSync(join(configDir, ".credentials.json"), 0o600);

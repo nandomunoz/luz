@@ -132,6 +132,11 @@ export const CHECKS = {
     const used = convo.turns.some((t) => t.toolUses.some((u) => u.name === "Skill" && /^luz$/.test(String(u.input?.skill ?? ""))));
     return used ? { ok: true, detail: "the luz skill was invoked" } : { ok: false, detail: "the luz skill was never invoked: the request did not wake it" };
   },
+  "says-not": (convo, caseDef) => {
+    const text = convo.turns.map((t) => t.assistant).join("\n");
+    const said = (caseDef.saysNot ?? []).filter((re) => new RegExp(re, "i").test(text));
+    return said.length ? { ok: false, detail: `the assistant said what the case forbids: ${said.join(", ")}` } : { ok: true, detail: "said nothing the case forbids" };
+  },
   says: (convo, caseDef) => {
     const text = convo.turns.map((t) => t.assistant).join("\n");
     const missing = (caseDef.says ?? []).filter((re) => !new RegExp(re, "i").test(text));
