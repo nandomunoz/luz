@@ -203,17 +203,21 @@ export function aiSections({ say, root, escapeHtml }) {
   // installs it already
   // A card: its icon, its title and technical name, what it does and the sentence to ask for it. Whether it reads or writes is
   // said by its group (the agents) or by the lead of its section (the skills, which all write), never on the card
-  const card = (id, title, name, text, asked, copy, mod) =>
+  const card = (id, title, name, text, asked, copy, mod, asking) =>
     [
       `<article class="landing-card landing-ai__card${mod}">`,
-      icon(id),
-      `<p class="landing-card__title">${title}</p>`,
+      `<div class="landing-ai__head">${icon(id)}<p class="landing-card__title">${title}</p></div>`,
       `<code class="landing-ai__name">${escapeHtml(name)}</code>`,
       `<p class="landing-ai__text">${text}</p>`,
-      `<p class="landing-ai__label">${t("level.ai.ask")}</p>${ask(asked, copy)}`,
+      asking ?? `<p class="landing-ai__label">${t("level.ai.ask")}</p>${ask(asked, copy)}`,
       `</article>`,
     ].join("");
-  const agentCard = (a) => card(a.name, t(`level.ai.agent.${a.name}.title`), a.name, t(`level.ai.agent.${a.name}.text`), say("level.ai.agents.use").replace("{name}", a.name), upTo(say("level.ai.agents.use"), a.name), a.acts ? " landing-ai__card--acts" : " landing-ai__card--reads");
+  // An agent's sentence: its name first, then a verb of its own (owner, 2026-11-26), all of it copied
+  const agentAsk = (a) => {
+    const sentence = say(`level.ai.agent.${a.name}.ask`);
+    return `<p class="landing-ai__label">${t("level.ai.ask")}</p><p class="landing-ai__ask" data-copy="${escapeHtml(`${a.name} ${sentence}`)}"><code><strong>${a.name}</strong> ${escapeHtml(sentence)}</code></p>`;
+  };
+  const agentCard = (a) => card(a.name, t(`level.ai.agent.${a.name}.title`), a.name, t(`level.ai.agent.${a.name}.text`), "", "", a.acts ? " landing-ai__card--acts" : " landing-ai__card--reads", agentAsk(a));
   // The agents in two groups (owner, 2026-11-26): the ones that read and propose, then the one that changes code after your go
   const group = (kind, list) =>
     `<div class="landing-ai-kind landing-ai-kind--${kind}"><h3 class="landing-ai-kind__title">${t(`level.ai.agents.group.${kind}`)}</h3><p class="landing-ai-kind__lead">${t(`level.ai.agents.group.${kind}.lead`)}</p><div class="landing-cards landing-ai__cards">${list.map(agentCard).join("")}</div></div>`;

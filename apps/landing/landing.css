@@ -5712,7 +5712,21 @@ html:has(.landing-marquee) {
   grid-template-columns: minmax(0, 1fr);
 }
 
+/* The head of a card: the icon and, beside it, the title (owner, 2026-11-26) */
+.landing-ai__head {
+  display: flex;
+  align-items: center;
+  gap: var(--luz-space-sm);
+  min-inline-size: 0;
+}
+
+.landing-ai__head .landing-card__title {
+  margin: 0;
+  min-inline-size: 0;
+}
+
 .landing-ai__icon {
+  flex: none;
   inline-size: 1.75rem;
   block-size: 1.75rem;
   fill: none;
@@ -5797,6 +5811,11 @@ html:has(.landing-marquee) {
    all of it so the whole line is the click, and shows a copy icon at the far end on hover or focus, always on a touch screen */
 .landing-ai__ask {
   position: relative;
+}
+
+/* The name of an agent at the head of its sentence */
+.landing-ai__ask strong {
+  color: var(--luz-brand-primary);
 }
 
 /* The hint after the name ("on my page", "<what you want>"): shown, not copied */
