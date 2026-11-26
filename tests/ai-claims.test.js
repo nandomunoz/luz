@@ -45,6 +45,29 @@ describe("the skill says what it does", () => {
     expect(words("ar")).toBe("تكتب وتنفّذ");
   });
 
+  it("accepts the go in the person's own language: the page tells a Spanish reader to say adelante, so the skill takes it as go (R2)", () => {
+    const skill = read(`${SKILL}/SKILL.md`);
+    const r2 = /- \*\*R2\*\*[^\n]*/.exec(skill)?.[0] ?? "";
+    expect(r2).toMatch(/or the same in (their|the person's) own language/);
+    expect(r2).toMatch(/adelante/);
+    // only a plain yes to the plan counts: a doubt is asked again, never taken as go
+    expect(r2).toMatch(/a doubt is not a go|if it is not plain, ask again/i);
+  });
+
+  it("the button to the docs of the skill says documentation and how to work with AI, in the three languages", () => {
+    const words = (code) => JSON.parse(read(`apps/landing/i18n/${code}.json`))["level.ai.next.docs"];
+    expect(words("en")).toBe("Documentation: working with AI");
+    expect(words("es")).toBe("Documentación: cómo trabajar con IA");
+    expect(words("ar")).toBe("التوثيق: كيف تعمل مع الذكاء الاصطناعي");
+  });
+
+  it("the section of the agents is titled Specialist agents, in the three languages", () => {
+    const words = (code) => JSON.parse(read(`apps/landing/i18n/${code}.json`))["level.ai.agents.title"];
+    expect(words("en")).toBe("Specialist agents");
+    expect(words("es")).toBe("Agentes especialistas");
+    expect(words("ar")).toBe("وكلاء متخصصون");
+  });
+
   it("the limits name the exception: --force overwrites, the check is downloaded with npx", () => {
     expect(en["level.ai.limits.2"]).toMatch(/unless/);
     expect(en["level.ai.limits.3"]).toMatch(/script/);

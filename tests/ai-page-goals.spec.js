@@ -29,7 +29,7 @@ for (const route of ROUTES) {
       const cards = page.locator(`#${id} article.landing-ai__card`);
       await expect(cards, id).toHaveCount(count);
       for (const card of await cards.all()) {
-        await expect(card.locator('svg[aria-hidden="true"]')).toBeVisible();
+        await expect(card.locator('svg.landing-ai__icon')).toBeVisible();
         await expect(card.locator('.landing-card__title')).toBeVisible();
         await expect(card.locator('.landing-ai__ask code')).toBeVisible();
       }
@@ -37,6 +37,22 @@ for (const route of ROUTES) {
     await expect(page.locator('#a-assistants li')).toHaveCount(5);
     await expect(page.locator('#a-decide li')).toHaveCount(5);
     await expect(page.locator('main table')).toHaveCount(0);
+  });
+
+  test(`${route}: at 1280 px the three commands that write fill three columns, and the five that read sit on five`, async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto(route);
+    const widths = async (selector) => page.locator(`${selector} article`).evaluateAll((all) => {
+      const grid = all[0].parentElement;
+      return { cards: all.map((el) => el.getBoundingClientRect().width), grid: grid.getBoundingClientRect().width, gap: parseFloat(getComputedStyle(grid).columnGap) };
+    });
+    const writes = await widths('#a-commands-writes');
+    const reads = await widths('#a-commands-reads');
+    const oneOf = (n, w) => (w.grid - (n - 1) * w.gap) / n;
+    expect(writes.cards).toHaveLength(3);
+    for (const w of writes.cards) expect(Math.abs(w - oneOf(3, writes))).toBeLessThan(2);
+    expect(reads.cards).toHaveLength(5);
+    for (const w of reads.cards) expect(Math.abs(w - oneOf(5, reads))).toBeLessThan(2);
   });
 
   for (const zoom of [100, 400]) {

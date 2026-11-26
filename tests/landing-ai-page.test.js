@@ -140,9 +140,16 @@ describe("the page of the luz skill, /ai/", () => {
     const list = cards(block);
     expect(list).toHaveLength(agents.length);
     for (const name of agents) {
-      const card = list.find((c) => c.includes(`<code>${name}</code>`));
+      const card = list.find((c) => c.includes(`<code>/luz add ${name}</code>`));
       expect(card, name).toBeDefined();
-      expect(card.split(`<code>${name}</code>`).length - 1, name).toBe(1);
+      // The technical name is a code of its own under the title, with no paragraph around it, then the badge, then the sentence (owner, 2026-11-26)
+      expect(card, name).toContain(`<code class="landing-ai__name">${name}</code>`);
+      expect(card, name).not.toContain("landing-ai__id");
+      expect(card.split(name).length - 1, name).toBe(2);
+      const at = (needle) => card.indexOf(needle);
+      expect(at("landing-card__title")).toBeLessThan(at("landing-ai__name"));
+      expect(at("landing-ai__name")).toBeLessThan(at("landing-ai__badge"));
+      expect(at("landing-ai__badge")).toBeLessThan(at("landing-ai__text"));
       const human = words[`level.ai.agent.${name}.title`];
       expect(human, `${code}: a human name for ${name}`).toBeTruthy();
       expect(human).not.toContain("luz-");
@@ -163,10 +170,12 @@ describe("the page of the luz skill, /ai/", () => {
     const facts = aiFacts(repo).agents;
     expect(facts.filter((a) => a.acts).map((a) => a.name)).toEqual(["luz-agent-optimiza"]);
     for (const a of facts) {
-      const card = cards(block).find((c) => c.includes(`<code>${a.name}</code>`));
-      const badge = a.acts ? `<span class="luz-badge luz-badge--primary landing-ai__badge">${escape(words["level.ai.agents.acts"])}</span>` : `<span class="luz-badge luz-badge--gray landing-ai__badge">${escape(words["level.ai.agents.reads"])}</span>`;
+      const card = cards(block).find((c) => c.includes(`<code>/luz add ${a.name}</code>`));
+      // Every badge of the page is the grey one (owner, 2026-11-26): the words tell what a card does, not a colour
+      const badge = `<span class="luz-badge luz-badge--gray landing-ai__badge">${escape(words[a.acts ? "level.ai.agents.acts" : "level.ai.agents.reads"])}</span>`;
       expect(card, a.name).toContain(badge);
-      expect(card.includes("<bdi>Gemini CLI</bdi>"), a.name).toBe(!a.acts);
+      // No line says which assistants it is written for (owner, 2026-11-26): `agent add` says it, and refuses one it cannot write
+      expect(card, a.name).not.toMatch(/<bdi>|landing-ai__meta/);
     }
   });
 
@@ -185,6 +194,16 @@ describe("the page of the luz skill, /ai/", () => {
     ]);
     expect(html.indexOf('class="landing-ai-toc"')).toBeGreaterThan(html.indexOf('id="a-assistants"'));
     expect(html.indexOf('class="landing-ai-toc"')).toBeLessThan(html.indexOf('id="a-commands"'));
+  });
+
+  it.each(LANGS)("in %s: the closing block has one button to the docs of the skill, not two that go to the same place", (code, prefix) => {
+    const html = rendered.get(`${prefix}ai/`);
+    const block = /<section class="landing-level__next" id="next"[\s\S]*?<\/section>/.exec(html)?.[0] ?? "";
+    const links = [...block.matchAll(/<a\b[^>]*href="([^"]*)"[^>]*>([^<]*)<\/a>/g)].map((m) => [m[1], m[2]]);
+    expect(links).toHaveLength(1);
+    expect(links[0][0]).toMatch(/\/docs\/ai\/$/);
+    expect(links[0][1]).toBe(escape(catalog(code)["level.ai.next.docs"]));
+    expect(new Set(links.map((l) => l[0])).size).toBe(links.length);
   });
 
   it("does not offer an agent that changes code to Gemini CLI, which agent add does not write it for", () => {

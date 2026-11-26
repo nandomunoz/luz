@@ -4,7 +4,7 @@
  * No text of the page is under 14 px at the default size, and the sentences a card or a strip says (what a card does, what the
  * skill promises, what the assistants are) are 16 px, the size of a paragraph. The code of a terminal and a box is 14 px at least.
  * The one exception is the badge in the corner of a card (owner, 2026-11-26: smaller): 12 px, core's own size for a badge, with
- * its colours checked by axe (tests/ai-page-badge-corner.spec.js).
+ * its colours checked by axe (tests/ai-page-badge-place.spec.js).
  */
 import { test, expect } from '@playwright/test';
 
