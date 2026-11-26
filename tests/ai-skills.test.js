@@ -130,6 +130,10 @@ describe("the three of 2026-11-26: translate, meta and license", () => {
     expect(text).toMatch(/Never touch `\.claude\/`, `AGENTS\.md`, `CLAUDE\.md`, `\.github\/`/);
     expect(text).toMatch(/No `curl`, no `wget`, no `fetch`/);
     expect(text).toMatch(/run only the commands the plan named/i);
+    // and every git command its references tell it to run is one the rule names (anatomy takes the authors from git shortlog)
+    const rule = text.split("\n").find((l) => /run only the commands the plan named/i.test(l));
+    const refs = readdirSync(join(skill, "assets/skills/luz-readme/references")).map((f) => read(join(skill, "assets/skills/luz-readme/references", f))).join("\n");
+    for (const [, cmd] of refs.matchAll(/`git (log|remote|shortlog|show|blame|tag)\b/g)) expect(rule, `git ${cmd}`).toContain(`\`git ${cmd}\``);
   });
 
   it("translate marks its work as pending and never as reviewed, keeps the code and the figures, and stops at legal text", () => {
