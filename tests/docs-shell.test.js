@@ -8,7 +8,9 @@
  *              (the rail is before main in the markup, and the grid places it: the
  *              third column from 80rem, above the content below it)
  *   sidebar    an accordion: every area of site.json with pages is a native details (one name), open only for
- *              the area of the current page, every page listed (tests/docs-nav-fold.test.js holds the markup)
+ *              the area of the current page, every page listed (tests/docs-nav-fold.test.js holds the markup); an area
+ *              with `nestIn` (the HTML elements, in Catalog) has no link or fold of its own: its pages are a group in
+ *              the fold of its host, which is the open one on them (tests/docs-nav-nested.test.js)
  *   page head  header.luz-doc-header: eyebrow "Area · Group", h1, lead and,
  *              on a component or pattern page, the chips
  *   rail       "On this page" (outside main) and the three actions
@@ -303,6 +305,9 @@ describe("the shell: body.o-shell.luz-docs-layout, the sidebar, the rail, then m
  * =================================================================================== */
 
 describe("the sidebar: every area a fold, only the current one open, every page listed", () => {
+  /** The area whose item holds the area of a page: itself, or the area it is nested in (the HTML elements, in Catalog). */
+  const hostOf = (area) => (area?.nestIn ? site.areas.find((a) => a.id === area.nestIn) : area);
+
   /** The page links of the sidebar, without the site links (Home, Docs, GitHub) the drawer starts with. */
   const pageLinks = (root) => {
     // Until the shell classes exist (the first describe) the sidebar is the core one: the list is checked on it
@@ -328,8 +333,14 @@ describe("the sidebar: every area a fold, only the current one open, every page 
       const nav = queryLive(treeOf(p.route), "nav.luz-docs-nav") ?? query(treeOf(p.route), "nav.luz-sidebar");
       expect(query(nav, "ul.docs-nav"), `${p.route} ul.docs-nav`).toBeTruthy();
       const areas = queryAll(nav, "a.docs-nav__area").map((a) => a.attrs.get("href"));
-      // Every area, HTML elements included, is an area link of the list: no area is nested in another
-      expect(areas, p.route).toEqual(site.areas.map((a) => `/docs/${a.slug}/`));
+      // Every area is an area link of the list but the nested one, which is a group in the fold of its host
+      expect(areas, p.route).toEqual(site.areas.filter((a) => !a.nestIn).map((a) => `/docs/${a.slug}/`));
+      for (const nested of site.areas.filter((a) => a.nestIn)) {
+        expect(areas, `${p.route}: ${nested.id} has no area link`).not.toContain(`/docs/${nested.slug}/`);
+        const host = queryAll(nav, "a.docs-nav__area").find((a) => a.attrs.get("id") === `a-${nested.nestIn}`).parent;
+        const group = findAll(host, (n) => hasClass(n, "docs-nav__group")).find((g) => query(g, ".luz-sidebar__section-label").attrs.get("id") === `nav-${nested.id}`);
+        expect(group, `${p.route}: ${nested.id} is a group in the fold of ${nested.nestIn}`).toBeTruthy();
+      }
       expect(queryAll(nav, "a.docs-nav__subarea"), `${p.route} sub-areas`).toEqual([]);
     }
   });
@@ -340,7 +351,8 @@ describe("the sidebar: every area a fold, only the current one open, every page 
       const folds = findAll(nav, (n) => n.name === "details");
       expect(folds.length, `${p.route}: the areas with pages are folds`).toBeGreaterThan(0);
       expect(folds.map((n) => n.attrs.get("name")), `${p.route}: one name makes it an accordion`).toEqual(folds.map(() => "nav"));
-      const area = areaOf(site, p);
+      // The fold of the page's area is the open one; for a nested area (the HTML elements) it is the fold of its host
+      const area = hostOf(areaOf(site, p));
       const open = folds.filter((n) => n.attrs.has("open")).map((n) => query(n.parent, "a.docs-nav__area").attrs.get("href"));
       expect(open, `${p.route}: only the fold of the page's area is open`).toEqual(area && folds.some((n) => query(n.parent, "a.docs-nav__area").attrs.get("href") === `/docs/${area.slug}/`) ? [`/docs/${area.slug}/`] : []);
       // The state is the browser's: nothing is hidden by the markup and no aria-expanded is written
@@ -349,14 +361,16 @@ describe("the sidebar: every area a fold, only the current one open, every page 
     }
   });
 
-  it("marks the current page with aria-current=\"page\" and its area with \"true\" (the area link itself on an area index)", () => {
+  it("marks the current page with aria-current=\"page\" and its area with \"true\" (the area link itself on an area index; the host's, for a nested area)", () => {
     for (const p of site.pages) {
       const links = pageLinks(treeOf(p.route));
       const current = links.filter((a) => a.attrs.get("aria-current") === "page").map((a) => a.attrs.get("href"));
       const parents = links.filter((a) => a.attrs.get("aria-current") === "true").map((a) => a.attrs.get("href"));
       const area = areaOf(site, p);
+      const host = hostOf(area);
       expect(current, `${p.route} page`).toEqual(area ? [p.route] : []);
-      expect(parents, `${p.route} area`).toEqual(area ? (p.route !== `/docs/${area.slug}/` ? [`/docs/${area.slug}/`] : []) : []);
+      // The page of a nested area is never its host's index, so its host is always "true"; the index of the nested area is "page" in the group
+      expect(parents, `${p.route} area`).toEqual(area ? (p.route !== `/docs/${host.slug}/` ? [`/docs/${host.slug}/`] : []) : []);
       expect(links.filter((a) => hasClass(a, "is-active")), p.route).toEqual([]);
     }
   });

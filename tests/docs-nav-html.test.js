@@ -1,20 +1,21 @@
 /**
- * LUZ docs site: HTML elements is an area of the sidebar like any other.
+ * LUZ docs site: the HTML elements are an area of the docs, listed inside Catalog in the sidebar.
  *
- * The owner's decision (2026-10-22): "HTML elements" (area `html`, 15 pages under /docs/html/) is
- * no longer nested in Documentation. The `parent` feature of site.json is removed: no area is
- * nested, and the sidebar, the breadcrumb and the reading order treat `html` as every other area.
- * The URLs and the `area: html` of the pages do not change.
+ * Two owner decisions, the second one current:
+ *   2026-10-22  "HTML elements" (area `html`, 15 pages under /docs/html/) is no longer nested in Documentation: the
+ *               `parent` feature of site.json is removed, the URLs and the `area: html` of the pages do not change.
+ *   2026-11-25  the area has no entry of its own in the sidebar: `"nestIn": "catalog"` in site.json lists it inside Catalog
+ *               (tests/docs-nav-nested.test.js is the spec of the nesting; this file keeps what the area still has).
  *
- *   site.json     no area carries "parent"; scanSite does not read it (no check, no field).
- *   sidebar       `html` is a top-level item of `ul.docs-nav`: `a.docs-nav__area` (the area label, linking
- *                 to the area index) and the list of the 14 other pages in its fold, as Documentation and
- *                 Accessibility. Order: Get started, AI, Tokens, Core, Catalog (since F5b it holds the
- *                 patterns of the kinds of site), HTML elements, Accessibility. `.docs-nav__sub` and `a.docs-nav__subarea` are gone.
- *   aria-current  on an HTML page: "page" on its own link and "true" on the HTML elements area link (and not
- *                 on Documentation); on the HTML index the area link is "page".
+ *   site.json     no area carries "parent" (scanSite does not read it); the area keeps its slug and its place in the order.
+ *   sidebar       `ul.docs-nav` has six area links, with no `a.docs-nav__area` and no fold for `html`: its index and its 14
+ *                 other pages are the labelled group `li.docs-nav__group` ("HTML elements"), the last child of the fold of
+ *                 Catalog, each linked once. Order of the areas: Get started, AI, Tokens, Core, Catalog, Accessibility;
+ *                 the group closes Catalog. `.docs-nav__sub` and `a.docs-nav__subarea` are gone.
+ *   aria-current  on an HTML page: "page" on its own link (in the group) and "true" on the area link of Catalog, whose
+ *                 fold is the open one; on the HTML index the link of the group is "page" and Catalog's is still "true".
  *   breadcrumb    Docs > HTML elements > Title; on the index, Docs > HTML elements.
- *   reading order the HTML pages come after the Documentation pages, before Accessibility.
+ *   reading order the HTML pages come after the Catalog pages, before Accessibility.
  *   es and ar     the same, with the labels of the catalogs (area.html): no new catalog key.
  *
  * The browser half (the look, the keyboard, the drawer, the reflow) is tests/docs-nav-html.spec.js.
@@ -28,13 +29,15 @@ import { renderLlmsTxt } from "../scripts/docs-site/ai.js";
 import { buildSearchIndex, buildSite, indexData, readingOrder, scanSite } from "../scripts/docs-site/site.js";
 import { docsLanguage, languageOf } from "./helpers/docs-i18n-fixture.js";
 import { makeSite } from "./helpers/docs-i18n-size-fixture.js";
-import { findAll, hasClass, parse, query, queryAll, queryAllLive, queryLive, textOf } from "./helpers/html-dom.js";
+import { findAll, hasClass, isInside, parse, query, queryAll, queryAllLive, queryLive, textOf } from "./helpers/html-dom.js";
 
 const repo = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
-/** The top-level areas of the sidebar, in order (the owner's list). */
+/** The areas of the site, in reading order (the owner's list). */
 // F5b: landing, cms, app and documentation are not areas any more, their pages are catalog's (groups of Catalog)
 const AREA_ORDER = ["get-started", "ai", "tokens", "components", "catalog", "html", "accessibility"];
+/** The areas that have a link of their own in the sidebar: `html` is nested in Catalog (2026-11-25), a group of its fold. */
+const NAV_AREAS = AREA_ORDER.filter((id) => id !== "html");
 
 /* ---- site.json: "parent" is gone ----------------------------------------------------------------- */
 
@@ -59,7 +62,7 @@ function fixtureSite(areas) {
   return { repoRoot, docsDir };
 }
 
-describe("site.json: no area is nested", () => {
+describe("site.json: no area carries a \"parent\"", () => {
   it("has no \"parent\" on any area of the real site.json, and no scanned area carries one", () => {
     const { areas } = JSON.parse(readFileSync(join(repo, "apps/docs/site.json"), "utf-8"));
     expect(areas.filter((a) => "parent" in a).map((a) => a.id)).toEqual([]);
@@ -99,54 +102,70 @@ const order = readingOrder(site);
 const orderRoutes = order.map((p) => p.route);
 
 const HTML_INDEX = "/docs/html/";
-/** The area before HTML elements (Documentation, until the patterns of the kinds of site went to the Catalog). */
+/** The area HTML elements is listed in: Catalog, whose fold ends with the group of the area. */
 const DOCS_INDEX = "/docs/catalog/";
 const ACCESSIBILITY = "/docs/accessibility/";
 const htmlPages = site.pages.filter((p) => p.meta.area === "html");
-/** The pages listed under the area link: the area's pages but its index, in reading order. */
+/** The pages of the area but its index, in reading order: the group lists the index, then these. */
 const htmlListed = order.filter((p) => p.meta.area === "html" && p.route !== HTML_INDEX).map((p) => p.route);
 /** The sidebar's list: the one `ul.docs-nav` of the page. */
 const listOf = (route) => query(treeOf(route), "ul.docs-nav");
 const linksOf = (route) => findAll(listOf(route), (n) => n.name === "a");
 const areaItem = (list, href) => queryAll(list, "a.docs-nav__area").find((a) => a.attrs.get("href") === href).parent;
+/** The labelled group of the HTML elements: the last `li` of the list of pages in the fold of Catalog. */
+const groupOf = (list, href = DOCS_INDEX) => {
+  const fold = query(areaItem(list, href), "details");
+  const groups = findAll(fold, (n) => n.name === "li" && hasClass(n, "docs-nav__group"));
+  return groups.find((g) => query(g, ".luz-sidebar__section-label").attrs.get("id") === "nav-html");
+};
 
-describe("the sidebar lists HTML elements as an area of its own", () => {
+describe("the sidebar lists the HTML elements as a group at the end of the fold of Catalog", () => {
   it("has the 15 pages of the HTML elements area where they were: same routes, same area, same files", () => {
     const files = readdirSync(join(repo, "apps/docs/pages/html")).filter((f) => f.endsWith(".html"));
     expect(files).toHaveLength(15);
     expect(htmlPages.map((p) => p.route).sort()).toEqual(files.map((f) => (f === "index.html" ? HTML_INDEX : `/docs/html/${f.replace(/\.html$/, "")}/`)).sort());
-    // The index is the area link, the 14 others the list under it
+    // The index and the 14 others are the links of the group
     expect(htmlListed).toHaveLength(14);
   });
 
-  it("lists the seven areas as a.docs-nav__area, in the owner's order, with HTML elements between Catalog and Accessibility, on every page", () => {
+  it("lists the six areas as a.docs-nav__area, in the owner's order, with no link for HTML elements, on every page", () => {
     for (const p of site.pages) {
       const hrefs = queryAll(listOf(p.route), "a.docs-nav__area").map((a) => a.attrs.get("href"));
-      expect(hrefs, p.route).toEqual(AREA_ORDER.map((id) => `/docs/${site.areas.find((a) => a.id === id).slug}/`));
+      expect(hrefs, p.route).toEqual(NAV_AREAS.map((id) => `/docs/${site.areas.find((a) => a.id === id).slug}/`));
+      expect(hrefs, `${p.route}: the area is not an item of its own`).not.toContain(HTML_INDEX);
     }
   });
 
-  it("holds HTML elements in its own item of ul.docs-nav: the area link, then the list in its fold with the 14 pages, like Catalog", () => {
+  it("holds HTML elements in a labelled group, the last item of the fold of Catalog: its label, then a list of its index and its 14 pages", () => {
     const label = site.areas.find((a) => a.id === "html").label;
     expect(label).toBe("HTML elements");
     for (const p of site.pages) {
       const list = listOf(p.route);
-      const item = areaItem(list, HTML_INDEX);
-      expect(item.name, p.route).toBe("li");
-      expect(item.parent, `${p.route}: the item is a direct child of ul.docs-nav`).toBe(list);
-      const head = query(item, "a.docs-nav__area");
+      const item = areaItem(list, DOCS_INDEX);
+      expect(item.parent, `${p.route}: Catalog is a direct child of ul.docs-nav`).toBe(list);
+      const group = groupOf(list);
+      expect(group, `${p.route}: the group is in the fold of Catalog`).toBeTruthy();
+      const pages = group.parent;
+      expect(pages.name, `${p.route}: the group is an item of the list of the fold`).toBe("ul");
+      expect(pages.parent.name, p.route).toBe("details");
+      expect(isInside(pages, item), p.route).toBe(true);
+      expect(pages.children.filter((n) => n.name === "li").at(-1), `${p.route}: the group closes the fold`).toBe(group);
+      // A label (not a link) names the group, and the list it holds is named by it
+      const head = query(group, ".luz-sidebar__section-label");
+      expect(head.name, p.route).toBe("span");
       expect(textOf(head), p.route).toBe(label);
-      expect(hasClass(head, "luz-sidebar__link"), `${p.route}: it is a sidebar link`).toBe(true);
-      const lists = queryAll(item, "ul");
+      const lists = queryAll(group, "ul");
       expect(lists, `${p.route}: one list of pages`).toHaveLength(1);
+      expect(lists[0].attrs.get("aria-labelledby"), p.route).toBe(head.attrs.get("id"));
       expect(head.open.index, p.route).toBeLessThan(lists[0].open.index);
       expect(
         findAll(lists[0], (n) => n.name === "a").map((a) => a.attrs.get("href")),
         p.route,
-      ).toEqual(htmlListed);
-      // Nothing of the area is inside the Documentation item, nor the other way round
-      const documentation = areaItem(list, DOCS_INDEX);
-      expect(findAll(documentation, (n) => n.name === "a" && n.attrs.get("href").startsWith("/docs/html/")), `${p.route}: no HTML link inside Catalog`).toEqual([]);
+      ).toEqual([HTML_INDEX, ...htmlListed]);
+      // The index is a link of the list, not an area link; nothing of the area is outside the group
+      expect(queryAll(group, "a.docs-nav__area"), `${p.route}: no area link inside the group`).toEqual([]);
+      const outside = findAll(list, (n) => n.name === "a" && n.attrs.get("href").startsWith("/docs/html/") && !isInside(n, group));
+      expect(outside, `${p.route}: no HTML link outside the group`).toEqual([]);
     }
   });
 
@@ -157,13 +176,15 @@ describe("the sidebar lists HTML elements as an area of its own", () => {
     }
   });
 
-  it("folds the areas with pages and still lists every page of every area once, in reading order", () => {
+  it("folds the areas with pages, with no fold of its own for HTML elements, and still lists every page of every area once, in reading order", () => {
     for (const p of site.pages) {
-      // The HTML elements area is a fold of its own, a sibling of the others, with its pages in it; nothing is hidden by the markup
+      // Nothing is hidden by the markup; the HTML elements are inside the fold of Catalog, not a fold of their own
       const folded = findAll(listOf(p.route), (n) => n.attrs.has("hidden") || n.attrs.has("aria-expanded"));
       expect(folded.map((n) => n.name), p.route).toEqual([]);
-      expect(query(areaItem(listOf(p.route), HTML_INDEX), "details"), `${p.route}: HTML elements has a fold`).toBeTruthy();
-      expect(queryAll(listOf(p.route), "details").every((d) => d.parent.parent === listOf(p.route)), `${p.route}: no fold is nested in another`).toBe(true);
+      const folds = queryAll(listOf(p.route), "details");
+      expect(folds.every((d) => d.parent.parent === listOf(p.route)), `${p.route}: no fold is nested in another`).toBe(true);
+      expect(folds.filter((d) => isInside(d, groupOf(listOf(p.route)))), `${p.route}: the group has no fold`).toEqual([]);
+      expect(queryAll(areaItem(listOf(p.route), DOCS_INDEX), "details"), `${p.route}: Catalog has the one fold`).toHaveLength(1);
       const hrefs = linksOf(p.route).map((a) => a.attrs.get("href"));
       let at = -1;
       for (const route of orderRoutes) {
@@ -177,36 +198,50 @@ describe("the sidebar lists HTML elements as an area of its own", () => {
 });
 
 describe("aria-current in the sidebar", () => {
-  /** What the sidebar must mark on a page: the page itself, and its area link when the page is not the area index. */
+  /** What the sidebar must mark on a page: the page itself, and the area link of its area (of Catalog, for the HTML pages) unless the page is that index. */
   const marksOf = (p) => {
     const area = site.areas.find((a) => a.id === p.meta.area);
     if (!area) return { page: [], true: [] };
-    return { page: [p.route], true: p.route === `/docs/${area.slug}/` ? [] : [`/docs/${area.slug}/`] };
+    const host = area.nestIn ? site.areas.find((a) => a.id === area.nestIn) : area;
+    const hostIndex = `/docs/${host.slug}/`;
+    return { page: [p.route], true: p.route === hostIndex ? [] : [hostIndex] };
   };
 
-  it("marks an HTML page \"page\" and the HTML elements area link \"true\", and not Documentation", () => {
+  it("marks an HTML page \"page\" in the group and the area link of Catalog \"true\", and no other area", () => {
     for (const p of htmlPages.filter((q) => q.route !== HTML_INDEX)) {
       const links = linksOf(p.route);
-      expect(links.find((a) => a.attrs.get("href") === p.route).attrs.get("aria-current"), p.route).toBe("page");
-      expect(links.find((a) => hasClass(a, "docs-nav__area") && a.attrs.get("href") === HTML_INDEX).attrs.get("aria-current"), p.route).toBe("true");
-      expect(links.find((a) => a.attrs.get("href") === DOCS_INDEX).attrs.has("aria-current"), `${p.route}: Documentation is not marked`).toBe(false);
+      const own = links.find((a) => a.attrs.get("href") === p.route);
+      expect(own.attrs.get("aria-current"), p.route).toBe("page");
+      expect(isInside(own, groupOf(listOf(p.route))), `${p.route}: the marked link is the one of the group`).toBe(true);
+      expect(links.find((a) => hasClass(a, "docs-nav__area") && a.attrs.get("href") === DOCS_INDEX).attrs.get("aria-current"), p.route).toBe("true");
+      const marked = links.filter((a) => hasClass(a, "docs-nav__area") && a.attrs.has("aria-current")).map((a) => a.attrs.get("href"));
+      expect(marked, `${p.route}: only Catalog's area link is marked`).toEqual([DOCS_INDEX]);
     }
   });
 
-  it("marks the HTML elements index \"page\" on the area link, and nothing else", () => {
+  it("marks the HTML elements index \"page\" on the link of the group, Catalog's area link \"true\", and nothing else", () => {
     const links = linksOf(HTML_INDEX);
-    expect(links.find((a) => hasClass(a, "docs-nav__area") && a.attrs.get("href") === HTML_INDEX).attrs.get("aria-current")).toBe("page");
-    expect(links.filter((a) => a.attrs.has("aria-current")).map((a) => a.attrs.get("href"))).toEqual([HTML_INDEX]);
+    const index = links.find((a) => a.attrs.get("href") === HTML_INDEX);
+    expect(index.attrs.get("aria-current")).toBe("page");
+    expect(isInside(index, groupOf(listOf(HTML_INDEX)))).toBe(true);
+    expect(links.filter((a) => a.attrs.has("aria-current")).map((a) => `${a.attrs.get("aria-current")} ${a.attrs.get("href")}`)).toEqual([`true ${DOCS_INDEX}`, `page ${HTML_INDEX}`]);
   });
 
-  it("leaves the HTML elements area link unmarked on every page that is not in the area", () => {
+  it("leaves the link of the HTML elements index unmarked on every page that is not in the area", () => {
     for (const p of site.pages.filter((q) => q.meta.area !== "html")) {
       const head = linksOf(p.route).find((a) => a.attrs.get("href") === HTML_INDEX);
       expect(head.attrs.has("aria-current"), p.route).toBe(false);
     }
   });
 
-  it("has exactly one aria-current=\"page\" per page and, at most, the \"true\" of its own area link", () => {
+  it("leaves Catalog's area link unmarked on a page that is neither Catalog's nor an HTML page", () => {
+    for (const p of site.pages.filter((q) => q.meta.area !== "html" && q.meta.area !== "catalog")) {
+      const head = linksOf(p.route).find((a) => a.attrs.get("href") === DOCS_INDEX && hasClass(a, "docs-nav__area"));
+      expect(head.attrs.has("aria-current"), p.route).toBe(false);
+    }
+  });
+
+  it("has exactly one aria-current=\"page\" per page and, at most, the \"true\" of the area link that holds its area", () => {
     for (const p of site.pages) {
       const links = linksOf(p.route);
       const expected = marksOf(p);
@@ -352,15 +387,17 @@ describe("the sidebar in Spanish (real) and Arabic (a stand-in copy of the docs)
         for (const gone of ["landing", "cms", "app", "documentation"]) expect(strings(code)[`area.${gone}`], `area.${gone} is gone with its area`).toBeUndefined();
       });
 
-      it("lists the seven areas, HTML elements labelled in the language between Catalog and Accessibility, linking to its index", () => {
+      it("lists the six areas in the language, and HTML elements, labelled in the language, as the group that closes the fold of Catalog", () => {
         for (const route of ["/docs/html/forms/", HTML_INDEX, DOCS_INDEX, "/docs/components/button/"]) {
           const areas = queryAll(list(route), "a.docs-nav__area");
           expect(
             areas.map((a) => textOf(a)),
             `${code} ${route}`,
-          ).toEqual(AREA_ORDER.map((id) => strings(code)[`area.${id}`]));
-          const head = areas.find((a) => a.attrs.get("href") === `${root}${HTML_INDEX}`);
-          expect(head, `${code} ${route}: the HTML elements area link`).toBeTruthy();
+          ).toEqual(NAV_AREAS.map((id) => strings(code)[`area.${id}`]));
+          expect(areas.map((a) => a.attrs.get("href")), `${code} ${route}: HTML elements has no area link`).not.toContain(`${root}${HTML_INDEX}`);
+          const group = groupOf(list(route), `${root}${DOCS_INDEX}`);
+          expect(group, `${code} ${route}: the group in the fold of Catalog`).toBeTruthy();
+          const head = query(group, ".luz-sidebar__section-label");
           expect(textOf(head), `${code} ${route}`).toBe(strings(code)["area.html"]);
           // The label is in the language of the page, as the other area links are
           expect(languageOf(head), `${code} ${route}`).toBe(code);
@@ -368,13 +405,13 @@ describe("the sidebar in Spanish (real) and Arabic (a stand-in copy of the docs)
         }
       });
 
-      it("lists the 14 pages under it in the language of the page, each as English (lang=en, left to right) when it is not translated", () => {
-        const item = areaItem(list("/docs/html/forms/"), `${root}${HTML_INDEX}`);
-        const links = findAll(query(item, "ul"), (n) => n.name === "a");
+      it("lists the index and the 14 pages in the group in the language of the page, each as English (lang=en, left to right) when it is not translated", () => {
+        const group = groupOf(list("/docs/html/forms/"), `${root}${DOCS_INDEX}`);
+        const links = findAll(query(group, "ul"), (n) => n.name === "a");
         expect(
           links.map((a) => a.attrs.get("href")),
           code,
-        ).toEqual(htmlListed.map((r) => `${root}${r}`));
+        ).toEqual([HTML_INDEX, ...htmlListed].map((r) => `${root}${r}`));
         for (const a of links) {
           const route = a.attrs.get("href").slice(root.length);
           const done = translates(code, route);
@@ -382,16 +419,21 @@ describe("the sidebar in Spanish (real) and Arabic (a stand-in copy of the docs)
           if (!done && code === "ar") expect(directionOf(a), `${code} ${route}: an English island in Arabic is left to right`).toBe("ltr");
           if (done && code === "ar") expect(directionOf(a), `${code} ${route}`).toBe("rtl");
         }
-        expect(directionOf(query(item, "a.docs-nav__area")), code).toBe(code === "ar" ? "rtl" : "ltr");
+        expect(directionOf(query(group, ".luz-sidebar__section-label")), code).toBe(code === "ar" ? "rtl" : "ltr");
       });
 
-      it("marks the current page and the HTML elements area link, and not Documentation", () => {
+      it("marks the current page in the group and the area link of Catalog, and no other area", () => {
         const links = findAll(list("/docs/html/forms/"), (n) => n.name === "a");
         const at = (value) => links.filter((a) => a.attrs.get("aria-current") === value).map((a) => a.attrs.get("href"));
         expect(at("page")).toEqual([`${root}/docs/html/forms/`]);
-        expect(at("true")).toEqual([`${root}${HTML_INDEX}`]);
+        expect(at("true")).toEqual([`${root}${DOCS_INDEX}`]);
         const index = findAll(list(HTML_INDEX), (n) => n.name === "a");
-        expect(index.filter((a) => a.attrs.has("aria-current")).map((a) => `${a.attrs.get("aria-current")} ${a.attrs.get("href")}`)).toEqual([`page ${root}${HTML_INDEX}`]);
+        expect(index.filter((a) => a.attrs.has("aria-current")).map((a) => `${a.attrs.get("aria-current")} ${a.attrs.get("href")}`)).toEqual([`true ${root}${DOCS_INDEX}`, `page ${root}${HTML_INDEX}`]);
+      });
+
+      it("opens the fold of Catalog, and only it, on a page of the HTML elements", () => {
+        const open = queryAll(list("/docs/html/forms/"), "details").filter((d) => d.attrs.has("open"));
+        expect(open.map((d) => query(d.parent, "a.docs-nav__area").attrs.get("href"))).toEqual([`${root}${DOCS_INDEX}`]);
       });
 
       it("writes the breadcrumb Docs > HTML elements > Title with the catalog's words", () => {
