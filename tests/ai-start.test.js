@@ -117,9 +117,11 @@ describe("the script is one file that depends on nothing", () => {
   it("deletes in one place only: `remove`, which takes away a file of luz-ai by name and a folder left empty, never a tree", () => {
     const remove = src.slice(src.indexOf("function runRemove"), src.indexOf("function removeText"));
     expect(src.match(/rmSync\(/g)).toHaveLength(2);
-    expect(remove.match(/rmSync\(/g)).toHaveLength(2);
+    // a file by name, and a folder only after it was seen to be empty (so the recursive option takes nothing)
+    expect(remove.match(/rmSync\(/g)).toHaveLength(1);
     expect(remove).toMatch(/rmSync\(join\(base, rel\)\)/);
-    expect(remove).toMatch(/filesOf\(folder\)\?\.length === 0\) rmSync\(folder, \{ recursive: true \}\)/);
+    const empty = src.slice(src.indexOf("function removeIfEmpty"), src.indexOf("function planRemove"));
+    expect(empty).toMatch(/readdirSync\(dir\)\.length === 0\) rmSync\(dir, \{ recursive: true \}\)/);
     expect(src).not.toMatch(/force: true/);
   });
 

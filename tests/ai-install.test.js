@@ -150,6 +150,49 @@ describe("remove: one piece away, and only what luz-ai wrote", () => {
     expect(r.out).toMatch(/not luz-ai's/);
   });
 
+  it("leaves a file of a skill that the person changed, says so, and --force takes it too", () => {
+    const d = dir();
+    run(["add", SKILLS[0], "--dir", d]);
+    const edited = join(d, `.claude/skills/${SKILLS[0]}/SKILL.md`);
+    writeFileSync(edited, "my own version\n");
+    const r = run(["remove", SKILLS[0], "--dir", d]);
+    expect(r.code).toBe(0);
+    expect(r.out).toMatch(/SKILL\.md was changed after luz-ai wrote it: left in place \(--force removes it\)/);
+    expect(readFileSync(edited, "utf-8")).toBe("my own version\n");
+    expect(existsSync(join(d, `.agents/skills/${SKILLS[0]}/SKILL.md`))).toBe(false);
+    expect(run(["remove", SKILLS[0], "--dir", d, "--force"]).code).toBe(0);
+    expect(existsSync(join(d, `.claude/skills/${SKILLS[0]}`))).toBe(false);
+  });
+
+  it("takes away the folders it emptied, but never a folder that still holds anything of the person's, a link included", () => {
+    const d = dir();
+    run(["add", SKILLS[0], "--dir", d]);
+    expect(run(["remove", SKILLS[0], "--dir", d]).code).toBe(0);
+    for (const place of [".agents/skills", ".claude/skills"]) expect(existsSync(join(d, place, SKILLS[0])), place).toBe(false);
+    run(["add", SKILLS[0], "--dir", d]);
+    const folder = join(d, `.claude/skills/${SKILLS[0]}`);
+    symlinkSync(d, join(folder, "mine-link"));
+    mkdirSync(join(folder, "my-folder"));
+    expect(run(["remove", SKILLS[0], "--dir", d]).code).toBe(0);
+    expect(existsSync(join(folder, "mine-link"))).toBe(true);
+    expect(existsSync(join(folder, "my-folder"))).toBe(true);
+    expect(existsSync(join(d, `.agents/skills/${SKILLS[0]}`))).toBe(false);
+  });
+
+  it("knows an agent by the name in its front matter, not by a line of its body, and does not crash on a folder in its place", () => {
+    const d = dir();
+    mkdirSync(join(d, ".claude/agents"), { recursive: true });
+    writeFileSync(join(d, ".claude/agents/luz-agent-ux.md"), "---\nname: mine\n---\nname: luz-agent-ux\n");
+    const r = run(["remove", "luz-agent-ux", "--dir", d]);
+    expect(r.code).toBe(0);
+    expect(existsSync(join(d, ".claude/agents/luz-agent-ux.md"))).toBe(true);
+    const e = dir();
+    mkdirSync(join(e, ".claude/agents/luz-agent-ux.md"), { recursive: true });
+    expect(run(["remove", "luz-agent-ux", "--dir", e]).code).toBe(0);
+    expect(run(["list", "--dir", e]).code).toBe(0);
+    expect(existsSync(join(e, ".claude/agents/luz-agent-ux.md"))).toBe(true);
+  });
+
   it("with --dry-run shows what it would delete and deletes nothing", () => {
     const d = dir();
     run(["add", "luz-agent-ux", "--for", "claude", "--dir", d]);
