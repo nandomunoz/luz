@@ -109,9 +109,18 @@ describe("the script is one file that depends on nothing", () => {
   });
 
   it("writes in one place only, the files of `site new`, and never deletes or moves one", () => {
-    expect(src).not.toMatch(/appendFile|rmSync|rmdir|unlink|rename|copyFile|createWriteStream|chmod/);
+    expect(src).not.toMatch(/appendFile|rmdir|unlink|rename|copyFile|createWriteStream|chmod/);
     expect(src.match(/writeFileSync\(/g)).toHaveLength(1);
     expect(src.match(/mkdirSync\(/g)).toHaveLength(1);
+  });
+
+  it("deletes in one place only: `remove`, which takes away a file of luz-ai by name and a folder left empty, never a tree", () => {
+    const remove = src.slice(src.indexOf("function runRemove"), src.indexOf("function removeText"));
+    expect(src.match(/rmSync\(/g)).toHaveLength(2);
+    expect(remove.match(/rmSync\(/g)).toHaveLength(2);
+    expect(remove).toMatch(/rmSync\(join\(base, rel\)\)/);
+    expect(remove).toMatch(/filesOf\(folder\)\?\.length === 0\) rmSync\(folder, \{ recursive: true \}\)/);
+    expect(src).not.toMatch(/force: true/);
   });
 
   it("has no hidden or bidi character", () => {
@@ -555,7 +564,7 @@ describe("the skill as /luz <subcommand>: the router and the rule IDs (owner, 20
   });
 
   it("has a row for each subcommand: none, new, doctor, lint, facts, agents, skills, add and help", () => {
-    expect(rows().map((r) => r.chat.replace(/^\/luz ?/, "").split(" ")[0])).toEqual(["", "new", "doctor", "lint", "facts", "agents", "skills", "add", "help"]);
+    expect(rows().map((r) => r.chat.replace(/^\/luz ?/, "").split(" ")[0])).toEqual(["", "new", "magic", "doctor", "lint", "facts", "agents", "skills", "list", "add", "remove", "help"]);
   });
 
   it("takes the kinds of `new` from the facts, never typed twice", () => {
@@ -571,10 +580,10 @@ describe("the skill as /luz <subcommand>: the router and the rule IDs (owner, 20
     for (const c of used) expect(help, c).toContain(c.split(" ")[0]);
   });
 
-  it("writes nothing for doctor, lint, facts, agents, skills and help, and writes only after \"go\" for the rest", () => {
+  it("writes nothing for doctor, lint, facts, agents, skills, list and help, and writes only after \"go\" for the rest", () => {
     const by = Object.fromEntries(rows().map((r) => [r.chat.replace(/^\/luz ?/, "").split(" ")[0], r.writes]));
-    for (const c of ["doctor", "lint", "facts", "agents", "skills", "help"]) expect(by[c], c).toBe("no");
-    for (const c of ["", "new", "add"]) expect(by[c], c).toBe("yes");
+    for (const c of ["doctor", "lint", "facts", "agents", "skills", "list", "help"]) expect(by[c], c).toBe("no");
+    for (const c of ["", "new", "magic", "add", "remove"]) expect(by[c], c).toBe("yes");
     expect(section("Subcommands")).toMatch(/"go"/);
   });
 
@@ -726,7 +735,7 @@ describe("the agents of luz-ai", () => {
     expect(list("agent").map((a) => a.name)).toEqual(AGENTS);
     for (const a of AGENTS) expect(a, a).toMatch(/^luz-agent-[a-z]+$/);
     // The small skills live beside the agents, in their own folder, and are not agents (tests/ai-skills.test.js)
-    expect(readdirSync(join(assets, "skills")).sort()).toEqual(["luz-migrate", "luz-readme", "luz-theme"]);
+    expect(readdirSync(join(assets, "skills")).sort()).toEqual(["luz-license", "luz-meta", "luz-migrate", "luz-readme", "luz-theme", "luz-translate"]);
     const r = run(["lint", "--json", join(assets, "agents")]);
     expect(JSON.parse(r.out).problems).toEqual([]);
     expect(JSON.parse(r.out).checked.length).toBe(AGENTS.length);

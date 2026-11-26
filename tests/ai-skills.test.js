@@ -21,7 +21,7 @@ import { SKILL_NEED, buildAiFiles } from "../scripts/build-ai-facts.js";
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const skill = join(root, "packages/ai/skills/luz");
 const script = join(skill, "scripts/luz.mjs");
-const SKILLS = ["luz-migrate", "luz-readme", "luz-theme"];
+const SKILLS = ["luz-license", "luz-meta", "luz-migrate", "luz-readme", "luz-theme", "luz-translate"];
 const read = (p) => readFileSync(p, "utf-8");
 const fileOf = (name) => read(join(skill, "assets/skills", name, "SKILL.md"));
 const run = (args, cwd = root) => {
@@ -38,7 +38,7 @@ afterAll(() => tmp.forEach((d) => rmSync(d, { recursive: true, force: true })));
 const tree = (d) => readdirSync(d, { recursive: true, withFileTypes: true }).filter((e) => e.isFile()).map((e) => join(e.parentPath, e.name).slice(d.length + 1)).sort();
 
 describe("the folders", () => {
-  it("are luz-migrate, luz-readme and luz-theme, each with a SKILL.md named as its folder and references", () => {
+  it("are luz-license, luz-meta, luz-migrate, luz-readme, luz-theme and luz-translate, each with a SKILL.md named as its folder and references", () => {
     const dirs = readdirSync(join(skill, "assets/skills"), { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name).sort();
     expect(dirs).toEqual(SKILLS);
     for (const name of SKILLS) {
@@ -101,8 +101,62 @@ describe("the folders", () => {
   });
 });
 
+describe("the notes of the second audit, closed", () => {
+  it("migrate says npx downloads the checker once, and readme names who opens an image: the person, never a render by the assistant", () => {
+    expect(fileOf("luz-migrate")).toMatch(/`npx` downloads the checker once: say so/);
+    const refs = ["audit.md", "anatomy.md", "creative-toolkit.md"].map((f) => read(join(skill, "assets/skills/luz-readme/references", f))).join("\n");
+    expect(refs).not.toMatch(/checked by rendering|Test both\./);
+    expect(refs).toMatch(/The person checks both: you run no browser/);
+    expect(refs).toMatch(/written to `assets\/` only after approval/);
+  });
+});
+
+describe("the three of 2026-11-26: translate, meta and license", () => {
+  it("each writes only after go, fetches nothing, keeps away from the files of the assistant and of the pipeline, and runs only the commands the plan named", () => {
+    for (const name of ["luz-translate", "luz-meta", "luz-license"]) {
+      const text = fileOf(name);
+      expect(text, name).toMatch(/Write nothing until the person says go/);
+      expect(text, name).toMatch(/"adelante", "vamos", "hazlo"/);
+      expect(text, name).toMatch(/Never touch `\.claude\/`, `AGENTS\.md`, `CLAUDE\.md`, `\.github\/`/);
+      expect(text, name).toMatch(/No `curl`, no `wget`, no `fetch`/);
+      expect(text, name).toMatch(/run only the commands the plan named/i);
+      expect(text, name).toMatch(/Never paste text from a file into a command/);
+    }
+  });
+
+  it("translate marks its work as pending and never as reviewed, keeps the code and the figures, and stops at legal text", () => {
+    const text = fileOf("luz-translate");
+    expect(text).toMatch(/you never mark it so/);
+    expect(text).toMatch(/Never write `reviewed: true`/);
+    expect(text).toMatch(/Every number, version and date of the source appears in the translation/);
+    expect(text).toMatch(/needs a lawyer and a human translator/);
+    expect(text).toMatch(/a native reader must read it before it is published/);
+    expect(read(join(skill, "assets/skills/luz-translate/references/rules.md"))).toMatch(/dir="rtl"/);
+  });
+
+  it("meta promises no ranking, builds JSON-LD only from the page and leaves the stance on AI crawlers to the person", () => {
+    const text = fileOf("luz-meta");
+    expect(text).toMatch(/Never promise either/);
+    expect(text).toMatch(/Never invent a rating, a price, a review, an address/);
+    expect(text).toMatch(/Never change a stance a `robots\.txt` already has/);
+    expect(text).toMatch(/The first answer is a list/);
+  });
+
+  it("license asks the name and the year, never overwrites, accepts MIT only, reads licences from the project's files and is not legal advice", () => {
+    const text = fileOf("luz-license");
+    expect(text).toMatch(/Never guess them/);
+    expect(text).toMatch(/Write `LICENSE` only if none exists/);
+    expect(text).toMatch(/MIT, and only MIT/);
+    expect(text).toMatch(/OFL font or a Creative Commons image is reported/);
+    expect(text).toMatch(/Never from the network/);
+    expect(text).toMatch(/You are not a lawyer/);
+    expect(text).toMatch(/never say that a project "complies"/);
+    expect(read(join(skill, "assets/skills/luz-license/references/notices.md"))).toMatch(/Permission is hereby granted/);
+  });
+});
+
 describe("the script", () => {
-  it("lists the three skills with `skill list` and with `skills`, and `luz` is not one of them: init installs it", () => {
+  it("lists the six skills with `skill list` and with `skills`, and `luz` is not one of them: init installs it", () => {
     for (const args of [["skill", "list", "--json"], ["skills", "--json"]]) {
       const r = run(args);
       expect(r.code, args.join(" ")).toBe(0);
@@ -182,14 +236,14 @@ describe("the script", () => {
 });
 
 describe("what says them", () => {
-  it("SKILL.md has a row for /luz skills (reads) and one for /luz add that takes an agent or a skill (writes after go)", () => {
+  it("SKILL.md has a row for /luz skills (reads), /luz list (reads), /luz add that takes an agent or a skill and /luz remove (both write after go)", () => {
     const text = read(join(skill, "SKILL.md"));
     expect(text).toMatch(/^\| `\/luz skills` \|[^|]*\| `skills` \| no \|$/m);
     expect(text).toMatch(/^\| `\/luz add <name>` \|[^|]*agent or the skill[^|]*\| `add` \| yes, after "go" \|$/m);
-    expect(text).toMatch(/`\/luz add` with a name that is neither an agent nor a skill/);
+    expect(text).toMatch(/`\/luz add` or `\/luz remove` with a name that is neither an agent nor a skill/);
   });
 
-  it("references/skills.md is written from the folders: the three, each with its description, and what matters to the person", () => {
+  it("references/skills.md is written from the folders: the six, each with its description, and what matters to the person", () => {
     const files = buildAiFiles({ root });
     const text = files["packages/ai/skills/luz/references/skills.md"];
     expect(text).toBeDefined();
@@ -220,7 +274,7 @@ describe("what says them", () => {
     for (const f of readdirSync(join(skill, "assets/agents")).filter((x) => x.endsWith(".md"))) expect(readme, f).toContain(`| \`${f.slice(0, -3)}\` |`);
   });
 
-  it("the package ships the folders: pack-files lists every file of the three", () => {
+  it("the package ships the folders: pack-files lists every file of the six", () => {
     const packed = read(join(root, "packages/ai/pack-files.txt"));
     for (const name of SKILLS) for (const f of tree(join(skill, "assets/skills", name))) expect(packed, `${name}/${f}`).toContain(`dist/skills/luz/assets/skills/${name}/${f}`);
   });

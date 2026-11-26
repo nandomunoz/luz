@@ -383,7 +383,7 @@ describe("checks: the transcript, one rule each", () => {
     for (const c of cases.filter((x) => x.ran)) expect(c.transcript, c.id).toContain("ran");
     for (const id of ["doctor", "facts", "agents", "unknown-subcommand"]) expect(cases.map((c) => c.id), id).toContain(id);
     for (const c of cases) expect(typeof c.prompt, c.id).toBe("string");
-    for (const c of cases.filter((x) => !x.readOnly)) expect(c.answers?.go, `${c.id} has a go`).toBeTruthy();
+    for (const c of cases.filter((x) => !x.readOnly && x.id !== "magic")) expect(c.answers?.go, `${c.id} has a go`).toBeTruthy();
   });
 });
 
@@ -546,14 +546,14 @@ describe("/skill-fix: the skill that fixes a failure with the evidence of a run"
 /* ---- phase 3: the examples of the docs, frozen from green runs ------------------------------------------------- */
 
 describe("examples: a conversation of a green run, frozen for the docs", () => {
-  const EXAMPLES = ["start", "new", "doctor", "lint", "facts", "agents", "skills", "add", "help", "unknown", "hostile"];
+  const EXAMPLES = ["start", "new", "doctor", "lint", "facts", "agents", "skills", "list", "add", "remove", "magic", "help", "unknown", "hostile"];
 
   it("has a case for each section of the commands page: one per subcommand, an unknown one and a hostile one", async () => {
     const grade = await import(join(root, "tools/ai-eval/src/grade.js"));
     const cases = grade.loadCases(root);
     expect(cases.map((c) => c.example).filter(Boolean).sort()).toEqual([...EXAMPLES].sort());
     for (const c of cases.filter((x) => x.example)) expect(c.prompt, c.id).toMatch(/^\/luz|^There is a project/);
-    for (const c of cases.filter((x) => x.example && !x.readOnly && x.example !== "hostile")) expect(c.answers.go, c.id).toBeTruthy();
+    for (const c of cases.filter((x) => x.example && !x.readOnly && x.example !== "hostile" && x.example !== "magic")) expect(c.answers.go, c.id).toBeTruthy();
   });
 
   const state = (status = "pass") => ({ runId: "r1", meta: { model: "sonnet", layer: "full" }, cases: { doctor: { status, runs: [{ passed: status === "pass" }] } } });

@@ -52,9 +52,9 @@ describe("the chat and the script say the same words", () => {
     expect(run(["--help"]).out).not.toMatch(/^ {2}check\b/m);
   });
 
-  it("has a table in SKILL.md whose script column is the chat word: new, doctor, lint, facts, agents, add", () => {
+  it("has a table in SKILL.md whose script column is the chat word: new, doctor, lint, facts, agents, skills, list, add, remove, help", () => {
     const table = rows();
-    expect(table.map((r) => r.chat.replace(/^\/luz ?/, "").split(" ")[0])).toEqual(["", "new", "doctor", "lint", "facts", "agents", "skills", "add", "help"]);
+    expect(table.map((r) => r.chat.replace(/^\/luz ?/, "").split(" ")[0])).toEqual(["", "new", "magic", "doctor", "lint", "facts", "agents", "skills", "list", "add", "remove", "help"]);
     for (const { chat, script } of table) {
       const word = chat.replace(/^\/luz ?/, "").split(" ")[0];
       if (!word || word === "help") continue;

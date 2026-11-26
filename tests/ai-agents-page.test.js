@@ -32,8 +32,8 @@ describe("the rows come from the files of the package", () => {
     for (const lang of ["en", "es"]) for (const [, name] of BY_NEED) expect(strings(lang)[`ai.agents.need.${name}`], `${lang} ${name}`).toBeTruthy();
   });
 
-  it("are the skills too: luz-migrate, luz-readme and luz-theme, with their description, and a sentence of what matters for each of SKILL_NEED", () => {
-    expect(skillRows(root).map((r) => r.name)).toEqual(["luz-migrate", "luz-readme", "luz-theme"]);
+  it("are the skills too: the six skills, with their description, and a sentence of what matters for each of SKILL_NEED", () => {
+    expect(skillRows(root).map((r) => r.name)).toEqual(["luz-license", "luz-meta", "luz-migrate", "luz-readme", "luz-theme", "luz-translate"]);
     for (const r of skillRows(root)) expect(r.description.length, r.name).toBeGreaterThan(40);
     for (const lang of ["en", "es"]) for (const [, name] of SKILL_NEED) expect(strings(lang)[`ai.agents.need.${name}`], `${lang} ${name}`).toBeTruthy();
   });

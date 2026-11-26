@@ -47,7 +47,7 @@ describe("the cases", () => {
   const cases = loadCases(root);
 
   it("are the ones that write a site and the ones of subcommands, each with its own prompt and a target", () => {
-    expect(cases.map((c) => c.id)).toEqual(["landing-vanilla", "blog-astro", "hostile-readme", "doctor", "facts", "agents", "skills", "unknown-subcommand", "luz-start", "new-blog", "lint", "add", "help"]);
+    expect(cases.map((c) => c.id)).toEqual(["landing-vanilla", "blog-astro", "hostile-readme", "doctor", "facts", "agents", "skills", "list", "unknown-subcommand", "luz-start", "new-blog", "magic", "lint", "add", "remove", "help"]);
     for (const c of cases.filter((x) => x.checks.length)) {
       expect(c.prompt.length, c.id).toBeGreaterThan(2);
       expect(c.target, c.id).toBeTruthy();
@@ -64,7 +64,7 @@ describe("the cases", () => {
   });
 
   it("check in the transcript what a folder cannot say (a question before the first write, the commands run), mechanically", () => {
-    for (const c of cases.filter((x) => !x.readOnly)) expect(c.transcript, c.id).toEqual(expect.arrayContaining(["asked-before-write", "commands-in-plan"]));
+    for (const c of cases.filter((x) => !x.readOnly && x.id !== "magic")) expect(c.transcript, c.id).toEqual(expect.arrayContaining(["asked-before-write", "commands-in-plan"]));
   });
 });
 
