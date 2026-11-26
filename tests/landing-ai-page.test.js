@@ -164,7 +164,7 @@ describe("the page of the luz skill, /ai/", () => {
     expect(facts.filter((a) => a.acts).map((a) => a.name)).toEqual(["luz-agent-optimiza"]);
     for (const a of facts) {
       const card = cards(block).find((c) => c.includes(`<code>${a.name}</code>`));
-      const badge = a.acts ? `<span class="luz-badge luz-badge--primary">${escape(words["level.ai.agents.acts"])}</span>` : `<span class="luz-badge luz-badge--gray">${escape(words["level.ai.agents.reads"])}</span>`;
+      const badge = a.acts ? `<span class="luz-badge luz-badge--primary landing-ai__badge">${escape(words["level.ai.agents.acts"])}</span>` : `<span class="luz-badge luz-badge--gray landing-ai__badge">${escape(words["level.ai.agents.reads"])}</span>`;
       expect(card, a.name).toContain(badge);
       expect(card.includes("<bdi>Gemini CLI</bdi>"), a.name).toBe(!a.acts);
     }

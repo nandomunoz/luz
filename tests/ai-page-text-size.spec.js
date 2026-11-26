@@ -3,6 +3,8 @@
  * The page of the skill, /ai/ (owner, 2026-11-25): the text was too small, and a reader with low vision or a phone would miss it.
  * No text of the page is under 14 px at the default size, and the sentences a card or a strip says (what a card does, what the
  * skill promises, what the assistants are) are 16 px, the size of a paragraph. The code of a terminal and a box is 14 px at least.
+ * The one exception is the badge in the corner of a card (owner, 2026-11-26: smaller): 12 px, core's own size for a badge, with
+ * its colours checked by axe (tests/ai-page-badge-corner.spec.js).
  */
 import { test, expect } from '@playwright/test';
 
@@ -20,7 +22,7 @@ for (const route of ROUTES) {
         for (let n = walker.nextNode(); n; n = walker.nextNode()) {
           if (!n.textContent?.trim()) continue;
           const el = n.parentElement;
-          if (!el || el.closest('[hidden], script, style, [aria-hidden="true"] svg')) continue;
+          if (!el || el.closest('[hidden], script, style, [aria-hidden="true"] svg, .landing-ai__badge')) continue;
           const px = parseFloat(getComputedStyle(el).fontSize);
           if (px < 13.99) out.push(`${el.localName}.${el.className}: ${px}px "${n.textContent.trim().slice(0, 30)}"`);
         }
