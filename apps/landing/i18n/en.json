@@ -472,7 +472,7 @@
   "level.ai.install.pick.title": "Piece by piece",
   "level.ai.install.pick.text": "The minimum first, then, in your chat, only the agents and skills you choose.",
   "level.ai.install.pick.then": "Then, in your chat",
-  "level.ai.install.terminal": "Terminal",
+  "level.ai.install.terminal": "In your terminal",
   "level.ai.install.note": "Another assistant? Change claude for codex, gemini, cursor or agents-md.",
   "level.ai.use.title": "Use it",
   "level.ai.use.lead": "Type these in the chat of your assistant. The ones that write wait for your go; /luz magic is the go.",
