@@ -203,7 +203,6 @@ describe("the page of the luz skill, /ai/", () => {
       const card = list.find((c) => c.includes(`<code class="landing-ai__name">${name}</code>`));
       expect(card, name).toBeDefined();
       const at = (needle) => card.indexOf(needle);
-      expect(at("landing-ai__kind")).toBeLessThan(at("landing-card__title"));
       expect(at("landing-card__title")).toBeLessThan(at("landing-ai__name"));
       expect(at("landing-ai__name")).toBeLessThan(at("landing-ai__text"));
       expect(at("landing-ai__text")).toBeLessThan(at("landing-ai__label"));
@@ -222,8 +221,9 @@ describe("the page of the luz skill, /ai/", () => {
       expect(card, name).not.toContain("landing-ai__where");
     }
     expect(block).toContain(`<p class="landing-ai-goal__note">${escape(words["level.ai.agents.missing"])}</p>`);
-    // A legend under the title says what the small icons mean (owner, 2026-11-26), so a card needs no hover to be read
-    expect(legendOf(block)).toEqual([escape(words["level.ai.agents.reads"]), escape(words["level.ai.agents.acts"])]);
+    // The groups say whether an agent reads or changes code (owner, 2026-11-26): no small icon on a card, no legend
+    expect(block).not.toContain("landing-ai-legend");
+    expect(block).not.toContain("landing-ai__kind");
     expect(chatCommands.find((c) => c.chat === "/luz add <name>")).toEqual({ chat: "/luz add <name>", writes: true });
     expect(block).toContain("docs/ai/agents/");
   });
@@ -266,19 +266,24 @@ describe("the page of the luz skill, /ai/", () => {
     }
   });
 
-  it.each(LANGS)("in %s: an agent that changes code says so in its small icon, and the ones that read say they read", (code, prefix) => {
+  it.each(LANGS)("in %s: the agents are in two groups, the ones that read and propose first and the one that changes code after your go, each under its own heading", (code, prefix) => {
     const block = sectionOf(rendered.get(`${prefix}ai/`), "a-agents");
     const words = catalog(code);
     const facts = aiFacts(repo).agents;
     expect(facts.filter((a) => a.acts).map((a) => a.name)).toEqual(["luz-agent-optimiza"]);
+    const groups = [...block.matchAll(/<div class="landing-ai-kind landing-ai-kind--(reads|acts)">([\s\S]*?)<\/div>\s*<\/div>/g)].map((m) => ({ kind: m[1], html: m[2] }));
+    expect(groups.map((g) => g.kind)).toEqual(["reads", "acts"]);
+    for (const g of groups) {
+      expect(g.html).toMatch(new RegExp(`<h3 class="landing-ai-kind__title">${escape(words[`level.ai.agents.group.${g.kind}`])}</h3>`));
+      expect(g.html).toContain(`<p class="landing-ai-kind__lead">${escape(words[`level.ai.agents.group.${g.kind}.lead`])}</p>`);
+      const names = [...g.html.matchAll(/<code class="landing-ai__name">([^<]+)<\/code>/g)].map((m) => m[1]);
+      expect(names, g.kind).toEqual(facts.filter((a) => a.acts === (g.kind === "acts")).map((a) => a.name));
+    }
     for (const a of facts) {
+      const tools = /^tools:\s*(.*)$/m.exec(read(`${SKILL}/assets/agents/${a.name}.md`))[1];
+      expect(/\b(Edit|Write|Bash)\b/.test(tools), a.name).toBe(a.acts);
       const card = cards(block).find((c) => c.includes(`<code class="landing-ai__name">${a.name}</code>`));
-      // A small grey icon beside the blue one says it (owner, 2026-11-26), its words in its title and a hidden text; no badge
-      expect(card, a.name).toContain(kindOf(words[a.acts ? "level.ai.agents.acts" : "level.ai.agents.reads"]));
-      expect(card, a.name).toContain(kindText(words[a.acts ? "level.ai.agents.acts" : "level.ai.agents.reads"]));
-      expect(card, a.name).not.toContain("luz-badge");
-      // No line says which assistants it is written for (owner, 2026-11-26): `agent add` says it, and refuses one it cannot write
-      expect(card, a.name).not.toMatch(/<bdi>|landing-ai__meta/);
+      expect(card, a.name).not.toMatch(/luz-badge|landing-ai__kind|<bdi>|landing-ai__meta/);
     }
   });
 

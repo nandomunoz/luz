@@ -46,7 +46,13 @@ for (const route of ROUTES) {
     // A command is one line: it never breaks in the middle of a flag
     const lines = await page.locator('#a-install .landing-ai__ask code').evaluateAll((all) => all.map((el) => Math.round(el.getBoundingClientRect().height / parseFloat(getComputedStyle(el).lineHeight))));
     expect(lines).toEqual([1, 1, 1, 1]);
-    for (const selector of ['#a-agents article', '#a-skills article']) {
+    // The two groups of agents side by side: the four that read, wider, then the one that changes code
+    const [reads, acts] = await page.locator('#a-agents .landing-ai-kind').evaluateAll((all) => all.map((el) => { const b = el.getBoundingClientRect(); return { top: b.top, left: b.left, right: b.right, width: b.width }; }));
+    expect(Math.abs(reads.top - acts.top)).toBeLessThan(2);
+    expect(reads.width).toBeGreaterThan(acts.width);
+    if (route === '/ar/ai/') expect(acts.right).toBeLessThanOrEqual(reads.left);
+    else expect(reads.right).toBeLessThanOrEqual(acts.left);
+    for (const selector of ['#a-skills article']) {
       const row = await page.locator(selector).evaluateAll((all) => {
         const bs = all.map((el) => el.getBoundingClientRect());
         return bs.filter((b) => Math.abs(b.top - bs[0].top) < 2).map((b) => b.width);

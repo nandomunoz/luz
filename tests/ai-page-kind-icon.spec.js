@@ -1,6 +1,6 @@
 // @ts-check
 /**
- * What a card of /ai/ does (an agent reads and proposes, or changes code; a small skill writes after your go) is a small grey
+ * What a card of a small skill on /ai/ does (it writes after your go; the agents are grouped by it instead) is a small grey
  * icon beside the card's blue icon, on its row (owner, 2026-11-26: the badge goes). Its words are not lost: they are the icon's
  * title, shown on hover, and a text for screen readers inside it. No badge is left in a card. At 1280 and 320 px, with and
  * without JavaScript, and axe finds nothing in light and dark.
@@ -16,7 +16,7 @@ for (const route of ROUTES) {
       await page.setViewportSize({ width, height: 900 });
       await page.goto(route);
       const found = await page.evaluate(() =>
-        [...document.querySelectorAll('#a-agents article, #a-skills article')].map((card) => {
+        [...document.querySelectorAll('#a-skills article')].map((card) => {
           const kind = /** @type {HTMLElement | null} */ (card.querySelector('.landing-ai__kind'));
           const title = card.querySelector('.landing-card__title')?.textContent;
           if (!kind) return { title, missing: true };
@@ -38,7 +38,7 @@ for (const route of ROUTES) {
           };
         }),
       );
-      expect(found.length).toBe(11);
+      expect(found.length).toBe(6);
       for (const f of found) {
         expect(f.missing, `${f.title}: no small icon`).toBeUndefined();
         expect(f.badges, `${f.title}: no badge left`).toBe(0);
@@ -50,8 +50,6 @@ for (const route of ROUTES) {
         expect(f.inside, `${f.title}: inside the card`).toBe(true);
         expect(f.stroke, `${f.title}: grey, not the brand's blue`).not.toBe(f.brand);
       }
-      // Two kinds of agent and one of skill: the icons say which, so the agent that changes code has another one
-      expect(new Set(found.map((f) => f.label)).size).toBeGreaterThanOrEqual(2);
     });
   }
 
