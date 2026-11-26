@@ -450,7 +450,7 @@
   "level.ai.cmd.agents": "Lista los agentes de luz-ai que puedes añadir.",
   "level.ai.cmd.add": "Añade el agente que nombres, tras preguntarte lo que necesita y esperar tu adelante.",
   "level.ai.cmd.help": "Muestra la tabla de comandos.",
-  "level.ai.cmd.writes": "Escribe, tras tu adelante",
+  "level.ai.cmd.writes": "Escribe y ejecuta",
   "level.ai.cmd.reads": "Solo lee",
   "level.ai.limits.title": "Tú decides",
   "level.ai.limits.lead": "La skill es un punto de partida: tú la revisas y la haces tuya.",

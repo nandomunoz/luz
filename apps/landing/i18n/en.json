@@ -450,7 +450,7 @@
   "level.ai.cmd.agents": "Lists the agents of luz-ai that you can add.",
   "level.ai.cmd.add": "Adds the agent you name, after asking what it needs and waiting for your go.",
   "level.ai.cmd.help": "Shows the table of commands.",
-  "level.ai.cmd.writes": "Writes, after your go",
+  "level.ai.cmd.writes": "Writes & executes",
   "level.ai.cmd.reads": "Only reads",
   "level.ai.limits.title": "You decide",
   "level.ai.limits.lead": "The skill is a starting point: you review it, and you make it yours.",

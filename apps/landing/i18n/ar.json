@@ -450,7 +450,7 @@
   "level.ai.cmd.agents": "تعرض وكلاء luz-ai الذين يمكنك إضافتهم.",
   "level.ai.cmd.add": "تضيف الوكيل الذي تسمّيه، بعد أن تسأل عمّا يحتاجه وتنتظر موافقتك.",
   "level.ai.cmd.help": "تعرض جدول الأوامر.",
-  "level.ai.cmd.writes": "تكتب، بعد موافقتك",
+  "level.ai.cmd.writes": "تكتب وتنفّذ",
   "level.ai.cmd.reads": "تقرأ فقط",
   "level.ai.limits.title": "أنت من يقرّر",
   "level.ai.limits.lead": "المهارة نقطة انطلاق: تراجعها أنت وتجعلها لك.",
