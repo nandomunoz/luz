@@ -77,7 +77,8 @@ test.describe('with JavaScript every line copies itself', () => {
       const line = page.locator('#a-agents .landing-ai__ask').first();
       await line.scrollIntoViewIfNeeded();
       const text = ((await line.locator('code').textContent()) ?? '').trim();
-      expect(text).toBe('/luz add luz-agent-accessibility');
+      // The first line of an agent's card is the sentence to ask for it (owner, 2026-11-26: the third pass)
+      expect(text).toContain('luz-agent-accessibility');
       await line.locator('button').click();
       expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(text);
       await expect(page.locator('#luz-live-region')).not.toBeEmpty();
@@ -110,7 +111,7 @@ test.describe('with JavaScript every line copies itself', () => {
       test(`${route}: axe finds nothing in the cards with their copy buttons (${scheme})`, async ({ page }) => {
         await page.emulateMedia({ colorScheme: scheme, reducedMotion: 'reduce' });
         await page.goto(route);
-        const results = await new AxeBuilder({ page }).include('#a-commands').include('#a-agents').include('#a-skills').include('#a-how').analyze();
+        const results = await new AxeBuilder({ page }).include('#a-install').include('#a-use').include('#a-agents').include('#a-skills').analyze();
         expect(results.violations, results.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`).join(' | ')).toEqual([]);
       });
     }

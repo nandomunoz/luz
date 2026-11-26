@@ -17,7 +17,7 @@ for (const route of ROUTES) {
       await page.setViewportSize({ width, height: 900 });
       await page.goto(route);
       const found = await page.evaluate(() =>
-        [...document.querySelectorAll('#a-commands article, #a-agents article, #a-skills article')].map((card) => {
+        [...document.querySelectorAll('#a-agents article, #a-skills article')].map((card) => {
           const badge = /** @type {HTMLElement | null} */ (card.querySelector('.landing-ai__badge'));
           if (!badge) return { missing: card.querySelector('.landing-card__title')?.textContent };
           const cs = getComputedStyle(badge);
@@ -77,7 +77,7 @@ for (const route of ROUTES) {
     test(`${route}: axe finds nothing in the cards with their badges (${scheme})`, async ({ page }) => {
       await page.emulateMedia({ colorScheme: scheme, reducedMotion: 'reduce' });
       await page.goto(route);
-      const results = await new AxeBuilder({ page }).include('#a-commands').include('#a-agents').analyze();
+      const results = await new AxeBuilder({ page }).include('#a-agents').include('#a-skills').analyze();
       expect(results.violations, results.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`).join(' | ')).toEqual([]);
     });
   }
