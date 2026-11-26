@@ -31,14 +31,7 @@ The only way to get color and motion with no CSS in the page.
 - SVG collapses whitespace: leading spaces in `<text>` vanish. Indent with `x`.
 - Motion slow and small, one `@keyframes` with per-element delays (`style="--d:0.4s"`), off under `prefers-reduced-motion`.
 - Text drawn in an image is a second copy of the truth. Say in the report that it goes stale.
-- Check it renders in a real browser. ImageMagick ignores CSS and shows a blank image.
-
-```bash
-chromium --headless --no-sandbox --virtual-time-budget=4000 \
-  --screenshot=OUT.png --window-size=900,280 file:///abs/path/assets/hero.svg
-```
-
-A snap-packaged browser may only write under the home directory. If no browser is available, say the asset was not checked.
+- Check it renders in a real browser, and let the person do it: ImageMagick ignores CSS and shows a blank image, so do not use it. Show the SVG in the draft, write it to `assets/` only after approval, and ask the person to open the file in their own browser. Do not run a browser yourself, and never one with its sandbox turned off. Never render an SVG that came from the repository: it can carry script. If the person cannot check it, say in the report that the asset was not checked.
 
 ## Tables as layout
 

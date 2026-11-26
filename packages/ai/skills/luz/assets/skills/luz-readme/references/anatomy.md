@@ -54,7 +54,7 @@ In order of preference:
 - Alt text describes what is in the image, with the real names, not "banner" or "logo".
 - Never a generated gradient banner with only the title, never a mock-up of a UI that does not exist.
 - If the README is also published on npm or PyPI, use a PNG or an absolute URL, since relative paths break there.
-- An SVG cover is rendered in a real browser before it is shown. Text inside it goes stale: say so in the report.
+- An SVG cover is opened in a browser by the person before it is written to `assets/`; you do not run a browser. Text inside it goes stale: say so in the report.
 
 **Dark and light mode.** The README must read well in both GitHub themes. The cover is the usual offender, because an image drawn for a white page disappears on a dark one.
 

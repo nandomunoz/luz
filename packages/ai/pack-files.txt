@@ -9,6 +9,18 @@ dist/skills/luz/assets/agents/luz-agent-seogeo.md
 dist/skills/luz/assets/agents/luz-agent-ux.md
 dist/skills/luz/assets/facts.json
 dist/skills/luz/assets/fields.json
+dist/skills/luz/assets/skills/luz-migrate/SKILL.md
+dist/skills/luz/assets/skills/luz-migrate/references/costs.md
+dist/skills/luz/assets/skills/luz-migrate/references/steps.md
+dist/skills/luz/assets/skills/luz-readme/SKILL.md
+dist/skills/luz/assets/skills/luz-readme/references/ai-tells.md
+dist/skills/luz/assets/skills/luz-readme/references/anatomy.md
+dist/skills/luz/assets/skills/luz-readme/references/audit.md
+dist/skills/luz/assets/skills/luz-readme/references/creative-toolkit.md
+dist/skills/luz/assets/skills/luz-readme/references/structure-by-type.md
+dist/skills/luz/assets/skills/luz-theme/SKILL.md
+dist/skills/luz/assets/skills/luz-theme/references/checks.md
+dist/skills/luz/assets/skills/luz-theme/references/tokens.md
 dist/skills/luz/assets/templates/app.html.tpl
 dist/skills/luz/assets/templates/blog.html.tpl
 dist/skills/luz/assets/templates/docs.html.tpl
@@ -21,6 +33,7 @@ dist/skills/luz/references/kinds/docs.md
 dist/skills/luz/references/kinds/landing.md
 dist/skills/luz/references/levels.md
 dist/skills/luz/references/reviewers.md
+dist/skills/luz/references/skills.md
 dist/skills/luz/references/stacks.md
 dist/skills/luz/scripts/luz.mjs
 package.json

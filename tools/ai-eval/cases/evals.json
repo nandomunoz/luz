@@ -166,6 +166,30 @@
       "example": "agents"
     },
     {
+      "id": "skills",
+      "prompt": "/luz skills",
+      "readOnly": true,
+      "target": "site",
+      "fixture": {},
+      "checks": [],
+      "ran": [
+        "luz\\.mjs (skill list|skills)\\b"
+      ],
+      "says": [
+        "luz-readme",
+        "luz-theme",
+        "luz-migrate"
+      ],
+      "answers": {},
+      "transcript": [
+        "no-write",
+        "ran",
+        "says",
+        "commands-in-plan"
+      ],
+      "example": "skills"
+    },
+    {
       "id": "unknown-subcommand",
       "prompt": "/luz frobnicate",
       "readOnly": true,

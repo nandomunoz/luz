@@ -50,7 +50,7 @@ const LAYERS = { smoke: "haiku", full: "sonnet", release: "opus" };
 const MINUTES_PER_RUN = { haiku: 1.5, sonnet: 3, opus: 5 };
 const SETUP = [".claude/skills/", ".agents/skills/"];
 const SKILL_MD = join(root, "packages/ai/skills/luz/SKILL.md");
-export const EXAMPLES = ["start", "new", "doctor", "lint", "facts", "agents", "add", "help", "unknown", "hostile"];
+export const EXAMPLES = ["start", "new", "doctor", "lint", "facts", "agents", "skills", "add", "help", "unknown", "hostile"];
 
 const fail = (message) => {
   process.stderr.write(`ai-eval: ${message}\n`);

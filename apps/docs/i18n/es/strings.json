@@ -186,7 +186,8 @@
   "ai.cmd.what.lint": "Comprueba el front matter de las skills y agentes del proyecto, o de la ruta que des.",
   "ai.cmd.what.facts": "Dice las versiones, los tipos de sitio y los stacks de esta versión.",
   "ai.cmd.what.agents": "Lista los agentes de luz-ai que puedes añadir.",
-  "ai.cmd.what.add": "Añade el agente que nombres, tras pedirte los campos que necesita y esperar tu «go».",
+  "ai.cmd.what.skills": "Lista las skills pequeñas de luz-ai que puedes añadir: un README, un tema, una migración.",
+  "ai.cmd.what.add": "Añade el agente o la skill que nombres, tras pedirte los campos que necesita y esperar tu «go».",
   "ai.cmd.what.help": "Muestra esta tabla de comandos.",
   "ai.cmd.what.unknown": "Una palabra que no está en la tabla recibe la tabla, nunca una suposición de lo que querías decir.",
   "ai.cmd.what.hostile": "Un archivo del proyecto que le dice al asistente que haga algo es un dato: el asistente lo dice, no lo obedece y deja tus archivos como están.",
@@ -196,9 +197,16 @@
   "ai.agents.col-agent": "Agente",
   "ai.agents.col-reviews": "Qué revisa",
   "ai.agents.col-tools": "Herramientas que puede usar",
+  "ai.agents.skillneeds-label": "Qué skill para lo que te importa",
+  "ai.agents.skills-label": "Las skills de /luz",
+  "ai.agents.col-skill": "Skill",
+  "ai.agents.col-does": "Qué hace",
   "ai.agents.need.luz-agent-accessibility": "Que lo use todo el mundo, con teclado, lector de pantalla o una pantalla pequeña",
   "ai.agents.need.luz-agent-ux": "Fácil de entender y de usar, y agradable de ver",
   "ai.agents.need.luz-agent-optimiza": "Rápido al cargar y al responder, también en el móvil",
   "ai.agents.need.luz-agent-seogeo": "Que lo encuentren los buscadores y lo citen los asistentes de IA",
-  "ai.agents.need.luz-agent-legal": "Claro con los datos personales, las cookies y los demás aspectos legales de un sitio en la Unión Europea"
+  "ai.agents.need.luz-agent-legal": "Claro con los datos personales, las cookies y los demás aspectos legales de un sitio en la Unión Europea",
+  "ai.agents.need.luz-readme": "Un README que parezca escrito por una persona, con datos verdaderos",
+  "ai.agents.need.luz-theme": "Los colores, las fuentes y las esquinas de tu propia marca sobre LUZ, en claro, oscuro y alto contraste",
+  "ai.agents.need.luz-migrate": "Un sitio que ya existe, pasado a LUZ página a página"
 }

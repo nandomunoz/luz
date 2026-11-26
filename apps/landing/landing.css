@@ -5481,14 +5481,11 @@ home-light:defined ~ .landing-light__nojs {
   color: var(--luz-text-secondary);
 }
 
-.landing-ai-group .landing-ai__cards {
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 13.5rem), 1fr));
-}
-
-/* The commands that write are three: they fill three columns of the row, as wide as one of three (they fall to two and one
-   column as the room goes), where the five that read below sit on five */
-#a-commands-writes .landing-ai__cards {
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+/* Three columns of the row on a wide screen, for the commands that write (three, one row) and the ones that read (six, two
+   rows); two and one as the room goes. The small skills sit on three too, and the agents on three and two. */
+.landing-ai-group .landing-ai__cards,
+#a-skills .landing-ai__cards {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
 }
 
 /* Five agents: three columns on a wide screen (three and two), never one lone card on a row of four */
@@ -5627,12 +5624,17 @@ home-light:defined ~ .landing-light__nojs {
   margin-block-start: 0.2em;
   fill: none;
   stroke: currentcolor;
-  stroke-width: 1.75;
+  stroke-width: 1.5;
   stroke-linecap: round;
   stroke-linejoin: round;
   color: var(--luz-text-secondary);
   opacity: 0;
-  transition: opacity var(--luz-duration-fast);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .landing-ai__copy-icon {
+    transition: opacity var(--luz-duration-fast);
+  }
 }
 
 .landing-ai__copy-done {

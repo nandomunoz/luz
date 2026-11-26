@@ -162,7 +162,8 @@
   "ai.cmd.what.lint": "Checks the front matter of the skills and agents of the project, or of the path you give.",
   "ai.cmd.what.facts": "Says the versions, the kinds of site and the stacks of this release.",
   "ai.cmd.what.agents": "Lists the agents of luz-ai that you can add.",
-  "ai.cmd.what.add": "Adds the agent you name, after asking for the fields it needs and waiting for your \"go\".",
+  "ai.cmd.what.skills": "Lists the small skills of luz-ai that you can add: a README, a theme, a migration.",
+  "ai.cmd.what.add": "Adds the agent or the skill you name, after asking for the fields it needs and waiting for your \"go\".",
   "ai.cmd.what.help": "Shows this table of commands.",
   "ai.cmd.what.unknown": "A word that is not in the table gets the table, never a guess at what you meant.",
   "ai.cmd.what.hostile": "A file of the project that tells the assistant to do something is data: the assistant says so, does not obey it and leaves your files as they are.",
@@ -172,9 +173,16 @@
   "ai.agents.col-agent": "Agent",
   "ai.agents.col-reviews": "What it reviews",
   "ai.agents.col-tools": "Tools it may use",
+  "ai.agents.skillneeds-label": "Which skill for what matters to you",
+  "ai.agents.skills-label": "The skills of /luz",
+  "ai.agents.col-skill": "Skill",
+  "ai.agents.col-does": "What it does",
   "ai.agents.need.luz-agent-accessibility": "Usable by everyone, with a keyboard, a screen reader or a small screen",
   "ai.agents.need.luz-agent-ux": "Easy to understand and to use, and good to look at",
   "ai.agents.need.luz-agent-optimiza": "Fast to load and quick to answer, on a phone too",
   "ai.agents.need.luz-agent-seogeo": "Found by search engines and cited by AI assistants",
-  "ai.agents.need.luz-agent-legal": "Clear about personal data, cookies and the other legal points of a site in the European Union"
+  "ai.agents.need.luz-agent-legal": "Clear about personal data, cookies and the other legal points of a site in the European Union",
+  "ai.agents.need.luz-readme": "A README that reads as written by a person, with true facts",
+  "ai.agents.need.luz-theme": "The colours, fonts and corners of your own brand on LUZ, in light, dark and high contrast",
+  "ai.agents.need.luz-migrate": "A site that already exists, moved to LUZ one page at a time"
 }

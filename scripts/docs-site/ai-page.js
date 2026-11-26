@@ -9,6 +9,7 @@
  * decide (a strip). The tables of commands and of targets
  * are in /docs/ai/. Everything that is a fact of the package is read from `packages/ai/skills/luz/` and never typed:
  *
+ *  - the small skills: the folders of `assets/skills/` (a card each, with the sentence that adds it);
  *  - the agents: `assets/agents/*.md`, their `name` and `tools`. An agent with a tool of `acting` (tool-map.json)
  *    changes code; the others only read and propose. An acting tool with no verified name for Gemini CLI leaves the
  *    agent out of Gemini CLI, as `agent add` does;
@@ -57,12 +58,13 @@ export function aiFacts(root) {
       const gemini = !tools.some((t) => map.acting.includes(t) && !map.gemini[t]);
       return { name: fields.name, tools, acts, hosts: AGENT_HOSTS.filter((h) => h !== "Gemini CLI" || gemini) };
     });
+  const skills = readdirSync(resolve(dir, "assets/skills"), { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name).sort();
   const line = /^const INIT_TARGETS = (\{.*\});$/m.exec(readFileSync(resolve(dir, "scripts/luz.mjs"), "utf-8"));
   if (!line) throw new Error(`${SKILL_DIR}/scripts/luz.mjs: no line "const INIT_TARGETS = {…};" to read the assistants of init from`);
   const INIT_TARGETS = JSON.parse(line[1].replace(/([{,]\s*)([a-z]+):/g, '$1"$2":'));
   const targets = Object.entries(INIT_TARGETS).map(([id, folders]) => ({ id, assistant: ASSISTANTS[id] ?? null, folder: folders[0] ?? "AGENTS.md" }));
   const dependencies = Object.keys(JSON.parse(readFileSync(resolve(root, "packages/ai/package.json"), "utf-8")).dependencies ?? {}).length;
-  return { agents, targets, dependencies };
+  return { agents, skills, targets, dependencies };
 }
 
 /** Stroke icons of the cards (24 x 24, drawn like the home's): a path for each piece of the page. */
@@ -78,6 +80,10 @@ const ICONS = {
   "luz-agent-optimiza": "M13 3 5 13.5h6L10 21l8-10.5h-6Z",
   "luz-agent-seogeo": "M10.5 4a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM15.5 15.5 20 20",
   "luz-agent-ux": "M4 5h16v14H4ZM4 10h16M10 10v9",
+  "luz-readme": "M6 3.5h9l3 3V20.5H6ZM9 11h6M9 14.5h6M9 7.5h3",
+  "luz-theme": "M12 3.5a8.5 8.5 0 1 0 0 17c1.4 0 2-.9 2-1.8 0-1.4-1.2-1.6-1.2-2.8 0-.9.7-1.4 1.6-1.4H17a3.5 3.5 0 0 0 3.5-3.5C20.5 6.7 16.7 3.5 12 3.5ZM7.5 11.5h.01M10 7.8h.01M14.5 7.8h.01",
+  "luz-migrate": "M4 8h11M12 4.5 15.5 8 12 11.5M20 16H9M12 12.5 8.5 16l3.5 3.5",
+  skills: "M12 3.5l2.2 5 5.3.5-4 3.6 1.2 5.3L12 15l-4.7 2.9 1.2-5.3-4-3.6 5.3-.5Z",
   agents: "M8.5 4.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5ZM3.5 19c0-3 2.2-5.5 5-5.5s5 2.5 5 5.5M16 6.5a2 2 0 1 0 0 4 2 2 0 0 0 0-4ZM15 13.6c3 0 5.5 2.2 5.5 5.4",
   add: "M12 5v14M5 12h14",
   help: "M12 3.5a8.5 8.5 0 1 0 0 17 8.5 8.5 0 0 0 0-17ZM9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 .9-1 1.7M12 17h.01",
@@ -90,7 +96,7 @@ const ICONS = {
  */
 export function aiSections({ say, root, escapeHtml }) {
   const t = (key) => escapeHtml(say(key));
-  const { agents, targets, dependencies } = aiFacts(root);
+  const { agents, skills, targets, dependencies } = aiFacts(root);
   const code = (text) => `<code>${escapeHtml(text)}</code>`;
   const icon = (id) => {
     if (!ICONS[id]) throw new Error(`scripts/docs-site/ai-page.js: no icon for "${id}": add its path to ICONS`);
@@ -100,12 +106,12 @@ export function aiSections({ say, root, escapeHtml }) {
   const ask = (sign, inner) => `<p class="landing-ai__ask"><span class="landing-ai__mark" aria-hidden="true">${sign}</span> ${inner}</p>`;
   const card = (id, title, text, extra, foot, mod = "") =>
     `<article class="landing-card landing-ai__card${mod}">${icon(id)}<p class="landing-card__title">${title}</p>${extra}<p class="landing-ai__text">${text}</p>${foot}</article>`;
-  const goal = (id, links, cards, raw = false) =>
+  const goal = (id, links, cards, raw = false, key = id) =>
     [
       `<section class="landing-ai-goal" id="a-${id}" aria-labelledby="a-${id}-title">`,
       `  <div class="landing-ai-goal__head">`,
-      `    <h2 class="landing-inside__title" id="a-${id}-title">${t(`level.ai.${id}.title`)}</h2>`,
-      `    <p class="landing-inside__lead">${t(`level.ai.${id}.lead`)}</p>`,
+      `    <h2 class="landing-inside__title" id="a-${id}-title">${t(`level.ai.${key}.title`)}</h2>`,
+      `    <p class="landing-inside__lead">${t(`level.ai.${key}.lead`)}</p>`,
       links.length ? `    <ul class="landing-block__groups">${links.map((l) => `<li><a class="landing-block__link" href="${l.href}">${l.label}</a></li>`).join("")}</ul>` : "",
       `  </div>`,
       raw ? cards : `  <div class="landing-cards landing-ai__cards">${cards}</div>`,
@@ -145,9 +151,23 @@ export function aiSections({ say, root, escapeHtml }) {
     )
     .join("");
 
+  // The small skills, a card each, the same shape as an agent's: title, technical name, badge, what it does, the sentence that adds it
+  const skillCards = skills
+    .map((name) =>
+      card(
+        name,
+        t(`level.ai.skills.${name}.title`),
+        t(`level.ai.skills.${name}.text`),
+        `<code class="landing-ai__name">${escapeHtml(name)}</code><span class="luz-badge luz-badge--gray landing-ai__badge">${t("level.ai.skills.badge")}</span>`,
+        ask("›", code(`/luz add ${name}`)),
+        " landing-ai__card--acts",
+      ),
+    )
+    .join("");
+
   // The commands of the chat, a card for each row of the table of SKILL.md: what to type, what it does, and whether it writes
   const TYPED = { start: "/luz", new: "/luz new landing", add: "/luz add luz-agent-accessibility" };
-  const ICON_OF = { start: "write", new: "write", doctor: "doctor", lint: "validate", facts: "plan", agents: "agents", add: "add", help: "help" };
+  const ICON_OF = { start: "write", new: "write", doctor: "doctor", lint: "validate", facts: "plan", agents: "agents", skills: "skills", add: "add", help: "help" };
   const commandCard = (row) => {
       const typed = row.chat.replace(/ [<[].*$/, "");
       const badge = `<span class="luz-badge luz-badge--gray landing-ai__badge">${t(row.writes ? "level.ai.cmd.writes" : "level.ai.cmd.reads")}</span>`;
@@ -177,15 +197,16 @@ export function aiSections({ say, root, escapeHtml }) {
   // The sections of the page, under the strip of assistants: a list of links, titled by the sections themselves
   const toc = [
     `<nav class="landing-ai-toc" aria-label="${t("level.ai.toc.label")}">`,
-    `  <ul class="landing-ai-toc__list">${[["a-commands", "level.ai.commands.title"], ["a-agents", "level.ai.agents.title"], ["a-skill", "level.ai.skill.title"], ["a-decide", "level.ai.limits.title"]].map(([id, key]) => `<li><a href="#${id}">${t(key)}</a></li>`).join("")}</ul>`,
+    `  <ul class="landing-ai-toc__list">${[["a-commands", "level.ai.commands.title"], ["a-agents", "level.ai.agents.title"], ["a-skills", "level.ai.skills.title"], ["a-how", "level.ai.skill.title"], ["a-decide", "level.ai.limits.title"]].map(([id, key]) => `<li><a href="#${id}">${t(key)}</a></li>`).join("")}</ul>`,
     `</nav>`,
   ].join("\n");
 
   const commandsDocs = [{ href: "/docs/ai/commands/", label: t("level.ai.commands.link") }];
   const skillDocs = [{ href: "/docs/ai/", label: t("level.ai.next.docs") }];
+  const skillsDocs = [{ href: "/docs/ai/agents/#skills", label: t("level.ai.skills.link") }];
   const agentsDocs = [{ href: "/docs/ai/agents/", label: t("level.ai.agents.link") }];
   return {
-    aiblocks: [works, toc, goal("commands", commandsDocs, commandGroups, true), goal("agents", agentsDocs, agentCards), goal("skill", skillDocs, phases), decide].join("\n"),
+    aiblocks: [works, toc, goal("commands", commandsDocs, commandGroups, true), goal("agents", agentsDocs, agentCards), goal("skills", skillsDocs, skillCards), goal("how", skillDocs, phases, false, "skill"), decide].join("\n"),
     naiagents: String(agents.length),
     naitargets: String(targets.length),
     ndepsai: String(dependencies),

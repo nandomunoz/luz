@@ -62,7 +62,7 @@ At most three questions, only about what the repo cannot tell you: audience, REA
 
 ### 4. Draft
 
-Build the parts above in order, with section names in the README's language. Keep the top short and put depth in `<details>` or `docs/`. Let sections be as long as their content, not symmetrical. Hand-made assets go in `assets/`, with alt text, and are rendered in a real browser before you show them. The README must read well in the dark and light themes of GitHub: images with color ship as a light and a dark file in a `picture` (see anatomy.md).
+Build the parts above in order, with section names in the README's language. Keep the top short and put depth in `<details>` or `docs/`. Let sections be as long as their content, not symmetrical. Hand-made assets are shown in the draft and written to `assets/` only after approval, with alt text; you do not run a browser, so ask the person to open them in theirs. The README must read well in the dark and light themes of GitHub: images with color ship as a light and a dark file in a `picture` (see anatomy.md).
 
 ### 5. Audit
 

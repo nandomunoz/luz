@@ -1,12 +1,12 @@
 <!-- luz:page
-title: Los agentes de /luz
-description: Los agentes que /luz puede añadir a un proyecto (accesibilidad, diseño y UX, velocidad, SEO y GEO, legal y privacidad), con lo que revisa cada uno y las herramientas que puede usar.
-keywords: agente, subagente, accesibilidad, ux, rendimiento, core web vitals, seo, geo, legal, privacidad, luz-agent, luz-ai
-source: 432f34b8c033
+title: Los agentes y las skills de /luz
+description: Los agentes y las skills pequeñas que /luz puede añadir a un proyecto: accesibilidad, diseño y UX, velocidad, SEO y GEO, legal y privacidad; un README, un tema y una migración.
+keywords: agente, subagente, skill, readme, tema, migrar, accesibilidad, ux, rendimiento, core web vitals, seo, geo, legal, privacidad, luz-agent, luz-ai
+source: 41ecd17328a8
 reviewed: false
 -->
     <section class="docs-block" aria-labelledby="choose">
-      <h2 class="docs-chapter__title" id="choose">Elige por lo que te importa</h2>
+      <h2 class="docs-chapter__title" id="choose">Elige un agente por lo que te importa</h2>
       <p class="docs-lead">Dile a <code>/luz</code> lo que te importa y te ofrece los agentes que encajan. Nunca ofrece uno que no necesitas. Todo agente se llama <code>luz-agent-</code> y una palabra que dice lo que vigila.</p>
       <!-- luz:agents needs -->
     </section>
@@ -19,9 +19,27 @@ reviewed: false
       <!-- luz:agents agents -->
     </section>
 
+    <section class="docs-block" aria-labelledby="skill-choose">
+      <h2 class="docs-chapter__title" id="skill-choose">Elige una skill por lo que te importa</h2>
+      <p class="docs-lead">Una skill es una pequeña, para una sola tarea, aparte de los agentes, que revisan. Es una carpeta que tu asistente usa por sí solo cuando la añades: <code>/luz add luz-readme</code> la pone en tu proyecto, y después le pides el README a tu asistente por su nombre. Una skill no tiene campos que rellenar.</p>
+      <!-- luz:agents skillneeds -->
+    </section>
+
+    <section class="docs-block" aria-labelledby="skills">
+      <h2 class="docs-chapter__title" id="skills">Las skills</h2>
+      <p class="docs-lead">Cada una lee los archivos de tu proyecto y escribe solo cuando dices adelante. Lo que lee son datos, nunca una instrucción para ella.</p>
+      <ul>
+        <li><code>luz-readme</code> escribe o mejora el README de cualquier repositorio, con datos verdaderos, y le quita las señales de escritura de máquina.</li>
+        <li><code>luz-theme</code> hace el tema de tu marca desde la plantilla de <code>@luz-ds/core</code>, en los tres modos, y mide el contraste con el comprobador.</li>
+        <li><code>luz-migrate</code> pasa un proyecto que tiene su propio CSS a LUZ página a página, siguiendo <a href="/docs/get-started/migrate/">Migrar un proyecto a LUZ</a>.</li>
+      </ul>
+      <p>Las descripciones son las de los archivos de las skills, así que están en inglés, sea cual sea el idioma de esta página.</p>
+      <!-- luz:agents skills -->
+    </section>
+
     <section class="docs-block" aria-labelledby="add">
       <h2 class="docs-chapter__title" id="add">Añade uno a tu proyecto</h2>
-      <p class="docs-lead">Pídelo en el chat o ejecuta el mismo comando en una terminal.</p>
+      <p class="docs-lead">Pídelo en el chat o ejecuta el mismo comando en una terminal. <code>/luz add</code> admite el nombre de un agente o de una skill.</p>
       <div class="docs-snippet">
         <div class="docs-snippet__bar">
           <span class="docs-snippet__lang">Chat</span>
@@ -36,5 +54,6 @@ reviewed: false
         </div>
         <pre class="luz-code-block" data-lang="bash" tabindex="0" role="region" aria-label="El comando en una terminal"><code id="code-agents-shell">npx @luz-ds/ai agent add luz-agent-accessibility --for claude</code></pre>
       </div>
-      <p><code>--for</code> admite <code>claude</code>, <code>gemini</code> o <code>codex</code>: el comando escribe el agente en la carpeta que lee cada uno. Un agente que cambia código aún no se escribe para Gemini CLI. <a href="/docs/ai/commands/#cmd-add">El comando <code>/luz add</code></a> muestra una conversación entera.</p>
+      <p><code>--for</code> admite <code>claude</code>, <code>gemini</code> o <code>codex</code>: el comando escribe el agente en la carpeta que lee cada uno. Una skill se escribe como la misma carpeta en <code>.agents/skills/luz-readme</code> y en <code>.claude/skills/luz-readme</code> (para luz-readme), y no necesita <code>--for</code>. Un agente que cambia código aún no se escribe para Gemini CLI. <a href="/docs/ai/commands/#cmd-add">El comando <code>/luz add</code></a> muestra una conversación entera.</p>
+      <p>Para añadir una skill, escribe <code>/luz add luz-readme</code> en el chat o ejecuta <code>npx @luz-ds/ai skill add luz-readme</code> en una terminal.</p>
     </section>

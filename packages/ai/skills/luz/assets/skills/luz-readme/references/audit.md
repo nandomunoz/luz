@@ -18,7 +18,7 @@ Against [ai-tells.md](ai-tells.md):
 ## Pass 2: truth
 
 - Title and subtitle: the title matches the manifest or repo name. The subtitle passes the portability test and every claim in it is verifiable.
-- Cover: exists, current, real alt text. SVG rendered in a browser.
+- Cover: exists, current, real alt text. SVG opened in a browser by the person, or said to be unchecked.
 - Section links: every anchor matches a heading, every external link points at something real.
 - GitHub data: each badge URL uses the real `OWNER/REPO` from the remote and links to its GitHub page. CI points at an existing workflow file, release only if releases exist, license only if `LICENSE` exists. Plain-line values come from a command you ran. At most eight.
 - Fixed sections: What it is, Usage, Installation, Credits and License all present, in that order, with real content. Credits names only real people and material.
@@ -28,7 +28,7 @@ Against [ai-tells.md](ai-tells.md):
 - License: badge, last section, `LICENSE` file and manifest agree. Third-party material has its own line. If there is no `LICENSE`, no section claims one and the report says so.
 - Versions, requirements and numbers come from files. No placeholders left (`OWNER`, `your-username`, `TODO`).
 - External links you could not check, and badges that fail on private repos, are listed in the report.
-- Images exist, have meaningful alt text, show the current project, and SVGs were rendered in a real browser.
+- Images exist, have meaningful alt text, show the current project, and SVGs were opened in a browser by the person, or the report says they were not checked.
 - Dark and light: every image with color has a light and a dark variant in a `picture`, or has contrast on both backgrounds, checked by rendering on `#ffffff` and on `#0d1117`. Badges and Mermaid are fine. No fixed-color HTML.
 - Portability test on every paragraph and visual.
 

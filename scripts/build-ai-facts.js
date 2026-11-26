@@ -12,6 +12,7 @@
  *   references/stacks.md           where each stack loads LUZ and which extensions the check reads
  *   assets/agents/luz-agent-accessibility.md   the reviewer of @luz-ds/check, built from its source (scripts/build-check.js)
  *   references/agents.md           the agents of luz-ai that the skill can add, from their own front matter
+ *   references/skills.md           the small skills of luz-ai (assets/skills/<name>/), from their own front matter
  *
  * A starter is a text for the person's own site, not a page of this repository, so it is `.html.tpl`: nothing here loads it,
  * and the CDN addresses in it are the packages' own (RL-12 reads the `.html` pages of packages/ and apps/).
@@ -30,7 +31,7 @@ import { FILES, catalogComponents, catalogFilesIn, minified } from "./docs-site/
 
 const repo = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const SKILL = "packages/ai/skills/luz";
-export { BY_NEED };
+export { BY_NEED, SKILL_NEED };
 export const FACTS_FILE = `${SKILL}/assets/facts.json`;
 
 const readJson = (root, file) => JSON.parse(readFileSync(join(root, file), "utf-8"));
@@ -135,6 +136,34 @@ const BY_NEED = [
   ["Clear about personal data, cookies and the other legal points of a site in the European Union", "luz-agent-legal"],
 ];
 
+// The same for the small skills: what the person says matters, and the skill for it (checked against the folders)
+const SKILL_NEED = [
+  ["A README that reads as written by a person, with true facts", "luz-readme"],
+  ["The colours, fonts and corners of their own brand on LUZ, in light, dark and high contrast", "luz-theme"],
+  ["A site that already exists, moved to LUZ one page at a time", "luz-migrate"],
+];
+
+function skillsReference(root) {
+  const dir = join(root, SKILL, "assets", "skills");
+  const skills = readdirSync(dir, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name).sort().map((n) => frontOf(readFileSync(join(dir, n, "SKILL.md"), "utf-8")));
+  return [
+    "# The skills of luz-ai",
+    "",
+    "Small skills of one task each, apart from the agents, which review. Offer the one that fits what the person says matters to them. Never offer one they do not need. A skill has no field.",
+    "",
+    "## By what matters to the person",
+    "",
+    ...SKILL_NEED.map(([need, name]) => `- ${need}: \`${name}\`.`),
+    "",
+    "## Skills",
+    "",
+    "`skill add <name>` (or `add <name>`) writes the skill folder in `.agents/skills` and in `.claude/skills`. Once added, the person asks the assistant for it by name.",
+    "",
+    ...skills.map((s) => `- \`${s.name}\`: ${s.description}`),
+    "",
+  ].join("\n");
+}
+
 function agentsReference(root) {
   const dir = join(root, SKILL, "assets");
   const agents = readdirSync(join(dir, "agents")).filter((f) => f.endsWith(".md")).sort().map((f) => frontOf(readFileSync(join(dir, "agents", f), "utf-8")));
@@ -168,6 +197,7 @@ export function buildAiFiles({ root = repo } = {}) {
   // The one accessibility agent is the reviewer of @luz-ds/check, from the same source (.claude/agents/accessibility-engineer.md)
   files[`${SKILL}/assets/agents/luz-agent-accessibility.md`] = buildAgent();
   files[`${SKILL}/references/agents.md`] = agentsReference(root);
+  files[`${SKILL}/references/skills.md`] = skillsReference(root);
   return files;
 }
 
