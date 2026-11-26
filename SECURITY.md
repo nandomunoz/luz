@@ -166,6 +166,7 @@ git diff pnpm-lock.yaml
 - The publish job installs with `--ignore-scripts`: no dependency lifecycle script runs while it can mint an OIDC token.
 - A release happens only when the changesets "version packages" PR is merged, and only after lint, audit, build, unit tests and the tarball contract check (`pnpm check:pack`) pass.
 - Since 0.2.0 nobody publishes from a laptop. The 0.1.0 versions and the placeholder versions of `@luz-ds/catalog` and `@luz-ds/site` were published by hand, before the workflow existed.
+- A package that is new to npm (`@luz-ds/check`, then `@luz-ds/ai`) cannot be published by trusted publishing the first time, because npm needs the package to exist before it can name its trusted publisher. Its owner creates it once by hand with a placeholder version that has no code (`0.0.0-stage`), sets `publish.yml` and the `release` environment as its trusted publisher, turns on "Require two-factor authentication and disallow tokens", and only then merges the Version PR that releases it. Every version after the placeholder is published by the workflow.
 
 **Code Review Requirements:**
 - Changes reach `main` through pull requests with passing status checks (branch ruleset).
