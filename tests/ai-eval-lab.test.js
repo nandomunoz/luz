@@ -215,6 +215,18 @@ describe("sandbox: the command and the folder of a run", () => {
     for (const p of ["/x/.claude", "/x/.claude/settings.json", "/x/.mcp.json", "/x/CLAUDE.md", "/x/AGENTS.md", "/x/package.json", "/x/site/.env"]) expect(keepFilter(p), p).toBe(false);
   });
 
+  it("installs the small skills and agents a case names after the skill, as a person adds them, and refuses a name luz-ai does not ship", async () => {
+    const { createSandbox } = await lab("sandbox.js");
+    const sb = createSandbox({ caseDef: { id: "c", fixture: {}, install: ["luz-license", "luz-agent-accessibility"] }, root, credentials: null });
+    tmp.push(sb.dir, sb.configDir, sb.binDir);
+    expect(existsSync(join(sb.dir, ".claude/skills/luz/SKILL.md"))).toBe(true);
+    expect(existsSync(join(sb.dir, ".claude/skills/luz-license/SKILL.md"))).toBe(true);
+    expect(existsSync(join(sb.dir, ".claude/agents/luz-agent-accessibility.md"))).toBe(true);
+    sb.cleanup();
+    for (const name of ["luz-nothing", "../luz-license", "--force", "luz-license/../../x", "", 7]) expect(() => createSandbox({ caseDef: { id: "c", fixture: {}, install: [name] }, root, credentials: null }), String(name)).toThrow(/install/);
+    expect(() => createSandbox({ caseDef: { id: "c", fixture: {}, install: "luz-license" }, root, credentials: null })).toThrow(/install/);
+  });
+
   it("refuses a fixture file that would run in the session of the person running it", async () => {
     const { createSandbox } = await lab("sandbox.js");
     for (const path of [".mcp.json", "package.json", ".claude/settings.json", "../out.txt"]) expect(() => createSandbox({ caseDef: { id: "c", fixture: { [path]: "x" } }, root, credentials: null }), path).toThrow();
@@ -350,6 +362,15 @@ describe("checks: the transcript, one rule each", () => {
     expect(checkTranscript("no-write", { turns: [turn("/luz doctor", [{ name: "Edit", input: {} }])] }, caseDef)).toMatchObject({ ok: false, rule: "R7", turn: 0 });
   });
 
+  it("says-not: the assistant never said what the case forbids (a promise of ranking), and a refusal of it is not a promise", async () => {
+    const { checkTranscript } = await lab("checks.js");
+    const c = { saysNot: ["(?<!not |n't |never |no |cannot )guarantee[sd]? (?:you )?(?:a |the )?(?:first page|top|ranking|rank)"] };
+    const said = (text) => ({ turns: [{ n: 0, user: "x", assistant: text, toolUses: [] }] });
+    expect(checkTranscript("says-not", said("This guarantees the first page of Google."), c)).toMatchObject({ ok: false });
+    expect(checkTranscript("says-not", said("A correct head does not guarantee ranking."), c)).toMatchObject({ ok: true });
+    expect(checkTranscript("says-not", said("Done."), {})).toMatchObject({ ok: true });
+  });
+
   it("ran: the script ran the command the subcommand maps to", async () => {
     const { checkTranscript } = await lab("checks.js");
     expect(checkTranscript("ran", { turns: [turn("/luz doctor", [bash("node .claude/skills/luz/scripts/luz.mjs doctor --json")])] }, caseDef).ok).toBe(true);
@@ -384,6 +405,20 @@ describe("checks: the transcript, one rule each", () => {
     for (const id of ["doctor", "facts", "agents", "unknown-subcommand"]) expect(cases.map((c) => c.id), id).toContain(id);
     for (const c of cases) expect(typeof c.prompt, c.id).toBe("string");
     for (const c of cases.filter((x) => !x.readOnly && x.id !== "magic")) expect(c.answers?.go, `${c.id} has a go`).toBeTruthy();
+  });
+
+  it("has a case for each small skill that writes after go (luz-license, luz-meta, luz-translate), which installs it and opens with its command", async () => {
+    const grade = await import(join(root, "tools/ai-eval/src/grade.js"));
+    const cases = grade.loadCases(root);
+    for (const skill of ["luz-license", "luz-meta", "luz-translate"]) {
+      const c = cases.find((x) => x.install?.includes(skill));
+      expect(c, skill).toBeTruthy();
+      expect(c.prompt, skill).toMatch(new RegExp(`^/${skill}\\b`));
+      expect(c.transcript, skill).toEqual(expect.arrayContaining(["asked-before-write", "commands-in-plan"]));
+      expect(c.checks, skill).toContain("expected-files");
+      expect(c.readOnly, skill).toBeFalsy();
+      expect(c.example, skill).toBeUndefined();
+    }
   });
 });
 

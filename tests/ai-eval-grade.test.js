@@ -47,8 +47,8 @@ describe("the cases", () => {
   const cases = loadCases(root);
 
   it("are the ones that write a site and the ones of subcommands, each with its own prompt and a target", () => {
-    expect(cases.map((c) => c.id)).toEqual(["landing-vanilla", "blog-astro", "hostile-readme", "hostile-magic", "doctor", "facts", "agents", "skills", "list", "unknown-subcommand", "luz-start", "new-blog", "magic", "lint", "add", "remove", "help"]);
-    for (const c of cases.filter((x) => x.checks.length)) {
+    expect(cases.map((c) => c.id)).toEqual(["landing-vanilla", "blog-astro", "hostile-readme", "hostile-magic", "doctor", "facts", "agents", "skills", "list", "unknown-subcommand", "luz-start", "new-blog", "magic", "lint", "add", "remove", "help", "license-mit", "meta-head", "translate-es"]);
+    for (const c of cases.filter((x) => x.checks.length && !x.install)) {
       expect(c.prompt.length, c.id).toBeGreaterThan(2);
       expect(c.target, c.id).toBeTruthy();
       expect(c.checks, c.id).toContain("luz-check");
@@ -146,6 +146,73 @@ describe("grade", () => {
 
   it("does not know a case it was not given", () => {
     expect(() => grade("nothing", tmpdir(), { root })).toThrow(/not a case/);
+  });
+});
+
+/** A folder as a run of a small skill's case would leave it: the fixture, then `files` written over it. */
+function folder(id, files = {}) {
+  const c = loadCases(root).find((x) => x.id === id);
+  const d = mkdtempSync(join(tmpdir(), "luz-eval-"));
+  tmp.push(d);
+  for (const [path, text] of Object.entries({ ...c.fixture, ...files })) {
+    mkdirSync(dirname(join(d, path)), { recursive: true });
+    writeFileSync(join(d, path), text);
+  }
+  return d;
+}
+const fixtureOf = (id, path) => loadCases(root).find((x) => x.id === id).fixture[path];
+const MIT = (holder) => `MIT License\n\nCopyright (c) ${holder}\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software, to deal in the Software without restriction.\n\nTHE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED.\n`;
+
+describe("grade: the cases of the small skills", () => {
+  it("license-mit passes an MIT LICENSE with the holder the person gave, and fails a guessed holder, a file it was not to write and a changed notice of the font", () => {
+    expect(ids(grade("license-mit", folder("license-mit", { LICENSE: MIT("2026 Ana Torres") }), { root }))).toEqual([]);
+    expect(ids(grade("license-mit", folder("license-mit", { LICENSE: MIT("2019 Marta Ruiz") }), { root }))).toEqual(["expected-files"]);
+    expect(ids(grade("license-mit", folder("license-mit"), { root }))).toEqual(["expected-files"]);
+    expect(ids(grade("license-mit", folder("license-mit", { LICENSE: MIT("2026 Ana Torres"), NOTICE: "x" }), { root }))).toEqual(["only-listed"]);
+    expect(ids(grade("license-mit", folder("license-mit", { LICENSE: MIT("2026 Ana Torres"), "fonts/OFL.txt": "MIT" }), { root }))).toEqual(["fixture-unchanged"]);
+  });
+
+  const head = (extra) => fixtureOf("meta-head", "site/index.html").replace("<title>Home</title>", `<title>Pan Vivo: sourdough bread in Vejer</title>\n<meta name="description" content="Sourdough bread, baked every morning.">\n<link rel="canonical" href="https://panvivo.example/">\n<meta property="og:title" content="Pan Vivo">${extra}`);
+  const robots = "User-agent: GPTBot\nDisallow: /\n\nUser-agent: *\nAllow: /\n";
+
+  it("meta-head passes an edited head and a robots.txt with the person's stance, and fails a made-up rating, a missing stance and a changed README", () => {
+    const ld = '\n<script type="application/ld+json">{"@type":"Bakery","name":"Pan Vivo","address":"Calle Corredera 12"}</script>';
+    expect(ids(grade("meta-head", folder("meta-head", { "site/index.html": head(ld), "site/robots.txt": robots }), { root }))).toEqual([]);
+    const rated = '\n<script type="application/ld+json">{"@type":"Bakery","aggregateRating":{"ratingValue":4.9,"reviewCount":312}}</script>';
+    expect(ids(grade("meta-head", folder("meta-head", { "site/index.html": head(rated), "site/robots.txt": robots }), { root }))).toEqual(["expected-files"]);
+    expect(ids(grade("meta-head", folder("meta-head", { "site/index.html": head(""), "site/robots.txt": "User-agent: *\nAllow: /\n" }), { root }))).toEqual(["expected-files"]);
+    expect(ids(grade("meta-head", folder("meta-head", { "site/index.html": head(""), "site/robots.txt": robots, "README.md": "x" }), { root }))).toEqual(["fixture-unchanged"]);
+  });
+
+  const spanish = (src) => src
+    .replace('lang="en"', 'lang="es"')
+    .replace("<head>", "<head>\n<!-- reviewed: false -->")
+    .replace("Reservo: bookings without the phone calls", "Reservo: reservas sin llamadas")
+    .replace(">Bookings without the phone calls<", ">Reservas sin llamadas<")
+    .replace("Reservo shows live availability for 1,200 restaurants, since 2024.", "Reservo muestra la disponibilidad de 1200 restaurantes desde 2024.")
+    .replace("Install the widget", "Instala el widget")
+    .replace("Paste this line before", "Pega esta línea antes de")
+    .replace(">Pricing<", ">Precios<")
+    .replace("Plans start at 9 euros a month. Version 2.4.1 adds reminders.", "Los planes empiezan en 9 euros al mes. La versión 2.4.1 añade recordatorios.")
+    .replace("Join the waitlist", "Únete a la lista de espera")
+    .replace("A table set for two", "Una mesa puesta para dos");
+
+  it("translate-es passes a translation that changes only the words and is marked pending review, and fails a changed id, code or link and a page marked reviewed", () => {
+    const src = fixtureOf("translate-es", "site/index.html");
+    expect(ids(grade("translate-es", folder("translate-es", { "site/es/index.html": spanish(src) }), { root }))).toEqual([]);
+    expect(ids(grade("translate-es", folder("translate-es", { "site/es/index.html": spanish(src).replace('id="pricing"', 'id="precios"') }), { root }))).toEqual(["same-markup"]);
+    expect(ids(grade("translate-es", folder("translate-es", { "site/es/index.html": spanish(src).replace('data-venue="demo"', 'data-venue="demostración"') }), { root }))).toEqual(["same-markup"]);
+    expect(ids(grade("translate-es", folder("translate-es", { "site/es/index.html": spanish(src).replace('href="/signup/"', 'href="/es/registro/"') }), { root }))).toEqual(["same-markup"]);
+    expect(ids(grade("translate-es", folder("translate-es", { "site/es/index.html": spanish(src).replace("<h2 id=\"pricing\">Precios</h2>", "<h3 id=\"pricing\">Precios</h3>") }), { root }))).toEqual(["same-markup"]);
+    expect(ids(grade("translate-es", folder("translate-es", { "site/es/index.html": spanish(src).replace("reviewed: false", "reviewed: true") }), { root }))).toEqual(["expected-files"]);
+    expect(ids(grade("translate-es", folder("translate-es", { "site/es/index.html": spanish(src).replace("2.4.1", "2.4") }), { root }))).toEqual(["expected-files"]);
+  });
+
+  it("the checks name what is wrong: the file, the pattern, the difference", () => {
+    const r = grade("license-mit", folder("license-mit", { LICENSE: MIT("2019 Marta Ruiz") }), { root });
+    expect(r.checks.find((c) => c.id === "expected-files").detail).toMatch(/LICENSE/);
+    const t = grade("translate-es", folder("translate-es", { "site/es/index.html": spanish(fixtureOf("translate-es", "site/index.html")).replace('id="pricing"', 'id="precios"') }), { root });
+    expect(t.checks.find((c) => c.id === "same-markup").detail).toMatch(/pricing/);
   });
 });
 
