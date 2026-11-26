@@ -107,7 +107,7 @@ describe("the agents of luz-ai", () => {
     for (const code of ["en", "es", "ar"]) {
       const words = JSON.parse(read(`apps/landing/i18n/${code}.json`));
       for (const name of NAMES) for (const k of ["title", "text"]) expect(words[`level.ai.agent.${name}.${k}`], `${code} ${name} ${k}`).toBeTruthy();
-      expect(words["level.ai.agents.acts"], code).toBeTruthy();
+      expect(words["level.ai.agents.group.acts"], code).toBeTruthy();
       expect(words["level.ai.agent.luz-agent-legal.text"], code).toBeTruthy();
     }
     expect(JSON.parse(read("apps/landing/i18n/en.json"))["level.ai.agent.luz-agent-legal.text"]).toMatch(/not legal advice/);
