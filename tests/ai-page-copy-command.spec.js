@@ -56,7 +56,7 @@ test.describe('with JavaScript every line copies itself', () => {
 
     test(`${route}: the icon is hidden until hover or focus, then at the far end of the line`, async ({ page }) => {
       await page.goto(route);
-      const line = page.locator('#a-agents .landing-ai__ask >> visible=true').first();
+      const line = page.locator('#a-agents .landing-ai__ask').first();
       await line.scrollIntoViewIfNeeded();
       const icon = line.locator('.landing-ai__copy-icon');
       await expect(icon).toHaveCSS('opacity', '0');
@@ -79,21 +79,20 @@ test.describe('with JavaScript every line copies itself', () => {
 
     test(`${route}: a click copies the sentence up to the name, without the hint after it, says so, and the icon turns into a tick`, async ({ page }) => {
       await page.goto(route);
-      const line = page.locator('#a-agents .landing-ai__ask >> visible=true').first();
+      const line = page.locator('#a-agents .landing-ai__ask').first();
       await line.scrollIntoViewIfNeeded();
       const text = ((await line.locator('code').textContent()) ?? '').trim();
       // The first line of an agent's card is the sentence to ask for it (owner, 2026-11-26: the third pass)
       expect(text).toContain('luz-agent-accessibility');
       await line.locator('button').click();
-      // An agent's sentence starts with its name and is copied whole (owner, 2026-11-26)
       const copied = await page.evaluate(() => navigator.clipboard.readText());
-      expect(copied.startsWith('luz-agent-accessibility '), copied).toBe(true);
-      expect(copied).toBe(text);
-      // A skill's line copies its sentence, the command first
-      const skill = page.locator('#a-skills .landing-ai__ask >> visible=true').first();
+      expect(copied.endsWith('luz-agent-accessibility'), copied).toBe(true);
+      expect(text.startsWith(copied)).toBe(true);
+      // A skill's line copies its command alone
+      const skill = page.locator('#a-skills .landing-ai__ask').first();
       await skill.scrollIntoViewIfNeeded();
       await skill.locator('button').click();
-      expect(await page.evaluate(() => navigator.clipboard.readText())).toMatch(/^\/luz-[a-z]+ \S/);
+      expect(await page.evaluate(() => navigator.clipboard.readText())).toMatch(/^\/luz-[a-z]+$/);
       await line.locator('button').click();
       await expect(page.locator('#luz-live-region')).not.toBeEmpty();
       await expect(line.locator('button')).toHaveClass(/is-copied/);
@@ -105,7 +104,7 @@ test.describe('with JavaScript every line copies itself', () => {
     const ctx = await browser.newContext({ hasTouch: true, isMobile: true, viewport: { width: 390, height: 800 } });
     const page = await ctx.newPage();
     await page.goto('/ai/');
-    const icon = page.locator('#a-agents .landing-ai__copy-icon >> visible=true').first();
+    const icon = page.locator('#a-agents .landing-ai__copy-icon').first();
     await icon.scrollIntoViewIfNeeded();
     await expect(icon).toHaveCSS('opacity', /^(0\.[5-9]|1)/);
     await ctx.close();

@@ -114,6 +114,8 @@ export function aiSections({ say, root, escapeHtml }) {
     const hint = text.slice(copy.length);
     return `<p class="landing-ai__ask" data-copy="${escapeHtml(copy)}"><code>${escapeHtml(copy)}${hint ? `<span class="landing-ai__hint">${escapeHtml(hint)}</span>` : ""}</code></p>`;
   };
+  // The part of a sentence that is copied: up to the name in it, or a command up to its first <argument>
+  const upTo = (sentence, name) => sentence.slice(0, sentence.indexOf("{name}")) + name;
   const badge = (key) => `<span class="luz-badge luz-badge--gray landing-ai__badge">${t(key)}</span>`;
   const head = (id, links = [], note = "") =>
     [
@@ -202,34 +204,30 @@ export function aiSections({ say, root, escapeHtml }) {
 
   // ---- Agents and small skills: what each does and how to ask for it; installing it is a closed details, since everything
   // installs it already
+  // What a card does, as a small grey icon beside its blue one (owner, 2026-11-26: no badge): its words are the title, shown on
+  // hover, and a hidden text for a screen reader
   const kindIcon = (key) => `<svg class="landing-ai__kind-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="${ICONS[key === "level.ai.agents.reads" ? "reads" : "writes"]}"/></svg>`;
+  const kind = (key) => `<span class="landing-ai__kind" title="${t(key)}">${kindIcon(key)}<span class="u-sr-only">${t(key)}</span></span>`;
   // The legend under the title of a section: what each small icon of its cards means, so no card needs a hover to be read
   const legend = (keys) => `    <ul class="landing-ai-legend">${keys.map((key) => `<li>${kindIcon(key)}${t(key)}</li>`).join("")}</ul>`;
-  // The agents (owner, 2026-11-26, from the prototype): a list, one item each, with the sentence to ask for it, the name first.
-  // On a phone that is all; on a wide screen landing.js makes the list five tiles to pick from under a stage
-  const agentKind = (a) => {
-    const key = a.acts ? "level.ai.agents.acts" : "level.ai.agents.reads";
-    return `<span class="landing-ai-agent__kind${a.acts ? " landing-ai-agent__kind--acts" : ""}">${kindIcon(key)}${t(key)}</span>`;
-  };
-  // One item: its icon, its title, what it does to your files (agents only: every skill writes, the legend says it once),
-  // the sentence with the name (or the command) first, all of it copied, and its text for a screen reader and the stage
-  const pickItem = (name, prefix, said, kindHtml) => {
-    const sentence = say(`${prefix}.${name}.ask`);
-    return [
-      `<li class="landing-ai-agent" data-agent="${name}">`,
-      `<div class="landing-ai-agent__top">${icon(name)}<p class="landing-ai-agent__title">${t(`${prefix}.${name}.title`)}</p>${kindHtml}</div>`,
-      `<p class="landing-ai__ask" data-copy="${escapeHtml(`${said} ${sentence}`)}"><code><strong>${said}</strong> ${escapeHtml(sentence)}</code></p>`,
-      `<p class="landing-ai-agent__text u-sr-only">${t(`${prefix}.${name}.text`)}</p>`,
-      `</li>`,
+  const card = (id, title, name, badgeKey, text, asked, copy, mod) =>
+    [
+      `<article class="landing-card landing-ai__card${mod}">`,
+      `<div class="landing-ai__top">${icon(id)}${kind(badgeKey)}</div>`,
+      `<p class="landing-card__title">${title}</p>`,
+      `<code class="landing-ai__name">${escapeHtml(name)}</code>`,
+      `<p class="landing-ai__text">${text}</p>`,
+      `<p class="landing-ai__label">${t("level.ai.ask")}</p>${ask(asked, copy)}`,
+      `</article>`,
     ].join("");
-  };
-  const pickList = (mod, label, items) => `<div class="landing-ai-agents${mod}" data-pick-label="${t(label)}"><ul class="landing-ai-agents__list">${items.join("")}</ul></div>`;
-  const agentList = pickList("", "level.ai.agents.pick", agents.map((a) => pickItem(a.name, "level.ai.agent", a.name, agentKind(a))));
-  const skillList = pickList(" landing-ai-agents--skills", "level.ai.skills.pick", skills.map((name) => pickItem(name, "level.ai.skills", `/${name}`, "")));
-  const goal = (id, links, body, kinds) => {
+  const agentCards = agents
+    .map((a) => card(a.name, t(`level.ai.agent.${a.name}.title`), a.name, a.acts ? "level.ai.agents.acts" : "level.ai.agents.reads", t(`level.ai.agent.${a.name}.text`), say("level.ai.agents.use").replace("{name}", a.name), upTo(say("level.ai.agents.use"), a.name), a.acts ? " landing-ai__card--acts" : " landing-ai__card--reads"))
+    .join("");
+  const skillCards = skills.map((name) => card(name, t(`level.ai.skills.${name}.title`), name, "level.ai.skills.badge", t(`level.ai.skills.${name}.text`), say("level.ai.skills.use").replace("{name}", name), upTo(say("level.ai.skills.use"), name), " landing-ai__card--acts")).join("");
+  const goal = (id, links, cards, kinds) => {
     const top = head(id, links, t(`level.ai.${id}.missing`));
-    if (kinds) top.splice(top.length - 1, 0, legend(kinds));
-    return [`<section class="landing-ai-goal" id="a-${id}" aria-labelledby="a-${id}-title">`, ...top, `  ${body}`, `</section>`].join("\n");
+    top.splice(top.length - 1, 0, legend(kinds));
+    return [`<section class="landing-ai-goal" id="a-${id}" aria-labelledby="a-${id}-title">`, ...top, `  <div class="landing-cards landing-ai__cards">${cards}</div>`, `</section>`].join("\n");
   };
 
   // What you decide: the guarantees of the skill, in a row of five
@@ -249,7 +247,7 @@ export function aiSections({ say, root, escapeHtml }) {
   ].join("\n");
 
   return {
-    aiblocks: [works, toc, install, use, goal("agents", [{ href: "/docs/ai/agents/", label: t("level.ai.agents.link") }], agentList), goal("skills", [{ href: "/docs/ai/agents/#skills", label: t("level.ai.skills.link") }], skillList, ["level.ai.skills.badge"]), decide].join("\n"),
+    aiblocks: [works, toc, install, use, goal("agents", [{ href: "/docs/ai/agents/", label: t("level.ai.agents.link") }], agentCards, ["level.ai.agents.reads", "level.ai.agents.acts"]), goal("skills", [{ href: "/docs/ai/agents/#skills", label: t("level.ai.skills.link") }], skillCards, ["level.ai.skills.badge"]), decide].join("\n"),
     naiagents: String(agents.length),
     naitargets: String(targets.length),
     ndepsai: String(dependencies),

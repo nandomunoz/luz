@@ -5652,6 +5652,33 @@ html:has(.landing-marquee) {
   color: var(--luz-text-secondary);
 }
 
+/* Three columns on a wide screen for the commands that install or uninstall, the ones used in the chat and the small skills; two
+   and one as the room goes. The agents sit on three and two. */
+.landing-ai-group .landing-ai__cards,
+#a-install .landing-ai__cards,
+#a-commands .landing-ai__cards,
+#a-skills .landing-ai__cards {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+}
+
+/* Five agents: three columns on a wide screen (three and two), never one lone card on a row of four */
+#a-agents .landing-ai__cards {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 21rem), 1fr));
+}
+
+/* The blue icon of a card and, beside it, the small grey one of what it does */
+.landing-ai__top {
+  display: flex;
+  align-items: center;
+  gap: var(--luz-space-sm);
+}
+
+.landing-ai__kind {
+  position: relative;
+  display: inline-flex;
+  cursor: help;
+}
+
 .landing-ai__kind-icon {
   inline-size: 1.125rem;
   block-size: 1.125rem;
@@ -5660,156 +5687,6 @@ html:has(.landing-marquee) {
   stroke-width: 1.75;
   stroke-linecap: round;
   stroke-linejoin: round;
-}
-
-/* ---- The agents (owner, 2026-11-26): a list, one sentence each with the name first. On a wide screen with JavaScript,
-   landing.js makes it five tiles to pick from under a stage (.is-picker) ---- */
-.landing-ai-agents {
-  display: grid;
-  gap: var(--luz-space-lg);
-  min-inline-size: 0;
-}
-
-.landing-ai-agents__list {
-  display: grid;
-  gap: var(--luz-space-sm);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.landing-ai-agent {
-  display: grid;
-  gap: var(--luz-space-sm);
-  min-inline-size: 0;
-  padding: var(--luz-space-md);
-  border: 1px solid var(--luz-divider);
-  border-radius: var(--luz-radius-md);
-  background: color-mix(in oklab, var(--luz-text-primary) 3%, var(--luz-surface-page));
-}
-
-.landing-ai-agent__top {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--luz-space-xs) var(--luz-space-sm);
-}
-
-.landing-ai-agent__title {
-  margin: 0;
-  font-family: var(--luz-font-sans);
-  font-weight: 600;
-}
-
-.landing-ai-agent__kind {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--luz-space-xs);
-  margin-inline-start: auto;
-  font-family: var(--luz-font-sans);
-  font-size: var(--luz-text-sm);
-  color: var(--luz-text-secondary);
-}
-
-.landing-ai-agent__kind--acts {
-  font-weight: 600;
-  color: var(--luz-text-primary);
-}
-
-.landing-ai-agent__kind .landing-ai__kind-icon {
-  stroke: currentcolor;
-}
-
-.landing-ai-agents .landing-ai__ask strong {
-  color: var(--luz-brand-primary);
-}
-
-.landing-ai-agents__stage {
-  display: none;
-}
-
-@media (min-width: 64rem) {
-  .landing-ai-agents.is-picker {
-    padding: var(--luz-space-xl);
-    border: 1px solid var(--luz-divider);
-    border-radius: var(--luz-radius-md);
-    background: color-mix(in oklab, var(--luz-text-primary) 3%, var(--luz-surface-page));
-  }
-
-  .is-picker .landing-ai-agents__stage {
-    display: grid;
-    gap: var(--luz-space-lg);
-  }
-
-  .is-picker .landing-ai-agents__stage > .landing-ai__ask {
-    padding-block: var(--luz-space-md);
-    padding-inline: var(--luz-space-lg) var(--luz-space-sm);
-    border-radius: var(--luz-radius-md);
-    background: color-mix(in oklab, var(--luz-text-primary) 8%, var(--luz-surface-page));
-    font-size: var(--luz-text-xl);
-  }
-
-  .landing-ai-agents__what {
-    display: grid;
-    gap: var(--luz-space-xs);
-    justify-items: start;
-    min-block-size: 5.5rem;
-    align-content: start;
-  }
-
-  .landing-ai-agents__what .landing-ai-agent__kind {
-    margin: 0;
-  }
-
-  .landing-ai-agents__text {
-    margin: 0;
-    max-inline-size: 48rem;
-    font-size: var(--luz-text-lg);
-    color: var(--luz-text-secondary);
-  }
-
-  .is-picker .landing-ai-agents__list {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-  }
-
-  /* Six skills: two rows of three */
-  .landing-ai-agents--skills.is-picker .landing-ai-agents__list {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .is-picker .landing-ai-agent {
-    align-content: start;
-    background: var(--luz-surface-page);
-    cursor: pointer;
-  }
-
-  .is-picker .landing-ai-agent:hover {
-    border-color: var(--luz-text-secondary);
-  }
-
-  .is-picker .landing-ai-agent:focus-visible {
-    outline: 2px solid var(--luz-focus-ring);
-    outline-offset: 2px;
-  }
-
-  .is-picker .landing-ai-agent[aria-checked="true"] {
-    border-color: var(--luz-brand-primary);
-    background: color-mix(in oklab, var(--luz-brand-primary) 10%, var(--luz-surface-page));
-    box-shadow: 0 0 0 1px var(--luz-brand-primary);
-  }
-
-  .is-picker .landing-ai-agent__top {
-    flex-direction: column;
-    align-items: start;
-  }
-
-  .is-picker .landing-ai-agent__top .landing-ai-agent__kind {
-    margin: 0;
-  }
-
-  .is-picker .landing-ai-agent > .landing-ai__ask {
-    display: none;
-  }
 }
 
 /* The legend under the title of a section: each small icon and what it means, in a quiet row */
@@ -5841,6 +5718,13 @@ html:has(.landing-marquee) {
   stroke-linejoin: round;
 }
 
+.landing-ai__card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--luz-space-xs);
+}
+
 /* What a card does to your files, right under its title: a small rectangle fitted to its text, over a tint of grey
    that lets the card show through, with no border */
 .landing-ai__badge {
@@ -5860,6 +5744,18 @@ html:has(.landing-marquee) {
   color: var(--luz-text-secondary);
 }
 
+.landing-ai__card .landing-card__title {
+  font-size: var(--luz-text-base);
+}
+
+/* The technical name of an agent, a code of its own right under the title (no paragraph around it) */
+.landing-ai__name {
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+  font-size: var(--luz-text-sm);
+  color: var(--luz-text-secondary);
+}
+
 /* The text takes the room, so what you say sits at the foot of every card of a row */
 .landing-ai__text {
   flex: 1;
@@ -5868,7 +5764,8 @@ html:has(.landing-marquee) {
   color: var(--luz-text-secondary);
 }
 
-/* At 400 % text nothing keeps to one line: a link wraps inside its head (WCAG 1.4.10) */
+/* At 400 % text nothing keeps to one line: a badge and a link wrap inside their card (WCAG 1.4.10) */
+.landing-ai__card > *,
 .landing-ai-goal__head > * {
   min-inline-size: 0;
   max-inline-size: 100%;

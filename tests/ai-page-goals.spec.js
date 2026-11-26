@@ -46,10 +46,28 @@ for (const route of ROUTES) {
     // A command is one line: it never breaks in the middle of a flag
     const lines = await page.locator('#a-install .landing-ai__ask code').evaluateAll((all) => all.map((el) => Math.round(el.getBoundingClientRect().height / parseFloat(getComputedStyle(el).lineHeight))));
     expect(lines).toEqual([1, 1, 1, 1]);
+    for (const selector of ['#a-agents article', '#a-skills article']) {
+      const row = await page.locator(selector).evaluateAll((all) => {
+        const bs = all.map((el) => el.getBoundingClientRect());
+        return bs.filter((b) => Math.abs(b.top - bs[0].top) < 2).map((b) => b.width);
+      });
+      expect(row.length, selector).toBeGreaterThanOrEqual(3);
+      for (const w of row) expect(Math.abs(w - row[0]), selector).toBeLessThan(2);
+    }
   });
 
   test(`${route}: the cards of agents and skills show how to ask for each, with no fold, and the section says once how to add one`, async ({ page }) => {
     await page.goto(route);
+    for (const [id, count] of [['a-agents', 5], ['a-skills', 6]]) {
+      const cards = page.locator(`#${id} article.landing-ai__card`);
+      await expect(cards, id).toHaveCount(count);
+      for (const card of await cards.all()) {
+        await expect(card.locator('svg.landing-ai__icon')).toBeVisible();
+        await expect(card.locator('.landing-card__title')).toBeVisible();
+        await expect(card.locator('.landing-ai__label + .landing-ai__ask code')).toBeVisible();
+        await expect(card.locator('details')).toHaveCount(0);
+      }
+    }
     await expect(page.locator('#a-agents .landing-ai-goal__note')).toBeVisible();
     await expect(page.locator('#a-skills .landing-ai-goal__note')).toBeVisible();
     // The commands of "Use it" sit in one panel, each row with its three parts on one line at this width

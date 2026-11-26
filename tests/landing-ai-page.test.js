@@ -194,76 +194,67 @@ describe("the page of the luz skill, /ai/", () => {
   };
   const copyOf = (card) => /<p class="landing-ai__ask" data-copy="([^"]*)">/.exec(card)?.[1];
 
-  /** The items of the list of agents: one li each, with what a phone shows and what the picker of a wide screen reads. */
-  const agentItems = (block) => [...block.matchAll(/<li class="landing-ai-agent[^"]*"[\s\S]*?<\/li>/g)].map((m) => m[0]);
-
-  it.each(LANGS)("in %s: the agents are a list, one item each: icon, name, what it does to your files, what it does, and its own sentence with the name first (owner, 2026-11-26: the list of a phone)", (code, prefix) => {
+  it.each(LANGS)("in %s: the agents are a card each, led by what it looks after and how to ask for it; how to add one is said once, under the title of the section", (code, prefix) => {
     const block = sectionOf(rendered.get(`${prefix}ai/`), "a-agents");
     const words = catalog(code);
-    expect(block).toMatch(/<div class="landing-ai-agents" data-pick-label="[^"]+">/);
-    expect(block).toContain(`<ul class="landing-ai-agents__list">`);
-    expect(block).not.toMatch(/<article\b/);
-    const items = agentItems(block);
-    expect(items).toHaveLength(agents.length);
+    const list = cards(block);
+    expect(list).toHaveLength(agents.length);
     for (const name of agents) {
-      const item = items.find((c) => c.includes(`data-agent="${name}"`));
-      expect(item, name).toBeDefined();
-      const at = (needle) => item.indexOf(needle);
-      expect(at("landing-ai__icon")).toBeLessThan(at("landing-ai-agent__title"));
-      expect(at("landing-ai-agent__title")).toBeLessThan(at("landing-ai-agent__kind"));
-      expect(at("landing-ai-agent__kind")).toBeLessThan(at("landing-ai-agent__text"));
-      expect(at("landing-ai-agent__text")).toBeLessThan(at("landing-ai__ask"));
+      const card = list.find((c) => c.includes(`<code class="landing-ai__name">${name}</code>`));
+      expect(card, name).toBeDefined();
+      const at = (needle) => card.indexOf(needle);
+      expect(at("landing-ai__kind")).toBeLessThan(at("landing-card__title"));
+      expect(at("landing-card__title")).toBeLessThan(at("landing-ai__name"));
+      expect(at("landing-ai__name")).toBeLessThan(at("landing-ai__text"));
+      expect(at("landing-ai__text")).toBeLessThan(at("landing-ai__label"));
       const human = words[`level.ai.agent.${name}.title`];
       expect(human).not.toContain("luz-");
-      expect(item).toContain(`<p class="landing-ai-agent__title">${escape(human)}</p>`);
-      // The sentence: the name first, then what to ask for, all of it copied
-      const ask = words[`level.ai.agent.${name}.ask`];
-      expect(ask, name).toBeTruthy();
-      expect(ask).not.toContain("luz-");
-      expect(item).toContain(`<p class="landing-ai__ask" data-copy="${escape(`${name} ${ask}`)}"><code><strong>${name}</strong> ${escape(ask)}</code></p>`);
-      // What it does, inside the card, before its sentence (owner, 2026-11-26)
-      expect(item).toContain(`<p class="landing-ai-agent__text">${escape(words[`level.ai.agent.${name}.text`])}</p>`);
-      expect(item).toMatch(/<svg class="landing-ai__icon"[^>]*aria-hidden="true"/);
-      expect(item).not.toMatch(/luz-badge|<details|landing-ai__where/);
+      expect(titleOf(card)).toBe(escape(human));
+      expect(card).toContain(escape(words[`level.ai.agent.${name}.text`]));
+      expect(askOf(card), name).toEqual([escape(words["level.ai.ask"]), escape(words["level.ai.agents.use"].replace("{name}", name))]);
+      // A click copies the sentence up to the agent's name, not "on my page" (owner, 2026-11-26)
+      expect(copyOf(card), name).toBe(escape(words["level.ai.agents.use"].slice(0, words["level.ai.agents.use"].indexOf("{name}"))+ name));
+      // No fold repeated on every card (owner, 2026-11-26): the section says once how to add one
+      expect(card).not.toContain("<details");
+      const tools = /^tools:\s*(.*)$/m.exec(read(`${SKILL}/assets/agents/${name}.md`))[1];
+      expect(card, name).toContain(`landing-ai__card--${/\b(Edit|Write|Bash)\b/.test(tools) ? "acts" : "reads"}`);
+      expect(card, name).toMatch(/<svg\b[^>]*aria-hidden="true"/);
+      expect(card, name).not.toContain("landing-ai__where");
     }
-    expect(words["level.ai.agents.use"]).toBeUndefined();
     expect(block).toContain(`<p class="landing-ai-goal__note">${escape(words["level.ai.agents.missing"])}</p>`);
-    // The kind is written on each item: no legend
-    expect(block).not.toContain("landing-ai-legend");
+    // A legend under the title says what the small icons mean (owner, 2026-11-26), so a card needs no hover to be read
+    expect(legendOf(block)).toEqual([escape(words["level.ai.agents.reads"]), escape(words["level.ai.agents.acts"])]);
     expect(chatCommands.find((c) => c.chat === "/luz add <name>")).toEqual({ chat: "/luz add <name>", writes: true });
     expect(block).toContain("docs/ai/agents/");
   });
 
-  it.each(LANGS)("in %s: the small skills are a list like the agents', one sentence each that starts with the command of the skill; that every one writes after your go is said once, by the legend (owner, 2026-11-26)", (code, prefix) => {
+  it.each(LANGS)("in %s: the small skills are a card each, what it does and how to ask for it by its own name, how to add one said once under the title, after the agents", (code, prefix) => {
     const html = rendered.get(`${prefix}ai/`);
     const block = sectionOf(html, "a-skills");
     const words = catalog(code);
     const names = readdirSync(join(repo, SKILL, "assets/skills"), { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name).sort();
     expect(names).toEqual(["luz-license", "luz-meta", "luz-migrate", "luz-readme", "luz-theme", "luz-translate"]);
-    expect(block).toMatch(/<div class="landing-ai-agents landing-ai-agents--skills" data-pick-label="[^"]+">/);
-    expect(block).not.toMatch(/<article\b/);
-    const items = agentItems(block);
-    expect(items).toHaveLength(names.length);
+    const list = cards(block);
+    expect(list).toHaveLength(names.length);
     for (const name of names) {
-      const item = items.find((c) => c.includes(`data-agent="${name}"`));
-      expect(item, name).toBeDefined();
-      expect(item).toContain(`<p class="landing-ai-agent__title">${escape(words[`level.ai.skills.${name}.title`])}</p>`);
-      const ask = words[`level.ai.skills.${name}.ask`];
-      expect(ask, name).toBeTruthy();
-      expect(item).toContain(`<p class="landing-ai__ask" data-copy="${escape(`/${name} ${ask}`)}"><code><strong>/${name}</strong> ${escape(ask)}</code></p>`);
-      expect(item).toContain(`<p class="landing-ai-agent__text">${escape(words[`level.ai.skills.${name}.text`])}</p>`);
-      // Every skill writes: the item does not say it again
-      expect(item).not.toContain("landing-ai-agent__kind");
-      expect(item).not.toMatch(/luz-badge|<details/);
-      expect(item).toMatch(/<svg class="landing-ai__icon"[^>]*aria-hidden="true"/);
+      const card = list.find((c) => c.includes(`<code class="landing-ai__name">${name}</code>`));
+      expect(card, name).toBeDefined();
+      expect(titleOf(card), name).toBe(escape(words[`level.ai.skills.${name}.title`]));
+      expect(card).toContain(escape(words[`level.ai.skills.${name}.text`]));
+      expect(card).toContain(kindOf(words["level.ai.skills.badge"]));
+      expect(card).toContain(kindText(words["level.ai.skills.badge"]));
+      expect(card).not.toContain("luz-badge");
+      expect(askOf(card), name).toEqual([escape(words["level.ai.ask"]), escape(words["level.ai.skills.use"].replace("{name}", name))]);
+      // A click copies the command of the skill, not "<what you want>" (owner, 2026-11-26)
+      expect(copyOf(card), name).toBe(`/${name}`);
+      expect(card).not.toContain("<details");
+      expect(card).toMatch(/<svg\b[^>]*aria-hidden="true"/);
     }
-    expect(words["level.ai.skills.use"]).toBeUndefined();
     expect(block).toContain(escape(words["level.ai.skills.title"]));
     expect(block).toContain(`<p class="landing-ai-goal__note">${escape(words["level.ai.skills.missing"])}</p>`);
     expect(legendOf(block)).toEqual([escape(words["level.ai.skills.badge"])]);
     expect(block).toContain("docs/ai/agents/#skills");
     expect(html.indexOf('id="a-agents"')).toBeLessThan(html.indexOf('id="a-skills"'));
-    expect(html).not.toContain("landing-ai__card");
   });
 
   it("has the words of every small skill in the three languages, and none for one that is gone", () => {
@@ -275,17 +266,19 @@ describe("the page of the luz skill, /ai/", () => {
     }
   });
 
-  it.each(LANGS)("in %s: an agent that changes code says so in words on its item, and the ones that read say they read", (code, prefix) => {
+  it.each(LANGS)("in %s: an agent that changes code says so in its small icon, and the ones that read say they read", (code, prefix) => {
     const block = sectionOf(rendered.get(`${prefix}ai/`), "a-agents");
     const words = catalog(code);
     const facts = aiFacts(repo).agents;
     expect(facts.filter((a) => a.acts).map((a) => a.name)).toEqual(["luz-agent-optimiza"]);
     for (const a of facts) {
-      const item = agentItems(block).find((c) => c.includes(`data-agent="${a.name}"`));
-      const tools = /^tools:\s*(.*)$/m.exec(read(`${SKILL}/assets/agents/${a.name}.md`))[1];
-      expect(/\b(Edit|Write|Bash)\b/.test(tools), a.name).toBe(a.acts);
-      expect(item, a.name).toMatch(new RegExp(`<span class="landing-ai-agent__kind${a.acts ? " landing-ai-agent__kind--acts" : ""}"><svg class="landing-ai__kind-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="[^"]+"/></svg>${escape(words[a.acts ? "level.ai.agents.acts" : "level.ai.agents.reads"])}</span>`));
-      expect(item, a.name).not.toMatch(/<bdi>|landing-ai__meta/);
+      const card = cards(block).find((c) => c.includes(`<code class="landing-ai__name">${a.name}</code>`));
+      // A small grey icon beside the blue one says it (owner, 2026-11-26), its words in its title and a hidden text; no badge
+      expect(card, a.name).toContain(kindOf(words[a.acts ? "level.ai.agents.acts" : "level.ai.agents.reads"]));
+      expect(card, a.name).toContain(kindText(words[a.acts ? "level.ai.agents.acts" : "level.ai.agents.reads"]));
+      expect(card, a.name).not.toContain("luz-badge");
+      // No line says which assistants it is written for (owner, 2026-11-26): `agent add` says it, and refuses one it cannot write
+      expect(card, a.name).not.toMatch(/<bdi>|landing-ai__meta/);
     }
   });
 
@@ -374,8 +367,8 @@ describe("the page of the luz skill, /ai/", () => {
       const words = catalog(code);
       const keys = Object.keys(words).filter((k) => /^level\.ai\.cmd\.[a-z-]+$/.test(k) && !["level.ai.cmd.writes", "level.ai.cmd.reads"].includes(k));
       expect(keys.sort(), code).toEqual(slugs.map((x) => `level.ai.cmd.${x}`).sort());
-      for (const k of ["install.title", "install.lead", "install.recommended", "install.note", "install.all.title", "install.all.text", "install.gets.luz", "install.gets.agents", "install.gets.skills", "install.gets.agents.pick", "install.gets.skills.pick", "install.gets.no", "agents.missing", "skills.missing", "install.min.title", "install.min.text", "install.pick.title", "install.pick.text", "use.title", "use.lead", "use.tabs", "use.create", "use.check", "use.manage", "use.terminal", "agents.pick", "hero.install"]) expect(words[`level.ai.${k}`], `${code} ${k}`).toBeTruthy();
-      for (const k of ["where.chat", "where.terminal", "line.install", "line.use", "install.init", "install.all", "commands.title", "commands.lead", "steps.title", "steps.1.title", "notinstalled", "install.all.gets", "install.min.gets", "agents.use", "skills.use", "ask"]) expect(words[`level.ai.${k}`], `${code} ${k} is gone`).toBeUndefined();
+      for (const k of ["install.title", "install.lead", "install.recommended", "install.note", "install.all.title", "install.all.text", "install.gets.luz", "install.gets.agents", "install.gets.skills", "install.gets.agents.pick", "install.gets.skills.pick", "install.gets.no", "agents.missing", "skills.missing", "install.min.title", "install.min.text", "install.pick.title", "install.pick.text", "use.title", "use.lead", "use.tabs", "use.create", "use.check", "use.manage", "use.terminal", "ask", "agents.use", "skills.use", "hero.install"]) expect(words[`level.ai.${k}`], `${code} ${k}`).toBeTruthy();
+      for (const k of ["where.chat", "where.terminal", "line.install", "line.use", "install.init", "install.all", "commands.title", "commands.lead", "steps.title", "steps.1.title", "notinstalled", "install.all.gets", "install.min.gets"]) expect(words[`level.ai.${k}`], `${code} ${k} is gone`).toBeUndefined();
       expect(words["level.ai.commands.writes"], code).toBeUndefined();
       expect(words["level.ai.cmd.writes"], code).toBeTruthy();
       expect(words["level.ai.cmd.reads"], code).toBeTruthy();
