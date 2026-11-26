@@ -89,11 +89,11 @@ test.describe('with JavaScript every line copies itself', () => {
       const copied = await page.evaluate(() => navigator.clipboard.readText());
       expect(copied.startsWith('luz-agent-accessibility '), copied).toBe(true);
       expect(copied).toBe(text);
-      // A skill's line copies its command alone
-      const skill = page.locator('#a-skills .landing-ai__ask').first();
+      // A skill's line copies its sentence, the command first
+      const skill = page.locator('#a-skills .landing-ai__ask >> visible=true').first();
       await skill.scrollIntoViewIfNeeded();
       await skill.locator('button').click();
-      expect(await page.evaluate(() => navigator.clipboard.readText())).toMatch(/^\/luz-[a-z]+$/);
+      expect(await page.evaluate(() => navigator.clipboard.readText())).toMatch(/^\/luz-[a-z]+ \S/);
       await line.locator('button').click();
       await expect(page.locator('#luz-live-region')).not.toBeEmpty();
       await expect(line.locator('button')).toHaveClass(/is-copied/);

@@ -67,12 +67,31 @@ for (const route of ROUTES) {
     expect(copied.startsWith(`${await items.nth(3).getAttribute('data-agent')} `)).toBe(true);
   });
 
+  test(`${route}: the small skills are the same: a list on a phone, and on a wide screen six tiles in two rows of three under a stage`, async ({ page }, info) => {
+    await page.setViewportSize({ width: 375, height: 640 });
+    await page.goto(route);
+    const items = page.locator('#a-skills li.landing-ai-agent');
+    await expect(items).toHaveCount(6);
+    for (const item of await items.all()) await expect(item.locator('.landing-ai__ask')).toBeVisible();
+    await expect(page.locator('#a-skills .landing-ai-legend')).toBeVisible();
+    if (info.project.name.endsWith('nojs')) return;
+    await page.setViewportSize({ width: 1280, height: 900 });
+    const stage = page.locator('#a-skills .landing-ai-agents__stage');
+    await expect(stage).toBeVisible();
+    const tops = await items.evaluateAll((all) => all.map((el) => Math.round(el.getBoundingClientRect().top)));
+    expect(new Set(tops).size, 'two rows').toBe(2);
+    expect(tops.filter((t) => t === tops[0]).length, 'three in a row').toBe(3);
+    await items.nth(4).click();
+    await expect(stage.locator('.landing-ai__ask code')).toContainText(`/${await items.nth(4).getAttribute('data-agent')}`);
+    await expect(stage.locator('.landing-ai-agents__text')).toHaveText((await items.nth(4).locator('.landing-ai-agent__text').textContent()) ?? '');
+  });
+
   for (const [width, scheme] of /** @type {const} */ ([[1280, 'light'], [1280, 'dark'], [375, 'light'], [375, 'dark']])) {
     test(`${route} at ${width} px: axe finds nothing in the agents (${scheme})`, async ({ page }) => {
       await page.setViewportSize({ width, height: 900 });
       await page.emulateMedia({ colorScheme: scheme, reducedMotion: 'reduce' });
       await page.goto(route);
-      const results = await new AxeBuilder({ page }).include('#a-agents').analyze();
+      const results = await new AxeBuilder({ page }).include('#a-agents').include('#a-skills').analyze();
       expect(results.violations, results.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`).join(' | ')).toEqual([]);
     });
   }

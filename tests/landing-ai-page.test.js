@@ -233,33 +233,36 @@ describe("the page of the luz skill, /ai/", () => {
     expect(block).toContain("docs/ai/agents/");
   });
 
-  it.each(LANGS)("in %s: the small skills are a card each, what it does and how to ask for it by its own name, how to add one said once under the title, after the agents", (code, prefix) => {
+  it.each(LANGS)("in %s: the small skills are a list like the agents', one sentence each that starts with the command of the skill; that every one writes after your go is said once, by the legend (owner, 2026-11-26)", (code, prefix) => {
     const html = rendered.get(`${prefix}ai/`);
     const block = sectionOf(html, "a-skills");
     const words = catalog(code);
     const names = readdirSync(join(repo, SKILL, "assets/skills"), { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name).sort();
     expect(names).toEqual(["luz-license", "luz-meta", "luz-migrate", "luz-readme", "luz-theme", "luz-translate"]);
-    const list = cards(block);
-    expect(list).toHaveLength(names.length);
+    expect(block).toMatch(/<div class="landing-ai-agents landing-ai-agents--skills" data-pick-label="[^"]+">/);
+    expect(block).not.toMatch(/<article\b/);
+    const items = agentItems(block);
+    expect(items).toHaveLength(names.length);
     for (const name of names) {
-      const card = list.find((c) => c.includes(`<code class="landing-ai__name">${name}</code>`));
-      expect(card, name).toBeDefined();
-      expect(titleOf(card), name).toBe(escape(words[`level.ai.skills.${name}.title`]));
-      expect(card).toContain(escape(words[`level.ai.skills.${name}.text`]));
-      expect(card).toContain(kindOf(words["level.ai.skills.badge"]));
-      expect(card).toContain(kindText(words["level.ai.skills.badge"]));
-      expect(card).not.toContain("luz-badge");
-      expect(askOf(card), name).toEqual([escape(words["level.ai.ask"]), escape(words["level.ai.skills.use"].replace("{name}", name))]);
-      // A click copies the command of the skill, not "<what you want>" (owner, 2026-11-26)
-      expect(copyOf(card), name).toBe(`/${name}`);
-      expect(card).not.toContain("<details");
-      expect(card).toMatch(/<svg\b[^>]*aria-hidden="true"/);
+      const item = items.find((c) => c.includes(`data-agent="${name}"`));
+      expect(item, name).toBeDefined();
+      expect(item).toContain(`<p class="landing-ai-agent__title">${escape(words[`level.ai.skills.${name}.title`])}</p>`);
+      const ask = words[`level.ai.skills.${name}.ask`];
+      expect(ask, name).toBeTruthy();
+      expect(item).toContain(`<p class="landing-ai__ask" data-copy="${escape(`/${name} ${ask}`)}"><code><strong>/${name}</strong> ${escape(ask)}</code></p>`);
+      expect(item).toContain(`<p class="landing-ai-agent__text u-sr-only">${escape(words[`level.ai.skills.${name}.text`])}</p>`);
+      // Every skill writes: the item does not say it again
+      expect(item).not.toContain("landing-ai-agent__kind");
+      expect(item).not.toMatch(/luz-badge|<details/);
+      expect(item).toMatch(/<svg class="landing-ai__icon"[^>]*aria-hidden="true"/);
     }
+    expect(words["level.ai.skills.use"]).toBeUndefined();
     expect(block).toContain(escape(words["level.ai.skills.title"]));
     expect(block).toContain(`<p class="landing-ai-goal__note">${escape(words["level.ai.skills.missing"])}</p>`);
     expect(legendOf(block)).toEqual([escape(words["level.ai.skills.badge"])]);
     expect(block).toContain("docs/ai/agents/#skills");
     expect(html.indexOf('id="a-agents"')).toBeLessThan(html.indexOf('id="a-skills"'));
+    expect(html).not.toContain("landing-ai__card");
   });
 
   it("has the words of every small skill in the three languages, and none for one that is gone", () => {
@@ -370,8 +373,8 @@ describe("the page of the luz skill, /ai/", () => {
       const words = catalog(code);
       const keys = Object.keys(words).filter((k) => /^level\.ai\.cmd\.[a-z-]+$/.test(k) && !["level.ai.cmd.writes", "level.ai.cmd.reads"].includes(k));
       expect(keys.sort(), code).toEqual(slugs.map((x) => `level.ai.cmd.${x}`).sort());
-      for (const k of ["install.title", "install.lead", "install.recommended", "install.note", "install.all.title", "install.all.text", "install.gets.luz", "install.gets.agents", "install.gets.skills", "install.gets.agents.pick", "install.gets.skills.pick", "install.gets.no", "agents.missing", "skills.missing", "install.min.title", "install.min.text", "install.pick.title", "install.pick.text", "use.title", "use.lead", "use.tabs", "use.create", "use.check", "use.manage", "use.terminal", "ask", "agents.pick", "skills.use", "hero.install"]) expect(words[`level.ai.${k}`], `${code} ${k}`).toBeTruthy();
-      for (const k of ["where.chat", "where.terminal", "line.install", "line.use", "install.init", "install.all", "commands.title", "commands.lead", "steps.title", "steps.1.title", "notinstalled", "install.all.gets", "install.min.gets", "agents.use"]) expect(words[`level.ai.${k}`], `${code} ${k} is gone`).toBeUndefined();
+      for (const k of ["install.title", "install.lead", "install.recommended", "install.note", "install.all.title", "install.all.text", "install.gets.luz", "install.gets.agents", "install.gets.skills", "install.gets.agents.pick", "install.gets.skills.pick", "install.gets.no", "agents.missing", "skills.missing", "install.min.title", "install.min.text", "install.pick.title", "install.pick.text", "use.title", "use.lead", "use.tabs", "use.create", "use.check", "use.manage", "use.terminal", "agents.pick", "hero.install"]) expect(words[`level.ai.${k}`], `${code} ${k}`).toBeTruthy();
+      for (const k of ["where.chat", "where.terminal", "line.install", "line.use", "install.init", "install.all", "commands.title", "commands.lead", "steps.title", "steps.1.title", "notinstalled", "install.all.gets", "install.min.gets", "agents.use", "skills.use", "ask"]) expect(words[`level.ai.${k}`], `${code} ${k} is gone`).toBeUndefined();
       expect(words["level.ai.commands.writes"], code).toBeUndefined();
       expect(words["level.ai.cmd.writes"], code).toBeTruthy();
       expect(words["level.ai.cmd.reads"], code).toBeTruthy();
