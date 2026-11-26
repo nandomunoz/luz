@@ -46,7 +46,7 @@ for (const route of ROUTES) {
     // A command is one line: it never breaks in the middle of a flag
     const lines = await page.locator('#a-install .landing-ai__ask code').evaluateAll((all) => all.map((el) => Math.round(el.getBoundingClientRect().height / parseFloat(getComputedStyle(el).lineHeight))));
     expect(lines).toEqual([1, 1, 1, 1]);
-    for (const selector of ['#a-agents article', '#a-skills article']) {
+    for (const selector of ['#a-skills article']) {
       const row = await page.locator(selector).evaluateAll((all) => {
         const bs = all.map((el) => el.getBoundingClientRect());
         return bs.filter((b) => Math.abs(b.top - bs[0].top) < 2).map((b) => b.width);
@@ -58,7 +58,7 @@ for (const route of ROUTES) {
 
   test(`${route}: the cards of agents and skills show how to ask for each, with no fold, and the section says once how to add one`, async ({ page }) => {
     await page.goto(route);
-    for (const [id, count] of [['a-agents', 5], ['a-skills', 6]]) {
+    for (const [id, count] of [['a-skills', 6]]) {
       const cards = page.locator(`#${id} article.landing-ai__card`);
       await expect(cards, id).toHaveCount(count);
       for (const card of await cards.all()) {
