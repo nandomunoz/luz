@@ -6,7 +6,8 @@
  * native button that the script makes of the code, so without JavaScript the line is the plain code it was.
  *
  *   - the button holds the code and an icon (aria-hidden); its name says copy, in the page's language, and the command;
- *   - a click copies the text of the code (not the sign) and says so in the polite live region; the icon turns into a tick;
+ *   - a click copies what the line's data-copy says: the sentence up to the name, never the hint after it ("on my page",
+ *     "<what you want>", owner 2026-11-26), and says so in the polite live region; the icon turns into a tick;
  *   - the icon is hidden until hover or focus where there is a pointer, and always there on a touch screen;
  *   - at 320 px nothing leaves the viewport, and axe finds nothing in light and dark.
  */
@@ -42,9 +43,13 @@ test.describe('with JavaScript every line copies itself', () => {
         await expect(button, `line ${i}`).toHaveCount(1);
         await expect(button.locator('code')).toHaveCount(1);
         const text = (await button.locator('code').textContent()) ?? '';
+        const copied = (await line.getAttribute('data-copy')) ?? '';
+        expect(copied.length, `line ${i}`).toBeGreaterThan(0);
+        expect(text.startsWith(copied), `${text} | ${copied}`).toBe(true);
+        expect(copied).not.toMatch(/[<>]/);
         const name = (await button.getAttribute('aria-label')) ?? '';
         expect(name.startsWith(COPY[route]), name).toBe(true);
-        expect(name.endsWith(text.trim()), name).toBe(true);
+        expect(name.endsWith(copied), name).toBe(true);
         await expect(button.locator('svg[aria-hidden="true"]').first()).toHaveCount(1);
       }
     });
@@ -72,7 +77,7 @@ test.describe('with JavaScript every line copies itself', () => {
       await expect(icon).toHaveCSS('opacity', '1');
     });
 
-    test(`${route}: a click copies the command without its sign, says so, and the icon turns into a tick`, async ({ page }) => {
+    test(`${route}: a click copies the sentence up to the name, without the hint after it, says so, and the icon turns into a tick`, async ({ page }) => {
       await page.goto(route);
       const line = page.locator('#a-agents .landing-ai__ask').first();
       await line.scrollIntoViewIfNeeded();
@@ -80,7 +85,15 @@ test.describe('with JavaScript every line copies itself', () => {
       // The first line of an agent's card is the sentence to ask for it (owner, 2026-11-26: the third pass)
       expect(text).toContain('luz-agent-accessibility');
       await line.locator('button').click();
-      expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(text);
+      const copied = await page.evaluate(() => navigator.clipboard.readText());
+      expect(copied.endsWith('luz-agent-accessibility'), copied).toBe(true);
+      expect(text.startsWith(copied)).toBe(true);
+      // A skill's line copies its command alone
+      const skill = page.locator('#a-skills .landing-ai__ask').first();
+      await skill.scrollIntoViewIfNeeded();
+      await skill.locator('button').click();
+      expect(await page.evaluate(() => navigator.clipboard.readText())).toMatch(/^\/luz-[a-z]+$/);
+      await line.locator('button').click();
       await expect(page.locator('#luz-live-region')).not.toBeEmpty();
       await expect(line.locator('button')).toHaveClass(/is-copied/);
       await expect(line.locator('code')).toHaveText(text);
