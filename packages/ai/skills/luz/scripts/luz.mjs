@@ -177,7 +177,10 @@ Example:
 const HELP_REMOVE = `luz-ai remove: takes an agent or a skill of luz-ai out of a project.
 
 Usage:
-  luz-ai remove <name> [--dir <folder>] [--dry-run] [--json]
+  luz-ai remove <name> [--dir <folder>] [--dry-run] [--force] [--json]
+
+  --force    also delete a file you changed after luz-ai wrote it (a skill file, or an agent file with more than its fields filled);
+             without it that file stays and is named
 
 It deletes, by name, the files luz-ai wrote: an agent from every place it is in, a skill from .agents/skills and .claude/skills.
 A file of yours in the same folder stays, and so does the folder; an agent file whose name is not the agent's is not touched.
@@ -659,6 +662,7 @@ const TOOL_MAP = JSON.parse(readFileSync(join(ASSETS, "tool-map.json"), "utf-8")
 const AGENT_TARGETS = ["claude", "gemini", "codex"];
 const SKILL_PLACES = [".agents/skills", ".claude/skills"];
 const ADAPT = /^\[ADAPT:\s*(.*)\]$/;
+const ADAPT_LINE = /\[ADAPT:.*\]\s*$/;
 
 const agentNames = () => readdirSync(join(ASSETS, "agents")).filter((f) => f.endsWith(".md")).map((f) => f.slice(0, -3)).sort();
 // The small skills of luz-ai, one folder each in assets/skills (this skill, luz, installs itself with init and is not one of them)
@@ -952,6 +956,18 @@ function frontOf(text) {
   return end === -1 ? "" : lines.slice(1, end).join("\n");
 }
 
+/** True when an agent file differs from what luz-ai writes in more than the lines of its fields (`[ADAPT: …]` filled in). */
+function agentChanged(name, rel, text) {
+  const target = Object.keys(AGENT_PLACES).find((t) => AGENT_PLACES[t](name) === rel);
+  const agent = loadAgent(name);
+  const wrapped = wrapAgent(agent, agent.body, target);
+  if (wrapped.error) return true;
+  const expected = wrapped.content.split("\n");
+  const actual = text.split("\n");
+  if (expected.length !== actual.length) return true;
+  return expected.some((line, i) => line !== actual[i] && !ADAPT_LINE.test(line));
+}
+
 /** What `remove` deletes: the files luz-ai wrote of one piece, and what it leaves. */
 function planRemove(dir, name, force) {
   const base = resolve(dir);
@@ -983,8 +999,9 @@ function planRemove(dir, name, force) {
       const text = readFileSync(file, "utf-8");
       // The name must be the one of its front matter (or the top key of a Codex file), not a line somewhere in its body
       const ours = rel.endsWith(".toml") ? new RegExp(`^name = "${name}"$`, "m").test(text.split("developer_instructions")[0]) : new RegExp(`^name: ${name}$`, "m").test(frontOf(text));
-      if (ours) files.push(rel);
-      else notes.push(`${rel} is not luz-ai's (its name is not ${name}): left as it is`);
+      if (!ours) notes.push(`${rel} is not luz-ai's (its name is not ${name}): left as it is`);
+      else if (!force && agentChanged(name, rel, text)) notes.push(`${rel} was changed after luz-ai wrote it: left in place (--force removes it)`);
+      else files.push(rel);
     }
   } else {
     for (const place of SKILL_PLACES) {
@@ -1119,6 +1136,9 @@ function show(text) {
 }
 
 // The words of the chat are the words of the script: /luz new, /luz agents and /luz add run these (the long forms still work)
+// The folders of the assistants and of the pipeline: a site is never made in one (the same list the skills keep their hands off)
+const CONFIG_FOLDERS = [".claude", ".agents", ".github", ".gemini", ".codex", ".cursor"];
+
 const ALIASES = { new: ["site", "new"], magic: ["site", "new"], agents: ["agent", "list"], skills: ["skill", "list"] };
 
 export function main(argv, { tty = Boolean(process.stdout.isTTY) } = {}) {
@@ -1166,7 +1186,17 @@ export function main(argv, { tty = Boolean(process.stdout.isTTY) } = {}) {
   if (magic && !values.help) {
     if (values.force) return usage("magic never takes --force: it writes only into a folder that does not exist yet");
     if (!values.target) return usage("--target is missing: magic writes only into a folder that does not exist yet, so it needs the folder it will make. Example: luz-ai magic --name Acme --kind landing --stack vanilla --target ./acme");
-    if (existsSync(resolve(values.target)) || isLink(resolve(values.target))) return usage(`${resolve(values.target)} exists: magic writes only into a folder that does not exist yet`);
+    const target = resolve(values.target);
+    const here = resolve(".");
+    if (existsSync(target) || isLink(target)) return usage(`${target} exists: magic writes only into a folder that does not exist yet`);
+    if (!target.startsWith(here + sep)) return usage(`${target} is not inside the folder it is run from (${here}): magic writes only inside it`);
+    if (CONFIG_FOLDERS.includes(relative(here, target).split(sep)[0])) return usage(`${relative(here, target)} is in the folder of an assistant or of the pipeline: magic never writes there`);
+    // A parent that is a symbolic link would send the write somewhere else
+    let at = here;
+    for (const part of relative(here, target).split(sep)) {
+      at = join(at, part);
+      if (isLink(at)) return usage(`${relative(here, at)} is a symbolic link: nothing was written`);
+    }
   }
   if (command === "list" || command === "remove") {
     const base = resolve(values.dir ?? ".");
