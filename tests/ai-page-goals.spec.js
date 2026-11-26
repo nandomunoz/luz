@@ -70,6 +70,9 @@ for (const route of ROUTES) {
       for (const card of await cards.all()) {
         await expect(card.locator('svg.landing-ai__icon')).toBeVisible();
         await expect(card.locator('.landing-card__title')).toBeVisible();
+        // The title beside the icon, on its row (owner, 2026-11-26)
+        const [i, t] = await Promise.all([card.locator('svg.landing-ai__icon').boundingBox(), card.locator('.landing-card__title').boundingBox()]);
+        expect(i && t && t.y < i.y + i.height && t.y + t.height > i.y, 'title on the row of the icon').toBeTruthy();
         await expect(card.locator('.landing-ai__label + .landing-ai__ask code')).toBeVisible();
         await expect(card.locator('details')).toHaveCount(0);
       }

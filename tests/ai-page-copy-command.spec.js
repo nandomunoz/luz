@@ -85,9 +85,10 @@ test.describe('with JavaScript every line copies itself', () => {
       // The first line of an agent's card is the sentence to ask for it (owner, 2026-11-26: the third pass)
       expect(text).toContain('luz-agent-accessibility');
       await line.locator('button').click();
+      // An agent's sentence starts with its name and is copied whole (owner, 2026-11-26)
       const copied = await page.evaluate(() => navigator.clipboard.readText());
-      expect(copied.endsWith('luz-agent-accessibility'), copied).toBe(true);
-      expect(text.startsWith(copied)).toBe(true);
+      expect(copied.startsWith('luz-agent-accessibility '), copied).toBe(true);
+      expect(copied).toBe(text);
       // A skill's line copies its command alone
       const skill = page.locator('#a-skills .landing-ai__ask').first();
       await skill.scrollIntoViewIfNeeded();
