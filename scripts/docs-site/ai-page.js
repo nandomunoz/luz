@@ -220,14 +220,28 @@ export function aiSections({ say, root, escapeHtml }) {
       `<p class="landing-ai__label">${t("level.ai.ask")}</p>${ask(asked, copy)}`,
       `</article>`,
     ].join("");
-  const agentCards = agents
-    .map((a) => card(a.name, t(`level.ai.agent.${a.name}.title`), a.name, a.acts ? "level.ai.agents.acts" : "level.ai.agents.reads", t(`level.ai.agent.${a.name}.text`), say("level.ai.agents.use").replace("{name}", a.name), upTo(say("level.ai.agents.use"), a.name), a.acts ? " landing-ai__card--acts" : " landing-ai__card--reads"))
-    .join("");
+  // The agents (owner, 2026-11-26, from the prototype): a list, one item each, with the sentence to ask for it, the name first.
+  // On a phone that is all; on a wide screen landing.js makes the list five tiles to pick from under a stage
+  const agentKind = (a) => {
+    const key = a.acts ? "level.ai.agents.acts" : "level.ai.agents.reads";
+    return `<span class="landing-ai-agent__kind${a.acts ? " landing-ai-agent__kind--acts" : ""}">${kindIcon(key)}${t(key)}</span>`;
+  };
+  const agentItem = (a) => {
+    const sentence = say(`level.ai.agent.${a.name}.ask`);
+    return [
+      `<li class="landing-ai-agent" data-agent="${a.name}">`,
+      `<div class="landing-ai-agent__top">${icon(a.name)}<p class="landing-ai-agent__title">${t(`level.ai.agent.${a.name}.title`)}</p>${agentKind(a)}</div>`,
+      `<p class="landing-ai__ask" data-copy="${escapeHtml(`${a.name} ${sentence}`)}"><code><strong>${a.name}</strong> ${escapeHtml(sentence)}</code></p>`,
+      `<p class="landing-ai-agent__text u-sr-only">${t(`level.ai.agent.${a.name}.text`)}</p>`,
+      `</li>`,
+    ].join("");
+  };
+  const agentList = `<div class="landing-ai-agents" data-pick-label="${t("level.ai.agents.pick")}"><ul class="landing-ai-agents__list">${agents.map(agentItem).join("")}</ul></div>`;
   const skillCards = skills.map((name) => card(name, t(`level.ai.skills.${name}.title`), name, "level.ai.skills.badge", t(`level.ai.skills.${name}.text`), say("level.ai.skills.use").replace("{name}", name), upTo(say("level.ai.skills.use"), name), " landing-ai__card--acts")).join("");
-  const goal = (id, links, cards, kinds) => {
+  const goal = (id, links, body, kinds) => {
     const top = head(id, links, t(`level.ai.${id}.missing`));
-    top.splice(top.length - 1, 0, legend(kinds));
-    return [`<section class="landing-ai-goal" id="a-${id}" aria-labelledby="a-${id}-title">`, ...top, `  <div class="landing-cards landing-ai__cards">${cards}</div>`, `</section>`].join("\n");
+    if (kinds) top.splice(top.length - 1, 0, legend(kinds));
+    return [`<section class="landing-ai-goal" id="a-${id}" aria-labelledby="a-${id}-title">`, ...top, `  ${body}`, `</section>`].join("\n");
   };
 
   // What you decide: the guarantees of the skill, in a row of five
@@ -247,7 +261,7 @@ export function aiSections({ say, root, escapeHtml }) {
   ].join("\n");
 
   return {
-    aiblocks: [works, toc, install, use, goal("agents", [{ href: "/docs/ai/agents/", label: t("level.ai.agents.link") }], agentCards, ["level.ai.agents.reads", "level.ai.agents.acts"]), goal("skills", [{ href: "/docs/ai/agents/#skills", label: t("level.ai.skills.link") }], skillCards, ["level.ai.skills.badge"]), decide].join("\n"),
+    aiblocks: [works, toc, install, use, goal("agents", [{ href: "/docs/ai/agents/", label: t("level.ai.agents.link") }], agentList), goal("skills", [{ href: "/docs/ai/agents/#skills", label: t("level.ai.skills.link") }], `<div class="landing-cards landing-ai__cards">${skillCards}</div>`, ["level.ai.skills.badge"]), decide].join("\n"),
     naiagents: String(agents.length),
     naitargets: String(targets.length),
     ndepsai: String(dependencies),

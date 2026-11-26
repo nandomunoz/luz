@@ -96,6 +96,78 @@ function initCopyCommands() {
  * stay hidden.
  */
 /**
+ * The agents of the page of the skill: a list, one sentence each. On a wide screen it becomes five tiles to pick from (a radio
+ * group: click, arrows, space) under a stage that shows the picked one's sentence, what it does to your files and its text.
+ * Below that width, or without this script, it stays the list. Runs after initCopyCommands, so a sentence is already a button.
+ */
+function initAgents() {
+  const wide = window.matchMedia("(min-width: 64rem)");
+  for (const root of document.querySelectorAll(".landing-ai-agents")) {
+    const list = root.querySelector(".landing-ai-agents__list");
+    const items = [...root.querySelectorAll(".landing-ai-agent")];
+    if (!list || !items.length) continue;
+    const stage = document.createElement("div");
+    stage.className = "landing-ai-agents__stage";
+    const what = document.createElement("div");
+    what.className = "landing-ai-agents__what";
+    const text = document.createElement("p");
+    text.className = "landing-ai-agents__text";
+    stage.append(document.createElement("p"), what);
+    root.prepend(stage);
+    let chosen = 0;
+    const pick = (i, focus = false) => {
+      chosen = (i + items.length) % items.length;
+      items.forEach((item, j) => {
+        item.setAttribute("aria-checked", String(j === chosen));
+        item.tabIndex = j === chosen ? 0 : -1;
+      });
+      const item = items[chosen];
+      stage.firstElementChild.replaceWith(item.querySelector(".landing-ai__ask").cloneNode(true));
+      text.textContent = item.querySelector(".landing-ai-agent__text").textContent;
+      what.replaceChildren(item.querySelector(".landing-ai-agent__kind").cloneNode(true), text);
+      if (focus) item.focus();
+    };
+    const apply = () => {
+      const on = wide.matches;
+      root.classList.toggle("is-picker", on);
+      if (on) {
+        list.setAttribute("role", "radiogroup");
+        list.setAttribute("aria-label", root.dataset.pickLabel ?? "");
+        items.forEach((item) => item.setAttribute("role", "radio"));
+        pick(chosen);
+      } else {
+        list.removeAttribute("role");
+        list.removeAttribute("aria-label");
+        items.forEach((item) => ["role", "aria-checked", "tabindex"].forEach((a) => item.removeAttribute(a)));
+      }
+    };
+    list.addEventListener("click", (event) => {
+      const item = event.target.closest(".landing-ai-agent");
+      if (root.classList.contains("is-picker") && item) pick(items.indexOf(item), true);
+    });
+    list.addEventListener("keydown", (event) => {
+      if (!root.classList.contains("is-picker")) return;
+      const rtl = getComputedStyle(root).direction === "rtl";
+      const step = { ArrowDown: 1, ArrowUp: -1, ArrowRight: rtl ? -1 : 1, ArrowLeft: rtl ? 1 : -1 }[event.key];
+      if (step) {
+        // eslint-disable-next-line no-restricted-syntax -- RL-3: in a radio group the arrows move the choice, as native radios do, instead of scrolling the page
+        event.preventDefault();
+        pick(chosen + step, true);
+      } else if (event.key === " " || event.key === "Enter") {
+        const item = event.target.closest(".landing-ai-agent");
+        if (item) {
+          // eslint-disable-next-line no-restricted-syntax -- RL-3: Space and Enter pick the focused tile, as a native radio does, instead of scrolling the page
+          event.preventDefault();
+          pick(items.indexOf(item), true);
+        }
+      }
+    });
+    wide.addEventListener("change", apply);
+    apply();
+  }
+}
+
+/**
  * The marquee of the page of the skill: the list is doubled for a seamless loop (the copy hidden from everyone), and the pause
  * button shows (WCAG 2.2.2). Nothing moves where the reader asks for less motion, nor without this script: the lines wrap.
  */
@@ -274,6 +346,7 @@ initDayBand();
 initSiteHeader();
 initCopy();
 initCopyCommands();
+initAgents();
 initMarquee();
 initModes();
 initCli();
