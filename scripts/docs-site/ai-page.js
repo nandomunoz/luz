@@ -138,8 +138,8 @@ export function aiSections({ say, root, escapeHtml }) {
         a.name,
         t(`level.ai.agent.${a.name}.title`),
         t(`level.ai.agent.${a.name}.text`),
-        `<span class="luz-badge ${a.acts ? "luz-badge--primary" : "luz-badge--gray"} landing-ai__badge">${t(a.acts ? "level.ai.agents.acts" : "level.ai.agents.reads")}</span><p class="landing-ai__id">${code(a.name)}</p>`,
-        `<p class="landing-ai__meta"><span>${t("level.ai.agents.for")} ${a.hosts.map((h) => `<bdi>${h}</bdi>`).join(" · ")}</span></p>${ask("›", code(`/luz add ${a.name}`))}`,
+        `<code class="landing-ai__name">${escapeHtml(a.name)}</code><span class="luz-badge luz-badge--gray landing-ai__badge">${t(a.acts ? "level.ai.agents.acts" : "level.ai.agents.reads")}</span>`,
+        ask("›", code(`/luz add ${a.name}`)),
         a.acts ? " landing-ai__card--acts" : " landing-ai__card--reads",
       ),
     )
@@ -150,7 +150,7 @@ export function aiSections({ say, root, escapeHtml }) {
   const ICON_OF = { start: "write", new: "write", doctor: "doctor", lint: "validate", facts: "plan", agents: "agents", add: "add", help: "help" };
   const commandCard = (row) => {
       const typed = row.chat.replace(/ [<[].*$/, "");
-      const badge = `<span class="luz-badge ${row.writes ? "luz-badge--primary" : "luz-badge--gray"} landing-ai__badge">${t(row.writes ? "level.ai.cmd.writes" : "level.ai.cmd.reads")}</span>`;
+      const badge = `<span class="luz-badge luz-badge--gray landing-ai__badge">${t(row.writes ? "level.ai.cmd.writes" : "level.ai.cmd.reads")}</span>`;
       if (!ICON_OF[row.slug]) throw new Error(`scripts/docs-site/ai-page.js: no icon for the command "${row.slug}": add it to ICON_OF`);
       return card(ICON_OF[row.slug], escapeHtml(typed), t(`level.ai.cmd.${row.slug}`), badge, ask("›", code(TYPED[row.slug] ?? typed)), row.writes ? " landing-ai__card--acts" : " landing-ai__card--reads");
   };

@@ -11,7 +11,8 @@
  * apps/site/header.js).
  */
 
-import { initCopyButtons } from "/packages/core/dist/clipboard.js";
+import { copyToClipboard, initCopyButtons } from "/packages/core/dist/clipboard.js";
+import { t } from "/packages/core/dist/i18n.js";
 import { highlightBlock } from "/packages/core/dist/highlight.js";
 import { activateTab, initTabs } from "/packages/core/dist/tabs.js";
 // Defines <luz-search> at once, not on idle as catalog.js would: the header's
@@ -41,6 +42,44 @@ function initCopy() {
   });
   // initCopyButtons() announces each copy in a polite live region
   initCopyButtons();
+}
+
+/**
+ * The commands and sentences on the cards of the page of the skill (`.landing-ai__ask`) copy themselves: the script makes
+ * a native button of each code, with an icon at the far end that shows on hover or focus. Without the script the line is
+ * the plain code. The name of the button is "Copy: " and the command, in the language of the page (data-luz-label-copy).
+ */
+function initCopyCommands() {
+  // The namespace is the one of the icons already on the page (no address typed here: red line 12)
+  const ns = document.querySelector("svg")?.namespaceURI;
+  if (!ns) return;
+  const svg = (className, ...paths) => {
+    const el = document.createElementNS(ns, "svg");
+    el.setAttribute("viewBox", "0 0 24 24");
+    el.setAttribute("aria-hidden", "true");
+    el.setAttribute("class", className);
+    for (const d of paths) {
+      const path = document.createElementNS(ns, "path");
+      path.setAttribute("d", d);
+      el.append(path);
+    }
+    return el;
+  };
+  document.querySelectorAll(".landing-ai__ask").forEach((line) => {
+    const code = line.querySelector("code");
+    if (!code || code.closest("button")) return;
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "landing-ai__copy";
+    button.dataset.copyCommand = code.textContent.trim();
+    button.setAttribute("aria-label", `${t("copy", line)}: ${code.textContent.trim()}`);
+    code.replaceWith(button);
+    button.append(code, svg("landing-ai__copy-icon", "M9 9h10.5v10.5H9ZM15 9V4.5H4.5V15H9"), svg("landing-ai__copy-done", "M5 12.5l4.5 4.5L19 7.5"));
+  });
+  document.body.addEventListener("click", (event) => {
+    const button = event.target.closest?.(".landing-ai__copy");
+    if (button) copyToClipboard(button.dataset.copyCommand, button, "token");
+  });
 }
 
 /* ---- Modes: each box uses its mode on a click ------------------------- */
@@ -207,6 +246,7 @@ initDayBand();
 // Color mode, menu drawer and header height (shared with the docs)
 initSiteHeader();
 initCopy();
+initCopyCommands();
 initModes();
 initCli();
 // The panels of "What's inside": install, code and result; level 4's, install and use
