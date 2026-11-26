@@ -5376,6 +5376,9 @@ home-light:defined ~ .landing-light__nojs {
 }
 
 .landing-ai-works__title {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--luz-space-sm);
   margin: 0;
   font-family: var(--luz-font-sans);
   font-size: var(--luz-text-lg);
@@ -5383,9 +5386,27 @@ home-light:defined ~ .landing-light__nojs {
   color: var(--luz-text-primary);
 }
 
+/* A short line of the brand on each side of the title ties the strip and the links into one block */
+.landing-ai-works__title::before,
+.landing-ai-works__title::after {
+  content: "";
+  inline-size: var(--luz-space-xl);
+  block-size: 2px;
+  border-radius: var(--luz-radius-full);
+  background-color: var(--luz-brand-primary);
+}
+
+/* On a phone the title wraps, and the lines would stand apart from it */
+@media (max-width: 640px) {
+  .landing-ai-works__title::before,
+  .landing-ai-works__title::after {
+    content: none;
+  }
+}
+
 .landing-ai-works__note {
   margin: 0;
-  max-inline-size: 40rem;
+  max-inline-size: 52rem;
   font-size: var(--luz-text-base);
   color: var(--luz-text-secondary);
 }
@@ -5410,8 +5431,40 @@ home-light:defined ~ .landing-light__nojs {
 
 /* The sections of the page, under the strip of assistants: one row of links that wraps, centred like the strip, and
    held close to it (half the gap between the sections), so the two read as the page's one entrance */
+/* The links hug the strip above them: one block, the promise then where to go (owner, 2026-11-26) */
 .landing-ai-toc {
-  margin-block-start: calc(var(--level-gap) / -2);
+  align-self: start;
+  margin-block-start: calc(var(--level-gap) * -1 + var(--luz-space-lg));
+}
+
+/* On a screen wide and tall enough the links stay under the header while the page goes by (owner, 2026-11-26, trial);
+   on a phone or with large text they would take too much of the screen, so they scroll away */
+@media (min-width: 641px) and (min-height: 600px) {
+  /* A band of the page's colour, with no line under it: the colour fades to transparent below, so the page reads as going
+     under it */
+  .landing-ai-toc {
+    position: sticky;
+    inset-block-start: var(--site-header-h, 0px);
+    z-index: 1;
+    margin-inline: calc(var(--luz-space-md) * -1);
+    padding: var(--luz-space-sm) var(--luz-space-md);
+    background-color: var(--luz-surface-page);
+  }
+
+  .landing-ai-toc::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    inset-block-start: 100%;
+    block-size: var(--luz-space-xl);
+    background-image: linear-gradient(to bottom, var(--luz-surface-page), transparent);
+    pointer-events: none;
+  }
+
+  .landing-ai-goal,
+  .landing-ai-works {
+    scroll-margin-block-start: 6rem;
+  }
 }
 
 .landing-ai-toc__list {
@@ -5790,28 +5843,21 @@ home-light:defined ~ .landing-light__nojs {
   rotate: none;
 }
 
-/* The commands sit at the foot, so the three cards line up on them */
-.landing-ai-option > .landing-install:first-of-type {
+/* The commands sit at the foot, so the three cards line up on them; each is a label and a line that copies itself */
+.landing-ai-option__cmd {
+  display: grid;
+  align-self: stretch;
+  gap: var(--luz-space-2xs);
+}
+
+.landing-ai-option__cmd:first-of-type {
   margin-block-start: auto;
-}
-
-.landing-ai-option .luz-code-block {
-  font-size: var(--luz-text-sm);
-}
-
-.landing-ai-option .luz-code-block code {
-  font-size: 1em;
 }
 
 /* On a wide screen a command is one line, never broken in the middle of a flag; on a narrow one it wraps, so nothing leaves the page */
 @media (width >= 64rem) {
-  .landing-ai-option .luz-code-block,
-  .landing-ai-option .luz-code-block code {
+  .landing-ai-option .landing-ai__ask code {
     white-space: pre;
-  }
-
-  .landing-ai-option .luz-code-block {
-    overflow-x: auto;
   }
 }
 

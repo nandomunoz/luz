@@ -135,9 +135,8 @@ export function aiSections({ say, root, escapeHtml }) {
 
   // ---- Install it (owner, 2026-11-26, .claude/plans/ai-page-v3.md): three choices side by side, everything recommended and first,
   // one command each, with the copy button of the page; the lead says once that it is the terminal
-  // The name of each code region is its choice and where it is typed, so no two regions of the page share one
-  const block = (id, label, command, choice, lang = "bash") =>
-    `<div class="landing-install"><div class="landing-install__bar"><span class="landing-install__label">${label}</span><button class="luz-copy-btn" type="button" data-copy-from="${id}" aria-label="${t("level.ai.copy.init")}: ${escapeHtml(command)}" hidden>${t("see.copy")}</button></div><pre class="luz-code-block" data-lang="${lang}" dir="ltr" tabindex="0" role="region" aria-label="${t(`level.ai.install.${choice}.title`)}: ${label}"><code id="${id}">${escapeHtml(command)}</code></pre></div>`;
+  // A command is a line like the ones of the cards (owner, 2026-11-26): a small label, the code, and the copy icon on hover
+  const block = (label, command) => `<div class="landing-ai-option__cmd"><p class="landing-ai__label">${label}</p>${ask(command)}</div>`;
   // A table of plans (owner, 2026-11-26, the visual pass): the recommended one in the middle, taller, with its flag; the same three
   // rows in each say what it brings (the skill, the agents, the skills) and what it leaves for later
   const option = (key, rows, body, recommended = false) =>
@@ -161,12 +160,12 @@ export function aiSections({ say, root, escapeHtml }) {
     `<section class="landing-ai-goal" id="a-install" aria-labelledby="a-install-title">`,
     ...head("install"),
     `  <div class="landing-ai-options">`,
-    option("min", [luzRow, get(agentsRow, { no: true }), get(skillsRow, { no: true })], block("ai-install-min", terminal, "npx @luz-ds/ai init --target claude", "min")),
-    option("all", [luzRow, get(agentsRow), get(skillsRow)], block("ai-install-all", terminal, "npx @luz-ds/ai init --target claude --all", "all"), true),
+    option("min", [luzRow, get(agentsRow, { no: true }), get(skillsRow, { no: true })], block(terminal, "npx @luz-ds/ai init --target claude")),
+    option("all", [luzRow, get(agentsRow), get(skillsRow)], block(terminal, "npx @luz-ds/ai init --target claude --all"), true),
     option(
       "pick",
       [luzRow, get(t("level.ai.install.gets.agents.pick"), { href: "#a-agents" }), get(t("level.ai.install.gets.skills.pick"), { href: "#a-skills" })],
-      block("ai-install-pick", terminal, "npx @luz-ds/ai init --target claude", "pick") + block("ai-install-add", t("level.ai.install.pick.then"), "/luz add luz-agent-ux", "pick", "text"),
+      block(terminal, "npx @luz-ds/ai init --target claude") + block(t("level.ai.install.pick.then"), "/luz add luz-agent-ux"),
     ),
     `  </div>`,
     `  <p class="landing-ai-options__note">${t("level.ai.install.note")}</p>`,
@@ -234,7 +233,7 @@ export function aiSections({ say, root, escapeHtml }) {
   ].join("\n");
 
   return {
-    aiblocks: [toc, install, works, use, goal("agents", [{ href: "/docs/ai/agents/", label: t("level.ai.agents.link") }], agentCards), goal("skills", [{ href: "/docs/ai/agents/#skills", label: t("level.ai.skills.link") }], skillCards), decide].join("\n"),
+    aiblocks: [works, toc, install, use, goal("agents", [{ href: "/docs/ai/agents/", label: t("level.ai.agents.link") }], agentCards), goal("skills", [{ href: "/docs/ai/agents/#skills", label: t("level.ai.skills.link") }], skillCards), decide].join("\n"),
     naiagents: String(agents.length),
     naitargets: String(targets.length),
     ndepsai: String(dependencies),
