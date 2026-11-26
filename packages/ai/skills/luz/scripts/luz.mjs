@@ -1137,7 +1137,7 @@ function show(text) {
 
 // The words of the chat are the words of the script: /luz new, /luz agents and /luz add run these (the long forms still work)
 // The folders of the assistants and of the pipeline: a site is never made in one (the same list the skills keep their hands off)
-const CONFIG_FOLDERS = [".claude", ".agents", ".github", ".gemini", ".codex", ".cursor"];
+const CONFIG_FOLDERS = [".claude", ".agents", ".github", ".gemini", ".codex", ".cursor", ".git", ".vscode", "node_modules"];
 
 const ALIASES = { new: ["site", "new"], magic: ["site", "new"], agents: ["agent", "list"], skills: ["skill", "list"] };
 
