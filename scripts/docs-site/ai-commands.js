@@ -26,21 +26,27 @@ export const EXTRA = ["unknown", "hostile"];
 const TERMINAL = {
   start: ["new", "--name", "Acme", "--kind", "landing", "--stack", "vanilla", "--target", "./acme", "--dry-run"],
   new: ["new", "--name", "Acme", "--kind", "blog", "--stack", "vanilla", "--target", "./acme", "--dry-run"],
+  magic: ["magic", "--name", "Pan Vivo", "--kind", "landing", "--stack", "vanilla", "--target", "./pan-vivo", "--dry-run"],
   doctor: ["doctor", "--dir", "."],
   lint: ["lint", "."],
   facts: ["facts"],
   agents: ["agents"],
   skills: ["skills"],
+  list: ["list", "--dir", "."],
   add: ["add", "luz-agent-accessibility", "--for", "claude", "--dir", ".", "--dry-run"],
+  remove: ["remove", "luz-agent-accessibility", "--dir", ".", "--dry-run"],
   help: ["--help"],
 };
+
+/** The words for a command: it writes after the person's go, writes at once (magic: typing it is the go), or only reads. */
+const writesKey = (row) => (row.now ? "ai.cmd.writes-now" : row.writes ? "ai.cmd.writes-go" : "ai.cmd.writes-no");
 
 export const slugOf = (chat) => chat.replace(/^\/luz\s*/, "").split(/\s+/)[0] || "start";
 
 /** The rows of the Subcommands table of SKILL.md: { slug, chat, what, script, writes }. */
 export function commandRows(root = REPO) {
   const text = readFileSync(join(root, SKILL, "SKILL.md"), "utf-8");
-  const rows = [...text.matchAll(/^\| `([^`]*)` \| ([^|]*) \| ([^|]*) \| ((?:yes|no)[^|]*)\|$/gm)].map((m) => ({ slug: slugOf(m[1]), chat: m[1], what: m[2].trim(), script: m[3].trim(), writes: m[4].trim().startsWith("yes") }));
+  const rows = [...text.matchAll(/^\| `([^`]*)` \| ([^|]*) \| ([^|]*) \| ((?:yes|no)[^|]*)\|$/gm)].map((m) => ({ slug: slugOf(m[1]), chat: m[1], what: m[2].trim(), script: m[3].trim(), writes: m[4].trim().startsWith("yes"), now: m[4].trim().startsWith("yes, at once") }));
   for (const r of rows) if (!/^[a-z-]+$/.test(r.slug)) throw new Error(`${SKILL}/SKILL.md: "${r.chat}" has a subcommand that is not letters and hyphens`);
   if (!rows.length) throw new Error(`${SKILL}/SKILL.md has no Subcommands table to write the commands page from`);
   return rows;
@@ -90,7 +96,7 @@ function section(row, t, root) {
     `<section class="docs-block" aria-labelledby="cmd-${slug}">`,
     `  <h2 class="docs-chapter__title" id="cmd-${slug}">${title}</h2>`,
     `  <p class="docs-lead">${escText(t(`ai.cmd.what.${slug}`))}</p>`,
-    ...(row.chat ? [`  <p>${escText(t("ai.cmd.writes-label"))}: <strong>${escText(t(row.writes ? "ai.cmd.writes-go" : "ai.cmd.writes-no"))}</strong>.</p>`] : []),
+    ...(row.chat ? [`  <p>${escText(t("ai.cmd.writes-label"))}: <strong>${escText(t(writesKey(row)))}</strong>.</p>`] : []),
     ...(terminal ? [`  <h3 class="docs-subhead" id="cmd-${slug}-terminal">${escText(t("ai.cmd.terminal"))}</h3>`, `  <p><code>${escText(terminal.command)}</code></p>`, `  <div data-docs-specimen>${pre(terminal.command, terminal.text)}</div>`] : []),
     `  <h3 class="docs-subhead" id="cmd-${slug}-chat">${escText(t("ai.cmd.chat"))}</h3>`,
     `  ${conversation(loadExample(slug, root), t).replace(/\n/g, "\n  ")}`,
@@ -109,7 +115,7 @@ export function fillCommandMarkers(html, site, { file = "<page>", root = REPO } 
     const table = tableOf(
       t("ai.cmd.table-label"),
       [t("ai.cmd.col-chat"), t("ai.cmd.col-what"), t("ai.cmd.col-script"), t("ai.cmd.col-writes")].map(escText),
-      rows.map((r) => [`<a href="#cmd-${r.slug}"><code>${escText(r.chat)}</code></a>`, escText(t(`ai.cmd.what.${r.slug}`)), `<code>${escText(r.script)}</code>`, escText(t(r.writes ? "ai.cmd.writes-go" : "ai.cmd.writes-no"))]),
+      rows.map((r) => [`<a href="#cmd-${r.slug}"><code>${escText(r.chat)}</code></a>`, escText(t(`ai.cmd.what.${r.slug}`)), `<code>${escText(r.script)}</code>`, escText(t(writesKey(r)))]),
     );
     const sections = [...rows, ...EXTRA.map((slug) => ({ slug, chat: "", what: "", script: "", writes: false }))].map((r) => section(r, t, root));
     return [table, ...sections].join("\n").replace(/^/gm, indent).replace(/^[ \t]+$/gm, "");

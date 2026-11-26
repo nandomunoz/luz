@@ -54,7 +54,7 @@ In order of preference:
 - Alt text describes what is in the image, with the real names, not "banner" or "logo".
 - Never a generated gradient banner with only the title, never a mock-up of a UI that does not exist.
 - If the README is also published on npm or PyPI, use a PNG or an absolute URL, since relative paths break there.
-- An SVG cover is opened in a browser by the person before it is written to `assets/`; you do not run a browser. Text inside it goes stale: say so in the report.
+- An SVG cover is shown in the draft and written to `assets/` only after approval; then the person opens it in their own browser. You do not run a browser. Text inside it goes stale: say so in the report.
 
 **Dark and light mode.** The README must read well in both GitHub themes. The cover is the usual offender, because an image drawn for a white page disappears on a dark one.
 
@@ -68,7 +68,7 @@ In order of preference:
 
 - Any image that has color (cover, diagram, screenshot with a themed UI) ships as two files, one per mode, in a `picture` as above. This follows the theme the visitor chose on GitHub. The `img` inside is the fallback for hosts that strip `picture`.
 - A single SVG with `@media (prefers-color-scheme: dark)` inside adapts to the operating system or browser setting, which can differ from the GitHub theme. Use it only when two files are not worth it, and say so in the report.
-- Images that do not need a variant: ones with a transparent background and mid-tone colors that keep their contrast on white and on near-black (`#0d1117`). Test both.
+- Images that do not need a variant: ones with a transparent background and mid-tone colors that keep their contrast on white and on near-black (`#0d1117`). The person checks both: you run no browser.
 - Do not put text in an image when the same text can be Markdown. Markdown, tables, code blocks, Mermaid and alerts adapt to the theme on their own.
 - Badges from shields.io work on both themes. Pick colors with contrast on white and on dark, and avoid `white` or `black` label colors.
 - Never rely on a color name in the prose ("the blue button") and never write HTML with fixed colors: GitHub strips them.

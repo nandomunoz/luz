@@ -141,6 +141,9 @@ const SKILL_NEED = [
   ["A README that reads as written by a person, with true facts", "luz-readme"],
   ["The colours, fonts and corners of their own brand on LUZ, in light, dark and high contrast", "luz-theme"],
   ["A site that already exists, moved to LUZ one page at a time", "luz-migrate"],
+  ["Pages or catalogs of strings in another language, with a glossary and a translation a person still has to review", "luz-translate"],
+  ["The head of the pages and the files around it (description, social cards, structured data, robots.txt, sitemap) written correctly", "luz-meta"],
+  ["The MIT licence and the notices of third-party work next to what the project publishes", "luz-license"],
 ];
 
 function skillsReference(root) {

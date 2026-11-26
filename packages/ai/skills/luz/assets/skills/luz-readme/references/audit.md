@@ -29,7 +29,7 @@ Against [ai-tells.md](ai-tells.md):
 - Versions, requirements and numbers come from files. No placeholders left (`OWNER`, `your-username`, `TODO`).
 - External links you could not check, and badges that fail on private repos, are listed in the report.
 - Images exist, have meaningful alt text, show the current project, and SVGs were opened in a browser by the person, or the report says they were not checked.
-- Dark and light: every image with color has a light and a dark variant in a `picture`, or has contrast on both backgrounds, checked by rendering on `#ffffff` and on `#0d1117`. Badges and Mermaid are fine. No fixed-color HTML.
+- Dark and light: every image with color has a light and a dark variant in a `picture`, or has contrast on both backgrounds, which the person checks by opening it on a white page and on a near-black one (`#ffffff`, `#0d1117`); say in the report if it was not checked. Badges and Mermaid are fine. No fixed-color HTML.
 - Portability test on every paragraph and visual.
 
 ## Rubric (100 points)

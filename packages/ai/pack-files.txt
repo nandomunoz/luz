@@ -9,6 +9,12 @@ dist/skills/luz/assets/agents/luz-agent-seogeo.md
 dist/skills/luz/assets/agents/luz-agent-ux.md
 dist/skills/luz/assets/facts.json
 dist/skills/luz/assets/fields.json
+dist/skills/luz/assets/skills/luz-license/SKILL.md
+dist/skills/luz/assets/skills/luz-license/references/notices.md
+dist/skills/luz/assets/skills/luz-license/references/reading.md
+dist/skills/luz/assets/skills/luz-meta/SKILL.md
+dist/skills/luz/assets/skills/luz-meta/references/files.md
+dist/skills/luz/assets/skills/luz-meta/references/head.md
 dist/skills/luz/assets/skills/luz-migrate/SKILL.md
 dist/skills/luz/assets/skills/luz-migrate/references/costs.md
 dist/skills/luz/assets/skills/luz-migrate/references/steps.md
@@ -21,6 +27,9 @@ dist/skills/luz/assets/skills/luz-readme/references/structure-by-type.md
 dist/skills/luz/assets/skills/luz-theme/SKILL.md
 dist/skills/luz/assets/skills/luz-theme/references/checks.md
 dist/skills/luz/assets/skills/luz-theme/references/tokens.md
+dist/skills/luz/assets/skills/luz-translate/SKILL.md
+dist/skills/luz/assets/skills/luz-translate/references/glossary.md
+dist/skills/luz/assets/skills/luz-translate/references/rules.md
 dist/skills/luz/assets/templates/app.html.tpl
 dist/skills/luz/assets/templates/blog.html.tpl
 dist/skills/luz/assets/templates/docs.html.tpl

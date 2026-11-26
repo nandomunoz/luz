@@ -83,6 +83,9 @@ const ICONS = {
   "luz-readme": "M6 3.5h9l3 3V20.5H6ZM9 11h6M9 14.5h6M9 7.5h3",
   "luz-theme": "M12 3.5a8.5 8.5 0 1 0 0 17c1.4 0 2-.9 2-1.8 0-1.4-1.2-1.6-1.2-2.8 0-.9.7-1.4 1.6-1.4H17a3.5 3.5 0 0 0 3.5-3.5C20.5 6.7 16.7 3.5 12 3.5ZM7.5 11.5h.01M10 7.8h.01M14.5 7.8h.01",
   "luz-migrate": "M4 8h11M12 4.5 15.5 8 12 11.5M20 16H9M12 12.5 8.5 16l3.5 3.5",
+  "luz-translate": "M4 5.5h9M8.5 4v1.5M6 5.5c.6 3.6 3.2 6.2 6.5 7.5M11 5.5c-.6 3.6-3.2 6.2-6.5 7.5M12.5 20l3.5-9 3.5 9M13.6 17.5h4.8",
+  "luz-meta": "M4.5 8 8 12l-3.5 4M10.5 17h5M13 4.5l-2 15M19.5 8 16 12l3.5 4",
+  "luz-license": "M12 3.5l7 2.8v5.4c0 4.4-2.8 7.4-7 8.8-4.2-1.4-7-4.4-7-8.8V6.3ZM9 12l2.2 2.2L15.2 10",
   skills: "M12 3.5l2.2 5 5.3.5-4 3.6 1.2 5.3L12 15l-4.7 2.9 1.2-5.3-4-3.6 5.3-.5Z",
   agents: "M8.5 4.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5ZM3.5 19c0-3 2.2-5.5 5-5.5s5 2.5 5 5.5M16 6.5a2 2 0 1 0 0 4 2 2 0 0 0 0-4ZM15 13.6c3 0 5.5 2.2 5.5 5.4",
   add: "M12 5v14M5 12h14",
@@ -104,6 +107,8 @@ export function aiSections({ say, root, escapeHtml }) {
   };
   // What you say to the assistant (›) or what the skill runs ($), under the card's text: the sentence or the command, not a word to translate
   const ask = (sign, inner) => `<p class="landing-ai__ask"><span class="landing-ai__mark" aria-hidden="true">${sign}</span> ${inner}</p>`;
+  // A line says where you type it: the chat or the terminal, or the two moments of a piece (install it, use it); the code is what you type
+  const line = (whereKey, text) => `<p class="landing-ai__ask"><span class="landing-ai__where">${t(whereKey)}</span> ${code(text)}</p>`;
   const card = (id, title, text, extra, foot, mod = "") =>
     `<article class="landing-card landing-ai__card${mod}">${icon(id)}<p class="landing-card__title">${title}</p>${extra}<p class="landing-ai__text">${text}</p>${foot}</article>`;
   const goal = (id, links, cards, raw = false, key = id) =>
@@ -145,7 +150,7 @@ export function aiSections({ say, root, escapeHtml }) {
         t(`level.ai.agent.${a.name}.title`),
         t(`level.ai.agent.${a.name}.text`),
         `<code class="landing-ai__name">${escapeHtml(a.name)}</code><span class="luz-badge luz-badge--gray landing-ai__badge">${t(a.acts ? "level.ai.agents.acts" : "level.ai.agents.reads")}</span>`,
-        ask("›", code(`/luz add ${a.name}`)),
+        line("level.ai.line.install", `/luz add ${a.name}`) + line("level.ai.line.use", say("level.ai.agents.use").replace("{name}", a.name)),
         a.acts ? " landing-ai__card--acts" : " landing-ai__card--reads",
       ),
     )
@@ -159,31 +164,31 @@ export function aiSections({ say, root, escapeHtml }) {
         t(`level.ai.skills.${name}.title`),
         t(`level.ai.skills.${name}.text`),
         `<code class="landing-ai__name">${escapeHtml(name)}</code><span class="luz-badge luz-badge--gray landing-ai__badge">${t("level.ai.skills.badge")}</span>`,
-        ask("›", code(`/luz add ${name}`)),
+        line("level.ai.line.install", `/luz add ${name}`) + line("level.ai.line.use", say("level.ai.skills.use").replace("{name}", name)),
         " landing-ai__card--acts",
       ),
     )
     .join("");
 
-  // The commands of the chat, a card for each row of the table of SKILL.md: what to type, what it does, and whether it writes
-  const TYPED = { start: "/luz", new: "/luz new landing", add: "/luz add luz-agent-accessibility" };
-  const ICON_OF = { start: "write", new: "write", doctor: "doctor", lint: "validate", facts: "plan", agents: "agents", skills: "skills", add: "add", help: "help" };
+  // The commands, a card for each row of the table of SKILL.md, in two sections (owner, 2026-11-26): the ones that put pieces in the
+  // project or take them out or say what is there (install and uninstall, in the terminal or the chat), and the ones you use in the chat.
+  // A card says where each line is typed: the chat, and the terminal when the script has the same word
+  const TYPED = { start: "/luz", new: "/luz new landing", add: "/luz add luz-agent-accessibility", remove: "/luz remove luz-agent-optimiza" };
+  const IN_TERMINAL = { new: "new --kind landing", doctor: "doctor", lint: "lint .", facts: "facts", agents: "agents", skills: "skills", list: "list", add: "add luz-agent-accessibility", remove: "remove luz-agent-optimiza", help: "--help" };
+  const ICON_OF = { start: "write", new: "write", magic: "write", doctor: "doctor", lint: "validate", facts: "plan", agents: "agents", skills: "skills", list: "doctor", add: "add", remove: "add", help: "help" };
+  const INSTALL = ["agents", "skills", "list", "add", "remove"];
+  const badgeOf = (writes) => `<span class="luz-badge luz-badge--gray landing-ai__badge">${t(writes ? "level.ai.cmd.writes" : "level.ai.cmd.reads")}</span>`;
   const commandCard = (row) => {
-      const typed = row.chat.replace(/ [<[].*$/, "");
-      const badge = `<span class="luz-badge luz-badge--gray landing-ai__badge">${t(row.writes ? "level.ai.cmd.writes" : "level.ai.cmd.reads")}</span>`;
-      if (!ICON_OF[row.slug]) throw new Error(`scripts/docs-site/ai-page.js: no icon for the command "${row.slug}": add it to ICON_OF`);
-      return card(ICON_OF[row.slug], escapeHtml(typed), t(`level.ai.cmd.${row.slug}`), badge, ask("›", code(TYPED[row.slug] ?? typed)), row.writes ? " landing-ai__card--acts" : " landing-ai__card--reads");
+    const typed = row.chat.replace(/ [<[].*$/, "");
+    if (!ICON_OF[row.slug]) throw new Error(`scripts/docs-site/ai-page.js: no icon for the command "${row.slug}": add it to ICON_OF`);
+    const foot = line("level.ai.where.chat", TYPED[row.slug] ?? typed) + (IN_TERMINAL[row.slug] ? line("level.ai.where.terminal", `npx @luz-ds/ai ${IN_TERMINAL[row.slug]}`) : "");
+    return card(ICON_OF[row.slug], escapeHtml(typed), t(`level.ai.cmd.${row.slug}`), badgeOf(row.writes), foot, row.writes ? " landing-ai__card--acts" : " landing-ai__card--reads");
   };
-  // Two groups: the commands that write, after your go, then the ones that only read, each in the order of SKILL.md
+  // init is only for the terminal: the minimum, and everything
+  const initCard = (all) => card("add", `init${all ? " --all" : ""}`, t(`level.ai.install.${all ? "all" : "init"}`), badgeOf(true), line("level.ai.where.terminal", `npx @luz-ds/ai init --target claude${all ? " --all" : ""}`), " landing-ai__card--acts");
   const rows = commandRows(root);
-  const group = (id, list) =>
-    [
-      `<div class="landing-ai-group" id="a-commands-${id}">`,
-      `  <h3 class="landing-ai-group__title" id="a-commands-${id}-title">${t(`level.ai.commands.${id}`)}</h3>`,
-      `  <div class="landing-cards landing-ai__cards">${list.map(commandCard).join("")}</div>`,
-      `</div>`,
-    ].join("\n");
-  const commandGroups = [group("writes", rows.filter((r) => r.writes)), group("reads", rows.filter((r) => !r.writes))].join("\n");
+  const installCards = initCard(false) + initCard(true) + rows.filter((r) => INSTALL.includes(r.slug)).map(commandCard).join("");
+  const useCards = rows.filter((r) => !INSTALL.includes(r.slug)).map(commandCard).join("");
 
   // What you decide: the guarantees of the skill, in a row of five
   const decide = [
@@ -197,7 +202,7 @@ export function aiSections({ say, root, escapeHtml }) {
   // The sections of the page, under the strip of assistants: a list of links, titled by the sections themselves
   const toc = [
     `<nav class="landing-ai-toc" aria-label="${t("level.ai.toc.label")}">`,
-    `  <ul class="landing-ai-toc__list">${[["a-commands", "level.ai.commands.title"], ["a-agents", "level.ai.agents.title"], ["a-skills", "level.ai.skills.title"], ["a-how", "level.ai.skill.title"], ["a-decide", "level.ai.limits.title"]].map(([id, key]) => `<li><a href="#${id}">${t(key)}</a></li>`).join("")}</ul>`,
+    `  <ul class="landing-ai-toc__list">${[["a-install", "level.ai.install.title"], ["a-agents", "level.ai.agents.title"], ["a-skills", "level.ai.skills.title"], ["a-commands", "level.ai.commands.title"], ["a-how", "level.ai.skill.title"], ["a-decide", "level.ai.limits.title"]].map(([id, key]) => `<li><a href="#${id}">${t(key)}</a></li>`).join("")}</ul>`,
     `</nav>`,
   ].join("\n");
 
@@ -206,7 +211,7 @@ export function aiSections({ say, root, escapeHtml }) {
   const skillsDocs = [{ href: "/docs/ai/agents/#skills", label: t("level.ai.skills.link") }];
   const agentsDocs = [{ href: "/docs/ai/agents/", label: t("level.ai.agents.link") }];
   return {
-    aiblocks: [works, toc, goal("commands", commandsDocs, commandGroups, true), goal("agents", agentsDocs, agentCards), goal("skills", skillsDocs, skillCards), goal("how", skillDocs, phases, false, "skill"), decide].join("\n"),
+    aiblocks: [works, toc, goal("install", commandsDocs, installCards), goal("agents", agentsDocs, agentCards), goal("skills", skillsDocs, skillCards), goal("commands", commandsDocs, useCards), goal("how", skillDocs, phases, false, "skill"), decide].join("\n"),
     naiagents: String(agents.length),
     naitargets: String(targets.length),
     ndepsai: String(dependencies),

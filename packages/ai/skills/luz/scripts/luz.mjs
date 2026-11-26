@@ -13,7 +13,7 @@
  *
  * Exit codes: 0 nothing blocks, 1 a problem blocks, 2 the command was used wrongly.
  */
-import { existsSync, lstatSync, mkdirSync, readdirSync, readFileSync, realpathSync, statSync, writeFileSync } from "node:fs";
+import { existsSync, lstatSync, mkdirSync, readdirSync, readFileSync, realpathSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { basename, dirname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
@@ -49,17 +49,20 @@ const BANNER = [
 /** The banner and a blank line, or nothing when stdout is not a terminal. */
 const banner = (tty) => (tty ? `${BANNER.join("\n")}\n\n` : "");
 
-const HELP = `luz-ai: starts a site with LUZ and lints the skills and subagents of a project. Only init, new and add write.
+const HELP = `luz-ai: starts a site with LUZ and lints the skills and subagents of a project. Only init, new, magic, add and remove write.
 
 Usage:
   luz-ai <command> [options]
 
 Commands:
-  init      put this skill where an assistant reads it (--target claude, codex, gemini, cursor or agents-md)
+  init      put this skill where an assistant reads it (--target claude, codex, gemini, cursor or agents-md); --all adds every agent and skill
   new       write the starter page of a kind of site and a stack (--dry-run shows it first); also site new
+  magic     the same as new, for /luz magic: the whole site from one description, written by the skill with no question
   agents    list the agents of luz-ai; also agent list
   skills    list the small skills of luz-ai (a README, a theme, a migration); also skill list
+  list      what the project has of luz-ai and what it does not: the skill, the agents and the small skills
   add       add an agent or a skill to a project (an agent for Claude Code, Gemini CLI or Codex); also agent add, skill add
+  remove    take an agent or a skill of luz-ai out of a project
   facts     the versions, the kinds of site and the stacks of this release
   doctor    the project, the assistants it has and whether their skills and agents pass lint
   lint      the front matter and the body of skills (SKILL.md) and subagents (.md)
@@ -81,7 +84,11 @@ Example:
 const HELP_INIT = `luz-ai init: puts the luz skill in a project, where the assistant you use reads it.
 
 Usage:
-  luz-ai init --target <assistants> [--dir <folder>] [--dry-run] [--force] [--json]
+  luz-ai init --target <assistants> [--all] [--dir <folder>] [--dry-run] [--force] [--json]
+
+  --all      also write every agent and every small skill of luz-ai (the minimum is only /luz). The agents are written
+             with their fields still [ADAPT], so they stop and ask until they are filled; an assistant that has no agent
+             file (cursor, agents-md) gets the skills only, and an agent a target cannot take is left out and named
 
   --target   claude, codex, gemini, cursor, agents-md, comma separated:
                claude     .claude/skills (the only folder Claude Code reads): /luz is the skill
@@ -153,6 +160,31 @@ Nothing is overwritten without --force. \`luz-ai add <name>\` adds an agent or a
 
 Example:
   luz-ai skill add luz-readme --dir . --dry-run
+`;
+
+const HELP_LIST = `luz-ai list: what the project has of luz-ai and what it does not. It only reads.
+
+Usage:
+  luz-ai list [--dir <folder>] [--json]
+
+For each piece (the luz skill, the agents, the small skills) the places it is installed in, or "not installed", and "changed"
+when a skill is not the one the package carries. \`luz-ai agents\` and \`luz-ai skills\` show the whole catalogue.
+
+Example:
+  luz-ai list --dir .
+`;
+
+const HELP_REMOVE = `luz-ai remove: takes an agent or a skill of luz-ai out of a project.
+
+Usage:
+  luz-ai remove <name> [--dir <folder>] [--dry-run] [--json]
+
+It deletes, by name, the files luz-ai wrote: an agent from every place it is in, a skill from .agents/skills and .claude/skills.
+A file of yours in the same folder stays, and so does the folder; an agent file whose name is not the agent's is not touched.
+It follows no symbolic link and never leaves the project. The luz skill itself is not removed by this command.
+
+Example:
+  luz-ai remove luz-agent-optimiza --dry-run
 `;
 
 const HELP_FACTS = `luz-ai facts: the versions of the LUZ packages, the kinds of site and the stacks of this release.
@@ -846,6 +878,130 @@ function listText(kind, items) {
   return `${out.join("\n")}\n`;
 }
 
+
+// ---- list and remove --------------------------------------------------------------------------------------------
+
+const AGENT_PLACES = { claude: (n) => `.claude/agents/${n}.md`, gemini: (n) => `.gemini/agents/${n}.md`, codex: (n) => `.codex/agents/${n}.toml` };
+
+/** The files of a folder, relative to it, or none if it is not a real folder. */
+function filesOf(folder) {
+  if (!existsSync(folder) || isLink(folder) || !statSync(folder).isDirectory()) return null;
+  return readdirSync(folder, { recursive: true, withFileTypes: true }).filter((e) => e.isFile()).map((e) => relative(folder, join(e.parentPath, e.name)).split(sep).join("/")).sort();
+}
+
+/** True when the installed folder lacks a file of the package or has it different: a file of the person's own does not count. */
+function changedFolder(folder, packaged) {
+  return packaged.some(({ rel, content }) => {
+    const file = join(folder, ...rel.split("/"));
+    return !existsSync(file) || isLink(file) || readFileSync(file, "utf-8") !== content;
+  });
+}
+
+function packagedFolder(root) {
+  return readdirSync(root, { recursive: true, withFileTypes: true })
+    .filter((e) => e.isFile())
+    .map((e) => relative(root, join(e.parentPath, e.name)).split(sep).join("/"))
+    .filter((rel) => !rel.split("/").some((part) => part.startsWith(".")))
+    .sort()
+    .map((rel) => ({ rel, content: readFileSync(join(root, ...rel.split("/")), "utf-8") }));
+}
+
+function runList(dir) {
+  const base = resolve(dir);
+  const folderPiece = (name, kind, packaged) => {
+    const places = SKILL_PLACES.filter((place) => filesOf(join(base, place, name)) !== null);
+    return { name, kind, places: places.map((place) => `${place}/${name}`), changed: places.some((place) => changedFolder(join(base, place, name), packaged)) };
+  };
+  const luzPackaged = skillFiles([""]).map((f) => ({ rel: f.path.slice(`/${SELF}/`.length), content: f.content }));
+  const pieces = [
+    // /luz is written by init into the folder of its assistant, which can be any of the two
+    { ...folderPiece(SELF, "skill", luzPackaged), name: "luz" },
+    ...agentNames().map((name) => ({ name, kind: "agent", places: Object.values(AGENT_PLACES).map((f) => f(name)).filter((rel) => existsSync(join(base, rel)) && !isLink(join(base, rel))), changed: false })),
+    ...skillNames().map((name) => folderPiece(name, "skill", packagedFolder(join(ASSETS, "skills", name)))),
+  ];
+  return { ok: true, dir: base, pieces };
+}
+
+function listPiecesText({ pieces }) {
+  const have = pieces.filter((p) => p.places.length);
+  const out = [`list: ${have.length} of ${pieces.length} pieces of luz-ai installed`];
+  for (const p of pieces) out.push(`  ${p.name} (${p.kind}): ${p.places.length ? `${p.places.join(", ")}${p.changed ? " (changed)" : ""}` : "not installed"}`);
+  return `${out.join("\n")}\n`;
+}
+
+/** What `remove` deletes: the files luz-ai wrote of one piece, and what it leaves. */
+function planRemove(dir, name) {
+  const base = resolve(dir);
+  const files = [];
+  const notes = [];
+  const links = [];
+  const seeLink = (rel) => {
+    let at = base;
+    for (const part of rel.split("/")) {
+      at = join(at, part);
+      if (isLink(at)) return relative(base, at);
+    }
+    return null;
+  };
+  if (agentNames().includes(name)) {
+    for (const make of Object.values(AGENT_PLACES)) {
+      const rel = make(name);
+      const link = seeLink(rel);
+      if (link) {
+        links.push(link);
+        continue;
+      }
+      const file = join(base, rel);
+      if (!existsSync(file)) continue;
+      const text = readFileSync(file, "utf-8");
+      const ours = rel.endsWith(".toml") ? new RegExp(`^name = "${name}"$`, "m").test(text) : new RegExp(`^name: ${name}$`, "m").test(text);
+      if (ours) files.push(rel);
+      else notes.push(`${rel} is not luz-ai's (its name is not ${name}): left as it is`);
+    }
+  } else {
+    for (const place of SKILL_PLACES) {
+      const link = seeLink(`${place}/${name}`);
+      if (link) {
+        links.push(link);
+        continue;
+      }
+      const folder = join(base, place, name);
+      if (filesOf(folder) === null) continue;
+      const packaged = new Set(packagedFolder(join(ASSETS, "skills", name)).map((f) => f.rel));
+      const present = filesOf(folder);
+      for (const rel of present) if (packaged.has(rel)) files.push(`${place}/${name}/${rel}`);
+      const stay = present.filter((rel) => !packaged.has(rel));
+      if (stay.length) notes.push(`${place}/${name} keeps ${stay.join(", ")}, which is not luz-ai's: the folder stays`);
+    }
+  }
+  return { base, files, notes, links };
+}
+
+function runRemove(values, name) {
+  if (!name) return { error: `a name is missing. Example: luz-ai remove ${agentNames()[0]} --dry-run (agents: ${agentNames().join(", ")}; skills: ${skillNames().join(", ")})` };
+  if (name === "luz" || name === SELF) return { error: `"${name}" is the skill that runs this command: remove it by hand, folder by folder, or leave it` };
+  if (!agentNames().includes(name) && !skillNames().includes(name)) return { error: `"${name}" is not an agent or a skill (agents: ${agentNames().join(", ")}; skills: ${skillNames().join(", ")})` };
+  const { base, files, notes, links } = planRemove(values.dir ?? ".", name);
+  if (links.length) return { error: `${links[0]} is a symbolic link: nothing was removed` };
+  const dryRun = Boolean(values["dry-run"]);
+  if (!dryRun) {
+    for (const rel of files) rmSync(join(base, rel));
+    // A folder luz-ai made is taken away when nothing of the person's is in it
+    for (const place of SKILL_PLACES) {
+      const folder = join(base, place, name);
+      if (skillNames().includes(name) && filesOf(folder)?.length === 0) rmSync(folder, { recursive: true });
+    }
+  }
+  return { report: { ok: true, dryRun, name, files: files.map((rel) => ({ path: join(values.dir ?? ".", rel), bytes: 0 })), notes } };
+}
+
+function removeText({ dryRun, name, files, notes }) {
+  const out = files.length ? [`remove: ${dryRun ? "would delete" : "deleted"} ${files.length} file${files.length === 1 ? "" : "s"} of ${name}`, ...files.slice(0, MAX_LINES).map((f) => `  ${f.path}`)] : [`remove: ${name} is not installed: nothing to delete`];
+  if (files.length > MAX_LINES) out.push(`  … and ${files.length - MAX_LINES} more (use --json)`);
+  out.push(...notes.map((n) => `note: ${n}`));
+  return `${out.join("\n")}\n`;
+}
+
 // ---- init: put this skill where an assistant reads it ----------------------------------------------------------
 
 // Where each assistant reads a skill of a project, each read at its source on 2026-11-23: Claude Code (.claude/skills only),
@@ -858,7 +1014,7 @@ const INIT_TARGETS = { claude: [".claude/skills"], codex: [".agents/skills"], ge
 const SKILL_FILE = ".agents/skills/luz/SKILL.md";
 const COMMAND_TEXT = `Run the luz skill: read ${SKILL_FILE} and follow it. What the person typed after /luz is the subcommand and its argument, and if it is empty the skill starts a site.`;
 const INIT_COMMANDS = {
-  gemini: { path: ".gemini/commands/luz.toml", content: `description = "Start a site with LUZ, or run one subcommand: new, doctor, lint, facts, agents, skills, add or help"\nprompt = """\n${COMMAND_TEXT}\n\nArguments: {{args}}\n"""\n` },
+  gemini: { path: ".gemini/commands/luz.toml", content: `description = "Start a site with LUZ, or run one subcommand: new, magic, doctor, lint, facts, agents, skills, list, add, remove or help"\nprompt = """\n${COMMAND_TEXT}\n\nArguments: {{args}}\n"""\n` },
   cursor: { path: ".cursor/commands/luz.md", content: `${COMMAND_TEXT}\n` },
 };
 // How to call it, per assistant, for the `next` line
@@ -880,13 +1036,30 @@ function runInit(values) {
     else files.push({ path: "AGENTS.md", content: `# AGENTS.md\n\n${AGENTS_MD}` });
   }
   for (const t of targets) if (INIT_COMMANDS[t]) files.push(INIT_COMMANDS[t]);
+  if (values.all) {
+    // Everything: each agent for each assistant that has an agent file, and every small skill in both skill folders. The agents
+    // keep their [ADAPT] fields, so they stop until the person fills them; one a target cannot take is left out and named
+    for (const name of agentNames()) {
+      const agent = loadAgent(name);
+      for (const t of targets.filter((x) => AGENT_TARGETS.includes(x))) {
+        const wrapped = wrapAgent(agent, agent.body, t);
+        if (wrapped.error) notes.push(`${name} is not written for ${t}: ${wrapped.error.replace(`${name} `, "")}`);
+        else {
+          files.push({ path: wrapped.path, content: wrapped.content });
+          notes.push(...wrapped.notes);
+        }
+      }
+    }
+    for (const t of targets.filter((x) => !AGENT_TARGETS.includes(x))) notes.push(`${t} has no agent file: the agents are not written for it`);
+    for (const name of skillNames()) files.push(...smallSkillFiles(name, SKILL_PLACES));
+  }
   // Only Claude Code is run through the lab; the others are written from their documentation
   const untested = targets.filter((t) => t !== "claude");
   if (untested.length) notes.push(`tested only in Claude Code: ${untested.join(", ")} ${untested.length === 1 ? "follows" : "follow"} its documentation and has not been run. If it does not work, tell us: https://github.com/nandomunoz/luz/issues/new?template=ai-target.yml`);
   if (targets.includes("cursor") && !targets.includes("claude")) notes.push("Cursor also reads .claude/skills, so a project that has the skill in both folders may show it twice there");
   const written = writeFiles(values.dir ?? ".", files, { dryRun: Boolean(values["dry-run"]), force: values.force });
   if (written.error) return written;
-  return { report: { ok: true, dryRun: Boolean(values["dry-run"]), targets, places, files: written.files, notes, next: targets.filter((t) => INIT_CALL[t]).map((t) => INIT_CALL[t]).concat(targets.includes("agents-md") ? ["tell your assistant what you want to make with LUZ"] : []) } };
+  return { report: { ok: true, dryRun: Boolean(values["dry-run"]), all: Boolean(values.all), targets, places, files: written.files, notes, next: targets.filter((t) => INIT_CALL[t]).map((t) => INIT_CALL[t]).concat(targets.includes("agents-md") ? ["tell your assistant what you want to make with LUZ"] : []) } };
 }
 
 function initText({ dryRun, places, files, notes, next }) {
@@ -912,7 +1085,7 @@ function show(text) {
 }
 
 // The words of the chat are the words of the script: /luz new, /luz agents and /luz add run these (the long forms still work)
-const ALIASES = { new: ["site", "new"], agents: ["agent", "list"], skills: ["skill", "list"] };
+const ALIASES = { new: ["site", "new"], magic: ["site", "new"], agents: ["agent", "list"], skills: ["skill", "list"] };
 
 export function main(argv, { tty = Boolean(process.stdout.isTTY) } = {}) {
   if (ALIASES[argv[0]]) argv = [...ALIASES[argv[0]], ...argv.slice(1)];
@@ -920,8 +1093,8 @@ export function main(argv, { tty = Boolean(process.stdout.isTTY) } = {}) {
   else if (argv[0] === "add") argv = [argv.slice(1).some((a) => skillNames().includes(a)) ? "skill" : "agent", "add", ...argv.slice(1)];
   const [command, ...rest] = argv;
   if (command === "--help" || command === "-h") return show(banner(tty) + HELP);
-  if (!command) return usage("a command is missing (init, new, site new, agents, skills, add, agent, skill, facts, doctor or lint)", true);
-  if (!["init", "site", "agent", "skill", "facts", "doctor", "lint"].includes(command)) return usage(`"${command}" is not a command (init, new, site new, agents, skills, add, agent, skill, facts, doctor, lint)`, true);
+  if (!command) return usage("a command is missing (init, new, magic, site new, agents, skills, list, add, remove, agent, skill, facts, doctor or lint)", true);
+  if (!["init", "site", "agent", "skill", "facts", "doctor", "lint", "list", "remove"].includes(command)) return usage(`"${command}" is not a command (init, new, magic, site new, agents, skills, list, add, remove, agent, skill, facts, doctor, lint)`, true);
   let args;
   try {
     args = parseArgs({
@@ -939,6 +1112,7 @@ export function main(argv, { tty = Boolean(process.stdout.isTTY) } = {}) {
         lang: { type: "string" },
         "dry-run": { type: "boolean" },
         force: { type: "boolean" },
+        all: { type: "boolean" },
         for: { type: "string" },
         set: { type: "string", multiple: true },
       },
@@ -951,7 +1125,23 @@ export function main(argv, { tty = Boolean(process.stdout.isTTY) } = {}) {
     const v = values[flag];
     if (v !== undefined && (/[\r\n]/.test(v) || HIDDEN.test(v) || v.startsWith("-"))) return usage(`--${flag} is a path on one line, with no control or hidden character, and not starting with "-"`);
   }
-  if (values.help) return show({ init: HELP_INIT, site: HELP_SITE, agent: HELP_AGENT, skill: HELP_SKILL, facts: HELP_FACTS, doctor: HELP_DOCTOR, lint: HELP_LINT }[command]);
+  if (values.help) return show({ init: HELP_INIT, site: HELP_SITE, agent: HELP_AGENT, skill: HELP_SKILL, facts: HELP_FACTS, doctor: HELP_DOCTOR, lint: HELP_LINT, list: HELP_LIST, remove: HELP_REMOVE }[command]);
+  if (values.all && command !== "init") return usage("--all is only for init");
+  if (command === "list" || command === "remove") {
+    const base = resolve(values.dir ?? ".");
+    if (!existsSync(base)) return usage(`${base} was not found`);
+    if (command === "list") {
+      if (positionals.length) return usage("list takes no word: use --dir <folder>");
+      const report = runList(values.dir ?? ".");
+      process.stdout.write(values.json ? `${JSON.stringify(report, null, 2)}\n` : listPiecesText(report));
+      return 0;
+    }
+    if (positionals.length > 1) return usage("remove takes one name");
+    const { error, report } = runRemove(values, positionals[0]);
+    if (error) return usage(error);
+    process.stdout.write(values.json ? `${JSON.stringify(report, null, 2)}\n` : removeText(report));
+    return 0;
+  }
   if (command === "init") {
     if (positionals.length) return usage("init takes no word: use --target");
     const { error, report } = runInit(values);

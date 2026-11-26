@@ -5481,9 +5481,11 @@ home-light:defined ~ .landing-light__nojs {
   color: var(--luz-text-secondary);
 }
 
-/* Three columns of the row on a wide screen, for the commands that write (three, one row) and the ones that read (six, two
-   rows); two and one as the room goes. The small skills sit on three too, and the agents on three and two. */
+/* Three columns on a wide screen for the commands that install or uninstall, the ones used in the chat and the small skills; two
+   and one as the room goes. The agents sit on three and two. */
 .landing-ai-group .landing-ai__cards,
+#a-install .landing-ai__cards,
+#a-commands .landing-ai__cards,
 #a-skills .landing-ai__cards {
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
 }
@@ -5668,7 +5670,7 @@ home-light:defined ~ .landing-light__nojs {
 
 .landing-ai__ask code {
   min-inline-size: 0;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
   /* The size of the box, not the 0.875em that core gives code: what you type is read at 14 px at least */
   font-size: 1em;
 }
@@ -5681,6 +5683,14 @@ home-light:defined ~ .landing-light__nojs {
 .landing-ai__mark {
   color: var(--luz-brand-primary);
   font-family: var(--luz-font-mono);
+}
+
+/* Where a line is typed (the chat, the terminal) or when (install it, use it): a fixed width, so the commands of a card line up */
+.landing-ai__where {
+  flex: none;
+  inline-size: 8rem;
+  color: var(--luz-text-secondary);
+  font-size: var(--luz-text-sm);
 }
 
 .landing-ai-decide {
