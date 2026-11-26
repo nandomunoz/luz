@@ -91,9 +91,6 @@ const ICONS = {
   add: "M12 5v14M5 12h14",
   help: "M12 3.5a8.5 8.5 0 1 0 0 17 8.5 8.5 0 0 0 0-17ZM9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 .9-1 1.7M12 17h.01",
   promise: "M12 3.5a8.5 8.5 0 1 0 0 17 8.5 8.5 0 0 0 0-17ZM8.5 12l2.5 2.5 4.5-5",
-  // What a card does, the small grey icon beside the blue one: it reads (an eye), or it writes (a pencil)
-  reads: "M2.5 12s3.5-6.5 9.5-6.5 9.5 6.5 9.5 6.5-3.5 6.5-9.5 6.5S2.5 12 2.5 12ZM12 9.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5Z",
-  writes: "M4.5 19.5h4l10-10-4-4-10 10ZM13 7l4 4",
 };
 
 /**
@@ -204,31 +201,25 @@ export function aiSections({ say, root, escapeHtml }) {
 
   // ---- Agents and small skills: what each does and how to ask for it; installing it is a closed details, since everything
   // installs it already
-  // What a card does, as a small grey icon beside its blue one (owner, 2026-11-26: no badge): its words are the title, shown on
-  // hover, and a hidden text for a screen reader
-  const kindIcon = (key) => `<svg class="landing-ai__kind-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="${ICONS[key === "level.ai.agents.reads" ? "reads" : "writes"]}"/></svg>`;
-  const kind = (key) => `<span class="landing-ai__kind" title="${t(key)}">${kindIcon(key)}<span class="u-sr-only">${t(key)}</span></span>`;
-  // The legend under the title of a section: what each small icon of its cards means, so no card needs a hover to be read
-  const legend = (keys) => `    <ul class="landing-ai-legend">${keys.map((key) => `<li>${kindIcon(key)}${t(key)}</li>`).join("")}</ul>`;
-  const card = (id, title, name, badgeKey, text, asked, copy, mod) =>
+  // A card: its icon, its title and technical name, what it does and the sentence to ask for it. Whether it reads or writes is
+  // said by its group (the agents) or by the lead of its section (the skills, which all write), never on the card
+  const card = (id, title, name, text, asked, copy, mod) =>
     [
       `<article class="landing-card landing-ai__card${mod}">`,
-      `<div class="landing-ai__top">${icon(id)}${kind(badgeKey)}</div>`,
+      icon(id),
       `<p class="landing-card__title">${title}</p>`,
       `<code class="landing-ai__name">${escapeHtml(name)}</code>`,
       `<p class="landing-ai__text">${text}</p>`,
       `<p class="landing-ai__label">${t("level.ai.ask")}</p>${ask(asked, copy)}`,
       `</article>`,
     ].join("");
-  const agentCards = agents
-    .map((a) => card(a.name, t(`level.ai.agent.${a.name}.title`), a.name, a.acts ? "level.ai.agents.acts" : "level.ai.agents.reads", t(`level.ai.agent.${a.name}.text`), say("level.ai.agents.use").replace("{name}", a.name), upTo(say("level.ai.agents.use"), a.name), a.acts ? " landing-ai__card--acts" : " landing-ai__card--reads"))
-    .join("");
-  const skillCards = skills.map((name) => card(name, t(`level.ai.skills.${name}.title`), name, "level.ai.skills.badge", t(`level.ai.skills.${name}.text`), say("level.ai.skills.use").replace("{name}", name), upTo(say("level.ai.skills.use"), name), " landing-ai__card--acts")).join("");
-  const goal = (id, links, cards, kinds) => {
-    const top = head(id, links, t(`level.ai.${id}.missing`));
-    top.splice(top.length - 1, 0, legend(kinds));
-    return [`<section class="landing-ai-goal" id="a-${id}" aria-labelledby="a-${id}-title">`, ...top, `  <div class="landing-cards landing-ai__cards">${cards}</div>`, `</section>`].join("\n");
-  };
+  const agentCard = (a) => card(a.name, t(`level.ai.agent.${a.name}.title`), a.name, t(`level.ai.agent.${a.name}.text`), say("level.ai.agents.use").replace("{name}", a.name), upTo(say("level.ai.agents.use"), a.name), a.acts ? " landing-ai__card--acts" : " landing-ai__card--reads");
+  // The agents in two groups (owner, 2026-11-26): the ones that read and propose, then the one that changes code after your go
+  const group = (kind, list) =>
+    `<div class="landing-ai-kind landing-ai-kind--${kind}"><h3 class="landing-ai-kind__title">${t(`level.ai.agents.group.${kind}`)}</h3><p class="landing-ai-kind__lead">${t(`level.ai.agents.group.${kind}.lead`)}</p><div class="landing-cards landing-ai__cards">${list.map(agentCard).join("")}</div></div>`;
+  const agentGroups = `<div class="landing-ai-kinds">${group("reads", agents.filter((a) => !a.acts))}${group("acts", agents.filter((a) => a.acts))}</div>`;
+  const skillCards = `<div class="landing-cards landing-ai__cards">${skills.map((name) => card(name, t(`level.ai.skills.${name}.title`), name, t(`level.ai.skills.${name}.text`), say("level.ai.skills.use").replace("{name}", name), upTo(say("level.ai.skills.use"), name), " landing-ai__card--acts")).join("")}</div>`;
+  const goal = (id, links, body) => [`<section class="landing-ai-goal" id="a-${id}" aria-labelledby="a-${id}-title">`, ...head(id, links, t(`level.ai.${id}.missing`)), `  ${body}`, `</section>`].join("\n");
 
   // What you decide: the guarantees of the skill, in a row of five
   const decide = [
@@ -247,7 +238,7 @@ export function aiSections({ say, root, escapeHtml }) {
   ].join("\n");
 
   return {
-    aiblocks: [works, toc, install, use, goal("agents", [{ href: "/docs/ai/agents/", label: t("level.ai.agents.link") }], agentCards, ["level.ai.agents.reads", "level.ai.agents.acts"]), goal("skills", [{ href: "/docs/ai/agents/#skills", label: t("level.ai.skills.link") }], skillCards, ["level.ai.skills.badge"]), decide].join("\n"),
+    aiblocks: [works, toc, install, use, goal("agents", [{ href: "/docs/ai/agents/", label: t("level.ai.agents.link") }], agentGroups), goal("skills", [{ href: "/docs/ai/agents/#skills", label: t("level.ai.skills.link") }], skillCards), decide].join("\n"),
     naiagents: String(agents.length),
     naitargets: String(targets.length),
     ndepsai: String(dependencies),

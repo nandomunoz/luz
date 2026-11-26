@@ -5661,51 +5661,55 @@ html:has(.landing-marquee) {
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
 }
 
-/* Five agents: three columns on a wide screen (three and two), never one lone card on a row of four */
-#a-agents .landing-ai__cards {
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 21rem), 1fr));
+/* ---- The agents in two groups (owner, 2026-11-26): the four that read and propose, then the one that changes code after your
+   go, set apart on the brand's tint. Side by side on a wide screen, the first wider; stacked on a narrow one ---- */
+.landing-ai-kinds {
+  display: grid;
+  gap: var(--luz-space-lg);
+  align-items: start;
 }
 
-/* The blue icon of a card and, beside it, the small grey one of what it does */
-.landing-ai__top {
-  display: flex;
-  align-items: center;
+@media (min-width: 64rem) {
+  .landing-ai-kinds {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  }
+}
+
+.landing-ai-kind {
+  display: grid;
   gap: var(--luz-space-sm);
+  min-inline-size: 0;
+  /* A share of the width caps it at 400 % text, as the panels do; at any usual size the token is the smaller */
+  padding: min(var(--luz-space-lg), 5%);
+  border: 1px solid var(--luz-divider);
+  border-radius: var(--luz-radius-md);
 }
 
-.landing-ai__kind {
-  position: relative;
-  display: inline-flex;
-  cursor: help;
+.landing-ai-kind--acts {
+  border-color: var(--luz-brand-primary);
+  background: color-mix(in oklab, var(--luz-brand-primary) 6%, var(--luz-surface-page));
 }
 
-.landing-ai__kind-icon {
-  inline-size: 1.125rem;
-  block-size: 1.125rem;
-  fill: none;
-  stroke: var(--luz-text-secondary);
-  stroke-width: 1.75;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-/* The legend under the title of a section: each small icon and what it means, in a quiet row */
-.landing-ai-legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--luz-space-xs) var(--luz-space-lg);
+.landing-ai-kind__title {
   margin: 0;
-  padding: 0;
-  list-style: none;
   font-family: var(--luz-font-sans);
-  font-size: var(--luz-text-sm);
+  font-size: var(--luz-text-lg);
+  font-weight: 600;
+}
+
+.landing-ai-kind__lead {
+  margin: 0 0 var(--luz-space-sm);
+  font-size: var(--luz-text-base);
   color: var(--luz-text-secondary);
 }
 
-.landing-ai-legend li {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--luz-space-xs);
+/* Inside a group: two columns for the four that read, one for the one that changes code */
+.landing-ai-kind--reads .landing-ai__cards {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
+}
+
+.landing-ai-kind--acts .landing-ai__cards {
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .landing-ai__icon {
