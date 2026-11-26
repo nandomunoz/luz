@@ -193,6 +193,28 @@ describe("remove: one piece away, and only what luz-ai wrote", () => {
     expect(existsSync(join(e, ".claude/agents/luz-agent-ux.md"))).toBe(true);
   });
 
+  it("leaves an agent file that the person changed, and takes one whose only difference is a field luz-ai filled; --force takes the changed one", () => {
+    const d = dir();
+    const field = json(["agents"]).find((a) => a.name === "luz-agent-ux").fields[0];
+    expect(run(["add", "luz-agent-ux", "--for", "claude", "--set", `${field}=our visitors are small bakeries`, "--dir", d]).code).toBe(0);
+    expect(run(["remove", "luz-agent-ux", "--dir", d]).code).toBe(0);
+    expect(existsSync(join(d, ".claude/agents/luz-agent-ux.md"))).toBe(false);
+    run(["add", "luz-agent-ux", "--for", "claude", "--dir", d]);
+    const file = join(d, ".claude/agents/luz-agent-ux.md");
+    writeFileSync(file, `${readFileSync(file, "utf-8")}\nMy own extra rule.\n`);
+    const r = run(["remove", "luz-agent-ux", "--dir", d]);
+    expect(r.code).toBe(0);
+    expect(r.out).toMatch(/luz-agent-ux\.md was changed after luz-ai wrote it: left in place \(--force removes it\)/);
+    expect(existsSync(file)).toBe(true);
+    expect(run(["remove", "luz-agent-ux", "--dir", d, "--force"]).code).toBe(0);
+    expect(existsSync(file)).toBe(false);
+  });
+
+  it("says --force in the help of remove, and SKILL.md has the assistant use it only when the person typed it", () => {
+    expect(run(["remove", "--help"]).out).toMatch(/luz-ai remove <name> \[--dir <folder>\] \[--dry-run\] \[--force\]/);
+    expect(readFileSync(join(SKILL, "SKILL.md"), "utf-8")).toMatch(/Run `remove` with `--force` only if the person typed it/);
+  });
+
   it("with --dry-run shows what it would delete and deletes nothing", () => {
     const d = dir();
     run(["add", "luz-agent-ux", "--for", "claude", "--dir", d]);

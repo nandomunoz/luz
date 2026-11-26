@@ -9,7 +9,7 @@
  *   - the text of the page has no invented fact (a price, a review, an address, a person), and the report says it is a prototype.
  */
 import { spawnSync } from "node:child_process";
-import { existsSync, mkdtempSync, readFileSync, readdirSync, rmSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, readdirSync, rmSync, symlinkSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -20,8 +20,8 @@ const SKILL = join(root, "packages/ai/skills/luz");
 const SCRIPT = join(SKILL, "scripts/luz.mjs");
 const md = readFileSync(join(SKILL, "SKILL.md"), "utf-8");
 const section = (title) => new RegExp(`^## ${title}\\n([\\s\\S]*?)(?=\\n## |(?![\\s\\S]))`, "m").exec(md)?.[1] ?? "";
-const run = (args) => {
-  const r = spawnSync(process.execPath, [SCRIPT, ...args], { encoding: "utf-8" });
+const run = (args, cwd) => {
+  const r = spawnSync(process.execPath, [SCRIPT, ...args], { encoding: "utf-8", cwd });
   return { code: r.status, out: r.stdout, err: r.stderr };
 };
 const tmp = [];
@@ -42,11 +42,11 @@ describe("the script", () => {
   it("runs `magic` as `site new` does, so the skill writes the starter page in one step, and never overwrites", () => {
     const d = mkdtempSync(join(tmpdir(), "luz-magic-"));
     tmp.push(d);
-    const flags = ["--name", "Pan Vivo", "--kind", "landing", "--stack", "vanilla", "--target", join(d, "pan-vivo")];
-    expect(run(["magic", ...flags, "--dry-run"])).toEqual(run(["site", "new", ...flags, "--dry-run"]));
-    expect(run(["magic", ...flags]).code).toBe(0);
+    const flags = ["--name", "Pan Vivo", "--kind", "landing", "--stack", "vanilla", "--target", "pan-vivo"];
+    expect(run(["magic", ...flags, "--dry-run"], d)).toEqual(run(["site", "new", ...flags, "--dry-run"], d));
+    expect(run(["magic", ...flags], d).code).toBe(0);
     expect(readdirSync(join(d, "pan-vivo")).length).toBeGreaterThan(0);
-    const again = run(["magic", ...flags]);
+    const again = run(["magic", ...flags], d);
     expect(again.code).toBe(2);
     expect(again.err).toMatch(/exists|--force/);
   });
@@ -55,19 +55,38 @@ describe("the script", () => {
     const d = mkdtempSync(join(tmpdir(), "luz-magic-"));
     tmp.push(d);
     const base = ["--name", "Pan Vivo", "--kind", "landing", "--stack", "vanilla"];
-    const forced = run(["magic", ...base, "--target", join(d, "a"), "--force"]);
+    const forced = run(["magic", ...base, "--target", "a", "--force"], d);
     expect(forced.code).toBe(2);
     expect(forced.err).toMatch(/magic never takes --force/);
     expect(existsSync(join(d, "a"))).toBe(false);
-    const exists = run(["magic", ...base, "--target", d]);
+    const exists = run(["magic", ...base, "--target", "."], d);
     expect(exists.code).toBe(2);
     expect(exists.err).toMatch(/writes only into a folder that does not exist yet/);
     expect(readdirSync(d)).toEqual([]);
-    const none = run(["magic", ...base]);
+    const none = run(["magic", ...base], d);
     expect(none.code).toBe(2);
     expect(none.err).toMatch(/--target/);
     // the long form keeps its own rules: a folder that exists is fine for `new`, and --force is its word
     expect(run(["new", ...base, "--target", d, "--dry-run"]).code).toBe(0);
+  });
+
+  it("keeps its folder inside the one it is run from, out of the folders of the assistant and the pipeline, and out of a link", () => {
+    const d = mkdtempSync(join(tmpdir(), "luz-magic-"));
+    tmp.push(d);
+    const outside = mkdtempSync(join(tmpdir(), "luz-magic-out-"));
+    tmp.push(outside);
+    const base = ["--name", "Pan Vivo", "--kind", "landing", "--stack", "vanilla"];
+    for (const target of [join(outside, "x"), "../x", ".claude/site", ".agents/x", ".github/x", ".codex/x", ".gemini/x", ".cursor/x"]) {
+      const r = run(["magic", ...base, "--target", target], d);
+      expect(r.code, target).toBe(2);
+      expect(r.err, target).toMatch(/inside the folder it is run from|folder of an assistant or of the pipeline/);
+    }
+    symlinkSync(outside, join(d, "link"));
+    const linked = run(["magic", ...base, "--target", "link/site"], d);
+    expect(linked.code).toBe(2);
+    expect(linked.err).toMatch(/symbolic link/);
+    expect(readdirSync(outside)).toEqual([]);
+    expect(run(["magic", ...base, "--target", "ok/site"], d).code).toBe(0);
   });
 
   it("says in the header of the script and in the README that magic and remove write", () => {
@@ -120,6 +139,7 @@ describe("the Magic section of SKILL.md", () => {
 
   it("runs only the script and the check, installs nothing and adds no agent or skill", () => {
     expect(text).toMatch(/Run only `magic` and the check/);
+    expect(text).toMatch(/say in the same message that the check runs with `npx`, which downloads the checker once/);
     expect(text).toMatch(/Run no command to probe the machine/);
     expect(text).toMatch(/Add no agent and no skill/);
     expect(text).toMatch(/no `curl`, no `wget`/);
