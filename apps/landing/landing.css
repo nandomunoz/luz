@@ -5689,6 +5689,25 @@ html:has(.landing-marquee) {
   stroke-linejoin: round;
 }
 
+/* The legend under the title of a section: each small icon and what it means, in a quiet row */
+.landing-ai-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--luz-space-xs) var(--luz-space-lg);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--luz-font-sans);
+  font-size: var(--luz-text-sm);
+  color: var(--luz-text-secondary);
+}
+
+.landing-ai-legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--luz-space-xs);
+}
+
 .landing-ai__icon {
   inline-size: 1.75rem;
   block-size: 1.75rem;

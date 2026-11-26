@@ -206,8 +206,10 @@ export function aiSections({ say, root, escapeHtml }) {
   // installs it already
   // What a card does, as a small grey icon beside its blue one (owner, 2026-11-26: no badge): its words are the title, shown on
   // hover, and a hidden text for a screen reader
-  const kind = (key) =>
-    `<span class="landing-ai__kind" title="${t(key)}"><svg class="landing-ai__kind-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="${ICONS[key === "level.ai.agents.reads" ? "reads" : "writes"]}"/></svg><span class="u-sr-only">${t(key)}</span></span>`;
+  const kindIcon = (key) => `<svg class="landing-ai__kind-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="${ICONS[key === "level.ai.agents.reads" ? "reads" : "writes"]}"/></svg>`;
+  const kind = (key) => `<span class="landing-ai__kind" title="${t(key)}">${kindIcon(key)}<span class="u-sr-only">${t(key)}</span></span>`;
+  // The legend under the title of a section: what each small icon of its cards means, so no card needs a hover to be read
+  const legend = (keys) => `    <ul class="landing-ai-legend">${keys.map((key) => `<li>${kindIcon(key)}${t(key)}</li>`).join("")}</ul>`;
   const card = (id, title, name, badgeKey, text, asked, copy, mod) =>
     [
       `<article class="landing-card landing-ai__card${mod}">`,
@@ -222,7 +224,11 @@ export function aiSections({ say, root, escapeHtml }) {
     .map((a) => card(a.name, t(`level.ai.agent.${a.name}.title`), a.name, a.acts ? "level.ai.agents.acts" : "level.ai.agents.reads", t(`level.ai.agent.${a.name}.text`), say("level.ai.agents.use").replace("{name}", a.name), upTo(say("level.ai.agents.use"), a.name), a.acts ? " landing-ai__card--acts" : " landing-ai__card--reads"))
     .join("");
   const skillCards = skills.map((name) => card(name, t(`level.ai.skills.${name}.title`), name, "level.ai.skills.badge", t(`level.ai.skills.${name}.text`), say("level.ai.skills.use").replace("{name}", name), upTo(say("level.ai.skills.use"), name), " landing-ai__card--acts")).join("");
-  const goal = (id, links, cards) => [`<section class="landing-ai-goal" id="a-${id}" aria-labelledby="a-${id}-title">`, ...head(id, links, t(`level.ai.${id}.missing`)), `  <div class="landing-cards landing-ai__cards">${cards}</div>`, `</section>`].join("\n");
+  const goal = (id, links, cards, kinds) => {
+    const top = head(id, links, t(`level.ai.${id}.missing`));
+    top.splice(top.length - 1, 0, legend(kinds));
+    return [`<section class="landing-ai-goal" id="a-${id}" aria-labelledby="a-${id}-title">`, ...top, `  <div class="landing-cards landing-ai__cards">${cards}</div>`, `</section>`].join("\n");
+  };
 
   // What you decide: the guarantees of the skill, in a row of five
   const decide = [
@@ -241,7 +247,7 @@ export function aiSections({ say, root, escapeHtml }) {
   ].join("\n");
 
   return {
-    aiblocks: [works, toc, install, use, goal("agents", [{ href: "/docs/ai/agents/", label: t("level.ai.agents.link") }], agentCards), goal("skills", [{ href: "/docs/ai/agents/#skills", label: t("level.ai.skills.link") }], skillCards), decide].join("\n"),
+    aiblocks: [works, toc, install, use, goal("agents", [{ href: "/docs/ai/agents/", label: t("level.ai.agents.link") }], agentCards, ["level.ai.agents.reads", "level.ai.agents.acts"]), goal("skills", [{ href: "/docs/ai/agents/#skills", label: t("level.ai.skills.link") }], skillCards, ["level.ai.skills.badge"]), decide].join("\n"),
     naiagents: String(agents.length),
     naitargets: String(targets.length),
     ndepsai: String(dependencies),
