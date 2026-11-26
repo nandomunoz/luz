@@ -20,31 +20,43 @@ const ROUTES = ['/ai/', '/es/ai/', '/ar/ai/'];
 const SECTIONS = '#a-assistants, #a-install, #a-use, #a-agents, #a-skills, #a-decide';
 
 for (const route of ROUTES) {
-  test(`${route}: install is three choices, the recommended one first, each with its command`, async ({ page }) => {
+  test(`${route}: install is three choices, the recommended one in the middle, each with its command`, async ({ page }) => {
     await page.goto(route);
     const options = page.locator('#a-install article.landing-ai-option');
     await expect(options).toHaveCount(3);
-    await expect(options.first()).toHaveClass(/landing-ai-option--recommended/);
+    await expect(options.nth(1)).toHaveClass(/landing-ai-option--recommended/);
+    await expect(options.nth(1).locator('.landing-ai-option__flag')).toBeVisible();
     for (const option of await options.all()) {
       await expect(option.locator('h3')).toBeVisible();
       await expect(option.locator('pre code').first()).toBeVisible();
     }
   });
 
-  test(`${route}: at 1280 px the three choices sit on one row, the same width, and the cards of agents and skills on three or more`, async ({ page }) => {
+  test(`${route}: at 1280 px the three choices are one row like a table of plans, the recommended one in the middle and taller, and no command wraps`, async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 900 });
     await page.goto(route);
-    for (const [selector, least] of [['#a-install article.landing-ai-option', 3], ['#a-agents article', 3], ['#a-skills article', 3]]) {
+    const boxes = await page.locator('#a-install article.landing-ai-option').evaluateAll((all) => all.map((el) => { const b = el.getBoundingClientRect(); return { top: b.top, bottom: b.bottom, left: b.left, right: b.right }; }));
+    const [first, mid, last] = route === '/ar/ai/' ? [...boxes].reverse() : boxes;
+    expect(first.right).toBeLessThanOrEqual(mid.left);
+    expect(mid.right).toBeLessThanOrEqual(last.left);
+    expect(mid.top).toBeLessThan(first.top - 4);
+    expect(mid.bottom).toBeGreaterThan(first.bottom + 4);
+    expect(Math.abs(first.top - last.top)).toBeLessThan(2);
+    expect(Math.abs(first.bottom - last.bottom)).toBeLessThan(2);
+    // A command is one line: it never breaks in the middle of a flag
+    const lines = await page.locator('#a-install pre.luz-code-block code').evaluateAll((all) => all.map((el) => Math.round(el.getBoundingClientRect().height / parseFloat(getComputedStyle(el).lineHeight))));
+    expect(lines).toEqual([1, 1, 1, 1]);
+    for (const selector of ['#a-agents article', '#a-skills article']) {
       const row = await page.locator(selector).evaluateAll((all) => {
-        const boxes = all.map((el) => el.getBoundingClientRect());
-        return boxes.filter((b) => Math.abs(b.top - boxes[0].top) < 2).map((b) => b.width);
+        const bs = all.map((el) => el.getBoundingClientRect());
+        return bs.filter((b) => Math.abs(b.top - bs[0].top) < 2).map((b) => b.width);
       });
-      expect(row.length, selector).toBeGreaterThanOrEqual(least);
+      expect(row.length, selector).toBeGreaterThanOrEqual(3);
       for (const w of row) expect(Math.abs(w - row[0]), selector).toBeLessThan(2);
     }
   });
 
-  test(`${route}: the cards of agents and skills show how to ask for each, and the install line only in its open details`, async ({ page }) => {
+  test(`${route}: the cards of agents and skills show how to ask for each, with no fold, and the section says once how to add one`, async ({ page }) => {
     await page.goto(route);
     for (const [id, count] of [['a-agents', 5], ['a-skills', 6]]) {
       const cards = page.locator(`#${id} article.landing-ai__card`);
@@ -53,13 +65,16 @@ for (const route of ROUTES) {
         await expect(card.locator('svg.landing-ai__icon')).toBeVisible();
         await expect(card.locator('.landing-card__title')).toBeVisible();
         await expect(card.locator('.landing-ai__label + .landing-ai__ask code')).toBeVisible();
-        const install = card.locator('details.landing-ai__install');
-        await expect(install.locator('.landing-ai__ask code')).toBeHidden();
+        await expect(card.locator('details')).toHaveCount(0);
       }
     }
-    const first = page.locator('#a-agents details.landing-ai__install').first();
-    await first.locator('summary').click();
-    await expect(first.locator('.landing-ai__ask code')).toBeVisible();
+    await expect(page.locator('#a-agents .landing-ai-goal__note')).toBeVisible();
+    await expect(page.locator('#a-skills .landing-ai-goal__note')).toBeVisible();
+    // The commands of "Use it" sit in one panel, each row with its three parts on one line at this width
+    await page.setViewportSize({ width: 1280, height: 900 });
+    const row = page.locator('#a-use li.landing-ai-cmd').first();
+    const tops = await row.locator('> *').evaluateAll((all) => all.map((el) => { const b = el.getBoundingClientRect(); return (b.top + b.bottom) / 2; }));
+    expect(Math.max(...tops) - Math.min(...tops)).toBeLessThan(6);
     await expect(page.locator('#a-decide li')).toHaveCount(5);
     await expect(page.locator('main table')).toHaveCount(0);
   });

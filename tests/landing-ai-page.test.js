@@ -96,16 +96,34 @@ describe("the page of the luz skill, /ai/", () => {
     expect(block).toContain(escape(words["level.ai.install.title"]));
     expect(block).toContain(escape(words["level.ai.install.lead"]));
     const options = optionsOf(block);
-    expect(options.map((o) => o.id)).toEqual(["a-install-all", "a-install-min", "a-install-pick"]);
-    expect(options.map((o) => o.recommended)).toEqual([true, false, false]);
-    expect(options[0].html).toContain(`<span class="luz-badge luz-badge--gray landing-ai__badge">${escape(words["level.ai.install.recommended"])}</span>`);
-    for (const [o, key] of [[options[0], "all"], [options[1], "min"], [options[2], "pick"]]) {
+    // As a table of plans (owner, 2026-11-26, the visual pass): the recommended one in the middle, with its flag
+    expect(options.map((o) => o.id)).toEqual(["a-install-min", "a-install-all", "a-install-pick"]);
+    expect(options.map((o) => o.recommended)).toEqual([false, true, false]);
+    expect(options[1].html).toContain(`<p class="landing-ai-option__flag">${escape(words["level.ai.install.recommended"])}</p>`);
+    const getsOf = (o) => [...o.html.matchAll(/<li class="landing-ai-option__get( landing-ai-option__get--no)?">(?:<span class="u-sr-only">([^<]*)<\/span>)?(?:<a href="(#[^"]*)">)?([^<]*)(?:<\/a>)?<\/li>/g)].map((m) => ({ no: Boolean(m[1]), sr: m[2] ?? null, href: m[3] ?? null, text: m[4] }));
+    const n = (key, count) => escape(words[key].replace("{n}", count));
+    // The same three rows in each: what it brings and what it leaves for later
+    expect(getsOf(options[1])).toEqual([
+      { no: false, sr: null, href: null, text: escape(words["level.ai.install.gets.luz"]) },
+      { no: false, sr: null, href: null, text: n("level.ai.install.gets.agents", facts.agents.length) },
+      { no: false, sr: null, href: null, text: n("level.ai.install.gets.skills", facts.skills.length) },
+    ]);
+    expect(getsOf(options[0])).toEqual([
+      { no: false, sr: null, href: null, text: escape(words["level.ai.install.gets.luz"]) },
+      { no: true, sr: `${escape(words["level.ai.install.gets.no"])} `, href: null, text: n("level.ai.install.gets.agents", facts.agents.length) },
+      { no: true, sr: `${escape(words["level.ai.install.gets.no"])} `, href: null, text: n("level.ai.install.gets.skills", facts.skills.length) },
+    ]);
+    expect(getsOf(options[2])).toEqual([
+      { no: false, sr: null, href: null, text: escape(words["level.ai.install.gets.luz"]) },
+      { no: false, sr: null, href: "#a-agents", text: escape(words["level.ai.install.gets.agents.pick"]) },
+      { no: false, sr: null, href: "#a-skills", text: escape(words["level.ai.install.gets.skills.pick"]) },
+    ]);
+    for (const [o, key] of [[options[1], "all"], [options[0], "min"], [options[2], "pick"]]) {
       expect(o.html).toMatch(new RegExp(`<h3 class="landing-ai-option__title">${escape(words[`level.ai.install.${key}.title`])}</h3>`));
       expect(o.html).toContain(escape(words[`level.ai.install.${key}.text`]));
     }
-    expect(options[0].html).toContain(escape(words["level.ai.install.all.gets"].replace("{agents}", facts.agents.length).replace("{skills}", facts.skills.length)));
-    expect(commandsOf(options[0].html)).toEqual(["npx @luz-ds/ai init --target claude --all"]);
-    expect(commandsOf(options[1].html)).toEqual(["npx @luz-ds/ai init --target claude"]);
+    expect(commandsOf(options[1].html)).toEqual(["npx @luz-ds/ai init --target claude --all"]);
+    expect(commandsOf(options[0].html)).toEqual(["npx @luz-ds/ai init --target claude"]);
     // Piece by piece: the minimum in the terminal, then a piece in the chat, and the way to the agents and the skills
     expect(commandsOf(options[2].html)).toEqual(["npx @luz-ds/ai init --target claude", "/luz add luz-agent-ux"]);
     expect(options[2].html).toContain('href="#a-agents"');
@@ -152,9 +170,8 @@ describe("the page of the luz skill, /ai/", () => {
 
   /** The sentence to ask for a piece, and the one in "Not installed?", of a card. */
   const askOf = (card) => /<p class="landing-ai__label">([^<]*)<\/p><p class="landing-ai__ask"><code>([^<]*)<\/code><\/p>/.exec(card)?.slice(1);
-  const installOf = (card) => /<details class="landing-ai__install"><summary>([^<]*)<\/summary><p class="landing-ai__ask"><code>([^<]*)<\/code><\/p><\/details>/.exec(card)?.slice(1);
 
-  it.each(LANGS)("in %s: the agents are a card each, led by what it looks after and how to ask for it; installing it is a closed details at the foot", (code, prefix) => {
+  it.each(LANGS)("in %s: the agents are a card each, led by what it looks after and how to ask for it; how to add one is said once, under the title of the section", (code, prefix) => {
     const block = sectionOf(rendered.get(`${prefix}ai/`), "a-agents");
     const words = catalog(code);
     const list = cards(block);
@@ -167,24 +184,24 @@ describe("the page of the luz skill, /ai/", () => {
       expect(at("landing-ai__name")).toBeLessThan(at("landing-ai__badge"));
       expect(at("landing-ai__badge")).toBeLessThan(at("landing-ai__text"));
       expect(at("landing-ai__text")).toBeLessThan(at("landing-ai__label"));
-      expect(at("landing-ai__label")).toBeLessThan(at("<details"));
       const human = words[`level.ai.agent.${name}.title`];
       expect(human).not.toContain("luz-");
       expect(titleOf(card)).toBe(escape(human));
       expect(card).toContain(escape(words[`level.ai.agent.${name}.text`]));
       expect(askOf(card), name).toEqual([escape(words["level.ai.ask"]), escape(words["level.ai.agents.use"].replace("{name}", name))]);
-      expect(installOf(card), name).toEqual([escape(words["level.ai.notinstalled"]), `/luz add ${name}`]);
-      expect(card).not.toMatch(/<details[^>]*\sopen\b/);
+      // No fold repeated on every card (owner, 2026-11-26): the section says once how to add one
+      expect(card).not.toContain("<details");
       const tools = /^tools:\s*(.*)$/m.exec(read(`${SKILL}/assets/agents/${name}.md`))[1];
       expect(card, name).toContain(`landing-ai__card--${/\b(Edit|Write|Bash)\b/.test(tools) ? "acts" : "reads"}`);
       expect(card, name).toMatch(/<svg\b[^>]*aria-hidden="true"/);
       expect(card, name).not.toContain("landing-ai__where");
     }
+    expect(block).toContain(`<p class="landing-ai-goal__note">${escape(words["level.ai.agents.missing"])}</p>`);
     expect(chatCommands.find((c) => c.chat === "/luz add <name>")).toEqual({ chat: "/luz add <name>", writes: true });
     expect(block).toContain("docs/ai/agents/");
   });
 
-  it.each(LANGS)("in %s: the small skills are a card each, what it does and how to ask for it by its own name, installing it in a closed details, after the agents", (code, prefix) => {
+  it.each(LANGS)("in %s: the small skills are a card each, what it does and how to ask for it by its own name, how to add one said once under the title, after the agents", (code, prefix) => {
     const html = rendered.get(`${prefix}ai/`);
     const block = sectionOf(html, "a-skills");
     const words = catalog(code);
@@ -199,10 +216,11 @@ describe("the page of the luz skill, /ai/", () => {
       expect(card).toContain(escape(words[`level.ai.skills.${name}.text`]));
       expect(card).toContain(`<span class="luz-badge luz-badge--gray landing-ai__badge">${escape(words["level.ai.skills.badge"])}</span>`);
       expect(askOf(card), name).toEqual([escape(words["level.ai.ask"]), escape(words["level.ai.skills.use"].replace("{name}", name))]);
-      expect(installOf(card), name).toEqual([escape(words["level.ai.notinstalled"]), `/luz add ${name}`]);
+      expect(card).not.toContain("<details");
       expect(card).toMatch(/<svg\b[^>]*aria-hidden="true"/);
     }
     expect(block).toContain(escape(words["level.ai.skills.title"]));
+    expect(block).toContain(`<p class="landing-ai-goal__note">${escape(words["level.ai.skills.missing"])}</p>`);
     expect(block).toContain("docs/ai/agents/#skills");
     expect(html.indexOf('id="a-agents"')).toBeLessThan(html.indexOf('id="a-skills"'));
   });
@@ -300,7 +318,7 @@ describe("the page of the luz skill, /ai/", () => {
     }
     // How a session goes, in the tab that creates a site: the four phases, in order
     const create = /<div class="luz-tabpanel landing-ai-use__pane" id="a-use-create">([\s\S]*?)<\/div>/.exec(block)[1];
-    const phases = [...create.matchAll(/<li><strong>([^<]*)<\/strong> <span>([^<]*)<\/span><\/li>/g)].map((m) => m[1]);
+    const phases = [...create.matchAll(/<li><span class="landing-ai-phases__n" aria-hidden="true">\d<\/span><strong>([^<]*)<\/strong><span>([^<]*)<\/span><\/li>/g)].map((m) => m[1]);
     expect(phases).toEqual(["ask", "plan", "write", "check"].map((k) => escape(words[`level.ai.skill.${k}.title`])));
     // The terminal is the docs' page, one link: no terminal line here
     expect(block).toMatch(/href="[^"]*\/docs\/ai\/commands\/"/);
@@ -317,8 +335,8 @@ describe("the page of the luz skill, /ai/", () => {
       const words = catalog(code);
       const keys = Object.keys(words).filter((k) => /^level\.ai\.cmd\.[a-z-]+$/.test(k) && !["level.ai.cmd.writes", "level.ai.cmd.reads"].includes(k));
       expect(keys.sort(), code).toEqual(slugs.map((x) => `level.ai.cmd.${x}`).sort());
-      for (const k of ["install.title", "install.lead", "install.recommended", "install.note", "install.all.title", "install.all.text", "install.all.gets", "install.min.title", "install.min.text", "install.pick.title", "install.pick.text", "use.title", "use.lead", "use.tabs", "use.create", "use.check", "use.manage", "use.terminal", "ask", "notinstalled", "agents.use", "skills.use", "hero.install"]) expect(words[`level.ai.${k}`], `${code} ${k}`).toBeTruthy();
-      for (const k of ["where.chat", "where.terminal", "line.install", "line.use", "install.init", "install.all", "commands.title", "commands.lead", "steps.title", "steps.1.title"]) expect(words[`level.ai.${k}`], `${code} ${k} is gone`).toBeUndefined();
+      for (const k of ["install.title", "install.lead", "install.recommended", "install.note", "install.all.title", "install.all.text", "install.gets.luz", "install.gets.agents", "install.gets.skills", "install.gets.agents.pick", "install.gets.skills.pick", "install.gets.no", "agents.missing", "skills.missing", "install.min.title", "install.min.text", "install.pick.title", "install.pick.text", "use.title", "use.lead", "use.tabs", "use.create", "use.check", "use.manage", "use.terminal", "ask", "agents.use", "skills.use", "hero.install"]) expect(words[`level.ai.${k}`], `${code} ${k}`).toBeTruthy();
+      for (const k of ["where.chat", "where.terminal", "line.install", "line.use", "install.init", "install.all", "commands.title", "commands.lead", "steps.title", "steps.1.title", "notinstalled", "install.all.gets", "install.min.gets"]) expect(words[`level.ai.${k}`], `${code} ${k} is gone`).toBeUndefined();
       expect(words["level.ai.commands.writes"], code).toBeUndefined();
       expect(words["level.ai.cmd.writes"], code).toBeTruthy();
       expect(words["level.ai.cmd.reads"], code).toBeTruthy();
