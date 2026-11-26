@@ -102,13 +102,31 @@ for (const route of ROUTES) {
     await expect(panes.nth(2)).toBeVisible();
   });
 
+  test(`${route}: a link of the sticky list leaves the title of its section in view, under the list`, async ({ page }, info) => {
+    test.skip(info.project.name.endsWith('nojs'), 'the same with or without JavaScript');
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.goto(route);
+    for (const id of ['a-install', 'a-use', 'a-agents', 'a-skills', 'a-decide']) {
+      await page.locator(`.landing-ai-toc a[href="#${id}"]`).click();
+      await page.waitForTimeout(400);
+      const gap = await page.evaluate((id) => {
+        const toc = /** @type {Element} */ (document.querySelector('.landing-ai-toc')).getBoundingClientRect();
+        const title = /** @type {Element} */ (document.querySelector(`#${id} h2`)).getBoundingClientRect();
+        return title.top - toc.bottom;
+      }, id);
+      expect(gap, id).toBeGreaterThanOrEqual(0);
+    }
+  });
+
   for (const zoom of [100, 400]) {
     test(`${route}: at 320 px${zoom === 400 ? ' and 400 % text' : ''} the sections do not leave the viewport sideways`, async ({ page }) => {
       await page.setViewportSize({ width: 320, height: 800 });
       await page.goto(route);
       if (zoom === 400) await page.evaluate(() => { document.documentElement.style.fontSize = '400%'; });
+      // The marquee's own copy of its list runs off the window by design, and is hidden from everyone
       const outside = await page.locator(SECTIONS).locator('h2, h3, p, li, article, code, pre, summary').evaluateAll((all) =>
         all
+          .filter((el) => !el.closest('[aria-hidden="true"], .u-sr-only'))
           .map((el) => ({ el, box: el.getBoundingClientRect() }))
           .filter(({ box }) => box.width > 0 && (box.right > window.innerWidth + 0.5 || box.left < -0.5))
           .map(({ el, box }) => `${el.localName}.${el.className} spans ${Math.round(box.left)}-${Math.round(box.right)}`),

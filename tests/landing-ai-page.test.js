@@ -165,16 +165,19 @@ describe("the page of the luz skill, /ai/", () => {
     expect(pane("hero-claude")).not.toContain("landing-clitabs__note");
   });
 
-  it.each(LANGS)("in %s: the strip of where it works names no assistant (owner, 2026-11-26: not every one is tested), only that it works in any harness, in open formats", (code, prefix) => {
+  it.each(LANGS)("in %s: the strip of where it works is a marquee of short lines under a hidden heading (owner, 2026-11-26), naming no assistant, with its pause button hidden until the script shows it", (code, prefix) => {
     const strip = sectionOf(rendered.get(`${prefix}ai/`), "a-assistants");
     const block = strip.slice(0, strip.indexOf("</section>"));
     const words = catalog(code);
-    expect(block).toContain(escape(words["level.ai.assistants.title"]));
-    expect(block).toContain(escape(words["level.ai.assistants.note"]));
-    expect(words["level.ai.assistants.title"]).toMatch(/harness/i);
+    expect(block).toContain(`<h2 class="u-sr-only" id="a-assistants-title">${escape(words["level.ai.assistants.title"])}</h2>`);
+    const items = Object.keys(words).filter((k) => /^level\.ai\.marquee\.\d+$/.test(k));
+    expect(items.length).toBeGreaterThanOrEqual(8);
+    const list = /<ul class="landing-marquee__list">([\s\S]*?)<\/ul>/.exec(block)?.[1] ?? "";
+    expect([...list.matchAll(/<li>([^<]*)<\/li>/g)].map((m) => m[1])).toEqual(items.map((k) => escape(words[k])));
+    expect(words["level.ai.marquee.1"]).toMatch(/harness/i);
+    expect(block).toMatch(new RegExp(`<button class="landing-marquee__pause" type="button" aria-pressed="false" aria-label="${escape(words["level.ai.marquee.pause"])}" hidden>`));
     for (const { assistant } of aiFacts(repo).targets.filter((x) => x.assistant)) expect(block, assistant).not.toContain(assistant);
-    expect(block).not.toMatch(/<ul\b|<bdi>|<img\b/);
-    for (const gone of ["level.ai.assistants.agents-md", "level.ai.assistants.tested"]) expect(words[gone], gone).toBeUndefined();
+    expect(words["level.ai.assistants.note"]).toBeUndefined();
   });
 
   /** The label and the sentence to ask for a piece, and what a click copies: the sentence up to the name, never the hint after it. */
