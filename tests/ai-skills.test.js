@@ -124,6 +124,13 @@ describe("the three of 2026-11-26: translate, meta and license", () => {
     }
   });
 
+  it("theme and migrate keep away from the files of the assistant and of the pipeline, and theme fetches nothing and runs only the commands of its plan", () => {
+    for (const name of ["luz-theme", "luz-migrate"]) expect(fileOf(name), name).toMatch(/Never touch `\.claude\/`, `AGENTS\.md`, `CLAUDE\.md`, `\.github\/`/);
+    const theme = fileOf("luz-theme");
+    expect(theme).toMatch(/No `curl`, no `wget`, no `fetch`/);
+    expect(theme).toMatch(/run only the commands the plan named/i);
+  });
+
   it("readme holds the same fences as the others: go first, nothing fetched, only the commands of its plan (git log, git remote), away from the files of the assistant and of the pipeline", () => {
     const text = fileOf("luz-readme");
     expect(text).toMatch(/"adelante", "vamos", "hazlo"/);

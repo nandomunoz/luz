@@ -76,7 +76,7 @@ describe("the script", () => {
     const outside = mkdtempSync(join(tmpdir(), "luz-magic-out-"));
     tmp.push(outside);
     const base = ["--name", "Pan Vivo", "--kind", "landing", "--stack", "vanilla"];
-    for (const target of [join(outside, "x"), "../x", ".claude/site", ".agents/x", ".github/x", ".codex/x", ".gemini/x", ".cursor/x", ".git/x", ".vscode/x", "node_modules/x"]) {
+    for (const target of [join(outside, "x"), "../x", ".claude/site", ".agents/x", ".github/x", ".codex/x", ".gemini/x", ".cursor/x", ".git/x", ".vscode/x", "node_modules/x", ".Claude/x", ".GIT/x", "Node_Modules/x"]) {
       const r = run(["magic", ...base, "--target", target], d);
       expect(r.code, target).toBe(2);
       expect(r.err, target).toMatch(/inside the folder it is run from|folder of an assistant or of the pipeline/);
