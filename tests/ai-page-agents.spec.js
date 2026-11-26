@@ -4,8 +4,8 @@
  *
  *   - On a phone, and without JavaScript, they are a list: each item shows its icon, its name, what it does to your files
  *     and its own sentence to copy; nothing changes out of view.
- *   - On a wide screen with JavaScript, the same list becomes five tiles to pick from (a radio group: click, arrows), under
- *     a stage that shows the sentence of the one picked, large, what it does to your files and its text.
+ *   - On a wide screen with JavaScript, the same list becomes tiles to pick from in three columns (a radio group: click,
+ *     arrows), each with its text inside, under a stage that shows the sentence of the one picked and what it does to your files.
  *   - axe finds nothing in light and dark, at both widths.
  */
 import { test, expect } from '@playwright/test';
@@ -22,13 +22,14 @@ for (const route of ROUTES) {
     for (const item of await items.all()) {
       await expect(item.locator('.landing-ai-agent__title')).toBeVisible();
       await expect(item.locator('.landing-ai-agent__kind')).toBeVisible();
+      await expect(item.locator('.landing-ai-agent__text')).toBeVisible();
       await expect(item.locator('.landing-ai__ask')).toBeVisible();
       await expect(item).not.toHaveAttribute('role', 'radio');
     }
     await expect(page.locator('#a-agents .landing-ai-agents__stage')).toBeHidden();
   });
 
-  test(`${route}: on a wide screen the list is five tiles in a row under a stage; picking one changes the stage`, async ({ page }, info) => {
+  test(`${route}: on a wide screen the list is tiles in three columns, each with its text, under a stage; picking one changes the stage`, async ({ page }, info) => {
     await page.setViewportSize({ width: 1280, height: 900 });
     await page.goto(route);
     const items = page.locator('#a-agents li.landing-ai-agent');
@@ -41,9 +42,16 @@ for (const route of ROUTES) {
     await expect(stage).toBeVisible();
     await expect(page.locator('#a-agents .landing-ai-agents__list')).toHaveAttribute('role', 'radiogroup');
     const tops = await items.evaluateAll((all) => all.map((el) => Math.round(el.getBoundingClientRect().top)));
-    expect(new Set(tops).size, 'one row').toBe(1);
+    expect(tops.filter((t) => t === tops[0]).length, 'three in the first row').toBe(3);
+    expect(new Set(tops).size, 'three and two').toBe(2);
     await expect(items.nth(0)).toHaveAttribute('aria-checked', 'true');
-    for (const item of await items.all()) await expect(item.locator('.landing-ai__ask')).toBeHidden();
+    for (const item of await items.all()) {
+      await expect(item.locator('.landing-ai__ask')).toBeHidden();
+      await expect(item.locator('.landing-ai-agent__text')).toBeVisible();
+    }
+    // The stage's sentence is smaller than a heading: no larger than the text of a paragraph plus a step
+    const px = await stage.locator('.landing-ai__ask code').evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
+    expect(px).toBeLessThanOrEqual(18.5);
     const sentence = stage.locator('.landing-ai__ask code');
     await expect(sentence).toContainText('luz-agent-accessibility');
     // Picking the third shows its sentence and its text
@@ -52,9 +60,9 @@ for (const route of ROUTES) {
     await expect(items.nth(0)).toHaveAttribute('aria-checked', 'false');
     const name = await items.nth(2).getAttribute('data-agent');
     await expect(sentence).toContainText(name ?? '');
-    const text = await items.nth(2).locator('.landing-ai-agent__text').textContent();
-    await expect(stage.locator('.landing-ai-agents__text')).toHaveText(text ?? '');
     await expect(stage.locator('.landing-ai-agent__kind')).toBeVisible();
+    // The text is in the card, not repeated on the stage
+    await expect(stage.locator('.landing-ai-agent__text, .landing-ai-agents__text')).toHaveCount(0);
     // The arrows move the choice, as in any radio group (the other way in a right-to-left page)
     await items.nth(2).focus();
     await page.keyboard.press(route === '/ar/ai/' ? 'ArrowLeft' : 'ArrowRight');
@@ -83,7 +91,7 @@ for (const route of ROUTES) {
     expect(tops.filter((t) => t === tops[0]).length, 'three in a row').toBe(3);
     await items.nth(4).click();
     await expect(stage.locator('.landing-ai__ask code')).toContainText(`/${await items.nth(4).getAttribute('data-agent')}`);
-    await expect(stage.locator('.landing-ai-agents__text')).toHaveText((await items.nth(4).locator('.landing-ai-agent__text').textContent()) ?? '');
+    for (const item of await items.all()) await expect(item.locator('.landing-ai-agent__text')).toBeVisible();
   });
 
   for (const [width, scheme] of /** @type {const} */ ([[1280, 'light'], [1280, 'dark'], [375, 'light'], [375, 'dark']])) {

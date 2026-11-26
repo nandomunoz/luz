@@ -197,7 +197,7 @@ describe("the page of the luz skill, /ai/", () => {
   /** The items of the list of agents: one li each, with what a phone shows and what the picker of a wide screen reads. */
   const agentItems = (block) => [...block.matchAll(/<li class="landing-ai-agent[^"]*"[\s\S]*?<\/li>/g)].map((m) => m[0]);
 
-  it.each(LANGS)("in %s: the agents are a list, one item each: icon, name, what it does to your files, its own sentence with the name first, and its text for a screen reader (owner, 2026-11-26: the list of a phone)", (code, prefix) => {
+  it.each(LANGS)("in %s: the agents are a list, one item each: icon, name, what it does to your files, what it does, and its own sentence with the name first (owner, 2026-11-26: the list of a phone)", (code, prefix) => {
     const block = sectionOf(rendered.get(`${prefix}ai/`), "a-agents");
     const words = catalog(code);
     expect(block).toMatch(/<div class="landing-ai-agents" data-pick-label="[^"]+">/);
@@ -211,7 +211,8 @@ describe("the page of the luz skill, /ai/", () => {
       const at = (needle) => item.indexOf(needle);
       expect(at("landing-ai__icon")).toBeLessThan(at("landing-ai-agent__title"));
       expect(at("landing-ai-agent__title")).toBeLessThan(at("landing-ai-agent__kind"));
-      expect(at("landing-ai-agent__kind")).toBeLessThan(at("landing-ai__ask"));
+      expect(at("landing-ai-agent__kind")).toBeLessThan(at("landing-ai-agent__text"));
+      expect(at("landing-ai-agent__text")).toBeLessThan(at("landing-ai__ask"));
       const human = words[`level.ai.agent.${name}.title`];
       expect(human).not.toContain("luz-");
       expect(item).toContain(`<p class="landing-ai-agent__title">${escape(human)}</p>`);
@@ -220,8 +221,8 @@ describe("the page of the luz skill, /ai/", () => {
       expect(ask, name).toBeTruthy();
       expect(ask).not.toContain("luz-");
       expect(item).toContain(`<p class="landing-ai__ask" data-copy="${escape(`${name} ${ask}`)}"><code><strong>${name}</strong> ${escape(ask)}</code></p>`);
-      // What it does, kept for a screen reader on a phone, shown by the picker on a wide screen
-      expect(item).toContain(`<p class="landing-ai-agent__text u-sr-only">${escape(words[`level.ai.agent.${name}.text`])}</p>`);
+      // What it does, inside the card, before its sentence (owner, 2026-11-26)
+      expect(item).toContain(`<p class="landing-ai-agent__text">${escape(words[`level.ai.agent.${name}.text`])}</p>`);
       expect(item).toMatch(/<svg class="landing-ai__icon"[^>]*aria-hidden="true"/);
       expect(item).not.toMatch(/luz-badge|<details|landing-ai__where/);
     }
@@ -250,7 +251,7 @@ describe("the page of the luz skill, /ai/", () => {
       const ask = words[`level.ai.skills.${name}.ask`];
       expect(ask, name).toBeTruthy();
       expect(item).toContain(`<p class="landing-ai__ask" data-copy="${escape(`/${name} ${ask}`)}"><code><strong>/${name}</strong> ${escape(ask)}</code></p>`);
-      expect(item).toContain(`<p class="landing-ai-agent__text u-sr-only">${escape(words[`level.ai.skills.${name}.text`])}</p>`);
+      expect(item).toContain(`<p class="landing-ai-agent__text">${escape(words[`level.ai.skills.${name}.text`])}</p>`);
       // Every skill writes: the item does not say it again
       expect(item).not.toContain("landing-ai-agent__kind");
       expect(item).not.toMatch(/luz-badge|<details/);
