@@ -1190,7 +1190,7 @@ export function main(argv, { tty = Boolean(process.stdout.isTTY) } = {}) {
     const here = resolve(".");
     if (existsSync(target) || isLink(target)) return usage(`${target} exists: magic writes only into a folder that does not exist yet`);
     if (!target.startsWith(here + sep)) return usage(`${target} is not inside the folder it is run from (${here}): magic writes only inside it`);
-    if (CONFIG_FOLDERS.includes(relative(here, target).split(sep)[0])) return usage(`${relative(here, target)} is in the folder of an assistant or of the pipeline: magic never writes there`);
+    if (CONFIG_FOLDERS.includes(relative(here, target).split(sep)[0].toLowerCase())) return usage(`${relative(here, target)} is in the folder of an assistant or of the pipeline: magic never writes there`);
     // A parent that is a symbolic link would send the write somewhere else
     let at = here;
     for (const part of relative(here, target).split(sep)) {
