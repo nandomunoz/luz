@@ -38,6 +38,13 @@ describe("the skill says what it does", () => {
     expect(ref).toMatch(/no field is written as it is/);
   });
 
+  it("the badge of a command that writes says it writes and executes, in the three languages", () => {
+    const words = (code) => JSON.parse(read(`apps/landing/i18n/${code}.json`))["level.ai.cmd.writes"];
+    expect(words("en")).toBe("Writes & executes");
+    expect(words("es")).toBe("Escribe y ejecuta");
+    expect(words("ar")).toBe("تكتب وتنفّذ");
+  });
+
   it("the limits name the exception: --force overwrites, the check is downloaded with npx", () => {
     expect(en["level.ai.limits.2"]).toMatch(/unless/);
     expect(en["level.ai.limits.3"]).toMatch(/script/);
