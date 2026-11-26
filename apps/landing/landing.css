@@ -5685,12 +5685,176 @@ home-light:defined ~ .landing-light__nojs {
   font-family: var(--luz-font-mono);
 }
 
-/* Where a line is typed (the chat, the terminal) or when (install it, use it): a fixed width, so the commands of a card line up */
-.landing-ai__where {
+
+/* ---- Install it: three choices side by side, the recommended one with the brand's border (third pass, 2026-11-26) ---- */
+.landing-ai-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+  gap: var(--luz-space-md);
+}
+
+.landing-ai-option {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--luz-space-sm);
+}
+
+.landing-ai-option > * {
+  margin: 0;
+}
+
+/* What you get stays under its sentence; only the commands go to the foot */
+.landing-ai-option .landing-ai__text {
   flex: none;
-  inline-size: 8rem;
+}
+
+.landing-ai-option--recommended {
+  border-color: var(--luz-brand-primary);
+  box-shadow: inset 0 0 0 1px var(--luz-brand-primary);
+}
+
+.landing-ai-option__title {
+  font-size: var(--luz-text-lg);
+}
+
+.landing-ai-option__gets {
   color: var(--luz-text-secondary);
   font-size: var(--luz-text-sm);
+}
+
+/* The commands sit at the foot, so the three cards line up on their commands */
+.landing-ai-option > .landing-install:first-of-type {
+  margin-block-start: auto;
+}
+
+.landing-ai-option > .landing-install {
+  align-self: stretch;
+}
+
+/* What you type reads at 14 px at least, as on the rest of the page */
+.landing-ai-option .luz-code-block {
+  font-size: var(--luz-text-sm);
+}
+
+.landing-ai-option .luz-code-block code {
+  font-size: 1em;
+}
+
+/* The two links of "piece by piece" wrap inside the card at any text size */
+.landing-ai-option .landing-block__groups {
+  max-inline-size: 100%;
+}
+
+.landing-ai-option .landing-block__groups li {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+
+.landing-ai-option .landing-block__link {
+  max-inline-size: 100%;
+  overflow-wrap: anywhere;
+}
+
+.landing-ai-options__note {
+  margin: 0;
+  color: var(--luz-text-secondary);
+  font-size: var(--luz-text-sm);
+}
+
+/* ---- Use it: core tabs; without JavaScript the panels stack, each under its heading, which the tabs then name ---- */
+.landing-ai-use {
+  display: grid;
+  gap: var(--luz-space-md);
+}
+
+.landing-ai-use__title {
+  margin: 0 0 var(--luz-space-sm);
+  font-size: var(--luz-text-lg);
+}
+
+.landing-ai-use__pane[role="tabpanel"] > .landing-ai-use__title {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.landing-ai-cmds {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* A row: the command, what it does, whether it writes; on a narrow screen the three stack */
+.landing-ai-cmd {
+  display: grid;
+  grid-template-columns: minmax(0, 16rem) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--luz-space-xs) var(--luz-space-md);
+  padding-block: var(--luz-space-sm);
+  border-block-end: 1px solid var(--luz-divider);
+}
+
+.landing-ai-cmd > * {
+  margin: 0;
+}
+
+.landing-ai-cmd .landing-ai__badge {
+  margin: 0;
+}
+
+@media (width < 48rem) {
+  .landing-ai-cmd {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: start;
+  }
+
+  .landing-ai-cmd .landing-ai__ask {
+    justify-self: stretch;
+  }
+}
+
+.landing-ai-phases {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  gap: var(--luz-space-md);
+  margin: var(--luz-space-md) 0 0;
+  padding: 0;
+  list-style-position: inside;
+}
+
+.landing-ai-phases li::marker {
+  color: var(--luz-brand-primary);
+  font-weight: 600;
+}
+
+.landing-ai-phases span {
+  display: block;
+}
+
+/* ---- Agents and skills: how to ask for each, then installing it, closed ---- */
+.landing-ai__label {
+  margin: 0;
+  color: var(--luz-text-secondary);
+  font-size: var(--luz-text-sm);
+}
+
+.landing-ai__install {
+  align-self: stretch;
+  font-size: var(--luz-text-sm);
+}
+
+.landing-ai__install > summary {
+  color: var(--luz-text-secondary);
+  cursor: pointer;
+}
+
+.landing-ai__install > .landing-ai__ask {
+  margin-block-start: var(--luz-space-xs);
 }
 
 .landing-ai-decide {

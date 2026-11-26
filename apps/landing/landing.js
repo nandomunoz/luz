@@ -254,6 +254,8 @@ for (const panel of document.querySelectorAll(".landing-panel")) {
   initTabs(panel);
   initTabCycle(panel);
 }
+// The tabs of "Use it" on the page of the skill: core tabs, chosen by the reader, never turning by themselves
+for (const tabs of document.querySelectorAll(".landing-ai-use")) initTabs(tabs);
 // highlightBlock() only: initHighlight() also injects a copy button into each
 // block, and core ships no position for it.
 // Not the typed scene: its lines are spans the scroll reveals, coloured in the markup

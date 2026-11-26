@@ -303,7 +303,7 @@ describe("the page of the luz skill, /ai/", () => {
     const phases = [...create.matchAll(/<li><strong>([^<]*)<\/strong> <span>([^<]*)<\/span><\/li>/g)].map((m) => m[1]);
     expect(phases).toEqual(["ask", "plan", "write", "check"].map((k) => escape(words[`level.ai.skill.${k}.title`])));
     // The terminal is the docs' page, one link: no terminal line here
-    expect(block).toContain('href="/docs/ai/commands/"');
+    expect(block).toMatch(/href="[^"]*\/docs\/ai\/commands\/"/);
     expect(block).toContain(escape(words["level.ai.use.terminal"]));
     expect(block).not.toMatch(/npx @luz-ds\/ai/);
     for (const slug of ["doctor", "lint", "facts", "agents", "skills", "list", "help"]) expect(rows.find((r) => r.slug === slug).writes, slug).toBe(false);
@@ -318,7 +318,7 @@ describe("the page of the luz skill, /ai/", () => {
       const keys = Object.keys(words).filter((k) => /^level\.ai\.cmd\.[a-z-]+$/.test(k) && !["level.ai.cmd.writes", "level.ai.cmd.reads"].includes(k));
       expect(keys.sort(), code).toEqual(slugs.map((x) => `level.ai.cmd.${x}`).sort());
       for (const k of ["install.title", "install.lead", "install.recommended", "install.note", "install.all.title", "install.all.text", "install.all.gets", "install.min.title", "install.min.text", "install.pick.title", "install.pick.text", "use.title", "use.lead", "use.tabs", "use.create", "use.check", "use.manage", "use.terminal", "ask", "notinstalled", "agents.use", "skills.use", "hero.install"]) expect(words[`level.ai.${k}`], `${code} ${k}`).toBeTruthy();
-      for (const k of ["where.chat", "where.terminal", "line.install", "line.use", "install.init", "install.all", "commands.title", "commands.lead", "steps.title"]) expect(words[`level.ai.${k}`], `${code} ${k} is gone`).toBeUndefined();
+      for (const k of ["where.chat", "where.terminal", "line.install", "line.use", "install.init", "install.all", "commands.title", "commands.lead", "steps.title", "steps.1.title"]) expect(words[`level.ai.${k}`], `${code} ${k} is gone`).toBeUndefined();
       expect(words["level.ai.commands.writes"], code).toBeUndefined();
       expect(words["level.ai.cmd.writes"], code).toBeTruthy();
       expect(words["level.ai.cmd.reads"], code).toBeTruthy();

@@ -75,8 +75,8 @@ describe("the skill says what it does", () => {
   });
 
   it("says the accessibility agent has no field to fill: it reads the project's own files", () => {
-    for (const k of ["inside.l4.p2.text", "level.ai.steps.result.2", "level.ai.agents.lead", "inside.cli.plan.agent", "inside.cli.adapt"]) expect(en[k], k).not.toMatch(/ADAPT/);
-    for (const k of ["inside.l4.p2.text", "level.ai.steps.result.2", "level.ai.agents.lead"]) expect(en[k], k).not.toMatch(/fills/i);
+    for (const k of ["inside.l4.p2.text", "level.ai.agents.lead", "inside.cli.plan.agent", "inside.cli.adapt"]) expect(en[k], k).not.toMatch(/ADAPT/);
+    for (const k of ["inside.l4.p2.text", "level.ai.agents.lead"]) expect(en[k], k).not.toMatch(/fills/i);
     expect(read("apps/docs/pages/ai/agents.html")).not.toMatch(/fields left to fill|\[ADAPT/);
     expect(read(`${SKILL}/SKILL.md`)).toMatch(/agent with no field is written as it is/);
   });

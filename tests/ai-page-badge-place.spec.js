@@ -50,7 +50,8 @@ for (const route of ROUTES) {
           };
         }),
       );
-      expect(found.length).toBeGreaterThanOrEqual(17);
+      // The five agents and the six small skills (the commands are rows of the tabs now, with no card)
+      expect(found.length).toBe(11);
       // One colour for all: the background and the text of the grey badge of "Only reads"
       expect(new Set(found.map((f) => `${f.bg} ${f.color}`)).size, 'every badge has the same background and text colour').toBe(1);
       for (const f of found) {
