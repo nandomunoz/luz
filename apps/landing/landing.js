@@ -71,8 +71,10 @@ function initCopyCommands() {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "landing-ai__copy";
-    button.dataset.copyCommand = code.textContent.trim();
-    button.setAttribute("aria-label", `${t("copy", line)}: ${code.textContent.trim()}`);
+    // What is copied is the line's data-copy: the hint after the name is shown, never copied
+    const copy = line.dataset.copy ?? code.textContent.trim();
+    button.dataset.copyCommand = copy;
+    button.setAttribute("aria-label", `${t("copy", line)}: ${copy}`);
     code.replaceWith(button);
     button.append(code, svg("landing-ai__copy-icon", "M9 9h10.5v10.5H9ZM15 9V4.5H4.5V15H9"), svg("landing-ai__copy-done", "M5 12.5l4.5 4.5L19 7.5"));
   });

@@ -100,13 +100,19 @@ const ICONS = {
 export function aiSections({ say, root, escapeHtml }) {
   const t = (key) => escapeHtml(say(key));
   const { agents, skills, targets, dependencies } = aiFacts(root);
-  const code = (text) => `<code>${escapeHtml(text)}</code>`;
   const icon = (id) => {
     if (!ICONS[id]) throw new Error(`scripts/docs-site/ai-page.js: no icon for "${id}": add its path to ICONS`);
     return `<svg class="landing-ai__icon" viewBox="0 0 24 24" aria-hidden="true"><path d="${ICONS[id]}"/></svg>`;
   };
-  // A line you copy: what you type, nothing else (the section says where you type it, once)
-  const ask = (text) => `<p class="landing-ai__ask">${code(text)}</p>`;
+  // A line you copy: what you type, nothing else (the section says where you type it, once). The hint after the name ("on my
+  // page", "<what you want>") is shown, dimmed, but never copied (owner, 2026-11-26): a click copies `copy` alone
+  const ask = (text, copy = text) => {
+    if (!text.startsWith(copy)) throw new Error(`scripts/docs-site/ai-page.js: "${copy}" is not the start of "${text}"`);
+    const hint = text.slice(copy.length);
+    return `<p class="landing-ai__ask" data-copy="${escapeHtml(copy)}"><code>${escapeHtml(copy)}${hint ? `<span class="landing-ai__hint">${escapeHtml(hint)}</span>` : ""}</code></p>`;
+  };
+  // The part of a sentence that is copied: up to the name in it, or a command up to its first <argument>
+  const upTo = (sentence, name) => sentence.slice(0, sentence.indexOf("{name}")) + name;
   const badge = (key) => `<span class="luz-badge luz-badge--gray landing-ai__badge">${t(key)}</span>`;
   const head = (id, links = [], note = "") =>
     [
@@ -118,12 +124,12 @@ export function aiSections({ say, root, escapeHtml }) {
       `  </div>`,
     ].filter(Boolean);
 
-  // The assistants it installs itself for, by name (no logos: they are not ours, nor MIT), and where it is tested
+  // Where it works (owner, 2026-11-26): no assistant by name, since not every one is tested; it is written in open formats, for
+  // any harness
   const works = [
     `<section class="landing-ai-works" id="a-assistants" aria-labelledby="a-assistants-title">`,
     `  <h2 class="landing-ai-works__title" id="a-assistants-title">${t("level.ai.assistants.title")}</h2>`,
-    `  <ul class="landing-ai-works__list">${targets.map((x) => `<li>${x.assistant ? `<bdi>${x.assistant}</bdi>` : t("level.ai.assistants.agents-md")}</li>`).join("")}</ul>`,
-    `  <p class="landing-ai-works__note">${t("level.ai.assistants.tested")}</p>`,
+    `  <p class="landing-ai-works__note">${t("level.ai.assistants.note")}</p>`,
     `</section>`,
   ].join("\n");
 
@@ -178,7 +184,7 @@ export function aiSections({ say, root, escapeHtml }) {
     const r = rows.find((x) => x.slug === slug);
     if (!r) throw new Error(`scripts/docs-site/ai-page.js: TABS names "${slug}", which is not a command of SKILL.md`);
     const typed = TYPED[slug] ?? r.chat.replace(/ \[.*$/, "");
-    return `<li class="landing-ai-cmd">${ask(typed)}<p class="landing-ai-cmd__text">${t(`level.ai.cmd.${slug}`)}</p>${badge(r.writes ? "level.ai.cmd.writes" : "level.ai.cmd.reads")}</li>`;
+    return `<li class="landing-ai-cmd">${ask(typed, typed.replace(/ <.*$/, ""))}<p class="landing-ai-cmd__text">${t(`level.ai.cmd.${slug}`)}</p>${badge(r.writes ? "level.ai.cmd.writes" : "level.ai.cmd.reads")}</li>`;
   };
   // How a session goes, under the commands that create a site
   const phases = `<ol class="landing-ai-phases">${["ask", "plan", "write", "check"].map((k, i) => `<li><span class="landing-ai-phases__n" aria-hidden="true">${i + 1}</span><strong>${t(`level.ai.skill.${k}.title`)}</strong><span>${t(`level.ai.skill.${k}.text`)}</span></li>`).join("")}</ol>`;
@@ -194,7 +200,7 @@ export function aiSections({ say, root, escapeHtml }) {
 
   // ---- Agents and small skills: what each does and how to ask for it; installing it is a closed details, since everything
   // installs it already
-  const card = (id, title, name, badgeKey, text, asked, mod) =>
+  const card = (id, title, name, badgeKey, text, asked, copy, mod) =>
     [
       `<article class="landing-card landing-ai__card${mod}">`,
       icon(id),
@@ -202,13 +208,13 @@ export function aiSections({ say, root, escapeHtml }) {
       `<code class="landing-ai__name">${escapeHtml(name)}</code>`,
       badge(badgeKey),
       `<p class="landing-ai__text">${text}</p>`,
-      `<p class="landing-ai__label">${t("level.ai.ask")}</p>${ask(asked)}`,
+      `<p class="landing-ai__label">${t("level.ai.ask")}</p>${ask(asked, copy)}`,
       `</article>`,
     ].join("");
   const agentCards = agents
-    .map((a) => card(a.name, t(`level.ai.agent.${a.name}.title`), a.name, a.acts ? "level.ai.agents.acts" : "level.ai.agents.reads", t(`level.ai.agent.${a.name}.text`), say("level.ai.agents.use").replace("{name}", a.name), a.acts ? " landing-ai__card--acts" : " landing-ai__card--reads"))
+    .map((a) => card(a.name, t(`level.ai.agent.${a.name}.title`), a.name, a.acts ? "level.ai.agents.acts" : "level.ai.agents.reads", t(`level.ai.agent.${a.name}.text`), say("level.ai.agents.use").replace("{name}", a.name), upTo(say("level.ai.agents.use"), a.name), a.acts ? " landing-ai__card--acts" : " landing-ai__card--reads"))
     .join("");
-  const skillCards = skills.map((name) => card(name, t(`level.ai.skills.${name}.title`), name, "level.ai.skills.badge", t(`level.ai.skills.${name}.text`), say("level.ai.skills.use").replace("{name}", name), " landing-ai__card--acts")).join("");
+  const skillCards = skills.map((name) => card(name, t(`level.ai.skills.${name}.title`), name, "level.ai.skills.badge", t(`level.ai.skills.${name}.text`), say("level.ai.skills.use").replace("{name}", name), upTo(say("level.ai.skills.use"), name), " landing-ai__card--acts")).join("");
   const goal = (id, links, cards) => [`<section class="landing-ai-goal" id="a-${id}" aria-labelledby="a-${id}-title">`, ...head(id, links, t(`level.ai.${id}.missing`)), `  <div class="landing-cards landing-ai__cards">${cards}</div>`, `</section>`].join("\n");
 
   // What you decide: the guarantees of the skill, in a row of five
@@ -220,7 +226,7 @@ export function aiSections({ say, root, escapeHtml }) {
     `</section>`,
   ].join("\n");
 
-  // The sections of the page, under the strip of assistants: a list of links, titled by the sections themselves
+  // The sections of the page, under the hero: a list of links, titled by the sections themselves
   const toc = [
     `<nav class="landing-ai-toc" aria-label="${t("level.ai.toc.label")}">`,
     `  <ul class="landing-ai-toc__list">${[["a-install", "level.ai.install.title"], ["a-use", "level.ai.use.title"], ["a-agents", "level.ai.agents.title"], ["a-skills", "level.ai.skills.title"], ["a-decide", "level.ai.limits.title"]].map(([id, key]) => `<li><a href="#${id}">${t(key)}</a></li>`).join("")}</ul>`,
@@ -228,7 +234,7 @@ export function aiSections({ say, root, escapeHtml }) {
   ].join("\n");
 
   return {
-    aiblocks: [works, toc, install, use, goal("agents", [{ href: "/docs/ai/agents/", label: t("level.ai.agents.link") }], agentCards), goal("skills", [{ href: "/docs/ai/agents/#skills", label: t("level.ai.skills.link") }], skillCards), decide].join("\n"),
+    aiblocks: [toc, install, works, use, goal("agents", [{ href: "/docs/ai/agents/", label: t("level.ai.agents.link") }], agentCards), goal("skills", [{ href: "/docs/ai/agents/#skills", label: t("level.ai.skills.link") }], skillCards), decide].join("\n"),
     naiagents: String(agents.length),
     naitargets: String(targets.length),
     ndepsai: String(dependencies),

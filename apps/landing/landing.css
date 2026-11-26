@@ -5378,20 +5378,7 @@ home-light:defined ~ .landing-light__nojs {
 .landing-ai-works__title {
   margin: 0;
   font-family: var(--luz-font-sans);
-  font-size: var(--luz-text-base);
-  font-weight: 600;
-  color: var(--luz-text-secondary);
-}
-
-.landing-ai-works__list {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: var(--luz-space-xs) var(--luz-space-md);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  font-family: var(--luz-font-sans);
+  font-size: var(--luz-text-lg);
   font-weight: 600;
   color: var(--luz-text-primary);
 }
@@ -5580,6 +5567,12 @@ home-light:defined ~ .landing-light__nojs {
    all of it so the whole line is the click, and shows a copy icon at the far end on hover or focus, always on a touch screen */
 .landing-ai__ask {
   position: relative;
+}
+
+/* The hint after the name ("on my page", "<what you want>"): shown, not copied */
+.landing-ai__hint {
+  font-weight: 400;
+  color: var(--luz-text-secondary);
 }
 
 .landing-ai__copy {
