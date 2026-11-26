@@ -60,9 +60,9 @@ describe("the data beside the script", () => {
     expect(json(join(skill, "assets/facts.json"))).toEqual(buildAiFacts({ root }));
   });
 
-  it("has every generated file (the facts, a starter page and a reference per kind, the stacks, the agent) as the generator builds it", () => {
+  it("has every generated file (the facts, a starter page and a reference per kind, the stacks, the agents, the skills) as the generator builds it", () => {
     const files = buildAiFiles({ root });
-    expect(Object.keys(files).length).toBe(12);
+    expect(Object.keys(files).length).toBe(13);
     for (const [file, text] of Object.entries(files)) expect(read(join(root, file)), `${file} is out of step: run node scripts/build-ai-facts.js`).toBe(text);
   });
 
@@ -554,8 +554,8 @@ describe("the skill as /luz <subcommand>: the router and the rule IDs (owner, 20
     expect(section("Subcommands")).toContain("$ARGUMENTS");
   });
 
-  it("has a row for each subcommand: none, new, doctor, lint, facts, agents, add and help", () => {
-    expect(rows().map((r) => r.chat.replace(/^\/luz ?/, "").split(" ")[0])).toEqual(["", "new", "doctor", "lint", "facts", "agents", "add", "help"]);
+  it("has a row for each subcommand: none, new, doctor, lint, facts, agents, skills, add and help", () => {
+    expect(rows().map((r) => r.chat.replace(/^\/luz ?/, "").split(" ")[0])).toEqual(["", "new", "doctor", "lint", "facts", "agents", "skills", "add", "help"]);
   });
 
   it("takes the kinds of `new` from the facts, never typed twice", () => {
@@ -571,9 +571,9 @@ describe("the skill as /luz <subcommand>: the router and the rule IDs (owner, 20
     for (const c of used) expect(help, c).toContain(c.split(" ")[0]);
   });
 
-  it("writes nothing for doctor, lint, facts, agents and help, and writes only after \"go\" for the rest", () => {
+  it("writes nothing for doctor, lint, facts, agents, skills and help, and writes only after \"go\" for the rest", () => {
     const by = Object.fromEntries(rows().map((r) => [r.chat.replace(/^\/luz ?/, "").split(" ")[0], r.writes]));
-    for (const c of ["doctor", "lint", "facts", "agents", "help"]) expect(by[c], c).toBe("no");
+    for (const c of ["doctor", "lint", "facts", "agents", "skills", "help"]) expect(by[c], c).toBe("no");
     for (const c of ["", "new", "add"]) expect(by[c], c).toBe("yes");
     expect(section("Subcommands")).toMatch(/"go"/);
   });
@@ -725,15 +725,16 @@ describe("the agents of luz-ai", () => {
   it("are named luz-agent-<word>, one clear word for what each looks after, kept here and passing the check", () => {
     expect(list("agent").map((a) => a.name)).toEqual(AGENTS);
     for (const a of AGENTS) expect(a, a).toMatch(/^luz-agent-[a-z]+$/);
-    expect(existsSync(join(assets, "skills"))).toBe(false);
+    // The small skills live beside the agents, in their own folder, and are not agents (tests/ai-skills.test.js)
+    expect(readdirSync(join(assets, "skills")).sort()).toEqual(["luz-migrate", "luz-readme", "luz-theme"]);
     const r = run(["lint", "--json", join(assets, "agents")]);
     expect(JSON.parse(r.out).problems).toEqual([]);
     expect(JSON.parse(r.out).checked.length).toBe(AGENTS.length);
   });
 
-  it("has no skill subcommand: the agents are all it adds, and the skill installs itself with init", () => {
-    expect(run(["skill", "list"]).code).toBe(2);
-    expect(run(["--help"]).out).not.toMatch(/\bskill {5}/);
+  it("has a skill subcommand that lists and adds the small skills, and `luz` is not one: the skill installs itself with init", () => {
+    expect(run(["skill", "list"]).code).toBe(0);
+    expect(run(["skill", "list", "--json"]).out).not.toContain('"luz"');
   });
 
   it("is the reviewer of @luz-ds/check, built from the same source, so there is one accessibility agent and not two", async () => {

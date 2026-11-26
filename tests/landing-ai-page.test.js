@@ -98,7 +98,7 @@ describe("the page of the luz skill, /ai/", () => {
   it("has the assistants' strip, then a section for each element of the skill (commands, agents, the skill) and the strip of what you decide, in that order, with no table", () => {
     for (const [, prefix] of LANGS) {
       const html = rendered.get(`${prefix}ai/`);
-      expect([...html.matchAll(/<section\b[^>]*\sid="(a-[a-z]+)"/g)].map((m) => m[1])).toEqual(["a-assistants", "a-commands", "a-agents", "a-skill", "a-decide"]);
+      expect([...html.matchAll(/<section\b[^>]*\sid="(a-[a-z]+)"/g)].map((m) => m[1])).toEqual(["a-assistants", "a-commands", "a-agents", "a-skills", "a-how", "a-decide"]);
       // The two tables of commands and the one of assistants are in /docs/ai/ now, not here
       expect(html, prefix).not.toMatch(/<table\b/);
       expect(html, prefix).not.toContain("--target</th>");
@@ -123,7 +123,7 @@ describe("the page of the luz skill, /ai/", () => {
   });
 
   it.each(LANGS)("in %s: the section of the skill is the phases of a session, each with what you say or what runs, and every command of it is the skill's", (code, prefix) => {
-    const block = sectionOf(rendered.get(`${prefix}ai/`), "a-skill");
+    const block = sectionOf(rendered.get(`${prefix}ai/`), "a-how");
     const words = catalog(code);
     const list = cards(block);
     expect(list.map(titleOf)).toEqual(["ask", "plan", "write", "check"].map((k) => escape(words[`level.ai.skill.${k}.title`])));
@@ -164,6 +164,40 @@ describe("the page of the luz skill, /ai/", () => {
     expect(block).toContain('docs/ai/agents/');
   });
 
+  it.each(LANGS)("in %s: the small skills are a card each, a title, what it does, the badge, and the sentence that adds it, between the agents and how /luz works", (code, prefix) => {
+    const html = rendered.get(`${prefix}ai/`);
+    const block = sectionOf(html, "a-skills");
+    const words = catalog(code);
+    const names = readdirSync(join(repo, SKILL, "assets/skills"), { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name).sort();
+    expect(names).toEqual(["luz-migrate", "luz-readme", "luz-theme"]);
+    const list = cards(block);
+    expect(list).toHaveLength(names.length);
+    for (const name of names) {
+      const card = list.find((c) => c.includes(`<code>/luz add ${name}</code>`));
+      expect(card, name).toBeDefined();
+      expect(titleOf(card), name).toBe(escape(words[`level.ai.skills.${name}.title`]));
+      expect(card).toContain(escape(words[`level.ai.skills.${name}.text`]));
+      expect(card).toContain(`<span class="luz-badge luz-badge--gray landing-ai__badge">${escape(words["level.ai.skills.badge"])}</span>`);
+      expect(card).toContain(`<code class="landing-ai__name">${name}</code>`);
+      expect(card).toMatch(/<svg\b[^>]*aria-hidden="true"/);
+      expect(card).not.toMatch(/<bdi>|landing-ai__meta/);
+    }
+    expect(block).toContain(escape(words["level.ai.skills.title"]));
+    expect(block).toContain(escape(words["level.ai.skills.lead"]));
+    expect(block).toContain("docs/ai/agents/#skills");
+    expect(html.indexOf('id="a-agents"')).toBeLessThan(html.indexOf('id="a-skills"'));
+    expect(html.indexOf('id="a-skills"')).toBeLessThan(html.indexOf('id="a-how"'));
+  });
+
+  it("has the words of every small skill in the three languages, and none for one that is gone", () => {
+    for (const [code] of LANGS) {
+      const words = catalog(code);
+      const keys = Object.keys(words).filter((k) => /^level\.ai\.skills\.luz-[a-z]+\.(title|text)$/.test(k)).sort();
+      expect(keys, code).toEqual(["luz-migrate", "luz-readme", "luz-theme"].flatMap((n) => [`level.ai.skills.${n}.text`, `level.ai.skills.${n}.title`]).sort());
+      for (const k of ["title", "lead", "link", "badge"]) expect(words[`level.ai.skills.${k}`], `${code} ${k}`).toBeTruthy();
+    }
+  });
+
   it.each(LANGS)("in %s: an agent that changes code says so in its badge, and the ones that read say they read", (code, prefix) => {
     const block = sectionOf(rendered.get(`${prefix}ai/`), "a-agents");
     const words = catalog(code);
@@ -189,7 +223,8 @@ describe("the page of the luz skill, /ai/", () => {
     expect(links).toEqual([
       ["a-commands", escape(words["level.ai.commands.title"])],
       ["a-agents", escape(words["level.ai.agents.title"])],
-      ["a-skill", escape(words["level.ai.skill.title"])],
+      ["a-skills", escape(words["level.ai.skills.title"])],
+      ["a-how", escape(words["level.ai.skill.title"])],
       ["a-decide", escape(words["level.ai.limits.title"])],
     ]);
     expect(html.indexOf('class="landing-ai-toc"')).toBeGreaterThan(html.indexOf('id="a-assistants"'));
@@ -237,7 +272,7 @@ describe("the page of the luz skill, /ai/", () => {
     });
     expect(block).toContain("docs/ai/commands/");
     // The two that only read and never change a file, said plainly
-    for (const slug of ["doctor", "lint", "facts", "agents", "help"]) expect(rows.find((r) => r.slug === slug).writes, slug).toBe(false);
+    for (const slug of ["doctor", "lint", "facts", "agents", "skills", "help"]) expect(rows.find((r) => r.slug === slug).writes, slug).toBe(false);
   });
 
   it("has a sentence for every command in the three languages, and none for a command that is gone", () => {

@@ -1045,7 +1045,7 @@ describe("the LUZ docs site", () => {
     it("has the index (Working with AI), the commands, the agents and one page for each kind, with these titles, in this order", () => {
       const pages = site.pages.filter((p) => p.meta.area === "ai").sort((a, b) => Number(a.meta.order) - Number(b.meta.order));
       expect(pages.map((p) => p.route)).toEqual(["/docs/ai/", "/docs/ai/commands/", "/docs/ai/agents/", ...KINDS.map(routeOfKind)]);
-      expect(pages.slice(0, 3).map((p) => p.meta.title)).toEqual(["Working with AI", "The commands of /luz", "The agents of /luz"]);
+      expect(pages.slice(0, 3).map((p) => p.meta.title)).toEqual(["Working with AI", "The commands of /luz", "The agents and skills of /luz"]);
       for (const kind of KINDS) expect(site.byRoute.get(routeOfKind(kind)).meta.title, kind.id).toBe(TITLES[kind.id]);
     });
 

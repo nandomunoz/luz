@@ -546,7 +546,7 @@ describe("/skill-fix: the skill that fixes a failure with the evidence of a run"
 /* ---- phase 3: the examples of the docs, frozen from green runs ------------------------------------------------- */
 
 describe("examples: a conversation of a green run, frozen for the docs", () => {
-  const EXAMPLES = ["start", "new", "doctor", "lint", "facts", "agents", "add", "help", "unknown", "hostile"];
+  const EXAMPLES = ["start", "new", "doctor", "lint", "facts", "agents", "skills", "add", "help", "unknown", "hostile"];
 
   it("has a case for each section of the commands page: one per subcommand, an unknown one and a hostile one", async () => {
     const grade = await import(join(root, "tools/ai-eval/src/grade.js"));

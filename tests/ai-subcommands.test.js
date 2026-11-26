@@ -54,7 +54,7 @@ describe("the chat and the script say the same words", () => {
 
   it("has a table in SKILL.md whose script column is the chat word: new, doctor, lint, facts, agents, add", () => {
     const table = rows();
-    expect(table.map((r) => r.chat.replace(/^\/luz ?/, "").split(" ")[0])).toEqual(["", "new", "doctor", "lint", "facts", "agents", "add", "help"]);
+    expect(table.map((r) => r.chat.replace(/^\/luz ?/, "").split(" ")[0])).toEqual(["", "new", "doctor", "lint", "facts", "agents", "skills", "add", "help"]);
     for (const { chat, script } of table) {
       const word = chat.replace(/^\/luz ?/, "").split(" ")[0];
       if (!word || word === "help") continue;
@@ -64,7 +64,7 @@ describe("the chat and the script say the same words", () => {
     expect(table.at(-1).script).toBe("--help");
   });
 
-  it("names, for Gemini CLI, the subcommands the table has and no other (it said skills, which is gone)", () => {
+  it("names, for Gemini CLI, the subcommands the table has and no other", () => {
     const d = dir();
     const r = run(["init", "--target", "gemini", "--dir", d, "--dry-run", "--json"]);
     expect(r.code, r.err).toBe(0);
@@ -74,6 +74,6 @@ describe("the chat and the script say the same words", () => {
     const said = /description = "Start a site with LUZ, or run one subcommand: ([^"]*)"/.exec(source)[1];
     const words = rows().map((r) => r.chat.replace(/^\/luz ?/, "").split(" ")[0]).filter(Boolean);
     expect(said).toBe(`${words.slice(0, -1).join(", ")} or ${words.at(-1)}`);
-    expect(said).not.toMatch(/skills|check/);
+    expect(said).not.toMatch(/\bcheck\b/);
   });
 });

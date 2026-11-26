@@ -211,8 +211,9 @@ function expectedSections() {
 // Patterns a published file must never carry (RL-19, OWNER.md section 5). The one
 // `.claude/` path a page may write is where a project copies the published
 // accessibility reviewer to (`npx @luz-ds/check agent > .claude/agents/luz-agent-accessibility.md`,
-// the page "Working with AI"): it is the consumer's folder, not this repository's.
-const PRIVATE = [/\.claude\/(?!agents\/luz-agent-accessibility\.md)/, /OWNER\.md/, /MEMORY\.md/, /\/home\/ares/, /ghp_[A-Za-z0-9]{20}/, /npm_[A-Za-z0-9]{30}/, /-----BEGIN/, /sincero/, /settings\.local/];
+// the page "Working with AI"), and where it copies a small skill to (`.claude/skills/luz-readme`, the page of the agents
+// and skills): the consumer's folder, not this repository's, and a skill of this repository's own is never named luz-<word>.
+const PRIVATE = [/\.claude\/(?!agents\/luz-agent-accessibility\.md|skills\/luz-)/, /OWNER\.md/, /MEMORY\.md/, /\/home\/ares/, /ghp_[A-Za-z0-9]{20}/, /npm_[A-Za-z0-9]{30}/, /-----BEGIN/, /sincero/, /settings\.local/];
 
 /* ---- fixtures: a small docs folder ------------------------------------------ */
 

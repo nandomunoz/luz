@@ -110,7 +110,7 @@ test.describe('with JavaScript every line copies itself', () => {
       test(`${route}: axe finds nothing in the cards with their copy buttons (${scheme})`, async ({ page }) => {
         await page.emulateMedia({ colorScheme: scheme, reducedMotion: 'reduce' });
         await page.goto(route);
-        const results = await new AxeBuilder({ page }).include('#a-commands').include('#a-agents').include('#a-skill').analyze();
+        const results = await new AxeBuilder({ page }).include('#a-commands').include('#a-agents').include('#a-skills').include('#a-how').analyze();
         expect(results.violations, results.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`).join(' | ')).toEqual([]);
       });
     }

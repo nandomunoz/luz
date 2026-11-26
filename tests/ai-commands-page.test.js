@@ -12,13 +12,13 @@ import { EXTRA, commandRows, fillCommandMarkers, loadExample, slugOf, terminalOu
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (p) => readFileSync(join(root, p), "utf-8");
 const strings = (lang) => JSON.parse(read(`apps/docs/i18n/${lang}/strings.json`));
-const SLUGS = ["start", "new", "doctor", "lint", "facts", "agents", "add", "help"];
+const SLUGS = ["start", "new", "doctor", "lint", "facts", "agents", "skills", "add", "help"];
 
 describe("the rows come from SKILL.md", () => {
-  it("are the eight subcommands, in the order of the table, with what the script runs and whether it writes", () => {
+  it("are the nine subcommands, in the order of the table, with what the script runs and whether it writes", () => {
     const rows = commandRows(root);
     expect(rows.map((r) => r.slug)).toEqual(SLUGS);
-    expect(rows.map((r) => r.writes)).toEqual([true, true, false, false, false, false, true, false]);
+    expect(rows.map((r) => r.writes)).toEqual([true, true, false, false, false, false, false, true, false]);
     for (const r of rows) expect(r.slug).toMatch(/^[a-z-]+$/);
     expect(slugOf("/luz")).toBe("start");
     expect(slugOf("/luz new <landing, blog, app or docs>")).toBe("new");

@@ -17,7 +17,7 @@ for (const route of ROUTES) {
       await page.setViewportSize({ width, height: 900 });
       await page.goto(route);
       const found = await page.evaluate(() =>
-        [...document.querySelectorAll('#a-commands article, #a-agents article')].map((card) => {
+        [...document.querySelectorAll('#a-commands article, #a-agents article, #a-skills article')].map((card) => {
           const badge = /** @type {HTMLElement | null} */ (card.querySelector('.landing-ai__badge'));
           if (!badge) return { missing: card.querySelector('.landing-card__title')?.textContent };
           const cs = getComputedStyle(badge);
@@ -50,7 +50,7 @@ for (const route of ROUTES) {
           };
         }),
       );
-      expect(found.length).toBeGreaterThanOrEqual(13);
+      expect(found.length).toBeGreaterThanOrEqual(17);
       // One colour for all: the background and the text of the grey badge of "Only reads"
       expect(new Set(found.map((f) => `${f.bg} ${f.color}`)).size, 'every badge has the same background and text colour').toBe(1);
       for (const f of found) {
