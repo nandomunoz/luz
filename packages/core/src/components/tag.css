@@ -79,10 +79,8 @@
 @supports (text-box: trim-both cap alphabetic) {
   .luz-badge {
     display: inline-block;
-    min-width: 20px;
     min-height: 0;
     padding-block: calc((var(--luz-space-md) + var(--luz-space-2xs) - 1cap) / 2);
-    padding-inline: var(--luz-space-xs);
     text-align: center;
     text-box: trim-both cap alphabetic;
     white-space: nowrap;

@@ -10,7 +10,9 @@ A row is closed only when **both** browsers have reviewed it: remove it from "Op
 
 One row is one `needs-browser-review` issue: the issue repeats the Scope, the Files and what to look at, and says which browser is missing. The `security-auditor` agent reads this section, those issues and the maintainer's private list before it gives an OK; it gives none while a row in its scope is open. On 2026-10-29 the owner allowed both reviews (Playwright's Firefox 155 and WebKit 26.6 on Linux: neither is a real Safari or a device) and the seven rows that were waiting are in "Closed". On 2026-10-30 the owner allowed both reviews again (Playwright's Firefox 155 and WebKit 26 on Linux: neither is a real Safari or a device) and the six rows of the 0.3.0 batch are in "Closed". On 2026-11-05 the owner allowed both reviews of nine rows the pre-release audit found had never had one: they are in "Closed". Nothing is waiting. A row a later change adds goes in this table, checked in Chromium (and in Chromium with JavaScript off) only.
 
-No row is open.
+| Scope | Files | What to look at | Browser |
+|---|---|---|---|
+| A lighter core stylesheet, with no visual change intended | `tooltip.css`, `table.css`, `theme-mode.css`, `form.css`, `breadcrumb.css`, `dropdown.css`, `icon-grid.css`, `tag.css`, `player.css`, `elements/inline.css`, `elements/text.css`, `elements/media.css`, `elements/sections.css` | The tooltip centred over its trigger in LTR and RTL, with and without anchor positioning; the stacked table under 480 px with a hidden head and with a sortable head row; the colour mode radios (legend, hover, focus ring, checked fill) and its round button; the toggle and check items; links, `dl` spacing, headings and media unchanged | Safari, Firefox |
 
 ## Closed
 

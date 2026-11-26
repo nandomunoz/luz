@@ -64,7 +64,6 @@
 }
 
 .luz-input[type="range"]:focus {
-  border-block-end: none;
   outline: 2px solid var(--luz-focus-ring);
   outline-offset: 4px;
 }
@@ -79,7 +78,6 @@
   cursor: pointer;
   width: 64px;
   border-block-end: 1px solid var(--luz-input-border);
-  background: var(--luz-input-bg);
 }
 
 /* --------------------------------------------------------------------------
@@ -147,8 +145,7 @@
   user-select: none;
 }
 
-.luz-check-item input[type="checkbox"],
-.luz-check-item input[type="radio"] {
+.luz-check-item input:is([type="checkbox"], [type="radio"]) {
   appearance: none;
   width: 18px;
   height: 18px;
@@ -238,9 +235,9 @@
   inline-size: 1px;
   block-size: 1px;
   margin: -1px;
-  opacity: 0;
   overflow: hidden;
   clip-path: inset(50%);
+  opacity: 0;
 }
 
 .luz-toggle__track {

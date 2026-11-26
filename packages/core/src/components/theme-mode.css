@@ -36,7 +36,6 @@
 }
 
 .luz-theme-mode__legend {
-  display: block;
   margin-block-end: var(--luz-space-xs);
   padding: 0;
   color: var(--luz-theme-mode-text);
@@ -59,10 +58,8 @@
   justify-content: center;
   gap: var(--luz-space-2xs);
   min-block-size: 28px;
-  margin: 0;
   border: 1px solid var(--luz-theme-mode-line);
   border-radius: var(--luz-radius-md);
-  color: inherit;
   font-family: var(--luz-font-mono);
   font-size: var(--luz-text-xs);
   cursor: pointer;
@@ -75,16 +72,20 @@
   inline-size: 1px;
   block-size: 1px;
   margin: -1px;
-  opacity: 0;
   overflow: hidden;
   clip-path: inset(50%);
+  opacity: 0;
 }
 
-.luz-theme-mode__option:hover {
+/* Hover and focus are the same on an option and on the button. Kept before
+   the checked option, which keeps its fill under the pointer. */
+.luz-theme-mode__option:hover,
+.luz-theme-mode__button:hover:not(:disabled) {
   background: var(--luz-theme-mode-hover);
 }
 
-.luz-theme-mode__option:has(:focus-visible) {
+.luz-theme-mode__option:has(:focus-visible),
+.luz-theme-mode__button:focus-visible {
   outline: 2px solid var(--luz-theme-mode-focus);
   outline-offset: 2px;
 }
@@ -145,15 +146,6 @@
 .luz-theme-mode__button .luz-theme-mode__icon {
   inline-size: 1.25rem;
   block-size: 1.25rem;
-}
-
-.luz-theme-mode__button:hover:not(:disabled) {
-  background: var(--luz-theme-mode-hover);
-}
-
-.luz-theme-mode__button:focus-visible {
-  outline: 2px solid var(--luz-theme-mode-focus);
-  outline-offset: 2px;
 }
 
 .luz-theme-mode__status {

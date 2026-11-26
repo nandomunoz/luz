@@ -7,15 +7,11 @@
   color: var(--luz-brand-primary);
   /* Every link in content, cards and lists is underlined: the brand blue is
      close in lightness to the text, so colour alone would not mark it
-     (WCAG 1.4.1, RL-6). */
+     (WCAG 1.4.1, RL-6). It stays on hover, so no hover rule is needed;
+     button classes and components that hold links (a tab, a breadcrumb, a
+     menu) remove it themselves, and a nav has no rule. */
   text-decoration: underline;
   text-underline-offset: 0.18em;
-}
-
-/* Button classes remove the underline themselves, and so does a component
-   that holds links (a tab, a breadcrumb, a menu): a nav has no rule. */
-:where(a:hover) {
-  text-decoration: underline;
 }
 
 :where(a:focus-visible) {

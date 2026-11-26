@@ -238,7 +238,7 @@
   appearance: none;
   inline-size: 12px;
   block-size: 12px;
-  margin-block-start: calc(var(--luz-space-2xs) * -1); /* centre the 12px thumb on the 4px track */
+  margin-block-start: calc(-1 * var(--luz-space-2xs)); /* centre the 12px thumb on the 4px track */
   border: 0;
   border-radius: 50%;
   background: var(--luz-brand-primary);
