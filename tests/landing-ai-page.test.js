@@ -144,6 +144,11 @@ describe("the page of the luz skill, /ai/", () => {
   /** The small grey icon of what a card does: its words as the title (hover) and as a hidden text (screen readers). */
   const kindOf = (words) => `title="${escape(words)}"><svg class="landing-ai__kind-icon" viewBox="0 0 24 24" aria-hidden="true">`;
   const kindText = (words) => `<span class="u-sr-only">${escape(words)}</span></span>`;
+  /** The legend of a section: the words of each small icon, in order, each after its icon. */
+  const legendOf = (block) => {
+    const list = /<ul class="landing-ai-legend">([\s\S]*?)<\/ul>/.exec(block)?.[1] ?? "";
+    return [...list.matchAll(/<li><svg class="landing-ai__kind-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="[^"]+"\/><\/svg>([^<]*)<\/li>/g)].map((m) => m[1]);
+  };
   const titleOf = (card) => /<p class="landing-card__title">([^<]*)<\/p>/.exec(card)?.[1];
 
   it("has the strip of where it works, then install it, use it, the agents, the small skills and the strip of what you decide, in that order, with no table", () => {
@@ -217,6 +222,8 @@ describe("the page of the luz skill, /ai/", () => {
       expect(card, name).not.toContain("landing-ai__where");
     }
     expect(block).toContain(`<p class="landing-ai-goal__note">${escape(words["level.ai.agents.missing"])}</p>`);
+    // A legend under the title says what the small icons mean (owner, 2026-11-26), so a card needs no hover to be read
+    expect(legendOf(block)).toEqual([escape(words["level.ai.agents.reads"]), escape(words["level.ai.agents.acts"])]);
     expect(chatCommands.find((c) => c.chat === "/luz add <name>")).toEqual({ chat: "/luz add <name>", writes: true });
     expect(block).toContain("docs/ai/agents/");
   });
@@ -245,6 +252,7 @@ describe("the page of the luz skill, /ai/", () => {
     }
     expect(block).toContain(escape(words["level.ai.skills.title"]));
     expect(block).toContain(`<p class="landing-ai-goal__note">${escape(words["level.ai.skills.missing"])}</p>`);
+    expect(legendOf(block)).toEqual([escape(words["level.ai.skills.badge"])]);
     expect(block).toContain("docs/ai/agents/#skills");
     expect(html.indexOf('id="a-agents"')).toBeLessThan(html.indexOf('id="a-skills"'));
   });
