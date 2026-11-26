@@ -240,7 +240,7 @@ describe("the page of the luz skill, /ai/", () => {
     const facts = aiFacts(repo).agents;
     expect(facts.filter((a) => a.acts).map((a) => a.name)).toEqual(["luz-agent-optimiza"]);
     for (const a of facts) {
-      const card = cards(block).find((c) => c.includes(`<code>/luz add ${a.name}</code>`));
+      const card = cards(block).find((c) => c.includes(`<code class="landing-ai__name">${a.name}</code>`));
       // Every badge of the page is the grey one (owner, 2026-11-26): the words tell what a card does, not a colour
       const badge = `<span class="luz-badge luz-badge--gray landing-ai__badge">${escape(words[a.acts ? "level.ai.agents.acts" : "level.ai.agents.reads"])}</span>`;
       expect(card, a.name).toContain(badge);

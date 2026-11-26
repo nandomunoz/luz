@@ -5686,53 +5686,122 @@ home-light:defined ~ .landing-light__nojs {
 }
 
 
-/* ---- Install it: three choices side by side, the recommended one with the brand's border (third pass, 2026-11-26) ---- */
+/* ---- Install it: a table of plans (the visual pass, 2026-11-26). Three choices on one row, the recommended one in the middle,
+   taller and on the brand's tint; each lists the same three rows and ends on its command ---- */
 .landing-ai-options {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--luz-space-md);
+  align-items: stretch;
 }
 
 .landing-ai-option {
+  position: relative;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: var(--luz-space-sm);
+  align-items: stretch;
+  gap: var(--luz-space-md);
+  padding: var(--luz-space-lg);
 }
 
 .landing-ai-option > * {
   margin: 0;
 }
 
-/* What you get stays under its sentence; only the commands go to the foot */
+.landing-ai-option--recommended {
+  border-color: var(--luz-brand-primary);
+  background: color-mix(in oklab, var(--luz-brand-primary) 7%, var(--luz-surface));
+  box-shadow: inset 0 0 0 1px var(--luz-brand-primary), var(--luz-shadow-md);
+}
+
+@media (width >= 64rem) {
+  .landing-ai-options {
+    /* The middle column is wider, so the longest command fits on one line */
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr) minmax(0, 1fr);
+    padding-block: var(--luz-space-lg);
+  }
+
+  /* Taller than its neighbours, above and below, as the plan a table of plans recommends */
+  .landing-ai-option--recommended {
+    margin-block: calc(-1 * var(--luz-space-lg));
+    padding-block: calc(var(--luz-space-lg) * 2);
+  }
+}
+
+/* The flag sits on the top edge of its card */
+.landing-ai-option__flag {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: var(--luz-space-lg);
+  translate: 0 -50%;
+  padding: var(--luz-space-2xs) var(--luz-space-sm);
+  border-radius: var(--luz-radius-full);
+  background: var(--luz-brand-fill);
+  color: var(--luz-text-on-fill);
+  font-family: var(--luz-font-sans);
+  font-size: var(--luz-text-sm);
+  font-weight: 600;
+}
+
+.landing-ai-option__title {
+  font-size: var(--luz-text-xl);
+}
+
+.landing-ai-option--recommended .landing-ai-option__title {
+  font-size: var(--luz-text-2xl);
+}
+
+/* The sentence does not stretch here: the rows follow it, and only the commands go to the foot */
 .landing-ai-option .landing-ai__text {
   flex: none;
 }
 
-.landing-ai-option--recommended {
-  border-color: var(--luz-brand-primary);
-  box-shadow: inset 0 0 0 1px var(--luz-brand-primary);
-}
-
-.landing-ai-option__title {
-  font-size: var(--luz-text-lg);
-}
-
 .landing-ai-option__gets {
-  color: var(--luz-text-secondary);
+  display: grid;
+  gap: var(--luz-space-xs);
+  padding: var(--luz-space-md) 0 0;
+  border-block-start: 1px solid var(--luz-divider);
+  list-style: none;
+  font-family: var(--luz-font-sans);
   font-size: var(--luz-text-sm);
 }
 
-/* The commands sit at the foot, so the three cards line up on their commands */
+/* A tick for what a choice brings, a dash for what it leaves: drawn with borders, no glyph */
+.landing-ai-option__get {
+  display: grid;
+  grid-template-columns: 1rem minmax(0, 1fr);
+  gap: var(--luz-space-xs);
+  align-items: start;
+}
+
+.landing-ai-option__get::before {
+  content: "";
+  inline-size: 0.4rem;
+  block-size: 0.7rem;
+  margin: 0.15rem 0 0 0.3rem;
+  border: solid var(--luz-brand-primary);
+  border-width: 0 2px 2px 0;
+  rotate: 45deg;
+}
+
+.landing-ai-option__get--no {
+  color: var(--luz-text-secondary);
+}
+
+.landing-ai-option__get--no::before {
+  inline-size: 0.6rem;
+  block-size: 0;
+  margin: 0.65rem 0 0 0.2rem;
+  border-width: 0 0 2px;
+  border-color: var(--luz-text-secondary);
+  rotate: none;
+}
+
+/* The commands sit at the foot, so the three cards line up on them */
 .landing-ai-option > .landing-install:first-of-type {
   margin-block-start: auto;
 }
 
-.landing-ai-option > .landing-install {
-  align-self: stretch;
-}
-
-/* What you type reads at 14 px at least, as on the rest of the page */
 .landing-ai-option .luz-code-block {
   font-size: var(--luz-text-sm);
 }
@@ -5741,35 +5810,41 @@ home-light:defined ~ .landing-light__nojs {
   font-size: 1em;
 }
 
-/* The two links of "piece by piece" wrap inside the card at any text size */
-.landing-ai-option .landing-block__groups {
-  max-inline-size: 100%;
+/* On a wide screen a command is one line, never broken in the middle of a flag; on a narrow one it wraps, so nothing leaves the page */
+@media (width >= 64rem) {
+  .landing-ai-option .luz-code-block,
+  .landing-ai-option .luz-code-block code {
+    white-space: pre;
+  }
+
+  .landing-ai-option .luz-code-block {
+    overflow-x: auto;
+  }
 }
 
-.landing-ai-option .landing-block__groups li {
-  min-inline-size: 0;
-  max-inline-size: 100%;
-}
-
-.landing-ai-option .landing-block__link {
-  max-inline-size: 100%;
-  overflow-wrap: anywhere;
-}
-
-.landing-ai-options__note {
+.landing-ai-options__note,
+.landing-ai-goal__note {
   margin: 0;
   color: var(--luz-text-secondary);
-  font-size: var(--luz-text-sm);
+  font-size: var(--luz-text-base);
 }
 
-/* ---- Use it: core tabs; without JavaScript the panels stack, each under its heading, which the tabs then name ---- */
+/* ---- Use it: one panel. Core tabs on its top edge; without JavaScript the panels stack, each under its heading ---- */
 .landing-ai-use {
-  display: grid;
-  gap: var(--luz-space-md);
+  overflow: hidden;
+  border: 1px solid var(--luz-divider);
+  border-radius: var(--luz-radius-md);
+  background: var(--luz-surface);
+}
+
+.landing-ai-use__tabs {
+  padding-inline: var(--luz-space-md);
+  background: color-mix(in oklab, var(--luz-text-primary) 3%, var(--luz-surface));
 }
 
 .landing-ai-use__title {
-  margin: 0 0 var(--luz-space-sm);
+  margin: 0;
+  padding: var(--luz-space-md) var(--luz-space-lg) 0;
   font-size: var(--luz-text-lg);
 }
 
@@ -5789,72 +5864,100 @@ home-light:defined ~ .landing-light__nojs {
   list-style: none;
 }
 
-/* A row: the command, what it does, whether it writes; on a narrow screen the three stack */
+/* A row: the command, what it does, whether it writes. The command is as wide as the longest of the page, so the sentences
+   start on one line down the panel; on a narrow screen the three stack */
 .landing-ai-cmd {
   display: grid;
-  grid-template-columns: minmax(0, 16rem) minmax(0, 1fr) auto;
+  grid-template-columns: 17rem minmax(0, 1fr) auto;
   align-items: center;
-  gap: var(--luz-space-xs) var(--luz-space-md);
-  padding-block: var(--luz-space-sm);
+  gap: var(--luz-space-xs) var(--luz-space-lg);
+  padding: var(--luz-space-md) var(--luz-space-lg);
   border-block-end: 1px solid var(--luz-divider);
+}
+
+.landing-ai-cmd:last-child {
+  border-block-end: 0;
 }
 
 .landing-ai-cmd > * {
   margin: 0;
 }
 
+.landing-ai-cmd__text {
+  color: var(--luz-text-secondary);
+  font-size: var(--luz-text-base);
+}
+
+/* The command is a chip as wide as its text, not a bar across its column */
+.landing-ai-cmd .landing-ai__ask {
+  justify-self: start;
+  max-inline-size: 100%;
+  font-weight: 600;
+}
+
 .landing-ai-cmd .landing-ai__badge {
   margin: 0;
 }
 
-@media (width < 48rem) {
+@media (width < 56rem) {
   .landing-ai-cmd {
     grid-template-columns: minmax(0, 1fr);
     justify-items: start;
-  }
-
-  .landing-ai-cmd .landing-ai__ask {
-    justify-self: stretch;
+    padding-inline: var(--luz-space-md);
   }
 }
 
+/* How a session goes: four numbered steps on the tint of the panel's foot */
 .landing-ai-phases {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
-  gap: var(--luz-space-md);
-  margin: var(--luz-space-md) 0 0;
-  padding: 0;
-  list-style-position: inside;
+  gap: var(--luz-space-lg);
+  margin: 0;
+  padding: var(--luz-space-lg);
+  border-block-start: 1px solid var(--luz-divider);
+  background: color-mix(in oklab, var(--luz-text-primary) 3%, var(--luz-surface));
+  list-style: none;
 }
 
-.landing-ai-phases li::marker {
-  color: var(--luz-brand-primary);
+.landing-ai-phases li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--luz-space-2xs) var(--luz-space-sm);
+  align-items: start;
+  align-content: start;
+}
+
+.landing-ai-phases strong {
+  align-self: center;
+  min-block-size: 1.75rem;
+  line-height: 1.75rem;
+}
+
+.landing-ai-phases__n {
+  display: grid;
+  place-items: center;
+  inline-size: 1.75rem;
+  block-size: 1.75rem;
+  border-radius: var(--luz-radius-full);
+  background: var(--luz-brand-fill);
+  color: var(--luz-text-on-fill);
+  font-family: var(--luz-font-sans);
+  font-size: var(--luz-text-sm);
   font-weight: 600;
 }
 
-.landing-ai-phases span {
-  display: block;
+.landing-ai-phases li > span:last-child {
+  grid-column: 2;
+  color: var(--luz-text-secondary);
 }
 
-/* ---- Agents and skills: how to ask for each, then installing it, closed ---- */
+/* ---- Agents and skills: how to ask for each ---- */
 .landing-ai__label {
   margin: 0;
   color: var(--luz-text-secondary);
+  font-family: var(--luz-font-sans);
   font-size: var(--luz-text-sm);
-}
-
-.landing-ai__install {
-  align-self: stretch;
-  font-size: var(--luz-text-sm);
-}
-
-.landing-ai__install > summary {
-  color: var(--luz-text-secondary);
-  cursor: pointer;
-}
-
-.landing-ai__install > .landing-ai__ask {
-  margin-block-start: var(--luz-space-xs);
+  font-weight: 600;
 }
 
 .landing-ai-decide {
