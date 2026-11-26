@@ -124,7 +124,9 @@ function initAgents() {
       const item = items[chosen];
       stage.firstElementChild.replaceWith(item.querySelector(".landing-ai__ask").cloneNode(true));
       text.textContent = item.querySelector(".landing-ai-agent__text").textContent;
-      what.replaceChildren(item.querySelector(".landing-ai-agent__kind").cloneNode(true), text);
+      // A skill has no kind of its own (every one writes: the legend says it)
+      const kind = item.querySelector(".landing-ai-agent__kind");
+      what.replaceChildren(...(kind ? [kind.cloneNode(true)] : []), text);
       if (focus) item.focus();
     };
     const apply = () => {

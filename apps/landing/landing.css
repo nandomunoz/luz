@@ -5652,33 +5652,6 @@ html:has(.landing-marquee) {
   color: var(--luz-text-secondary);
 }
 
-/* Three columns on a wide screen for the commands that install or uninstall, the ones used in the chat and the small skills; two
-   and one as the room goes. The agents sit on three and two. */
-.landing-ai-group .landing-ai__cards,
-#a-install .landing-ai__cards,
-#a-commands .landing-ai__cards,
-#a-skills .landing-ai__cards {
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
-}
-
-/* Five agents: three columns on a wide screen (three and two), never one lone card on a row of four */
-#a-agents .landing-ai__cards {
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 21rem), 1fr));
-}
-
-/* The blue icon of a card and, beside it, the small grey one of what it does */
-.landing-ai__top {
-  display: flex;
-  align-items: center;
-  gap: var(--luz-space-sm);
-}
-
-.landing-ai__kind {
-  position: relative;
-  display: inline-flex;
-  cursor: help;
-}
-
 .landing-ai__kind-icon {
   inline-size: 1.125rem;
   block-size: 1.125rem;
@@ -5799,6 +5772,11 @@ html:has(.landing-marquee) {
     grid-template-columns: repeat(5, minmax(0, 1fr));
   }
 
+  /* Six skills: two rows of three */
+  .landing-ai-agents--skills.is-picker .landing-ai-agents__list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
   .is-picker .landing-ai-agent {
     align-content: start;
     background: var(--luz-surface-page);
@@ -5863,13 +5841,6 @@ html:has(.landing-marquee) {
   stroke-linejoin: round;
 }
 
-.landing-ai__card {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--luz-space-xs);
-}
-
 /* What a card does to your files, right under its title: a small rectangle fitted to its text, over a tint of grey
    that lets the card show through, with no border */
 .landing-ai__badge {
@@ -5889,18 +5860,6 @@ html:has(.landing-marquee) {
   color: var(--luz-text-secondary);
 }
 
-.landing-ai__card .landing-card__title {
-  font-size: var(--luz-text-base);
-}
-
-/* The technical name of an agent, a code of its own right under the title (no paragraph around it) */
-.landing-ai__name {
-  min-inline-size: 0;
-  overflow-wrap: anywhere;
-  font-size: var(--luz-text-sm);
-  color: var(--luz-text-secondary);
-}
-
 /* The text takes the room, so what you say sits at the foot of every card of a row */
 .landing-ai__text {
   flex: 1;
@@ -5909,8 +5868,7 @@ html:has(.landing-marquee) {
   color: var(--luz-text-secondary);
 }
 
-/* At 400 % text nothing keeps to one line: a badge and a link wrap inside their card (WCAG 1.4.10) */
-.landing-ai__card > *,
+/* At 400 % text nothing keeps to one line: a link wraps inside its head (WCAG 1.4.10) */
 .landing-ai-goal__head > * {
   min-inline-size: 0;
   max-inline-size: 100%;
