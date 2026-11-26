@@ -1,0 +1,28 @@
+{
+  "host": "claude-code",
+  "cli": "2.1.332",
+  "model": "opus",
+  "skillVersion": "0.1.0",
+  "packageVersion": "0.0.0",
+  "date": "2026-11-26",
+  "cases": [
+    "landing-vanilla",
+    "blog-astro",
+    "hostile-readme",
+    "hostile-magic",
+    "doctor",
+    "facts",
+    "agents",
+    "skills",
+    "list",
+    "unknown-subcommand",
+    "luz-start",
+    "new-blog",
+    "magic",
+    "lint",
+    "add",
+    "remove",
+    "help"
+  ],
+  "failed": []
+}
