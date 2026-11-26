@@ -91,6 +91,9 @@ const ICONS = {
   add: "M12 5v14M5 12h14",
   help: "M12 3.5a8.5 8.5 0 1 0 0 17 8.5 8.5 0 0 0 0-17ZM9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 .9-1 1.7M12 17h.01",
   promise: "M12 3.5a8.5 8.5 0 1 0 0 17 8.5 8.5 0 0 0 0-17ZM8.5 12l2.5 2.5 4.5-5",
+  // What a card does, the small grey icon beside the blue one: it reads (an eye), or it writes (a pencil)
+  reads: "M2.5 12s3.5-6.5 9.5-6.5 9.5 6.5 9.5 6.5-3.5 6.5-9.5 6.5S2.5 12 2.5 12ZM12 9.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5Z",
+  writes: "M4.5 19.5h4l10-10-4-4-10 10ZM13 7l4 4",
 };
 
 /**
@@ -199,13 +202,16 @@ export function aiSections({ say, root, escapeHtml }) {
 
   // ---- Agents and small skills: what each does and how to ask for it; installing it is a closed details, since everything
   // installs it already
+  // What a card does, as a small grey icon beside its blue one (owner, 2026-11-26: no badge): its words are the title, shown on
+  // hover, and a hidden text for a screen reader
+  const kind = (key) =>
+    `<span class="landing-ai__kind" title="${t(key)}"><svg class="landing-ai__kind-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="${ICONS[key === "level.ai.agents.reads" ? "reads" : "writes"]}"/></svg><span class="u-sr-only">${t(key)}</span></span>`;
   const card = (id, title, name, badgeKey, text, asked, copy, mod) =>
     [
       `<article class="landing-card landing-ai__card${mod}">`,
-      icon(id),
+      `<div class="landing-ai__top">${icon(id)}${kind(badgeKey)}</div>`,
       `<p class="landing-card__title">${title}</p>`,
       `<code class="landing-ai__name">${escapeHtml(name)}</code>`,
-      badge(badgeKey),
       `<p class="landing-ai__text">${text}</p>`,
       `<p class="landing-ai__label">${t("level.ai.ask")}</p>${ask(asked, copy)}`,
       `</article>`,

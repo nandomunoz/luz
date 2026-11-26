@@ -5535,6 +5535,29 @@ home-light:defined ~ .landing-light__nojs {
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 21rem), 1fr));
 }
 
+/* The blue icon of a card and, beside it, the small grey one of what it does */
+.landing-ai__top {
+  display: flex;
+  align-items: center;
+  gap: var(--luz-space-sm);
+}
+
+.landing-ai__kind {
+  position: relative;
+  display: inline-flex;
+  cursor: help;
+}
+
+.landing-ai__kind-icon {
+  inline-size: 1.125rem;
+  block-size: 1.125rem;
+  fill: none;
+  stroke: var(--luz-text-secondary);
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 .landing-ai__icon {
   inline-size: 1.75rem;
   block-size: 1.75rem;
