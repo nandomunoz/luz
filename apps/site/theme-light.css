@@ -496,49 +496,55 @@
 @property --luz-sidebar-bg {
   syntax: "<color>";
   inherits: true;
-  initial-value: #2a211a;
+  initial-value: #fbf8f2;
 }
 
 @property --luz-sidebar-text {
   syntax: "<color>";
   inherits: true;
-  initial-value: #e3d5bf;
+  initial-value: #4a3c2f;
+}
+
+@property --luz-sidebar-text-hover {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #231c16;
 }
 
 @property --luz-sidebar-hover {
   syntax: "<color>";
   inherits: true;
-  initial-value: #3a2f25;
+  initial-value: #f4ede0;
 }
 
 @property --luz-sidebar-active-bg {
   syntax: "<color>";
   inherits: true;
-  initial-value: #9cc8ee;
+  initial-value: #2365a6;
 }
 
 @property --luz-sidebar-active-text {
   syntax: "<color>";
   inherits: true;
-  initial-value: #1a140f;
+  initial-value: #fff;
 }
 
 @property --luz-sidebar-border {
   syntax: "<color>";
   inherits: true;
-  initial-value: #3d3127;
+  initial-value: #e3d4b8;
 }
 
 @property --luz-sidebar-label {
   syntax: "<color>";
   inherits: true;
-  initial-value: #b9a78f;
+  initial-value: #6b5a48;
 }
 
 @property --luz-sidebar-logo-bg {
   syntax: "<color>";
   inherits: true;
-  initial-value: #9cc8ee;
+  initial-value: #2365a6;
 }
 
 @property --luz-color-success {
@@ -753,6 +759,7 @@
       --luz-brand-fill-active,
       --luz-sidebar-bg,
       --luz-sidebar-text,
+      --luz-sidebar-text-hover,
       --luz-sidebar-hover,
       --luz-sidebar-active-bg,
       --luz-sidebar-active-text,
