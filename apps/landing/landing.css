@@ -395,13 +395,35 @@
 }
 
 /* A short phone (320 x 568, 640 high in Spanish and Arabic, whose title wraps in more lines): the two stacked buttons end
-   below y 500 and the floating colour-mode button (the footer's, fixed at the end corner, from the script) covers the end of
-   one of them. The hero cannot clear it without a smaller title, so the button waits for the first scroll: hidden, and out of
-   the tab order, at the top where the buttons are; drawn once the page has gone by them, in the first 16rem of scroll. The
-   colour mode is still in the footer's radios, and where the browser has no scroll timelines the button is drawn as before */
+   below y 500 and the floating colour-mode button (the footer's, fixed at the end corner, written by the script) covers the end
+   of one of them (in Spanish up to a window 687 px high, so the rule holds below 43rem). The hero cannot clear it without a smaller title, so the button waits for the first scroll: hidden, and out
+   of the tab order, at the top where the buttons are; drawn once the page has gone by them (from about 136 px of scroll, in
+   the first 10rem). With the script the button is the only colour-mode control (core hides the radios when it exists), so on
+   a short phone it is out of reach for that first stretch of scroll; without the script there is no button and the footer's
+   radios show. Visibility and opacity change together (it takes focus only from half opacity), a focused button is never
+   hidden under the reader (WCAG 2.4.3, 2.4.7), under reduced motion it jumps instead of fading, and where the browser has
+   no scroll timelines the button is drawn as before */
 @keyframes landing-mode-button-in {
   0%,
-  60% {
+  85% {
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  85.1% {
+    opacity: 0.5;
+    visibility: visible;
+  }
+
+  100% {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+@keyframes landing-mode-button-jump {
+  0%,
+  99.9% {
     opacity: 0;
     visibility: hidden;
   }
@@ -429,12 +451,25 @@
   }
 }
 
-@media (max-width: 768px) and (max-height: 44rem) {
+@media (max-width: 768px) and (max-height: 43rem) {
   @supports (animation-timeline: scroll()) {
     :root:has(.landing-tunnel) .luz-theme-mode__button--fixed {
       animation: landing-mode-button-in linear both;
       animation-timeline: scroll(root);
-      animation-range: 0 16rem;
+      animation-range: 0 10rem;
+    }
+
+    /* A button that has focus stays as it is, whatever the scroll (Home from the end of the page) */
+    :root:has(.landing-tunnel) .luz-theme-mode__button--fixed:focus {
+      animation: none;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      :root:has(.landing-tunnel) .luz-theme-mode__button--fixed {
+        animation-name: landing-mode-button-jump;
+        animation-timing-function: step-end;
+        animation-range: 0 8.5rem;
+      }
     }
   }
 }
