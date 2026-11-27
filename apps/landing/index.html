@@ -18,6 +18,7 @@
   <link rel="stylesheet" href="/packages/catalog/dist/components/page-transition.css">
   <link rel="stylesheet" href="/packages/catalog/dist/components/faq.css">
   <link rel="stylesheet" href="/packages/catalog/dist/components/showcase.css">
+  <link rel="stylesheet" href="/packages/catalog/dist/components/marquee.css">
   <link rel="stylesheet" href="/packages/catalog/dist/components/hero.css">
   <link rel="stylesheet" href="/packages/catalog/dist/components/main.css">
   <link rel="stylesheet" href="/packages/catalog/dist/components/section.css">
@@ -444,10 +445,10 @@ a {
     </section>
 
     <!-- ====================== BUILT WITH LUZ (owner, 2026-11-27) ======================
-         The sites that use LUZ, in catalog's <luz-showcase scroll>
-         (showcase.css): logo and name, each a link to the site; the list is
-         written twice, the copy aria-hidden="true" with its links
-         tabindex="-1". For now they are the owner's projects; the marks are
+         The sites that use LUZ, in catalog's <luz-showcase> (showcase.css)
+         inside a <luz-marquee> (marquee.css): logo and name, each a link to
+         the site; the showcase is written twice, the copy aria-hidden="true"
+         with its links tabindex="-1". For now they are the owner's projects; the marks are
          drawn for this band in one colour (currentColor), MIT like the rest
          of the repository, and each name is set as its own wordmark
          (.landing-users__link--caps, --serif, --light, --sans, --italic).
@@ -455,30 +456,34 @@ a {
          site: one <symbol> in the sprite and one <li> in each list -->
     <section class="landing-users" id="users" aria-labelledby="users-title">
       <h2 class="landing-users__title" id="users-title">{{t:users.title}}</h2>
-      <luz-showcase scroll>
-        <ul>
-          <li><a class="landing-users__link landing-users__link--caps" title="{{t:users.coac}}" href="https://coac.com.es/"><svg aria-hidden="true"><use href="#u1"/></svg><span lang="es" dir="ltr">COAC</span></a></li>
-          <li><a class="landing-users__link landing-users__link--serif" title="{{t:users.nando}}" href="https://nandomunoz.com/"><svg aria-hidden="true"><use href="#u2"/></svg><span lang="es" dir="ltr">Nando Muñoz</span></a></li>
-          <li><a class="landing-users__link landing-users__link--sans" title="{{t:users.cole}}" href="https://cole.com.es/"><svg aria-hidden="true"><use href="#u6"/></svg><span lang="es" dir="ltr">Cole</span></a></li>
-          <li><a class="landing-users__link landing-users__link--light" title="{{t:users.string}}" href="https://nandomunoz.com/string-transformer/"><svg aria-hidden="true"><use href="#u3"/></svg><span lang="en" dir="ltr">String Transformer</span></a></li>
-          <li><a class="landing-users__link landing-users__link--caps" title="{{t:users.ikay}}" href="https://nandomunoz.com/ikay-vanilla/"><svg aria-hidden="true"><use href="#u8"/></svg><span lang="en" dir="ltr">IKAY</span></a></li>
-          <li><a class="landing-users__link landing-users__link--italic" title="{{t:users.libros}}" href="https://nandomunoz.com/libros-del-mundo/"><svg aria-hidden="true"><use href="#u5"/></svg><span lang="es" dir="ltr">Libros del Mundo</span></a></li>
-          <li><a class="landing-users__link landing-users__link--sans" title="{{t:users.toolbar}}" href="https://nandomunoz.com/toolbar-aem/"><svg aria-hidden="true"><use href="#u4"/></svg><span lang="en" dir="ltr">Toolbar AEM</span></a></li>
-          <li><a class="landing-users__link landing-users__link--light" title="{{t:users.chrome-ai}}" href="https://nandomunoz.com/apiChrome/"><svg aria-hidden="true"><use href="#u7"/></svg><span lang="en" dir="ltr">Chrome Local AI</span></a></li>
-          <li><a class="landing-users__link landing-users__link--sans" title="{{t:users.kong}}" href="https://nandomunoz.com/kong.sole/"><svg aria-hidden="true"><use href="#u9"/></svg><span lang="en" dir="ltr">kong.sole</span></a></li>
-        </ul>
-        <ul aria-hidden="true">
-          <li><a tabindex="-1" class="landing-users__link landing-users__link--caps" title="{{t:users.coac}}" href="https://coac.com.es/"><svg aria-hidden="true"><use href="#u1"/></svg><span lang="es" dir="ltr">COAC</span></a></li>
-          <li><a tabindex="-1" class="landing-users__link landing-users__link--serif" title="{{t:users.nando}}" href="https://nandomunoz.com/"><svg aria-hidden="true"><use href="#u2"/></svg><span lang="es" dir="ltr">Nando Muñoz</span></a></li>
-          <li><a tabindex="-1" class="landing-users__link landing-users__link--sans" title="{{t:users.cole}}" href="https://cole.com.es/"><svg aria-hidden="true"><use href="#u6"/></svg><span lang="es" dir="ltr">Cole</span></a></li>
-          <li><a tabindex="-1" class="landing-users__link landing-users__link--light" title="{{t:users.string}}" href="https://nandomunoz.com/string-transformer/"><svg aria-hidden="true"><use href="#u3"/></svg><span lang="en" dir="ltr">String Transformer</span></a></li>
-          <li><a tabindex="-1" class="landing-users__link landing-users__link--caps" title="{{t:users.ikay}}" href="https://nandomunoz.com/ikay-vanilla/"><svg aria-hidden="true"><use href="#u8"/></svg><span lang="en" dir="ltr">IKAY</span></a></li>
-          <li><a tabindex="-1" class="landing-users__link landing-users__link--italic" title="{{t:users.libros}}" href="https://nandomunoz.com/libros-del-mundo/"><svg aria-hidden="true"><use href="#u5"/></svg><span lang="es" dir="ltr">Libros del Mundo</span></a></li>
-          <li><a tabindex="-1" class="landing-users__link landing-users__link--sans" title="{{t:users.toolbar}}" href="https://nandomunoz.com/toolbar-aem/"><svg aria-hidden="true"><use href="#u4"/></svg><span lang="en" dir="ltr">Toolbar AEM</span></a></li>
-          <li><a tabindex="-1" class="landing-users__link landing-users__link--light" title="{{t:users.chrome-ai}}" href="https://nandomunoz.com/apiChrome/"><svg aria-hidden="true"><use href="#u7"/></svg><span lang="en" dir="ltr">Chrome Local AI</span></a></li>
-          <li><a tabindex="-1" class="landing-users__link landing-users__link--sans" title="{{t:users.kong}}" href="https://nandomunoz.com/kong.sole/"><svg aria-hidden="true"><use href="#u9"/></svg><span lang="en" dir="ltr">kong.sole</span></a></li>
-        </ul>
-      </luz-showcase>
+      <luz-marquee>
+        <luz-showcase>
+          <ul>
+            <li><a class="landing-users__link landing-users__link--caps" title="{{t:users.coac}}" href="https://coac.com.es/"><svg aria-hidden="true"><use href="#u1"/></svg><span lang="es" dir="ltr">COAC</span></a></li>
+            <li><a class="landing-users__link landing-users__link--serif" title="{{t:users.nando}}" href="https://nandomunoz.com/"><svg aria-hidden="true"><use href="#u2"/></svg><span lang="es" dir="ltr">Nando Muñoz</span></a></li>
+            <li><a class="landing-users__link landing-users__link--sans" title="{{t:users.cole}}" href="https://cole.com.es/"><svg aria-hidden="true"><use href="#u6"/></svg><span lang="es" dir="ltr">Cole</span></a></li>
+            <li><a class="landing-users__link landing-users__link--light" title="{{t:users.string}}" href="https://nandomunoz.com/string-transformer/"><svg aria-hidden="true"><use href="#u3"/></svg><span lang="en" dir="ltr">String Transformer</span></a></li>
+            <li><a class="landing-users__link landing-users__link--caps" title="{{t:users.ikay}}" href="https://nandomunoz.com/ikay-vanilla/"><svg aria-hidden="true"><use href="#u8"/></svg><span lang="en" dir="ltr">IKAY</span></a></li>
+            <li><a class="landing-users__link landing-users__link--italic" title="{{t:users.libros}}" href="https://nandomunoz.com/libros-del-mundo/"><svg aria-hidden="true"><use href="#u5"/></svg><span lang="es" dir="ltr">Libros del Mundo</span></a></li>
+            <li><a class="landing-users__link landing-users__link--sans" title="{{t:users.toolbar}}" href="https://nandomunoz.com/toolbar-aem/"><svg aria-hidden="true"><use href="#u4"/></svg><span lang="en" dir="ltr">Toolbar AEM</span></a></li>
+            <li><a class="landing-users__link landing-users__link--light" title="{{t:users.chrome-ai}}" href="https://nandomunoz.com/apiChrome/"><svg aria-hidden="true"><use href="#u7"/></svg><span lang="en" dir="ltr">Chrome Local AI</span></a></li>
+            <li><a class="landing-users__link landing-users__link--sans" title="{{t:users.kong}}" href="https://nandomunoz.com/kong.sole/"><svg aria-hidden="true"><use href="#u9"/></svg><span lang="en" dir="ltr">kong.sole</span></a></li>
+          </ul>
+        </luz-showcase>
+        <luz-showcase aria-hidden="true">
+          <ul>
+            <li><a tabindex="-1" class="landing-users__link landing-users__link--caps" title="{{t:users.coac}}" href="https://coac.com.es/"><svg aria-hidden="true"><use href="#u1"/></svg><span lang="es" dir="ltr">COAC</span></a></li>
+            <li><a tabindex="-1" class="landing-users__link landing-users__link--serif" title="{{t:users.nando}}" href="https://nandomunoz.com/"><svg aria-hidden="true"><use href="#u2"/></svg><span lang="es" dir="ltr">Nando Muñoz</span></a></li>
+            <li><a tabindex="-1" class="landing-users__link landing-users__link--sans" title="{{t:users.cole}}" href="https://cole.com.es/"><svg aria-hidden="true"><use href="#u6"/></svg><span lang="es" dir="ltr">Cole</span></a></li>
+            <li><a tabindex="-1" class="landing-users__link landing-users__link--light" title="{{t:users.string}}" href="https://nandomunoz.com/string-transformer/"><svg aria-hidden="true"><use href="#u3"/></svg><span lang="en" dir="ltr">String Transformer</span></a></li>
+            <li><a tabindex="-1" class="landing-users__link landing-users__link--caps" title="{{t:users.ikay}}" href="https://nandomunoz.com/ikay-vanilla/"><svg aria-hidden="true"><use href="#u8"/></svg><span lang="en" dir="ltr">IKAY</span></a></li>
+            <li><a tabindex="-1" class="landing-users__link landing-users__link--italic" title="{{t:users.libros}}" href="https://nandomunoz.com/libros-del-mundo/"><svg aria-hidden="true"><use href="#u5"/></svg><span lang="es" dir="ltr">Libros del Mundo</span></a></li>
+            <li><a tabindex="-1" class="landing-users__link landing-users__link--sans" title="{{t:users.toolbar}}" href="https://nandomunoz.com/toolbar-aem/"><svg aria-hidden="true"><use href="#u4"/></svg><span lang="en" dir="ltr">Toolbar AEM</span></a></li>
+            <li><a tabindex="-1" class="landing-users__link landing-users__link--light" title="{{t:users.chrome-ai}}" href="https://nandomunoz.com/apiChrome/"><svg aria-hidden="true"><use href="#u7"/></svg><span lang="en" dir="ltr">Chrome Local AI</span></a></li>
+            <li><a tabindex="-1" class="landing-users__link landing-users__link--sans" title="{{t:users.kong}}" href="https://nandomunoz.com/kong.sole/"><svg aria-hidden="true"><use href="#u9"/></svg><span lang="en" dir="ltr">kong.sole</span></a></li>
+          </ul>
+        </luz-showcase>
+      </luz-marquee>
     </section>
 
     <!-- Icons used more than once, drawn once here and used by reference (<use>) -->

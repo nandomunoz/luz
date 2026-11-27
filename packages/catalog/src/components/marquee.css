@@ -1,0 +1,150 @@
+/* ==========================================================================
+	 LUZ Catalog: marquee, <luz-marquee>.
+	 Content that moves along one line and loops, between two hairlines and
+	 fading at both ends: a ticker of short phrases, a row of links, the
+	 logos of <luz-showcase>. The content is written twice as the two children
+	 of the tag, the second with aria-hidden="true" (and any link in it with
+	 tabindex="-1"), so a reader and the keyboard meet it once while a pointer
+	 can follow any link. Each copy moves by its own width, so the loop has no
+	 seam. A ul child is a row of phrases with a small star between them (the
+	 star is decorative and has no text alternative to read).
+
+	 It stops while the pointer is over it or something in it has the focus.
+	 Under reduced motion and on paper it does not move at all: it is the
+	 first copy alone, wrapped and centred, with no fade. --luz-marquee-duration
+	 is how long one loop takes (40s): give a longer list more time, so it
+	 moves at the same speed. A CSS-only tag: no script defines it, so every
+	 selector that names it is wholly inside :where().
+
+	 @element luz-marquee - CSS-only: no script defines this tag. Content that loops along one line: write it twice, the second copy aria-hidden="true".
+	 ========================================================================== */
+
+:where(luz-marquee) {
+	--luz-marquee-duration: calc(var(--luz-duration-lazy) * 50);
+
+	display: flex;
+	overflow: hidden;
+	border-block: 1px solid var(--luz-divider);
+	font-family: var(--luz-font-sans);
+	mask-image: linear-gradient(to right, transparent, currentcolor 8%, currentcolor 92%, transparent);
+}
+
+/* A copy: moves by its own width, never wraps */
+:where(luz-marquee > *) {
+	display: flex;
+	flex: none;
+	align-items: center;
+	margin: 0;
+	padding: var(--luz-space-md) 0;
+	padding-inline-end: var(--luz-space-xl);
+	animation: luz-marquee-run var(--luz-marquee-duration) linear infinite;
+}
+
+/* What a copy holds never wraps either: a list, or another tag with a list */
+:where(luz-marquee ul) {
+	display: flex;
+	flex-wrap: nowrap;
+	align-items: center;
+	justify-content: flex-start;
+	gap: var(--luz-space-xl);
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+:where(luz-marquee li) {
+	margin: 0;
+}
+
+/* A ul of phrases: text on the page's colour, a star between them */
+:where(luz-marquee > ul > li) {
+	display: flex;
+	gap: var(--luz-space-xl);
+	align-items: center;
+	color: var(--luz-text-primary);
+	font-size: var(--luz-text-lg);
+	white-space: nowrap;
+}
+
+:where(luz-marquee > ul > li)::after {
+	content: "\2726" / "";
+	color: var(--luz-brand-primary);
+	font-size: var(--luz-text-sm);
+}
+
+:where(luz-marquee:dir(rtl) > *) {
+	animation-name: luz-marquee-run-rtl;
+}
+
+:where(luz-marquee:hover > *, luz-marquee:focus-within > *) {
+	animation-play-state: paused;
+}
+
+@keyframes luz-marquee-run {
+	to {
+		translate: -100% 0;
+	}
+}
+
+@keyframes luz-marquee-run-rtl {
+	to {
+		translate: 100% 0;
+	}
+}
+
+/* Reduced motion and print: the first copy alone, wrapped and centred, no fade */
+@media (prefers-reduced-motion: reduce) {
+	:where(luz-marquee) {
+		display: block;
+		mask-image: none;
+	}
+
+	:where(luz-marquee > *) {
+		justify-content: center;
+		padding-inline-end: 0;
+		animation: none;
+	}
+
+	:where(luz-marquee > [aria-hidden="true"]) {
+		display: none;
+	}
+
+	:where(luz-marquee ul) {
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: var(--luz-space-sm) var(--luz-space-xl);
+	}
+
+	:where(luz-marquee > ul > li) {
+		flex-wrap: wrap;
+		white-space: normal;
+	}
+}
+
+@media print {
+	:where(luz-marquee) {
+		display: block;
+		mask-image: none;
+	}
+
+	:where(luz-marquee > *) {
+		justify-content: center;
+		padding-inline-end: 0;
+		animation: none;
+	}
+
+	:where(luz-marquee > [aria-hidden="true"]) {
+		display: none;
+	}
+
+	:where(luz-marquee ul) {
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: var(--luz-space-sm) var(--luz-space-xl);
+	}
+
+	:where(luz-marquee > ul > li) {
+		flex-wrap: wrap;
+		white-space: normal;
+	}
+}
