@@ -46,6 +46,7 @@ const steps = [
   { name: "Exceptions register", cmd: [pnpm, "check:exceptions"] },
   { name: "Licences (RL-1, RL-13: published packages MIT with no dependencies; dev/LICENSES.md)", cmd: [pnpm, "check:license"] },
   { name: "Tarball contents", cmd: [pnpm, "check:pack"] },
+  { name: "Consumer smoke test (packs the tarballs, installs them in an empty project, runs the luz-ai, luz-check and luz-tokens bins and loads a page in Chromium)", cmd: [pnpm, "smoke:consumer"] },
   { name: "Token contrast (RL-7)", cmd: [pnpm, "check:contrast"] },
   { name: "Files for AI agents (RL-19: manifests, llms.txt, examples, READMEs, agent)", cmd: [pnpm, "check:ai"] },
   { name: "The luz skill has a release pass and no stale example (ai:eval; a warning, never blocks)", cmd: [pnpm, "check:ai-tested"] },

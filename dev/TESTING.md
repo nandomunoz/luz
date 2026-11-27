@@ -14,7 +14,7 @@ pnpm check:all              # everything, in order
 
 Install the browser once with `pnpm test:ui:install`.
 
-`pnpm check:all` runs `scripts/qa-release.js`. It writes a report to `test-results/qa-release/`. Two flags make it faster:
+`pnpm check:all` runs `scripts/qa-release.js`. It writes a report to `test-results/qa-release/`. Among its steps, `pnpm smoke:consumer` packs the tarballs and runs the `luz-ai`, `luz-check` and `luz-tokens` bins from them, so a broken tarball fails here, before the Version PR; it needs the build, so `--fast` runs it on the last build. Two flags make it faster:
 
 ```bash
 pnpm check:all -- --skip-ui   # no Playwright
