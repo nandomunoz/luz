@@ -277,17 +277,22 @@ test.describe('Documentation site', () => {
   });
 
   test.describe('navigation', () => {
-    test('the sidebar shows the seven areas, an accordion with only the current one open, every page listed, and HTML elements as an area of its own', async ({ page }) => {
+    test('the sidebar shows the seven areas as six links, an accordion with only the current one open, every page listed, and the HTML elements as a group in the fold of Catalog', async ({ page }) => {
       await page.setViewportSize({ width: 1440, height: 900 });
       await gotoId(page, 'c-button');
       const areas = page.locator('.docs-nav a.docs-nav__area');
-      await expect(areas).toHaveText(['Get started', 'AI', 'Tokens', 'Core', 'Catalog', 'HTML elements', 'Accessibility']);
-      // HTML elements is an area like the others, not nested in Catalog
-      await expect(page.locator('.docs-nav > li > a.docs-nav__area[href="/docs/html/"]')).toHaveText('HTML elements');
+      // The HTML elements keep their area, routes and index, but have no link or fold of their own (owner, 2026-11-25; `nestIn` in site.json)
+      await expect(areas).toHaveText(['Get started', 'AI', 'Tokens', 'Core', 'Catalog', 'Accessibility']);
+      await expect(page.locator('.docs-nav > li > a.docs-nav__area[href="/docs/html/"]')).toHaveCount(0);
+      // ... they are a labelled group at the end of the fold of Catalog, with their index and their pages
+      const htmlGroup = page.locator('.docs-nav > li:has(> a#a-catalog) li.docs-nav__group:has(#nav-html)');
+      await expect(htmlGroup.locator('#nav-html')).toHaveText('HTML elements');
+      await expect(htmlGroup.locator('a[href="/docs/html/"]')).toHaveCount(1);
+      await expect(htmlGroup.locator('a[href="/docs/html/forms/"]')).toHaveCount(1);
       await expect(page.locator('.docs-nav .docs-nav__sub')).toHaveCount(0);
       await expect(page.locator('.docs-nav a.docs-nav__subarea')).toHaveCount(0);
       // An accordion: a fold per area with pages (all of one name), only Core's open, and every page of every area is a link in the markup
-      await expect(page.locator('nav.luz-docs-nav details[name="nav"]')).toHaveCount(site.areas.filter((a) => readingOrder(site).some((p) => p.meta.area === a.id && p.route !== `/docs/${a.slug}/`)).length);
+      await expect(page.locator('nav.luz-docs-nav details[name="nav"]')).toHaveCount(site.areas.filter((a) => !a.nestIn && readingOrder(site).some((p) => (p.meta.area === a.id && p.route !== `/docs/${a.slug}/`) || site.areas.some((n) => n.nestIn === a.id && p.meta.area === n.id))).length);
       await expect(page.locator('nav.luz-docs-nav details[open]')).toHaveCount(1);
       await expect(page.locator('nav.luz-docs-nav details[open] a[aria-current="page"]')).toHaveText('Button');
       await expect(page.locator('.docs-nav a[aria-current="true"]')).toHaveText('Core');
@@ -898,7 +903,8 @@ test.describe('Documentation site', () => {
       // for theme authors, and the accessibility statement names the shipped themes
       const THEMES_PAGE = routeOf('themes');
       const MAKE_PAGE = '/docs/tokens/themes/';
-      const EXEMPT = [THEMES_PAGE, MAKE_PAGE, routeOf('t-primitives'), routeOf('h-a11y-checked')];
+      // The pages of /docs/ai/ list luz-theme, a small skill that makes the theme of a brand: a custom theme is its subject there too
+      const EXEMPT = [THEMES_PAGE, MAKE_PAGE, routeOf('t-primitives'), routeOf('h-a11y-checked'), ...ALL.filter((r) => r.startsWith('/docs/ai/'))];
       for (const route of ALL.filter((r) => !EXEMPT.includes(r))) {
         await page.goto(route);
         const offenders = await page.evaluate(([themesPage, exempt]) => {
@@ -1120,7 +1126,7 @@ test.describe('Documentation site', () => {
       await expect(drawer).toHaveAttribute('popover', '');
       await expect(page.locator('.luz-nav-toggle[popovertarget="page-nav"]')).toHaveCount(1);
       const hrefs = await drawer.locator('a').evaluateAll((all) => all.map((a) => a.getAttribute('href')));
-      expect(hrefs).toEqual(['/tokens/', '/core/', '/catalog/', '/ai/', '/docs/', 'https://github.com/nandomunoz/luz']);
+      expect(hrefs).toEqual(['/ai/', '/tokens/', '/core/', '/catalog/', '/docs/', 'https://github.com/nandomunoz/luz']);
     });
 
     test('at 390px the menu button opens the drawer and the two site links are reachable', async ({ page }) => {
@@ -1571,8 +1577,8 @@ test.describe('Site header and navigation toggle', () => {
     expect(HEADER).toContain('popovertarget="page-nav"');
     expect(HEADER).not.toContain('aria-current');
     const row = HEADER.match(/<nav class="site-header__nav"[\s\S]*?<\/nav>/)[0];
-    // The row holds the four sections of the site; Documentation and GitHub are the icons after it, and the logo ({{home}}) is the link to the home page
-    expect([...row.matchAll(/href="([^"]+)"/g)].map((m) => m[1])).toEqual(['{{home}}tokens/', '{{home}}core/', '{{home}}catalog/', '{{home}}ai/']);
+    // The row holds the four sections of the site, AI first; Documentation and GitHub are the icons after it, and the logo ({{home}}) is the link to the home page
+    expect([...row.matchAll(/href="([^"]+)"/g)].map((m) => m[1])).toEqual(['{{home}}ai/', '{{home}}tokens/', '{{home}}core/', '{{home}}catalog/']);
     expect(HEADER).toMatch(/class="site-header__docs" href="\/docs\/"/);
     expect(HEADER).toContain('href="https://github.com/nandomunoz/luz"');
     expect(HEADER).toMatch(/class="site-header__brand" href="\{\{home\}\}"/);
@@ -1581,7 +1587,7 @@ test.describe('Site header and navigation toggle', () => {
     // list inside the drawer's nav, not a nav in a nav (a11y.md F4)
     expect(SITE_LINKS).toMatch(/<ul class="page-nav__row" aria-label="\{\{t:site\.label\}\}">/);
     expect(SITE_LINKS).not.toContain('<nav');
-    expect([...SITE_LINKS.matchAll(/href="([^"]+)"/g)].map((m) => m[1])).toEqual(['{{home}}tokens/', '{{home}}core/', '{{home}}catalog/', '{{home}}ai/', '/docs/', 'https://github.com/nandomunoz/luz']);
+    expect([...SITE_LINKS.matchAll(/href="([^"]+)"/g)].map((m) => m[1])).toEqual(['{{home}}ai/', '{{home}}tokens/', '{{home}}core/', '{{home}}catalog/', '/docs/', 'https://github.com/nandomunoz/luz']);
     for (const [file, partials] of Object.entries(INCLUDERS)) {
       for (const name of partials) expect(read(file), file).toContain(`<!-- luz:include ${name} -->`);
       // tabindex="-1": a scrollable nav is a Tab stop of its own in Firefox
@@ -1640,7 +1646,9 @@ test.describe('Site header and navigation toggle', () => {
     });
   }
 
-  for (const width of [800, 1100, 1440]) {
+  // From 1024px the sections sit in the middle of the header itself; below it they sit in the middle of the free space between the logo
+  // and the tools, so they never cover them (tests/site-header.spec.js, 769 to 1024px)
+  for (const width of [1024, 1100, 1440]) {
     test(`the header centres the sections and shows its tools as icons at ${width}px`, async ({ page }) => {
       await page.setViewportSize({ width, height: 700 });
       await page.goto('/');
@@ -1726,13 +1734,13 @@ test.describe('Site header and navigation toggle', () => {
       await menu.focus();
       await page.keyboard.press('Enter');
       const site = page.getByRole('list', { name: 'Site', exact: true });
-      await expect(site.getByRole('link')).toHaveText(['Tokens', 'Core', 'Catalog', 'AI', 'Documentation', 'GitHub']);
+      await expect(site.getByRole('link')).toHaveText(['AI', 'Tokens', 'Core', 'Catalog', 'Documentation', 'GitHub']);
       await expect(page.locator('#page-nav').getByRole('link', { name: 'Home' })).toHaveCount(0);
       if (current) {
         await expect(site.locator('[aria-current]')).toHaveText(current);
-        // the drawer starts with the sections of the site: the first Tab from the button lands on Tokens
+        // the drawer starts with the sections of the site: the first Tab from the button lands on AI, the first section
         await page.keyboard.press('Tab');
-        await expect(site.getByRole('link', { name: 'Tokens' })).toBeFocused();
+        await expect(site.getByRole('link', { name: 'AI', exact: true })).toBeFocused();
         const underline = await site.locator('[aria-current]').evaluate((el) => getComputedStyle(el).textDecorationLine);
         expect(underline).toBe('underline');
       } else {
