@@ -631,7 +631,7 @@ function planSite(values) {
   if (!GENERATED.includes(stack)) return { error: `--stack ${stack}: a page is written for ${GENERATED.join(" and ")} only. Write the page with --stack vanilla, then move its markup and load LUZ as references/stacks.md says` };
   if (!/^[a-z]{2,3}(-[A-Za-z0-9]+)*$/.test(lang)) return { error: `--lang "${lang}" is not a language code such as en, es or ar` };
 
-  const page = readFileSync(join(HERE, "../assets/templates", `${kind}.html.tpl`), "utf-8").replace("{{lang}}", () => lang).replace("{{title}}", () => escapeHtml(name));
+  const page = readFileSync(join(HERE, "../assets/templates", `${kind}.html.tpl`), "utf-8").replace("{{lang}}", () => lang).replace("{{title}}", () => escapeHtml(name)).replace("<!doctype html>\n", () => `<!doctype html>\n<!-- ${NOTICE} -->\n`);
   const file = stack === "astro" ? { path: "src/pages/index.astro", content: `---\n---\n${page}` } : { path: "index.html", content: page };
   const todo = (file.content.match(/…/g) ?? []).length;
   const ext = stack === "astro" ? " --ext .astro" : "";
@@ -671,7 +671,12 @@ const skillNames = () => readdirSync(join(ASSETS, "skills"), { withFileTypes: tr
 const SELF = basename(join(HERE, ".."));
 // What the skill carries when it adds itself: these, and no file or folder that starts with a dot. Nothing else in its
 // folder (evals, a stray .env, node_modules) goes into a person's project
-const CARRIES = ["SKILL.md", "agents", "assets", "references", "scripts"];
+const CARRIES = ["SKILL.md", "LICENSE", "agents", "assets", "references", "scripts"];
+
+// The MIT notice of what luz-ai writes (F-2). The text is the LICENSE this skill carries, never typed here: a skill folder
+// gets a copy of it, an agent or a starter page one line that names it and where the text is
+const LICENSE_TEXT = readFileSync(join(HERE, "../LICENSE"), "utf-8");
+const NOTICE = `luz-ai: MIT License. ${LICENSE_TEXT.split("\n").find((l) => l.startsWith("Copyright (c)"))}. Text of the licence: https://github.com/nandomunoz/luz/blob/main/packages/ai/LICENSE`;
 
 /**
  * The fields of an agent left to fill: a bullet of its text whose value is `[ADAPT: hint]`. A bullet under a
@@ -719,7 +724,7 @@ const front = (name, description, extra) => ["---", `name: ${name}`, `descriptio
 /** One agent for one assistant: the same instructions, the front matter or keys that assistant reads. */
 function wrapAgent(agent, body, target) {
   const acting = agent.tools.filter((t) => TOOL_MAP.acting.includes(t));
-  if (target === "claude") return { path: `.claude/agents/${agent.name}.md`, content: `${front(agent.name, agent.description, [`tools: ${agent.tools.join(", ")}`])}\n${body}\n`, notes: [] };
+  if (target === "claude") return { path: `.claude/agents/${agent.name}.md`, content: `${front(agent.name, agent.description, [`tools: ${agent.tools.join(", ")}`])}\n<!-- ${NOTICE} -->\n\n${body}\n`, notes: [] };
   if (target === "gemini") {
     const tools = [];
     const dropped = [];
@@ -730,12 +735,12 @@ function wrapAgent(agent, body, target) {
       else dropped.push(tool);
     }
     const extra = ["tools:", ...tools.map((t) => `  - ${t}`)];
-    return { path: `.gemini/agents/${agent.name}.md`, content: `${front(agent.name, agent.description, extra)}\n${body}\n`, notes: dropped.length ? [`${agent.name} for gemini: ${dropped.join(", ")} left out, since Gemini CLI has no verified name for it; the agent can read and search, not list`] : [] };
+    return { path: `.gemini/agents/${agent.name}.md`, content: `${front(agent.name, agent.description, extra)}\n<!-- ${NOTICE} -->\n\n${body}\n`, notes: dropped.length ? [`${agent.name} for gemini: ${dropped.join(", ")} left out, since Gemini CLI has no verified name for it; the agent can read and search, not list`] : [] };
   }
   const triple = "'".repeat(3);
   if (body.includes(triple)) return { error: `${agent.name} holds ${triple}, which a Codex multi-line literal string cannot` };
   const notes = [acting.length ? `${agent.name} for codex: the agent's file cannot limit its tools, so only its instructions say it runs no command; set the sandbox of the session` : `${agent.name} for codex: the agent's file cannot limit its tools or make it read-only, so only its instructions say it does not edit; set the sandbox of the session`];
-  return { path: `.codex/agents/${agent.name}.toml`, content: `name = ${JSON.stringify(agent.name)}\ndescription = ${JSON.stringify(agent.description)}\ndeveloper_instructions = ${triple}\n${body}\n${triple}\n`, notes };
+  return { path: `.codex/agents/${agent.name}.toml`, content: `# ${NOTICE}\nname = ${JSON.stringify(agent.name)}\ndescription = ${JSON.stringify(agent.description)}\ndeveloper_instructions = ${triple}\n${body}\n${triple}\n`, notes };
 }
 
 /** `Label=value` from --set: the label as the agent writes it, the value one plain line. */
@@ -846,7 +851,9 @@ function smallSkillFiles(name, places) {
     .map((e) => relative(root, join(e.parentPath, e.name)).split(sep).join("/"))
     .filter((rel) => !rel.split("/").some((part) => part.startsWith(".")))
     .sort();
-  return places.flatMap((place) => rels.map((rel) => ({ path: `${place}/${name}/${rel}`, content: readFileSync(join(root, ...rel.split("/")), "utf-8") })));
+  const own = rels.map((rel) => ({ rel, content: readFileSync(join(root, ...rel.split("/")), "utf-8") }));
+  // Each folder of a skill carries the licence of the skill that wrote it (F-2)
+  return places.flatMap((place) => [...own, { rel: "LICENSE", content: LICENSE_TEXT }].map(({ rel, content }) => ({ path: `${place}/${name}/${rel}`, content })));
 }
 
 function runSkillAdd(values, name) {
@@ -917,7 +924,8 @@ function packagedFolder(root) {
     .map((e) => relative(root, join(e.parentPath, e.name)).split(sep).join("/"))
     .filter((rel) => !rel.split("/").some((part) => part.startsWith(".")))
     .sort()
-    .map((rel) => ({ rel, content: readFileSync(join(root, ...rel.split("/")), "utf-8") }));
+    .map((rel) => ({ rel, content: readFileSync(join(root, ...rel.split("/")), "utf-8") }))
+    .concat({ rel: "LICENSE", content: LICENSE_TEXT });
 }
 
 function runList(dir) {

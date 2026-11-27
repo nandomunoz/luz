@@ -1,5 +1,6 @@
 LICENSE
 README.md
+dist/skills/luz/LICENSE
 dist/skills/luz/SKILL.md
 dist/skills/luz/agents/openai.yaml
 dist/skills/luz/assets/agents/luz-agent-accessibility.md

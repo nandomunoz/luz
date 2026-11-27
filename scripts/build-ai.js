@@ -4,7 +4,7 @@
  * The package ships one folder, the luz skill, with the executable that installs it, writes a starter page and
  * adds the agents and skills of luz-ai:
  *
- *   packages/ai/dist/skills/luz/   SKILL.md, agents/, assets/, references/ and scripts/
+ *   packages/ai/dist/skills/luz/   SKILL.md, LICENSE, agents/, assets/, references/ and scripts/
  *
  * It is a copy of `packages/ai/skills/luz/` of what the skill carries (the folders above, and no file or folder
  * that starts with a dot), with its evals and everything else left behind. It fails, before writing anything, when a
@@ -25,7 +25,7 @@ import { buildAiFiles } from "./build-ai-facts.js";
 
 const repo = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const SOURCE = "packages/ai/skills/luz";
-export const CARRIES = ["SKILL.md", "agents", "assets", "references", "scripts"];
+export const CARRIES = ["SKILL.md", "LICENSE", "agents", "assets", "references", "scripts"];
 const RANGES = [[0x00, 0x08], [0x0b, 0x0c], [0x0e, 0x1f], [0x7f, 0x7f], [0x200b, 0x200f], [0x2028, 0x202e], [0x2060, 0x206f], [0xfeff, 0xfeff], [0xe0000, 0xe007f]];
 const hasHidden = (text) => [...text].some((ch) => RANGES.some(([a, b]) => ch.codePointAt(0) >= a && ch.codePointAt(0) <= b));
 

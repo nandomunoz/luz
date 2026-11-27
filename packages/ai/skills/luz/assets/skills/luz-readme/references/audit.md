@@ -25,6 +25,7 @@ Against [ai-tells.md](ai-tells.md):
 - Commands: each one traces to a manifest script, Makefile, Dockerfile or CI file. Flags exist. Copy targets exist or are created.
 - Code: every fenced block has a language tag. Shell blocks have no `$` prompt.
 - Diagram: present only if needed, drawn from the code, with real names. Removing it would lose information.
+- AI notice: the last line of the file says an AI drafted the README, once, in the README's language, after License.
 - License: badge, last section, `LICENSE` file and manifest agree. Third-party material has its own line. If there is no `LICENSE`, no section claims one and the report says so.
 - Versions, requirements and numbers come from files. No placeholders left (`OWNER`, `your-username`, `TODO`).
 - External links you could not check, and badges that fail on private repos, are listed in the report.

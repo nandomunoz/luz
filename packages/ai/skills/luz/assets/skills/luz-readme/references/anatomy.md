@@ -14,6 +14,7 @@ Installation
 (sections of the project type)
 Credits
 License
+AI notice
 ```
 
 The first four form the header, inside one `<div align="center">` (blank lines inside the `div` are needed for Markdown to render). The five fixed sections always appear, in this order, filled with real content. Type-specific sections go between Installation and Credits.
@@ -150,6 +151,19 @@ Who made it and what it stands on. Only real names and real material, never inve
 ### License
 
 One line with the license name and a link to the file, plus the third-party lines from the table in section 8. When the repo has no `LICENSE` file, this section says so plainly ("No license yet. Until there is one, the code cannot be legally reused.") and the report asks the user which license they want.
+
+### AI notice
+
+The last line of the file, after License, alone, in the README's language. An AI wrote the draft and the reader has the right to know.
+
+```markdown
+This README was drafted by an AI assistant (luz-readme).
+```
+
+- Always written, on a new README and on a rewrite. When the file already has the line, keep it once; never duplicate it.
+- Plain text, no badge, no emoji, no apology and no claim that a person reviewed it: you do not know that.
+- Translate it with the rest ("Este README lo redactó un asistente de IA (luz-readme)." in Spanish).
+- It is not an AI tell to hide: the audit checks that it is there.
 
 ## 6. Code
 

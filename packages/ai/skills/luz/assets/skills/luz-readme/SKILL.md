@@ -21,7 +21,7 @@ Removing AI tells is half the job. The other half is putting something specific 
 
 ## The parts of every README
 
-Details and recipes in [references/anatomy.md](references/anatomy.md). The first four form the header, the five fixed sections always appear, in this order.
+Details and recipes in [references/anatomy.md](references/anatomy.md). The first four form the header, the five fixed sections always appear, in this order, and the AI notice closes the file.
 
 | Part | Rule |
 |---|---|
@@ -35,6 +35,7 @@ Details and recipes in [references/anatomy.md](references/anatomy.md). The first
 | Type sections | What the project type adds, between Installation and Credits ([references/structure-by-type.md](references/structure-by-type.md)). Empty ones are dropped. |
 | Credits | Real authors, contributors, third-party material and inspirations. |
 | License | License name and link to the file, third-party lines, consistent with the badge and the manifest. |
+| AI notice | The last line of the file, after License: one line, in the README's language, that says an AI drafted it. Always written, never dropped. |
 
 Everything inside follows the code rules (language tag on every block, commands that exist) and uses a diagram only when the structure needs one.
 
@@ -78,6 +79,7 @@ Show the full draft and a short report. Write the file only after approval.
 - The angle and why, in two lines.
 - What was verified, and what could not be (external links, badges of private repos, numbers that go stale).
 - Sections dropped for lack of content.
+- That the last line says the README was drafted by an AI, and that the person reads the README before publishing it.
 - License issues found: no LICENSE file, manifest and file disagree, third-party material without a license.
 
 ## Limits
