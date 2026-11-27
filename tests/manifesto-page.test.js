@@ -131,4 +131,12 @@ describe("humans.txt", () => {
     expect(String(got.body)).toBe(readFileSync(join(repo, "apps/site/humans.txt"), "utf-8"));
     expect(String(got.body)).toContain("/* TEAM */");
   }, 120_000);
+
+  it("says WCAG 2.2 AA is an aim, not an audit, and credits ET Book with its licence file", () => {
+    const text = readFileSync(join(repo, "apps/site/humans.txt"), "utf-8");
+    expect(text).not.toMatch(/Standards:[^\n]*WCAG 2\.2 AA\s*$/m);
+    expect(text).toMatch(/Standards:[^\n]*aims for WCAG 2\.2 AA[^\n]*not audited[^\n]*\/docs\/accessibility\//);
+    expect(text).toContain("Fonts: ET Book, MIT, Copyright (c) 2015 Dmitry Krasny, Bonnie Scranton, Edward Tufte (/assets/LICENSE-ETBook.txt)");
+    expect(text).toMatch(/^Last update: 2026\/11\/27$/m);
+  });
 });
