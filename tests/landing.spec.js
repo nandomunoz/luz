@@ -1,8 +1,9 @@
 /**
  * LUZ Design System — Landing page checks
  * The home (apps/landing, served at /, /es/ and /ar/), section by section, in
- * the order of the page: the hero (the first screen, over the tunnel), the four
- * levels of "What's inside", the FAQ, and the footer (a brand and two columns).
+ * the order of the page: the hero (the first screen, over the tunnel), Who we are,
+ * the four levels of "What's inside" (the AI one first), the FAQ, the Built with LUZ
+ * band, and the footer (a brand and two columns).
  *
  * It is a level-3 consumer on top of catalog's landing files, with the base color
  * modes and the six lights of the hour. What other files own is not repeated
@@ -26,10 +27,10 @@ const fromRepo = (path) => fileURLToPath(new URL(`../${path}`, import.meta.url))
 test.use({ timezoneId: TIMEZONE, storageState: NO_CHOICE });
 
 const MODES = ['light', 'dark', 'high-contrast'];
-/** The ids of the sections of the home, in the order of the page: the four levels are four sections. */
-const SECTIONS = ['hero', 'tokens', 'core', 'catalog', 'ai', 'faq'];
-/** The sections of the drawer's "On this page", in the order of the page. */
-const DRAWER = ['tokens', 'faq'];
+/** The ids of the sections of the home, in the order of the page (owner, 2026-11-27): the four levels are four sections, the AI one first. */
+const SECTIONS = ['hero', 'who', 'ai', 'tokens', 'core', 'catalog', 'faq', 'users'];
+/** The sections of the drawer's "On this page", in the order of the page: the ones with a head of their own. */
+const DRAWER = ['who', 'ai', 'faq'];
 const ROUTES = [
   ['/', 'en'],
   ['/es/', 'es'],
@@ -209,15 +210,15 @@ test.describe('Landing page', () => {
 
   test.describe('the map of the page', () => {
     for (const [route, lang] of ROUTES) {
-      test(`${route}: seven sections, in order, one h1, each named by its heading (${lang})`, async ({ page }) => {
+      test(`${route}: eight sections, in order, one h1, each named by its heading (${lang})`, async ({ page }) => {
         await open(page, route);
 
         // The sections of the page: the groups of the FAQ are sections inside the FAQ, with no id
         expect(await page.locator('main section[id]').evaluateAll((all) => all.map((el) => el.id))).toEqual(SECTIONS);
         await expect(page.locator('h1')).toHaveCount(1);
         await expect(page.locator('#hero h1')).toHaveCount(1);
-        // The sections that went, with their ids
-        for (const gone of ['what', 'see', 'adopt', 'fit', 'type', 'start', 'why', 'native', 'modes']) await expect(page.locator(`#${gone}`), `#${gone}`).toHaveCount(0);
+        // The sections that went, with their ids (the globe and the band of the day went with the redesign)
+        for (const gone of ['what', 'see', 'adopt', 'fit', 'type', 'start', 'why', 'native', 'modes', 'globe', 'light']) await expect(page.locator(`#${gone}`), `#${gone}`).toHaveCount(0);
         // Every section is named by a heading of its own: h1 for the hero, h2 for the others
         const named = await page.locator('main section[id]').evaluateAll((all) =>
           all.map((el) => {
@@ -249,6 +250,10 @@ test.describe('Landing page', () => {
           await expect(page.locator(`#${id} h2 .landing-mark`), `${id}: one marked word`).toHaveCount(1);
           await expect(page.locator(`#${id} .landing-inside__eyebrow svg`), `${id}: the icon is decorative`).toHaveAttribute('aria-hidden', 'true');
         }
+        // Who we are has a heading for the outline and the drawer only (its sentence is the visual head); the band of the users has its own
+        await expect(page.locator('#who-title')).toHaveText(words['who.title']);
+        await expect(page.locator('#who-title')).toHaveClass(/\bu-sr-only\b/);
+        await expect(page.locator('#users-title')).toHaveText(words['users.title']);
       });
     }
 
@@ -445,25 +450,25 @@ test.describe('Landing page', () => {
       expect(Math.abs((actions.left + actions.right) / 2 - centre), 'the buttons sit about the centre').toBeLessThanOrEqual(4);
     });
 
-    test('says what LUZ is (English): the word LUZ above the title with two stressed words, the lead, two actions', async ({ page }) => {
+    test('says what LUZ is (English): the word LUZ above the title with two stressed words, no lead, two actions', async ({ page }) => {
       await page.setViewportSize({ width: 1280, height: 900 });
       await open(page);
 
       const hero = page.locator('section#hero');
-      // The word LUZ is drawn by CSS with its letters hidden from the tree: the h1 is named "LUZ" and the sentence
+      // The word LUZ is an SVG of three paths (L, U, Z) hidden from the tree: the h1 is named "LUZ" and the sentence
       await expect(hero.locator('h1.luz-hero__title')).toHaveAccessibleName('LUZ Design system for humans, ready for AI.');
       await expect(hero.locator('h1 .landing-hero__brand .u-sr-only')).toHaveText('LUZ');
-      await expect(hero.locator('h1 .landing-hero__brand .landing-imago__word .ch')).toHaveText(['L', 'U', 'Z']);
+      const word = hero.locator('h1 .landing-hero__brand svg.landing-wordmark');
+      await expect(word).toHaveAttribute('aria-hidden', 'true');
+      await expect(word.locator('path')).toHaveCount(3);
+      expect(await word.evaluate((svg) => svg.getBoundingClientRect().width), 'the word is drawn').toBeGreaterThan(100);
       // Both ends are stressed: the human and the AI
       await expect(hero.locator('h1 em')).toHaveText(['humans', 'AI']);
-      await expect(hero.locator('.luz-hero__lead')).toHaveText(
-        'Tokens, CSS and a little vanilla JavaScript, built on what the browser already does. Light, Usable and Zero-dependency: start a project, or migrate it page by page.',
-      );
-      await expect(hero.locator('.luz-hero__lead strong')).toHaveText(['Light', 'Usable', 'Zero-dependency']);
-      // No eyebrow over the title, no second line under the lead, and the lead carries no link
+      // No lead (owner, 2026-11-27: the title, the word and two buttons): the three words of the name are in Who we are
+      await expect(hero.locator('.luz-hero__lead')).toHaveCount(0);
+      // No eyebrow over the title and no second line under the buttons
       await expect(hero.locator('.luz-hero__eyebrow')).toHaveCount(0);
       await expect(hero.locator('.landing-built')).toHaveCount(0);
-      await expect(hero.locator('.luz-hero__lead a')).toHaveCount(0);
 
       // Two actions: Get started with AI (the primary one) to the prompts, then the docs
       // (the buttons themselves are in tests/landing-hero-buttons.spec.js)
@@ -479,13 +484,13 @@ test.describe('Landing page', () => {
     });
 
     for (const [route, lang] of ROUTES) {
-      test(`${route}: the title, the lead and the actions are the catalog's (${lang})`, async ({ page }) => {
+      test(`${route}: the title and the actions are the catalog's, and the hero has no lead (${lang})`, async ({ page }) => {
         const words = catalog(lang);
         await open(page, route);
 
         const hero = page.locator('section#hero');
         await expect(hero.locator('h1')).toHaveAccessibleName(`LUZ ${plain(words['hero.title'])}`);
-        expect(((await hero.locator('.luz-hero__lead').textContent()) ?? '').replace(/\s+/g, ' ').trim()).toBe(plain(words['hero.lead']));
+        await expect(hero.locator('.luz-hero__lead')).toHaveCount(0);
         // The brand is written in capitals in every language; every language stresses the human and the AI
         await expect(hero.locator('h1 .landing-hero__brand .u-sr-only')).toHaveText('LUZ');
         await expect(hero.locator('h1 em')).toHaveCount(2);
@@ -494,8 +499,8 @@ test.describe('Landing page', () => {
         await expect(hero.locator('a.luz-btn--secondary')).toHaveCount(0);
         await expect(hero.locator('a.luz-btn--outline')).toHaveText([words['hero.docs']]);
         if (lang !== 'en') expect(plain(words['hero.title'])).not.toBe(plain(EN['hero.title']));
-        // The old keys of the TDD statement, the brand line and the first action are gone from the catalog
-        expect(Object.keys(words).filter((key) => /^(built|hero\.(eyebrow|github|tdd|start$))/.test(key))).toEqual([]);
+        // The old keys of the TDD statement, the brand line, the lead and the first action are gone from the catalog
+        expect(Object.keys(words).filter((key) => /^(built|hero\.(eyebrow|github|tdd|lead|start$))/.test(key))).toEqual([]);
       });
     }
 
@@ -514,8 +519,8 @@ test.describe('Landing page', () => {
         expect(Math.abs(hero.bottom - first.bottom)).toBeLessThanOrEqual(1);
         await expect(page.locator('#hero h1')).toBeInViewport();
         await expect(page.locator('#hero a.luz-btn--primary')).toBeInViewport();
-        // The levels start below the fold
-        expect((await box('#tokens')).top).toBeGreaterThanOrEqual(height - 1);
+        // Who we are starts below the fold
+        expect((await box('#who')).top).toBeGreaterThanOrEqual(height - 1);
       });
     }
 
@@ -851,8 +856,11 @@ test.describe('Landing page', () => {
       test(`${route}: the legal line names the MIT licence, with a link to it (${lang})`, async ({ page }) => {
         await open(page, route);
 
-        const legal = footer(page).locator('p.landing-legal');
+        // Two legal lines: the licence, then the non-affiliation (legal audit of 2026-11-27)
+        await expect(footer(page).locator('p.landing-legal')).toHaveCount(2);
+        const legal = footer(page).locator('p.landing-legal').first();
         await expect(legal).toHaveText(plain(catalog(lang)['footer.legal']));
+        await expect(footer(page).locator('p.landing-legal').nth(1)).toHaveText(plain(catalog(lang)['footer.affiliation']));
         await expect(legal.locator('a[href="https://github.com/nandomunoz/luz/blob/main/LICENSE"]')).toHaveCount(1);
         // The author is named, as a link to his GitHub
         await expect(legal.locator('a[href="https://github.com/nandomunoz"]')).toHaveText('Fernando Muñoz');
