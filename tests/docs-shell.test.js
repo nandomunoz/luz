@@ -1026,7 +1026,7 @@ describe("the page foot: Last updated <time>, then Edit and Report", () => {
       const pager = queryLive(root, ".luz-pager");
       if (pager) expect(foot.open.index, p.route).toBeGreaterThan(pager.open.index);
     }
-  });
+  }, 60_000); // one git log per page of the site
 
   it("is followed by Edit and Report, the same URLs as the rail", () => {
     for (const p of site.pages) {

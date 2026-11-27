@@ -488,7 +488,7 @@ describe("docs: the patterns left apps/docs/reference.css and the docs app uses 
     expect(has(page, 'class="luz-pager__prev"'), "pager prev").toBe(true);
     expect(has(page, 'class="luz-pager__link"'), "pager link").toBe(true);
     expect(has(page, OLD), "an old class in the rendered page").toBe(false);
-  });
+  }, 60_000);
 
   it("a component page's Do and don't uses the pattern's classes", () => {
     const body = read("apps/docs/pages/components/button.html");

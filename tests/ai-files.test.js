@@ -1656,14 +1656,18 @@ describe("the Vite plugin emits and serves the examples and the manifests", () =
   }, 60_000);
 
   describe("in the dev server", () => {
+    // configureServer checks the links and renders every file once: configured once for the describe, not on every request (six requests of the path test took over a minute)
+    let middlewares;
     const serve = async (url) => {
-      const middlewares = [];
-      plugin(false).configureServer({
-        watcher: { on() {} },
-        ws: { send() {} },
-        middlewares: { use: (fn) => middlewares.push(fn) },
-        transformIndexHtml: async (_file, html) => html,
-      });
+      if (!middlewares) {
+        middlewares = [];
+        plugin(false).configureServer({
+          watcher: { on() {} },
+          ws: { send() {} },
+          middlewares: { use: (fn) => middlewares.push(fn) },
+          transformIndexHtml: async (_file, html) => html,
+        });
+      }
       return new Promise((resolve) => {
         const headers = {};
         const res = { statusCode: 200, setHeader: (k, v) => (headers[k.toLowerCase()] = v), end: (body) => resolve({ headers, body, statusCode: res.statusCode }) };

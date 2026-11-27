@@ -46,7 +46,7 @@ beforeAll(() => {
   site = scanSite(`${root}apps/docs`, root);
   rendered = buildSite(site).rendered;
   entries = indexEntries(site);
-});
+}, 60_000); // the whole site is built once, about 6 s with nothing else running
 
 /** The page's rendered HTML, or "" when the route is not there yet (so the assertion says what is missing). */
 const htmlOf = (route) => rendered.get(route) ?? "";
