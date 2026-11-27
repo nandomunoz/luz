@@ -116,6 +116,39 @@ test.describe('the hero and its tunnel', () => {
     });
   }
 
+  // The floating colour-mode button (bottom end corner, 44 px, from the script) covers the end of a hero button on a short
+  // phone: at 320 x 568 it sits at y 508 to 552 and the buttons stack from y 410 (English) to y 627 (Spanish), so the hero
+  // cannot be made to clear it without a smaller title. On a short phone it waits for the first scroll instead: hidden (and
+  // out of the tab order) at the top, where the buttons are, drawn once the reader has scrolled past them.
+  for (const route of ROUTES) {
+    test(`${route} at 320 x 568: at the top of the page the floating colour-mode button is not over a hero button, and it is drawn once the page is scrolled`, async ({ page }) => {
+      await page.setViewportSize({ width: 320, height: 568 });
+      await page.goto(route);
+      const fixed = page.locator('.luz-theme-mode__button--fixed');
+      const state = () => fixed.evaluate((el) => ({ visibility: getComputedStyle(el).visibility, opacity: Number(getComputedStyle(el).opacity), box: el.getBoundingClientRect().toJSON() }));
+      const hits = (a, b) => a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom;
+      const buttons = await page.locator('#hero .o-actions > a.luz-btn').evaluateAll((all) => all.map((el) => el.getBoundingClientRect().toJSON()));
+      if (await fixed.count()) {
+        const top = await state();
+        for (const [index, box] of buttons.entries()) {
+          expect(top.visibility === 'hidden' || !hits(top.box, box), `hero button ${index + 1} is not covered by the floating button at the top`).toBe(true);
+        }
+        await page.evaluate(() => window.scrollTo({ top: 600, behavior: 'instant' }));
+        await expect.poll(async () => (await state()).visibility, 'drawn after the first screen').toBe('visible');
+        await expect.poll(async () => (await state()).opacity).toBe(1);
+      }
+    });
+  }
+
+  test('/ at 390 x 844 and at 1280 x 800: the floating colour-mode button is drawn at the top, as before', async ({ page }) => {
+    for (const [width, height] of [[390, 844], [1280, 800]]) {
+      await page.setViewportSize({ width, height });
+      await page.goto('/');
+      const fixed = page.locator('.luz-theme-mode__button--fixed');
+      if (await fixed.count()) expect(await fixed.evaluate((el) => `${getComputedStyle(el).visibility} ${getComputedStyle(el).opacity}`), `${width} x ${height}`).toBe('visible 1');
+    }
+  });
+
   test('/: in forced colours the lines are the system text colour, not the brand', async ({ page }) => {
     await page.emulateMedia({ forcedColors: 'active' });
     await page.goto('/');
