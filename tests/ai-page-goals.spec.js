@@ -144,6 +144,25 @@ for (const route of ROUTES) {
     });
   }
 
+  // The title sits on the icon's row while there is room (320 px, normal text), and at 400 % text, when the card is a few
+  // letters wide, it goes under the icon instead of being squeezed beside it (WCAG 1.4.10)
+  for (const zoom of [100, 400]) {
+    test(`${route}: at 320 px${zoom === 400 ? ' and 400 % text' : ''} the title of a card is ${zoom === 400 ? 'under its icon' : 'on the row of its icon'}`, async ({ page }) => {
+      await page.setViewportSize({ width: 320, height: 800 });
+      await page.goto(route);
+      if (zoom === 400) await page.evaluate(() => { document.documentElement.style.fontSize = '400%'; });
+      const heads = await page.locator('#a-agents .landing-ai__head, #a-skills .landing-ai__head').evaluateAll((all) =>
+        all.map((head) => {
+          const i = /** @type {Element} */ (head.querySelector('svg.landing-ai__icon')).getBoundingClientRect();
+          const t = /** @type {Element} */ (head.querySelector('.landing-card__title')).getBoundingClientRect();
+          return t.top < i.bottom && t.bottom > i.top;
+        }),
+      );
+      expect(heads.length).toBe(11);
+      expect(heads.every((onRow) => onRow === (zoom === 100)), 'titles on the icon row: ' + heads.join()).toBe(true);
+    });
+  }
+
   for (const scheme of /** @type {const} */ (['light', 'dark'])) {
     test(`${route}: axe finds nothing in the sections (${scheme})`, async ({ page }) => {
       await page.emulateMedia({ colorScheme: scheme, reducedMotion: 'reduce' });
