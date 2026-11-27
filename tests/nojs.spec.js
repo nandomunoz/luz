@@ -271,13 +271,13 @@ test('docs: the specimens carry no data-theme without JavaScript, and the radios
 
 // The drawer's names on the home page in another language (apps/landing/i18n)
 const DRAWER = {
-  '/es/': { menu: 'Menú', site: 'Sitio', links: ['Tokens', 'Core', 'Catálogo', 'IA', 'Documentación', 'GitHub'] },
-  '/ar/': { menu: 'القائمة', site: 'الموقع', links: ['الرموز', 'النواة', 'الكتالوج', 'الذكاء الاصطناعي', 'التوثيق', 'GitHub'] },
+  '/es/': { menu: 'Menú', site: 'Sitio', links: ['IA', 'Tokens', 'Core', 'Catálogo', 'Documentación', 'GitHub'] },
+  '/ar/': { menu: 'القائمة', site: 'الموقع', links: ['الذكاء الاصطناعي', 'الرموز', 'النواة', 'الكتالوج', 'التوثيق', 'GitHub'] },
 };
 
 for (const app of APPS) {
   test(`${app}: the menu drawer opens and closes without JavaScript`, async ({ page }) => {
-    const names = DRAWER[app] ?? { menu: 'Menu', site: 'Site', links: ['Tokens', 'Core', 'Catalog', 'AI', 'Documentation', 'GitHub'] };
+    const names = DRAWER[app] ?? { menu: 'Menu', site: 'Site', links: ['AI', 'Tokens', 'Core', 'Catalog', 'Documentation', 'GitHub'] };
     await page.setViewportSize({ width: 360, height: 640 });
     await page.goto(app);
     const toggle = page.getByRole('button', { name: names.menu, exact: true });
@@ -323,12 +323,13 @@ test('/ with reduced motion and no script: the frames stand still, each in its o
   expect(new Set(frames.map((f) => f.transform)).size, 'thirteen places').toBe(13);
 });
 
-// The home: six sections in a fixed order (the hero, the four levels of "tokens" and the FAQ), all of them
-// words and native elements; what needs a script (the copy buttons) is not shown dead
-const SECTIONS = ['hero', 'tokens', 'core', 'catalog', 'ai', 'faq'];
+// The home: eight sections in a fixed order (the hero, Who we are, the four levels, the AI one first, the FAQ and the
+// Built with LUZ band; owner, 2026-11-27), all of them words and native elements; what needs a script (the copy
+// buttons) is not shown dead
+const SECTIONS = ['hero', 'who', 'ai', 'tokens', 'core', 'catalog', 'faq', 'users'];
 
 for (const home of ['/', '/es/', '/ar/']) {
-  test(`${home}: the six sections are in the page, in order, and every one has words`, async ({ page }) => {
+  test(`${home}: the eight sections are in the page, in order, and every one has words`, async ({ page }) => {
     await page.goto(home);
     expect(await page.locator('main section[id]').evaluateAll((all) => all.map((el) => el.id))).toEqual(SECTIONS);
     await expect(page.locator('h1')).toHaveCount(1);
