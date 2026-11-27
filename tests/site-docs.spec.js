@@ -39,6 +39,8 @@ const PACKAGES = {
       submenu: 'submenu',
       announcement: 'announcement',
       faq: 'faq',
+      // A row of links, each a logo and a name: a `<luz-showcase>` tag that is the block
+      showcase: 'showcase',
       // The facade of a player of another origin: a `<luz-embed>` tag that is the block, `.luz-embed__<part>`
       embed: 'embed',
       // A chart drawn from the author's own table: a `<luz-chart>` tag that is the block, `.luz-chart__<part>`

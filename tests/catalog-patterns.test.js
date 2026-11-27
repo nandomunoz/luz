@@ -72,7 +72,7 @@ describe("the 27 patterns are stylesheets of catalog, named for their block", ()
     expect(ALL).toHaveLength(27);
     // `app-bar` and `docs-layout` are the names of their blocks (`.luz-app-bar`, `.luz-docs-layout`), not a kind's prefix on a name
     const sources = readdirSync(`${root}packages/catalog/src/components`).filter((f) => f.endsWith(".css") && !f.startsWith("_")).map((f) => f.replace(/\.css$/, ""));
-    expect(sources.filter((f) => !["search", "navbar", "sidebar", "terminal", "timeline", "lang-switch", "submenu", "announcement", "faq", "cookie-consent", "theme-time", "embed", "chart", "page-transition"].includes(f)).sort()).toEqual([...ALL].sort());
+    expect(sources.filter((f) => !["search", "navbar", "sidebar", "terminal", "timeline", "lang-switch", "submenu", "announcement", "faq", "showcase", "cookie-consent", "theme-time", "embed", "chart", "page-transition"].includes(f)).sort()).toEqual([...ALL].sort());
   });
 
   it.each([...OLD_ALL, ...OLD_ELEMENT_FILES])("the F5b file %s is gone from src, dist (plain and minified) and the tarball list", (name) => {
@@ -296,7 +296,8 @@ describe("landing, cms, app and docs are not packages any more", () => {
     expect(exists("apps/docs/catalog-patterns.css"), "apps/docs/catalog-patterns.css").toBe(true);
     const imports = [...read("apps/docs/catalog-patterns.css").matchAll(/@import url\("([^"]+)"\)/g)].map((m) => m[1]);
     const names = imports.map((href) => /components\/([\w-]+)\.css$/.exec(href)?.[1]).filter(Boolean);
-    expect(names.sort(), "the file imports the 27 patterns, by their new names").toEqual([...ALL].sort());
+    // The showcase is an element (a page of its own, no pattern of a kind), and the docs show its marquee live
+    expect(names.sort(), "the file imports the 27 patterns, by their new names, and the showcase").toEqual([...ALL, "showcase"].sort());
   });
 });
 
@@ -329,7 +330,7 @@ describe("scripts/docs-site/kinds.js reads the files and the pages of each kind 
 
   it("the pages of a kind are the slugs of the pages that name it, `any` left out: the header and the footer are the page of landing and of blog", () => {
     const pages = (kind) => [...kindPatterns(kind, root, null).pages].sort();
-    expect(pages("landing")).toEqual(["hero", "section", "site-footer", "site-header", "stat", "timeline"]);
+    expect(pages("landing")).toEqual(["hero", "section", "showcase", "site-footer", "site-header", "stat", "timeline"]);
     expect(pages("blog")).toEqual(["article-header", "masthead", "page-header", "post-list", "site-footer", "site-header", "timeline", "toc"]);
     expect(pages("app")).toEqual(["app-bar", "bar-list", "column-chart", "dashboard", "heat-map", "ring", "sidebar", "stacked-bar"]);
     expect(pages("docs")).toEqual(["do-dont", "doc-header", "docs-layout", "example", "page-footer", "page-rail", "sidebar", "terminal"]);
@@ -433,7 +434,7 @@ const PAGES = [
 ];
 /** The pages of the old routes of F5b (`<kind>-<name>`) and of the pieces F8 renamed: none is a page now, in English or Spanish. */
 const OLD_SLUGS = [...OLD_ALL, "cms-toc", "consent", "mode", "color-mode", "banner"];
-const ELEMENT_PAGES = ["announcement", "faq", "cookie-consent", "embed", "chart", "lang-switch", "theme-time", "search", "submenu"];
+const ELEMENT_PAGES = ["announcement", "faq", "showcase", "cookie-consent", "embed", "chart", "lang-switch", "theme-time", "search", "submenu"];
 /** A page whose stylesheet has no class and no tag (one at-rule): it fits any site, and no kind names its file. */
 const SITE_WIDE_SHEET_PAGES = ["page-transition"];
 /** F7: the pages that came from core, in `pages/components/` until then. */
@@ -441,7 +442,7 @@ const LAYOUT_PAGES = ["navbar", "sidebar", "terminal", "timeline"];
 const catalogPages = () => repoSite.pages.filter((p) => p.meta.area === "catalog");
 
 describe("the pages of the 25 patterns, at /docs/catalog/<block>/", () => {
-  it("are 25 pages beside the nine elements, the four that came from core (F7), the class reference and the gallery: 41 in the area, with the page transition", () => {
+  it("are 25 pages beside the ten elements, the four that came from core (F7), the class reference and the gallery: 42 in the area, with the page transition", () => {
     expect(PAGES).toHaveLength(25);
     const routes = catalogPages().map((p) => p.route).sort();
     expect(routes).toEqual(["/docs/catalog/", "/docs/catalog/classes/", ...[...ELEMENT_PAGES, ...LAYOUT_PAGES, ...SITE_WIDE_SHEET_PAGES, ...PAGES.map(([slug]) => slug)].map((slug) => `/docs/catalog/${slug}/`)].sort());
@@ -634,7 +635,7 @@ describe("the Catalog area groups its pages by what they do", () => {
   const MEMBERS = {
     navigation: ["app-bar", "masthead", "site-header", "lang-switch", "submenu", "navbar", "sidebar"],
     "page-structure": ["article-header", "site-footer", "page-header", "hero", "section"],
-    content: ["embed", "faq", "post-list", "social", "stat", "toc", "terminal", "timeline"],
+    content: ["embed", "faq", "post-list", "showcase", "social", "stat", "toc", "terminal", "timeline"],
     charts: ["chart", "dashboard", "bar-list", "column-chart", "stacked-bar", "heat-map", "ring"],
     "site-wide": ["theme-time", "announcement", "cookie-consent", "search", "page-transition"],
     documentation: ["do-dont", "example", "page-footer", "doc-header", "pager", "page-rail", "docs-layout"],
@@ -659,12 +660,12 @@ describe("the Catalog area groups its pages by what they do", () => {
     for (const g of area.groups) expect(pages.some((p) => p.meta.group === g.id), `group ${g.id}`).toBe(true);
   });
 
-  it("gives every page of the area its own order number: 0 for the gallery, then 1 to 40 at most, no ties", () => {
+  it("gives every page of the area its own order number: 0 for the gallery, then 1 to 41 at most, no ties", () => {
     const orders = catalogPages().map((p) => Number(p.meta.order));
-    expect(catalogPages()).toHaveLength(41);
+    expect(catalogPages()).toHaveLength(42);
     expect(new Set(orders).size, `orders: ${orders.sort((a, b) => a - b).join(" ")}`).toBe(orders.length);
     expect(Math.min(...orders)).toBe(0);
-    expect(Math.max(...orders)).toBeLessThanOrEqual(40);
+    expect(Math.max(...orders)).toBeLessThanOrEqual(41);
     expect(repoSite.byRoute.get("/docs/catalog/").meta.order).toBe("0");
   });
 
@@ -740,7 +741,7 @@ describe("Fits best: the real pages", () => {
   const patterns = () => catalogPages().filter((p) => p.meta.group && p.meta.group !== "reference");
 
   it("every pattern page of catalog has both, and no other page has either", () => {
-    expect(patterns()).toHaveLength(39);
+    expect(patterns()).toHaveLength(40);
     for (const page of patterns()) {
       expect(page.meta["fits-kinds"], page.file).toBeTruthy();
       expect(page.meta.fits.length, page.file).toBeGreaterThan(10);
@@ -752,11 +753,11 @@ describe("Fits best: the real pages", () => {
     }
   });
 
-  it("a pattern fits the kinds its page says (the header and the footer fit landing and blog; the masthead blog), and the nine elements fit any site, as the pager does", () => {
+  it("a pattern fits the kinds its page says (the header and the footer fit landing and blog; the masthead blog), and the elements fit any site, as the pager does, but the showcase, which fits a landing page", () => {
     for (const [slug, , , fits] of PAGES) {
       expect(repoSite.byRoute.get(`/docs/catalog/${slug}/`).meta["fits-kinds"], slug).toBe(fits);
     }
-    for (const slug of ELEMENT_PAGES) expect(repoSite.byRoute.get(`/docs/catalog/${slug}/`).meta["fits-kinds"], slug).toBe("any");
+    for (const slug of ELEMENT_PAGES) expect(repoSite.byRoute.get(`/docs/catalog/${slug}/`).meta["fits-kinds"], slug).toBe(slug === "showcase" ? "landing" : "any");
   });
 
   it("the four that came from core say what they fit: the navbar any site, the sidebar docs and app, the terminal docs, the timeline blog and landing (F7)", () => {
@@ -821,7 +822,7 @@ describe("Fits best: what a page, a card and the Spanish page say", () => {
   it("the card of the gallery says it too, in plain words (the card is one link): no link inside the line", () => {
     for (const [route, lang] of [["/docs/catalog/", "en"], ["/es/docs/catalog/", "es"]]) {
       const cards = findAll(parse(rendered.get(route)), (n) => n.name === "li" && hasClass(n, "docs-card"));
-      expect(cards, route).toHaveLength(39);
+      expect(cards, route).toHaveLength(40);
       for (const card of cards) {
         const href = query(card, "h3.docs-card__title").children.find((n) => n.name === "a").attrs.get("href");
         const slug = href.split("/").filter(Boolean).at(-1);

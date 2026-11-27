@@ -31,7 +31,7 @@ const read = (/** @type {string} */ path) => readFileSync(fromRepo(path), 'utf-8
 const GROUPS = [
   { id: 'navigation', en: 'Navigation', pages: ['app-bar', 'lang-switch', 'masthead', 'navbar', 'sidebar', 'site-header', 'submenu'] },
   { id: 'page-structure', en: 'Page structure', pages: ['article-header', 'hero', 'page-header', 'section', 'site-footer'] },
-  { id: 'content', en: 'Content', pages: ['embed', 'faq', 'post-list', 'social', 'stat', 'terminal', 'timeline', 'toc'] },
+  { id: 'content', en: 'Content', pages: ['embed', 'faq', 'post-list', 'showcase', 'social', 'stat', 'terminal', 'timeline', 'toc'] },
   { id: 'charts', en: 'Charts', pages: ['bar-list', 'chart', 'column-chart', 'dashboard', 'heat-map', 'ring', 'stacked-bar'] },
   { id: 'site-wide', en: 'Site-wide', pages: ['announcement', 'theme-time', 'cookie-consent', 'search', 'page-transition'] },
   { id: 'documentation', en: 'Documentation', pages: ['do-dont', 'doc-header', 'docs-layout', 'example', 'page-footer', 'page-rail', 'pager'] },
@@ -57,6 +57,8 @@ const KIND_OF = {
   navbar: ['any'], sidebar: ['docs', 'app'], terminal: ['docs'], timeline: ['blog', 'landing'],
   // The components with data of the site fit any
   search: ['any'], 'cookie-consent': ['any'], 'theme-time': ['any'], 'lang-switch': ['any'], submenu: ['any'], announcement: ['any'], faq: ['any'], embed: ['any'], chart: ['any'],
+  // A row of the sites built with LUZ, as logos and names: the landing page's band of users (still, or a marquee with `scroll`)
+  showcase: ['landing'],
   // Link a stylesheet and the pages fade into one another: no class, no tag, any site
   'page-transition': ['any'],
 };

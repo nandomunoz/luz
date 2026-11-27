@@ -64,7 +64,7 @@ describe("the group Charts of Catalog", () => {
 
   it("holds chart, dashboard, the four that came from core and the ring, and Content no longer holds the first two", () => {
     expect(membersOf("catalog", "charts")).toEqual(["bar-list", "chart", "column-chart", "dashboard", "heat-map", "ring", "stacked-bar"]);
-    expect(membersOf("catalog", "content")).toEqual(["embed", "faq", "post-list", "social", "stat", "terminal", "timeline", "toc"]);
+    expect(membersOf("catalog", "content")).toEqual(["embed", "faq", "post-list", "showcase", "social", "stat", "terminal", "timeline", "toc"]);
   });
 
   it("is called Gráficos in Spanish", () => {

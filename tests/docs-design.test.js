@@ -72,8 +72,8 @@ function checkTokenList(html, used, where) {
 }
 
 describe("Design tab of every component and pattern page", () => {
-  it("covers the 70 pages, the four pages of Form fields (one Design tab per control) among them", () => {
-    expect(viewPages).toHaveLength(70);
+  it("covers the 71 pages, the four pages of Form fields (one Design tab per control) among them", () => {
+    expect(viewPages).toHaveLength(71);
     expect(viewPages.filter((p) => p.meta.parts === "controls").map((p) => p.route).sort()).toEqual(["choice", "field-parts", "inputs", "values"].map((slug) => `/docs/components/form-${slug}/`).sort());
   });
 

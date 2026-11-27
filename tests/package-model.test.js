@@ -27,7 +27,7 @@ import { isNpmOrReleased } from "./helpers/versions.js";
 const root = fileURLToPath(new URL("../", import.meta.url));
 const KINDS = ["landing", "cms", "app", "docs"];
 /** The tags catalog defines or styles for any site (the four components of F7 are in tests/helpers/catalog-names.js). */
-const SITE_TAGS = ["search", "cookie-consent", "lang-switch", "submenu", "announcement", "faq", "theme-time", "embed", "chart"];
+const SITE_TAGS = ["search", "cookie-consent", "lang-switch", "submenu", "announcement", "faq", "showcase", "theme-time", "embed", "chart"];
 // <luz-theme-time> replaced <luz-color-mode> (2026-10-29): core's <luz-theme-mode> is its twin in name only, and core names
 // the catalog's element in no code (its page and its comments may say that the catalog extends it)
 const SITE_COMPONENTS = [...SITE_TAGS];
@@ -72,7 +72,7 @@ describe("layering: tokens < core < catalog", () => {
     expect(offenders(["tokens", "core"], tags)).toEqual([]);
   });
 
-  it("the elements of catalog (search, cookie-consent, theme-time, lang-switch, submenu, announcement, faq) name no pattern of a kind of site, nor a name of before F8", () => {
+  it("the elements of catalog (search, cookie-consent, theme-time, lang-switch, submenu, announcement, faq, showcase) name no pattern of a kind of site, nor a name of before F8", () => {
     expect(offenders(["catalog"], OLD_NAME, (path) => !isPatternFile(path) && /\/components\//.test(path))).toEqual([]);
   });
 
@@ -234,7 +234,7 @@ describe("catalog after F8: nine `<luz-*>` elements, the 22 patterns of the four
 
   it("ships `dist` and the licence only, and describes its components", () => {
     expect(manifest.files).toEqual(["dist", "LICENSE"]);
-    for (const word of ["search", "consent", "language", "submenu", "announcement", "faq"]) expect(manifest.description.toLowerCase(), word).toContain(word);
+    for (const word of ["search", "consent", "language", "submenu", "announcement", "faq", "showcase"]) expect(manifest.description.toLowerCase(), word).toContain(word);
     expect(manifest.description.toLowerCase(), "no placeholder in the package").not.toContain("placeholder");
   });
 
