@@ -65,7 +65,7 @@ for (const route of DESIGN) {
           .map((el) => `${id} ← ${el.outerHTML.slice(0, 60)}`))));
     expect(outsideRefs).toEqual([]);
 
-    // In the accessibility tree the figure holds its caption and nothing else:
+    // In the accessibility tree the figure holds its caption and nothing else (a code block when the mistake is shown as code):
     // the verdict first, as a word (the ✓ / ✕ is CSS with empty alt text)
     expect(count, route).toBeGreaterThanOrEqual(2);
     for (const section of sections) {
@@ -75,7 +75,10 @@ for (const route of DESIGN) {
         const [head, ...inside] = (await figure.ariaSnapshot()).split('\n');
         expect(head, route).toMatch(/^- '?figure\b/);
         const caption = await figure.locator(':scope > figcaption').ariaSnapshot();
-        expect(inside.map((l) => l.replace(/^ {2}/, '')).join('\n'), route).toBe(caption);
+        // A mistake that would itself be a barrier is shown as a code block (TAB-20), which is read: the figure holds its caption, then the block
+        const blocks = figure.locator(':scope > pre.luz-code-block');
+        const code = await Promise.all((await blocks.all()).map((block) => block.ariaSnapshot()));
+        expect(inside.map((l) => l.replace(/^ {2}/, '')).join('\n'), route).toBe([caption, ...code].join('\n'));
         expect(caption.split('\n')[0], route).toBe(`- strong: ${verdict}`);
       }
     }
