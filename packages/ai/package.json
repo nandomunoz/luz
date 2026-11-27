@@ -1,6 +1,6 @@
 {
   "name": "@luz-ds/ai",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "LUZ Design System — the luz skill for AI assistants (Claude Code, Codex, Gemini CLI, Cursor): it asks what you want to make, writes a starter page that @luz-ds/check reads without a finding, and adds the agents and skills of luz-ai",
   "license": "MIT",
   "type": "module",

@@ -1,5 +1,16 @@
 # @luz-ds/tokens
 
+## 0.5.0
+
+### Minor Changes
+
+- f13387b: The sidebar is the colour of the page in light, in high contrast and in the morning and sunset moments: `--luz-sidebar-bg` is the page's own colour there, its links are read on it, and the current link is a filled one. Dark keeps its darker panel. A theme of your own that set the sidebar tokens for a dark panel in light keeps working; `packages/core/src/themes/_template.css` shows the new defaults.
+
+### Patch Changes
+
+- ff6500a: The site is at luzds.com: the links of the READMEs and the documentation URL of each rule of `luz-check` point there, not to nandomunoz.github.io/luz/.
+- 04acff8: The repository moved to github.com/nandomunoz/luz: the `repository`, `homepage` and `bugs` of every package, and the links of the READMEs, point there.
+
 ## 0.4.1
 
 ### Patch Changes

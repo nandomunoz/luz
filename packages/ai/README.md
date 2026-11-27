@@ -121,16 +121,18 @@ LUZ is not affiliated with Anthropic, OpenAI, Google or Anysphere (Cursor). Clau
 <!-- luz:ai-agents:start -->
 ## For AI agents
 
-`@luz-ds/ai` 0.0.0 is in beta: any release may break anything. Read the breaking changes below before you update, and use only what the files under "Read first" list.
+`@luz-ds/ai` 0.1.0 is in beta: any release may break anything. Read the breaking changes below before you update, and use only what the files under "Read first" list.
 
 ### Breaking changes
 
-Not released yet: 0.0.0 is the workspace's placeholder; the first release is 0.1.0. Nothing is deprecated and nothing breaks.
+First release of `@luz-ds/ai`. Nothing breaks inside @luz-ds. Coming from `@cai-ds/*`: see the migration note in `CHANGELOG.md`.
+
+Older versions: https://github.com/nandomunoz/luz/blob/main/packages/ai/CHANGELOG.md
 
 ### Read first
 
 1. `README.md` in this package: what the command does and its exit codes.
-2. `npx @luz-ds/ai@0.0.0 --help`: the command's options, from the version you run.
+2. `npx @luz-ds/ai@0.1.0 --help`: the command's options, from the version you run.
 3. https://luzds.com/llms.txt: the index of the documentation, short enough for a small context.
 4. https://luzds.com/llms-full.txt: the same pages in full.
 5. https://luzds.com/examples/: one standalone page of markup for each component and pattern.
@@ -141,7 +143,7 @@ Not released yet: 0.0.0 is the workspace's placeholder; the first release is 0.1
 
 ### Check what you write
 
-Run `npx @luz-ds/check@0.3.2 <files>` on every HTML and CSS file you write, and fix what it reports. To copy the accessibility reviewer into your project: `npx @luz-ds/check@0.3.2 agent > .claude/agents/luz-agent-accessibility.md`.
+Run `npx @luz-ds/check@0.4.0 <files>` on every HTML and CSS file you write, and fix what it reports. To copy the accessibility reviewer into your project: `npx @luz-ds/check@0.4.0 agent > .claude/agents/luz-agent-accessibility.md`.
 
 <!-- luz:ai-agents:end -->
 
