@@ -217,7 +217,7 @@
 }
 
 .luz-theme-apply-btn:focus-visible {
-  outline: 2px solid var(--luz-sidebar-text-hover);
+  outline: 2px solid var(--luz-focus-ring);
   outline-offset: 2px;
 }
 
