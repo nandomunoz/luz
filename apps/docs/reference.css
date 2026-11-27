@@ -2484,11 +2484,10 @@ h2.docs-demo__title {
    is its ::before at z-index -1, so it paints over the header's background
    and under its links, and travels with it.
    The text of the header keeps its contrast because no star sits under a
-   line of it: the row runs on a strip at the top (above the text, whose
-   lines start 15px down) that fades out downward, and a few fainter ones
-   sit in the empty middle of the row, between the brand and the links, at
-   every width. Each layer is one star, repeated across at its own odd
-   interval, so the pattern never lines up.
+   line of it: every star is in a strip at the top (above the text, whose
+   lines start 15px down) that fades out downward, in the middle of the row
+   too, where the site's links are. Each layer is one star, repeated across at
+   its own odd interval, so the pattern never lines up.
    -------------------------------------------------------------------------- */
 
 :root[data-theme="dark"] .site-header::before {
@@ -2512,13 +2511,13 @@ h2.docs-demo__title {
     radial-gradient(circle at 530px 9px, var(--docs-star-faint) 0 0.8px, transparent 1.6px),
     radial-gradient(circle at 150px 10px, var(--docs-star-faint) 0 0.5px, transparent 1.3px),
     radial-gradient(circle at 12px 11px, var(--docs-star-faint) 0 0.5px, transparent 1.2px),
-    /* the middle of the row: a few, fainter as they go down */
-    radial-gradient(circle at 48% 17px, var(--docs-star-dim) 0 0.7px, transparent 1.5px),
-    radial-gradient(circle at 58% 13px, var(--docs-star-dim) 0 0.9px, transparent 1.7px),
-    radial-gradient(circle at 53% 29px, var(--docs-star-faint) 0 0.6px, transparent 1.4px),
-    radial-gradient(circle at 44% 24px, var(--docs-star-faint) 0 0.6px, transparent 1.4px),
-    radial-gradient(circle at 61% 39px, var(--docs-star-faint) 0 0.5px, transparent 1.2px),
-    radial-gradient(circle at 50% 45px, var(--docs-star-faint) 0 0.45px, transparent 1.2px);
+    /* the middle of the row, where the site's links are: only in the strip above their text */
+    radial-gradient(circle at 48% 8px, var(--docs-star-dim) 0 0.7px, transparent 1.5px),
+    radial-gradient(circle at 58% 5px, var(--docs-star-dim) 0 0.9px, transparent 1.7px),
+    radial-gradient(circle at 53% 10px, var(--docs-star-faint) 0 0.6px, transparent 1.4px),
+    radial-gradient(circle at 44% 4px, var(--docs-star-faint) 0 0.6px, transparent 1.4px),
+    radial-gradient(circle at 61% 9px, var(--docs-star-faint) 0 0.5px, transparent 1.2px),
+    radial-gradient(circle at 50% 3px, var(--docs-star-faint) 0 0.45px, transparent 1.2px);
   background-size:
     641px 100%, 523px 100%, 283px 100%, 173px 100%, 419px 100%, 797px 100%, 229px 100%, 337px 100%,
     100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%;
