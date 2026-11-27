@@ -12,6 +12,9 @@ export function panel({ t, html }) {
     code: '<circle cx="7" cy="5.5" r="2.25"/><circle cx="7" cy="18.5" r="2.25"/><circle cx="17" cy="7" r="2.25"/><path d="M7 7.75v8.5M17 9.25c0 4.5-10 3-10 7"/>',
     person: '<circle cx="12" cy="8" r="4"/><path d="M4.5 20.5c.6-4 3.6-6 7.5-6s6.9 2 7.5 6"/>',
     feed: '<circle cx="6" cy="18" r="1"/><path d="M6 11a7 7 0 0 1 7 7M6 4a14 14 0 0 1 14 14"/>',
+    leaf: '<path d="M5 19c0-8 4-13 14-14 0 10-5 14-12 14M5 19c2-4 5-7 9-9"/>',
+    wave: '<path d="M3 9c3-3 6 3 9 0s6 3 9 0M3 15c3-3 6 3 9 0s6 3 9 0"/>',
+    book: '<path d="M12 6.5C10.5 5 8 4.5 4 4.5v13c4 0 6.5.5 8 2 1.5-1.5 4-2 8-2v-13c-4 0-6.5.5-8 2Zm0 0v13"/>',
   };
 
   const faq = [
@@ -97,6 +100,16 @@ export function panel({ t, html }) {
     `</div>`,
   ].join("");
 
+  // A marquee and a showcase: the ticker of three short phrases (written twice, the second list hidden from assistive
+  // technology, as the pages write it) and a row of three invented sites, with no href (a card links away from nothing)
+  const marquee = `<luz-marquee><ul>${[1, 2, 3].map((n) => `<li>${w(`marquee.phrase${n}`)}</li>`).join("")}</ul><ul aria-hidden="true">${[1, 2, 3].map((n) => `<li>${w(`marquee.phrase${n}`)}</li>`).join("")}</ul></luz-marquee>`;
+  const SITES = [
+    ["Greenleaf", ICON.leaf],
+    ["Tidewater", ICON.wave],
+    ["Pageturn", ICON.book],
+  ];
+  const showcase = `<luz-showcase><ul>${SITES.map(([name, d]) => `<li><a>${icon(d)}<span>${name}</span></a></li>`).join("")}</ul></luz-showcase>`;
+
   return {
     panel: `<div class="landing-cards landing-cat-content">${[
       card("faq", "faq", faq),
@@ -107,6 +120,8 @@ export function panel({ t, html }) {
       card("stat", "stat", stat),
       card("terminal", "terminal", terminal),
       card("social", "social", social),
+      card("marquee", "marquee", marquee),
+      card("showcase", "showcase", showcase),
     ].join("")}</div>`,
     aside: "",
   };
