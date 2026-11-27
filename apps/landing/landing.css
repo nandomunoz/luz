@@ -522,7 +522,7 @@
 
 .landing-who__points {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(13rem, 100%), 1fr));
   gap: var(--luz-space-lg) var(--luz-space-xl);
   margin: var(--luz-space-2xl) 0 var(--luz-space-xl);
   padding: var(--luz-space-xl) 0 0;
@@ -2168,6 +2168,8 @@
   --demo-line: 1px;
   --demo-edge: var(--luz-divider);
 
+  /* The level's own container: the terminal gives up its rem and ch at 400 % text (see @container inside) */
+  container: inside / inline-size;
   display: grid;
   justify-items: center;
   gap: var(--luz-space-2xl);
@@ -2684,7 +2686,9 @@
 
 /* The numbers: one quiet line of reassurance under the buttons that wraps
    and stays centred at any width. Room between two facts, not a dot, which
-   would start a line once it wraps; the bold number says where one begins */
+   would start a line once it wraps; the bold number says where one begins.
+   A fact is as wide as its words and wraps to a line of its own before it
+   breaks; only a fact wider than the window (400% text at 320px) wraps inside */
 .landing-intro__facts {
   display: flex;
   flex-wrap: wrap;
@@ -2700,7 +2704,6 @@
 
 .landing-intro__facts > li {
   margin: 0;
-  white-space: nowrap;
 }
 
 .landing-intro__facts strong {
@@ -5017,6 +5020,8 @@
   grid-template-columns: minmax(0, 1fr);
   min-inline-size: 0;
   margin: 0;
+  /* The bare figure's padding, capped by a share of the width at 400 % text */
+  padding: min(var(--luz-space-sm), 5%);
   overflow: hidden;
   border: 1px solid color-mix(in oklab, var(--luz-text-primary) 14%, transparent);
   border-radius: var(--luz-radius-md);
@@ -5027,6 +5032,7 @@
 
 .landing-cli__bar {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--luz-space-sm);
   padding: var(--luz-space-xs) var(--luz-space-sm);
@@ -5411,6 +5417,17 @@
   align-self: start;
 }
 
+/* The tabs of a level's panel wrap on a narrow screen (or large text) instead of scrolling out of it (WCAG 1.4.10) */
+.landing-panel > .luz-tabs {
+  flex-wrap: wrap;
+}
+
+/* A label wider than the panel (a long word at 400% text) wraps inside its tab */
+.landing-panel > .luz-tabs .luz-tab {
+  max-inline-size: 100%;
+  white-space: normal;
+}
+
 /* The four tabs of the page of the skill wrap on a narrow screen instead of scrolling out of it (WCAG 1.4.10) */
 .landing-clitabs > .luz-tabs {
   flex-wrap: wrap;
@@ -5444,7 +5461,7 @@
 /* The note gives way and wraps inside its own room, so the button stays beside it */
 .landing-cli__tested {
   flex: 1 1 0;
-  min-inline-size: 12rem;
+  min-inline-size: min(12rem, 100%);
 }
 
 /* The pause button in the foot sits in its row, at the end: none of the margin it has under a screen */
@@ -5456,6 +5473,17 @@
 /* The foot of the terminal the visitor answers (the page of the skill): Autoplay at the start, Enter at the end */
 .landing-cli__foot .landing-cli__next {
   margin-inline-start: auto;
+}
+
+/* 400 % text at 320 px: the buttons of the foot may shrink and wrap their words, as the ones under a screen do */
+@container inside (max-inline-size: 16em) {
+  .landing-cli__caption :is(.landing-cli__pause, .landing-cli__auto, .landing-cli__next) {
+    flex-shrink: 1;
+    flex-wrap: wrap;
+    max-inline-size: 100%;
+    white-space: normal;
+    block-size: auto;
+  }
 }
 
 /* ====================== The page of the skill (apps/landing/levels/ai.html) ======================
@@ -5831,6 +5859,7 @@ html:has(.landing-marquee) {
 /* The head of a card: the icon and, beside it, the title (owner, 2026-11-26) */
 .landing-ai__head {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--luz-space-sm);
   min-inline-size: 0;
