@@ -194,7 +194,7 @@ describe("legal audit of 2026-11-27: R-04 and R-05", () => {
     expect(front(readme)).toMatch(/ends it with a line (that )?say(s|ing) an AI drafted it/);
     expect(packageReadme).toMatch(/plain, specific language/);
     expect(packageReadme).toMatch(/stock phrases of machine-written text/);
-    expect(packageReadme).toMatch(/ends with a line (that )?say(s|ing) an AI drafted it/);
+    expect(packageReadme).toMatch(/ends (it )?with a line (that )?say(s|ing) an AI drafted it/);
     expect(readme).not.toMatch(/Removing AI tells/);
   });
 
