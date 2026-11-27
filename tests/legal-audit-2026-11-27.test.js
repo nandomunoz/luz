@@ -180,3 +180,30 @@ describe("R-10: the Arabic home does not say more than the English", () => {
     expect(catalog("en")["who.m2.title"]).toBe("Accessible, always.");
   });
 });
+
+/* ---- The three leftovers of that audit ---- */
+
+describe("the leftovers of the audit of 2026-11-27", () => {
+  it("the manifesto says Accessible, always in Arabic as the home does, in MANIFESTO.md and on its page", () => {
+    for (const file of ["MANIFESTO.md", "apps/site/manifesto/index.html"]) {
+      const text = read(file);
+      expect(text, file).not.toContain("متاح للجميع دائمًا");
+      expect(text, file).toContain("إمكانية الوصول دائمًا.");
+    }
+  });
+
+  it("the page of <luz-theme-time> does not send to a bar on the home, which has none (en and es)", () => {
+    for (const file of ["apps/docs/pages/catalog/theme-time.html", "apps/docs/i18n/es/pages/catalog/theme-time.html"]) {
+      const text = read(file);
+      expect(text, file).not.toMatch(/working bar is on the|barra que funciona está en la/i);
+    }
+  });
+
+  it("luz-license asks the question of the rights in step 3 with the same words as principle 2", () => {
+    const skill = read("packages/ai/skills/luz/assets/skills/luz-license/SKILL.md");
+    const question = skill.match(/ask one question: "([^"]+)"/)?.[1];
+    expect(question, "principle 2 has the question").toBeTruthy();
+    const step = skill.slice(skill.indexOf("### 3. Ask only what is missing"), skill.indexOf("### 4."));
+    expect(step).toContain(question);
+  });
+});
