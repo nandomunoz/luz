@@ -252,11 +252,15 @@ test.describe('the language switch', () => {
     });
   }
 
-  test('from 769px the button shows the language\'s name', async ({ page }) => {
+  test('from 769px the button is only its icon, and the language\'s name stays for a reader', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 700 });
     await open(page, '/es/');
-    await expect(switcher(page).locator('.luz-lang-switch__name')).toBeVisible();
-    expect(await switcher(page).locator('.luz-lang-switch__name').evaluate((el) => el.getBoundingClientRect().width)).toBeGreaterThan(20);
+    const name = switcher(page).locator('.luz-lang-switch__name');
+    await expect(name).not.toBeEmpty();
+    // Drawn the way u-sr-only draws it: one pixel, clipped, never display: none, so it is in the accessibility tree
+    expect(await name.evaluate((el) => el.getBoundingClientRect().width)).toBeLessThanOrEqual(1);
+    const text = (await name.textContent())?.trim() ?? '';
+    await expect(switcher(page).locator('.luz-lang-switch__button')).toHaveAccessibleName(new RegExp(text));
   });
 
   test('a browser without the popover API gets the languages as a row of links', async ({ page }) => {
