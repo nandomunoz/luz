@@ -241,7 +241,7 @@ describe("the AI-ready rows of budgets.json and PRINCIPLES.md section 8", () => 
 
   it("repeats the rows in the PRINCIPLES.md table, in the same order, after \"Each docs page\"", () => {
     expect(table.filter((cells) => /loose sheet/.test(cells[0]))).toEqual([]);
-    expect(table).toHaveLength(BEFORE.length + 10);
+    expect(table).toHaveLength(BEFORE.length + 7);
     expect(table[BEFORE.length - 1][0]).toMatch(/^Each docs page/);
     const [cli, text, manifests] = table.slice(BEFORE.length);
     expect(cli[0]).toMatch(/check/);
