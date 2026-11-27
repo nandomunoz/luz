@@ -100,7 +100,11 @@ test.describe('Catalog has seven groups, in the sidebar and in the gallery', () 
       const fold = page.locator('nav.luz-docs-nav ul.docs-nav > li', { has: page.locator('> a#a-catalog') });
       await expect(fold.locator('details[open]')).toHaveCount(1);
       const labels = fold.locator('li.docs-nav__group > .luz-sidebar__section-label');
-      await expect(labels).toHaveText(GROUPS.map((group) => groupLabel(code, group)));
+      // The HTML elements are nested in Catalog (`nestIn`, owner 2026-11-25): a labelled group at the end of the fold, after the seven of Catalog
+      const htmlLabel = code === 'en' ? 'HTML elements' : strings(code)['area.html'];
+      await expect(labels).toHaveText([...GROUPS.map((group) => groupLabel(code, group)), htmlLabel]);
+      await expect(fold.locator('li.docs-nav__group').last().locator('> .luz-sidebar__section-label'), 'the HTML elements are the last group').toHaveText(htmlLabel);
+      await expect(fold.locator('ul[aria-labelledby="nav-html"] a').first(), 'its first link is the index of the area').toHaveAttribute('href', `${prefix}/docs/html/`);
       for (const group of GROUPS) {
         const list = fold.locator(`ul[aria-labelledby="nav-${group.id}"]`);
         await expect(list, group.id).toBeVisible();
@@ -108,7 +112,7 @@ test.describe('Catalog has seven groups, in the sidebar and in the gallery', () 
         expect([...hrefs].sort(), `the pages of ${group.id}`).toEqual(group.pages.map((slug) => `${prefix}/docs/catalog/${slug}/`).sort());
       }
       // Each page is in one group only
-      const all = await fold.locator('ul.docs-nav__pages a').evaluateAll((links) => links.map((a) => a.getAttribute('href')));
+      const all = await fold.locator('li.docs-nav__group:not(:has(#nav-html)) ul.docs-nav__pages a').evaluateAll((links) => links.map((a) => a.getAttribute('href')));
       expect(new Set(all).size, 'no page twice').toBe(all.length);
       expect(all.length).toBe(PATTERNS.length + 1);
     });
@@ -233,7 +237,8 @@ test.describe('the four areas of the packages that are gone are not served', () 
     await page.goto('/docs/catalog/hero/');
     const hrefs = await page.locator('nav.luz-docs-nav a').evaluateAll((links) => links.map((a) => a.getAttribute('href') ?? ''));
     expect(hrefs.filter((href) => /^\/docs\/(landing|cms|app|documentation)\//.test(href))).toEqual([]);
-    await expect(page.locator('a.docs-nav__area')).toHaveText(['Get started', 'AI', 'Tokens', 'Core', 'Catalog', 'HTML elements', 'Accessibility']);
+    // The HTML elements have no area link: they are a group in the fold of Catalog (tests/docs-nav-nested.test.js)
+    await expect(page.locator('a.docs-nav__area')).toHaveText(['Get started', 'AI', 'Tokens', 'Core', 'Catalog', 'Accessibility']);
   });
 
   test('the files of the four packages are not served', async ({ request }) => {
