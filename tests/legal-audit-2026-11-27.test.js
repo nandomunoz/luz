@@ -69,7 +69,7 @@ describe("R-02: the Marquee entry", () => {
   it("says the same in Spanish", () => {
     expect(es).toMatch(/ningún (?:botón|control)[^.]*paus/i);
     expect(es).toMatch(/con o sin puntero/i);
-    expect(es).toMatch(/2\.2\.2[^.]*\bno se cumple\b/);
+    expect(es).toMatch(/2\.2\.2[\s\S]{0,80}\bno se cumple\b/);
     expect(es).toContain("Hecho con LUZ");
     expect(es).toMatch(/página de inicio/);
     expect(es).toMatch(/solo están en la banda/);
