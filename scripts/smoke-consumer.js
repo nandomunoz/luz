@@ -563,10 +563,10 @@ if (existsSync(aiFile)) {
   const copy = join(skillOf(".claude/skills"), "scripts", "luz.mjs");
   const site = spawnSync(process.execPath, [copy, "site", "new", "--name", "Smoke", "--kind", "landing", "--stack", "vanilla", "--target", join(target, "site")], { cwd: tmpdir(), encoding: "utf-8", env: { PATH: process.env.PATH } });
   check("the installed copy of the skill writes a starter page from any folder", site.status === 0 && existsSync(join(target, "site", "index.html")), `exit ${site.status}\n${site.stdout}${site.stderr}`);
-  const agent = spawnSync(process.execPath, [copy, "agent", "add", "luz-accessibility-auditor", "--for", "claude,gemini,codex", "--dir", target, "--set", "Target conformance level=WCAG 2.2 AA"], { cwd: tmpdir(), encoding: "utf-8", env: { PATH: process.env.PATH } });
-  check("the installed copy adds an agent for Claude Code, Gemini CLI and Codex", agent.status === 0 && existsSync(join(target, ".gemini/agents/luz-accessibility-auditor.md")) && existsSync(join(target, ".codex/agents/luz-accessibility-auditor.toml")), `exit ${agent.status}\n${agent.stdout}${agent.stderr}`);
-  const after = luzAi(["check", "--json", join(target, ".claude"), join(target, ".agents"), join(target, ".gemini"), join(target, ".codex")]);
-  check("luz-ai check finds no problem in what it installed", after.status === 0, `exit ${after.status}\n${after.stdout.slice(0, 1500)}${after.stderr}`);
+  const agent = spawnSync(process.execPath, [copy, "agent", "add", "luz-agent-accessibility", "--for", "claude,gemini,codex", "--dir", target], { cwd: tmpdir(), encoding: "utf-8", env: { PATH: process.env.PATH } });
+  check("the installed copy adds an agent for Claude Code, Gemini CLI and Codex", agent.status === 0 && existsSync(join(target, ".gemini/agents/luz-agent-accessibility.md")) && existsSync(join(target, ".codex/agents/luz-agent-accessibility.toml")), `exit ${agent.status}\n${agent.stdout}${agent.stderr}`);
+  const after = luzAi(["lint", "--json", join(target, ".claude"), join(target, ".agents"), join(target, ".gemini"), join(target, ".codex")]);
+  check("luz-ai lint finds no problem in what it installed", after.status === 0, `exit ${after.status}\n${after.stdout.slice(0, 1500)}${after.stderr}`);
 }
 
 /* ---- Done ------------------------------------------------------------------ */
