@@ -52,3 +52,21 @@ for (const PAGE of PAGES) for (const scale of ['100%', '200%', '400%']) {
     });
   });
 }
+
+// The page of the skill (/ai/, /es/ai/, /ar/ai/): at 64rem the three plans are on one row, and a command kept on one line
+// (white-space: pre) was 66 px wider than the narrow third column, so the page scrolled sideways by 9 px at exactly 1024 px.
+for (const path of ['/ai/', '/es/ai/', '/ar/ai/']) for (const width of [769, 1000, 1024, 1050, 1100, 1119, 1120, 1180]) {
+  test(`${path} at ${width} px: the install commands stay inside their card and the page does not scroll sideways`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 800 });
+    await page.goto(path);
+    await page.waitForLoadState('load');
+    expect(await sideways(page), 'the document scrolls sideways').toBe(0);
+    const out = await page.evaluate(() => [...document.querySelectorAll('.landing-ai-option')].flatMap((card) => {
+      const box = card.getBoundingClientRect();
+      return [...card.querySelectorAll('.landing-ai-option__cmd, .landing-ai__ask code')]
+        .filter((el) => { const r = el.getBoundingClientRect(); return r.right > box.right + 0.5 || r.left < box.left - 0.5; })
+        .map((el) => el.className || el.localName);
+    }));
+    expect(out, 'a command wider than its card').toEqual([]);
+  });
+}
