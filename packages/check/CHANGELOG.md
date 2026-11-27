@@ -1,5 +1,28 @@
 # @luz-ds/check
 
+## 0.4.0
+
+### Minor Changes
+
+- 16601bc: Two new CSS-only tags. `<luz-showcase>` (`components/showcase.css`): a row of links, each a logo and a name, for the sites built with something, its users, its customers or its sponsors; wrapped and centred. `<luz-marquee>` (`components/marquee.css`): content that loops along one line between two hairlines, fading at both ends, such as a ticker of short phrases or a showcase; write it twice, the second copy `aria-hidden="true"`. It stops while the pointer is over it or something has the focus, runs the other way right to left, and does not move under reduced motion or on paper. `--luz-marquee-duration` sets how long one loop takes.
+- 0b5657a: The accessibility agent that `luz-check agent` prints is named `luz-agent-accessibility`, not `luz-accessibility-reviewer`, and `@luz-ds/ai` writes the same one: the agents of LUZ are named `luz-agent-<word>`. Copy it with `npx @luz-ds/check agent > .claude/agents/luz-agent-accessibility.md`; the export `./agents/accessibility.md` is unchanged. If you copied the old file, delete it so the two do not both answer.
+
+### Patch Changes
+
+- 0249bce: `.luz-accordion`: a summary can hold two chevrons of the Icons page, `.luz-accordion__end` (shown while the panel is closed; `data-luz-flip` mirrors it in right-to-left text) and `.luz-accordion__down` (shown while it is open). The glyphs sit at the end of the row and replace the browser's marker, only in a summary that holds `.luz-accordion__end`: an accordion without them, and a bare `details`, keep the native marker. It is CSS only and works without JavaScript.
+
+  The same release shortens the core stylesheet by 62 B with no visual change: block-axis properties written as logical ones, a few dead fallbacks removed (`-webkit-overflow-scrolling`, the `vh` lines before `dvh`) and some rules merged. `@luz-ds/check` knows the two new classes.
+
+- a0c23d2: `.luz-accordion`: the chevron of a summary keeps its size. At 320 px, when the summary's text wrapped onto two lines, the glyph shrank, from 20 px to 13 px with a short second line and to a few pixels with a long one, because an SVG that is a flex child can shrink; it is now `flex: none`. It costs 7 B of the core stylesheet. `@luz-ds/check` is released with it because it carries a snapshot of the core's classes.
+- a6a6c29: `.luz-badge`: the text is centred in its box whatever the mono face. The padding above the text only fitted one face, so the digits and the words of a badge rode about 0.7 px high in the others. Where the browser supports `text-box`, the box of the text is trimmed to the height of the capitals and figures and the padding is the same above and below; the other browsers keep the flex centring they had.
+- a6c2e99: `.luz-badge`: words have room at the sides of the pill. The side padding was 4 px, drawn for a count of one or two digits, so a badge with words ("Changes code, after your go") touched both ends; it is 8 px now, the `xs` step of the space scale. A count keeps its 20 px height and its 20 px minimum width.
+- 0182bc3: `luz.css` and `luz.conditional.css` are lighter (about 125 and 160 bytes gzipped), with no change to how a page looks or behaves: declarations that another rule already gave or that could never apply are gone (the hover underline of a link, which a link already has; `text-decoration: none` on the hover of the breadcrumb and the dropdown items; the padding and border of the hidden table head; a dead cell padding in the stacked table), rules with the same body are merged (the two `dl` spacings, the hover and focus of `<luz-theme-mode>`'s option and button, the two container queries of the table), the tooltip is shifted with `translate` so the anchored version no longer undoes and redoes the shift, and the lists of bare elements are grouped in `:is()` so the conditional build scopes each once.
+- acf9acc: On paper, `::before` and `::after` lose their shadow, transition and animation like every element (the print rule listed them inside `:where()`, where a pseudo-element is dropped), and the focus ring of the custom-theme button (`.luz-theme-apply-btn`) uses `--luz-focus-ring` like every other control instead of `--luz-sidebar-text-hover`, a token of the sidebar, which core no longer reads.
+- 91baef2: The documentation about the luz skill has an area of its own, `/docs/ai/` (the page about working with AI, the commands of `/luz`, its agents and skills, and the recipes of each kind of site), and the pages of "Kinds of site" and the prompts for AI are gone. `@luz-ds/check` points its rules at `/docs/ai/#rules`. `@luz-ds/ai` builds its starter pages and its references from its own sources (`packages/ai/src`), the same ones as before.
+- ff6500a: The site is at luzds.com: the links of the READMEs and the documentation URL of each rule of `luz-check` point there, not to nandomunoz.github.io/luz/.
+- 04acff8: The repository moved to github.com/nandomunoz/luz: the `repository`, `homepage` and `bugs` of every package, and the links of the READMEs, point there.
+- f13387b: The sidebar is the colour of the page in light, in high contrast and in the morning and sunset moments: `--luz-sidebar-bg` is the page's own colour there, its links are read on it, and the current link is a filled one. Dark keeps its darker panel. A theme of your own that set the sidebar tokens for a dark panel in light keeps working; `packages/core/src/themes/_template.css` shows the new defaults.
+
 ## 0.3.2
 
 ### Patch Changes

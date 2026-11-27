@@ -1,5 +1,16 @@
 # @luz-ds/catalog
 
+## 0.5.0
+
+### Minor Changes
+
+- 16601bc: Two new CSS-only tags. `<luz-showcase>` (`components/showcase.css`): a row of links, each a logo and a name, for the sites built with something, its users, its customers or its sponsors; wrapped and centred. `<luz-marquee>` (`components/marquee.css`): content that loops along one line between two hairlines, fading at both ends, such as a ticker of short phrases or a showcase; write it twice, the second copy `aria-hidden="true"`. It stops while the pointer is over it or something has the focus, runs the other way right to left, and does not move under reduced motion or on paper. `--luz-marquee-duration` sets how long one loop takes.
+
+### Patch Changes
+
+- ff6500a: The site is at luzds.com: the links of the READMEs and the documentation URL of each rule of `luz-check` point there, not to nandomunoz.github.io/luz/.
+- 04acff8: The repository moved to github.com/nandomunoz/luz: the `repository`, `homepage` and `bugs` of every package, and the links of the READMEs, point there.
+
 ## 0.4.1
 
 ### Patch Changes
