@@ -133,8 +133,11 @@ test.describe('showcase: the still row', () => {
     expect(await page.evaluate(() => document.getAnimations().length)).toBe(0);
   });
 
-  test('wide, the links are in one row: every link on the same line', async ({ page }) => {
+  test('no margin of the page\'s rhythm lowers an item of the row: every link on the same line when the row cannot wrap', async ({ page }) => {
     await open(page, { width: 1280 });
+    // The width of a row depends on the font (DejaVu Sans, the system-ui of the CI runner, is wider than the fonts of a desktop, and five
+    // names plus their gaps pass 1280 px), so whether it wraps says nothing about the margin: measure it where it cannot wrap
+    await page.locator('#still > ul:first-child').evaluate((ul) => { ul.style.flexWrap = 'nowrap'; });
     const tops = await page.locator('#still > ul:first-child a').evaluateAll((els) => els.map((el) => el.getBoundingClientRect().top));
     // A margin of the page's rhythm on an li of the row (core spaces `li + li` of a list with no class) would push all but the first lower
     expect(Math.max(...tops) - Math.min(...tops), 'one row, every link on the same line').toBeLessThanOrEqual(EPS);
