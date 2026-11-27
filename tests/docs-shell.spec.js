@@ -25,7 +25,9 @@ import { readingOrder as walkTheTabOrder } from './helpers/reading-order.js';
 
 const BUTTON = '/docs/components/button/';
 /** The areas that have pages under their index: each is a fold of the sidebar. */
-const FOLDED = site.areas.filter((a) => readingOrder(site).some((p) => p.meta.area === a.id && p.route !== `/docs/${a.slug}/`)).length;
+// An area with `nestIn` (the HTML elements, in Catalog) has no link or fold of its own: its pages are a group in the fold of its host
+const SIDEBAR_AREAS = site.areas.filter((a) => !a.nestIn);
+const FOLDED = SIDEBAR_AREAS.filter((a) => readingOrder(site).some((p) => (p.meta.area === a.id && p.route !== `/docs/${a.slug}/`) || site.areas.some((n) => n.nestIn === a.id && p.meta.area === n.id))).length;
 const rail = (page) => page.getByRole('complementary', { name: 'About this page' });
 const box = async (page, selector) => {
   const element = page.locator(selector).first();
@@ -146,7 +148,7 @@ test.describe('docs shell, with JavaScript', () => {
     await expect(nav.locator('details[open]')).toHaveCount(1);
     await expect(nav.locator('details[open] a[href="/docs/components/button/"]')).toBeVisible();
     // Every area is a link, open or not; the pages of the closed folds are in the markup, not on the screen
-    for (const area of site.areas) await expect(nav.locator(`a.docs-nav__area[href="/docs/${area.slug}/"]`), area.id).toBeVisible();
+    for (const area of SIDEBAR_AREAS) await expect(nav.locator(`a.docs-nav__area[href="/docs/${area.slug}/"]`), area.id).toBeVisible();
     for (const href of ['/docs/tokens/color/', '/docs/get-started/snippet/', '/docs/catalog/search/', '/docs/catalog/page-rail/']) {
       await expect(nav.locator(`a[href="${href}"]`), href).toBeHidden();
     }
