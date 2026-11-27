@@ -2,7 +2,7 @@
 title: Trabajar con IA
 description: Qué puede leer un agente de programación con IA, cómo comprobar lo que ha escrito y qué revisor de accesibilidad puedes darle.
 keywords: llms.txt, agente, Claude, Copilot, Cursor, manifiesto, comprobación
-source: 21de207b8d84
+source: 07b0a2ed198f
 reviewed: false
 -->
     <section class="docs-block" aria-labelledby="start">
@@ -27,13 +27,12 @@ reviewed: false
     <section class="docs-block" aria-labelledby="skill">
       <h2 class="docs-chapter__title" id="skill">Instalar /luz</h2>
       <p class="docs-lead">Escribe <code>/luz</code> (<code>$luz</code> en Codex; con <code>agents-md</code>, dilo con palabras). <a href="/docs/ai/commands/">Todos los comandos</a>.</p>
-      <p><code>@luz-ds/ai</code> todavía no está en npm.</p>
       <div class="docs-snippet">
         <div class="docs-snippet__bar">
           <span class="docs-snippet__lang">Shell</span>
           <button class="luz-copy-btn" type="button" data-copy-from="code-skill-init" aria-label="Copiar el comando">Copiar</button>
         </div>
-        <pre class="luz-code-block" data-lang="bash" tabindex="0" role="region" aria-label="El comando"><code id="code-skill-init">npx @luz-ds/ai init --target claude</code></pre>
+        <pre class="luz-code-block" data-lang="bash" tabindex="0" role="region" aria-label="El comando"><code id="code-skill-init">npx @luz-ds/ai@0.1.0 init --target claude</code></pre>
       </div>
       <p>Destinos: <code>claude</code>, <code>codex</code>, <code>gemini</code>, <code>cursor</code>. <code>init</code> escribe la carpeta que lee cada uno y <code>/luz</code> para Gemini CLI y Cursor.</p>
       <p>Un agente añadido se detiene y pregunta por un campo que quede como <code>[ADAPT: …]</code>.</p>

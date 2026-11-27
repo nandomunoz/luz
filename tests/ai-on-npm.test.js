@@ -19,7 +19,7 @@ const read = (p) => readFileSync(join(root, p), "utf-8");
 const version = JSON.parse(read("packages/ai/package.json")).version;
 
 const PAGES = ["apps/docs/pages/ai/index.html", "apps/docs/i18n/es/pages/ai/index.html"];
-const NOT_ON_NPM = /not on npm|no está en npm|on npm yet|until it is on npm|coming soon|pronto en npm|próximamente|قريبًا/i;
+const NOT_ON_NPM = /not on npm|no está en npm|on npm yet|until it is on npm|coming soon|pronto en npm|próximamente|(?<!ت)قريبًا/i;
 
 describe("@luz-ds/ai is on npm", () => {
   it("is released (the page pins a real version, not the placeholder)", () => {

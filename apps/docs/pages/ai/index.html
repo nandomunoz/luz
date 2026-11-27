@@ -28,13 +28,12 @@ keywords: llms.txt, agent, claude, copilot, cursor, manifest, check
     <section class="docs-block" aria-labelledby="skill">
       <h2 class="docs-chapter__title" id="skill">Install /luz</h2>
       <p class="docs-lead">Type <code>/luz</code> (<code>$luz</code> in Codex; with <code>agents-md</code>, say it in words). <a href="/docs/ai/commands/">All the commands</a>.</p>
-      <p><code>@luz-ds/ai</code> is not on npm yet.</p>
       <div class="docs-snippet">
         <div class="docs-snippet__bar">
           <span class="docs-snippet__lang">Shell</span>
           <button class="luz-copy-btn" type="button" data-copy-from="code-skill-init" aria-label="Copy the command">Copy</button>
         </div>
-        <pre class="luz-code-block" data-lang="bash" tabindex="0" role="region" aria-label="The command"><code id="code-skill-init">npx @luz-ds/ai init --target claude</code></pre>
+        <pre class="luz-code-block" data-lang="bash" tabindex="0" role="region" aria-label="The command"><code id="code-skill-init">npx @luz-ds/ai@0.1.0 init --target claude</code></pre>
       </div>
       <p>Targets: <code>claude</code>, <code>codex</code>, <code>gemini</code>, <code>cursor</code>. <code>init</code> writes the folder each one reads, and <code>/luz</code> for Gemini CLI and Cursor.</p>
       <p>An added agent stops and asks about a field left as <code>[ADAPT: …]</code>.</p>

@@ -19,7 +19,7 @@ updates:
     # Group updates by type
     groups:
       dev-dependencies:
-        dependency-type: "dev"
+        dependency-type: "development"
       production-dependencies:
         dependency-type: "production"
     # Ignore versions for major updates (require manual review)

@@ -24,7 +24,7 @@ describe("SECURITY.md: publishing a package", () => {
     expect(text).toContain("npx npm@latest stage publish --tag stage --access public");
     expect(text).toContain("0.0.1-stage");
     expect(text).not.toMatch(/by hand with a placeholder version that has no code \(`0\.0\.0-stage`\)/);
-    expect(text).toMatch(/0\.0\.0-stage[^.]*reserve/i);
+    expect(text).toMatch(/reserves?[^.]*0\.0\.0-stage/i);
     expect(text).toContain("E403");
     expect(text).toMatch(/npm 11\.15/);
     expect(text).toMatch(/Node 22\.22\.2/);
