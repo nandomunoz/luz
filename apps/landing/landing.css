@@ -6202,8 +6202,10 @@ html:has(.landing-marquee) {
   margin-block-start: auto;
 }
 
-/* On a wide screen a command is one line, never broken in the middle of a flag; on a narrow one it wraps, so nothing leaves the page */
-@media (width >= 64rem) {
+/* On a wide screen a command is one line, never broken in the middle of a flag; on a narrow one it wraps, so nothing leaves the page.
+   The three plans are on one row from 64rem, but the narrow third column holds its command on one line only from 70rem: between the
+   two (1024 to 1119 px) it was 66 px too wide and the page scrolled sideways, so there the command wraps at its spaces */
+@media (width >= 70rem) {
   .landing-ai-option .landing-ai__ask code {
     white-space: pre;
   }
