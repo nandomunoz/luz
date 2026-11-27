@@ -49,12 +49,28 @@ describe("the manifest", () => {
   });
 
   it("is released by a changeset that names only it, as a minor, and says what it does not do", () => {
+    // Two states of the same facts. Before the version step they are a changeset in .changeset/; the step (`changeset version`)
+    // consumes it, so on the Version PR they are the 0.1.0 entry of packages/ai/CHANGELOG.md, under "Minor Changes".
     const sets = readdirSync(join(root, ".changeset")).filter((f) => f.endsWith(".md") && f !== "README.md").map((f) => read(`.changeset/${f}`));
     const own = sets.find((s) => /"@luz-ds\/ai": minor/.test(s));
-    expect(own).toBeTruthy();
-    expect(own.match(/^"@luz-ds\/[a-z]+": \w+$/gm)).toEqual(['"@luz-ds/ai": minor']);
-    expect(own).toMatch(/no network request/);
-    expect(own).toMatch(/symbolic link/);
+    let text;
+    if (own) {
+      // Names only this package, and as a minor
+      expect(own.match(/^"@luz-ds\/[a-z]+": \w+$/gm)).toEqual(['"@luz-ds/ai": minor']);
+      text = own;
+    } else {
+      // The changelog of a package names only that package; the bump is the heading its entry sits under
+      const log = read("packages/ai/CHANGELOG.md");
+      expect(log.startsWith("# @luz-ds/ai\n"), "no changeset names @luz-ds/ai and packages/ai/CHANGELOG.md is not its changelog").toBe(true);
+      const entry = log.split(/^## /m).find((e) => e.startsWith("0.1.0\n"));
+      expect(entry, "no changeset names @luz-ds/ai and packages/ai/CHANGELOG.md has no 0.1.0 entry").toBeTruthy();
+      const minor = entry.split(/^### /m).find((h) => h.startsWith("Minor Changes\n"));
+      expect(minor, "the 0.1.0 entry has no Minor Changes").toBeTruthy();
+      expect(entry).not.toMatch(/^### Major Changes$/m);
+      text = minor;
+    }
+    expect(text).toMatch(/no network request/);
+    expect(text).toMatch(/symbolic link/);
   });
 });
 

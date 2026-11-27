@@ -34,8 +34,10 @@ describe("the domain", () => {
     let hits = "";
     try {
       // Written or escaped in a regular expression (nandomunoz\.github\.io)
-      // This file and the changesets name the old address on purpose: the one to look for, the one that went
-      hits = execFileSync("git", ["grep", "-l", "-E", "nandomunoz(\\\\)?\\.github(\\\\)?\\.io", "--", ".", ":!tests/site-domain.test.js", ":!.changeset"], { cwd: repo, encoding: "utf-8" });
+      // This file and the changesets name the old address on purpose: the one to look for, the one that went.
+      // So does the CHANGELOG.md of each package (exactly packages/*/CHANGELOG.md, no other file): the version step
+      // writes the consumed changesets there, and those that moved the domain say what moved, as history
+      hits = execFileSync("git", ["grep", "-l", "-E", "nandomunoz(\\\\)?\\.github(\\\\)?\\.io", "--", ".", ":!tests/site-domain.test.js", ":!.changeset", ":(exclude,glob)packages/*/CHANGELOG.md"], { cwd: repo, encoding: "utf-8" });
     } catch {
       hits = ""; // git grep exits 1 when nothing matches
     }

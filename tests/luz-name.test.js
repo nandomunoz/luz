@@ -50,8 +50,18 @@ describe("the old name is gone", () => {
   it("no file mentions the old name, apart from the phrase 'formerly <OLD>'", () => {
     const hits = [];
     for (const [file, content] of texts) {
+      // The CHANGELOG.md of a package is history: the version step writes the consumed changesets there, and the ones that
+      // renamed the project say what was renamed. Exactly packages/<name>/CHANGELOG.md, no other file
+      if (/^packages\/[^/]+\/CHANGELOG\.md$/.test(file)) continue;
       const lines = content.split("\n");
+      const readme = /^packages\/[^/]+\/README\.md$/.test(file);
+      let generated = false; // inside the block `scripts/ai-readme.js` writes, from the changelog, between its two markers
       for (let i = 0; i < lines.length; i++) {
+        if (readme && lines[i] === "<!-- luz:ai-agents:start -->") generated = true;
+        if (readme && lines[i] === "<!-- luz:ai-agents:end -->") generated = false;
+        // The first release of a package says where it comes from ("Coming from @<former scope>/*: see the migration note"):
+        // that one generated line is history too, like the changelog it points to. Nothing else of the block is exempt
+        if (generated && /^First release of /.test(lines[i])) continue;
         const line = lines[i].replace(ALLOWED, "");
         if (line.match(OLD)) hits.push(`${file}:${i + 1}: ${lines[i].trim().slice(0, 160)}`);
       }
