@@ -1106,7 +1106,8 @@
   align-items: center;
   flex-wrap: wrap;
   gap: var(--luz-space-2xs) var(--luz-space-sm);
-  padding: var(--luz-space-2xs) var(--luz-space-sm);
+  /* A share of the width caps the side padding at 400 % text */
+  padding: var(--luz-space-2xs) min(var(--luz-space-sm), 5%);
   border-block-end: 1px solid color-mix(in oklab, var(--luz-text-primary) 12%, transparent);
   background: color-mix(in oklab, var(--luz-text-primary) 7%, var(--luz-surface-page));
 }
@@ -1120,8 +1121,9 @@
 }
 
 .landing-install__label {
-  /* At 400 % text the bar wraps, and a label never stacks a letter per line */
-  white-space: nowrap;
+  /* At 400 % text the bar wraps, and a label never stacks a letter per line;
+     only a word wider than the whole bar breaks, in two lines at most */
+  overflow-wrap: anywhere;
   font-family: var(--luz-font-mono);
   font-size: var(--luz-text-sm);
   letter-spacing: 0.08em;
@@ -5325,6 +5327,11 @@
 @container inside (max-inline-size: 16em) {
   .landing-cli__bar {
     padding: 4%;
+  }
+
+  /* The spacing between the capitals of an install label goes too, so "Commands" breaks in two lines, not three */
+  .landing-install__label {
+    letter-spacing: 0;
   }
 
   /* The title in ASCII is a picture as wide as its letters: it goes, and the word stays for a reader */
