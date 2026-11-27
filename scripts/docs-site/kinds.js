@@ -31,7 +31,7 @@ const CATALOG_PAGES = "apps/docs/pages/catalog";
  */
 export const CASCADE = [
   "navbar", "sidebar", "terminal", "timeline",
-  "site-header", "masthead", "hero", "main", "section", "stat", "site-footer", "glow", "social",
+  "site-header", "masthead", "hero", "main", "section", "stat", "site-footer", "glow", "social", "showcase",
   "page-header", "article-header", "article", "post-list",
   "app-bar", "dashboard",
   "bar-list", "column-chart", "stacked-bar", "heat-map", "ring",

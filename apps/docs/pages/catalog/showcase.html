@@ -1,0 +1,229 @@
+<!-- luz:page
+title: Showcase
+description: Shows the sites, products or people a page is proud of, each a link with its logo and its name, in a row or a marquee.
+area: catalog
+order: 41
+group: content
+fits-kinds: landing
+fits: the sites built with a product, its customers or its sponsors
+files: <luz-showcase>, scroll
+keywords: logo cloud, logo wall, built with, customers, sponsors, partners, marquee
+toc: h2,h3
+-->
+    <div class="docs-component" id="p-showcase">
+          <h2 id="example">Example</h2>
+          <p>Five invented sites, each a link with its mark and its name: first the still row, which wraps and is centred, then the same list as a marquee with <code>scroll</code>.</p>
+          <div class="docs-example" data-docs-specimen>
+          <div class="docs-demo__stage">
+            <div class="o-stack">
+            <luz-showcase>
+              <ul>
+                <li><a href="#example" title="Greenleaf: a gardening journal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 19c0-8 5-14 14-14 0 9-6 14-14 14ZM5 19l8-8"/></svg><span>Greenleaf</span></a></li>
+                <li><a href="#example" title="Tidewater: tide tables for the coast"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 9c3-3 6-3 9 0s6 3 9 0M3 15c3-3 6-3 9 0s6 3 9 0"/></svg><span>Tidewater</span></a></li>
+                <li><a href="#example" title="Pageturn: a second-hand bookshop"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 5.5C7 4.5 10 4.5 12 6c2-1.5 5-1.5 8-.5v13c-3-1-6-1-8 .5-2-1.5-5-1.5-8-.5ZM12 6v13"/></svg><span>Pageturn</span></a></li>
+                <li><a href="#example" title="Shellbox: a terminal for teaching"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="4.5" width="18" height="15" rx="2"/><path d="m7 10 3 2-3 2M12.5 15h4"/></svg><span>Shellbox</span></a></li>
+                <li><a href="#example" title="Northstar: a small observatory"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m12 3.5 2.6 5.3 5.8.8-4.2 4.1 1 5.8L12 16.8l-5.2 2.7 1-5.8-4.2-4.1 5.8-.8L12 3.5Z"/></svg><span>Northstar</span></a></li>
+              </ul>
+            </luz-showcase>
+            <luz-showcase scroll>
+              <ul>
+                <li><a href="#example" title="Greenleaf: a gardening journal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 19c0-8 5-14 14-14 0 9-6 14-14 14ZM5 19l8-8"/></svg><span>Greenleaf</span></a></li>
+                <li><a href="#example" title="Tidewater: tide tables for the coast"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 9c3-3 6-3 9 0s6 3 9 0M3 15c3-3 6-3 9 0s6 3 9 0"/></svg><span>Tidewater</span></a></li>
+                <li><a href="#example" title="Pageturn: a second-hand bookshop"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 5.5C7 4.5 10 4.5 12 6c2-1.5 5-1.5 8-.5v13c-3-1-6-1-8 .5-2-1.5-5-1.5-8-.5ZM12 6v13"/></svg><span>Pageturn</span></a></li>
+                <li><a href="#example" title="Shellbox: a terminal for teaching"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="4.5" width="18" height="15" rx="2"/><path d="m7 10 3 2-3 2M12.5 15h4"/></svg><span>Shellbox</span></a></li>
+                <li><a href="#example" title="Northstar: a small observatory"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m12 3.5 2.6 5.3 5.8.8-4.2 4.1 1 5.8L12 16.8l-5.2 2.7 1-5.8-4.2-4.1 5.8-.8L12 3.5Z"/></svg><span>Northstar</span></a></li>
+              </ul>
+              <ul aria-hidden="true">
+                <li><a tabindex="-1" href="#example" title="Greenleaf: a gardening journal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 19c0-8 5-14 14-14 0 9-6 14-14 14ZM5 19l8-8"/></svg><span>Greenleaf</span></a></li>
+                <li><a tabindex="-1" href="#example" title="Tidewater: tide tables for the coast"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 9c3-3 6-3 9 0s6 3 9 0M3 15c3-3 6-3 9 0s6 3 9 0"/></svg><span>Tidewater</span></a></li>
+                <li><a tabindex="-1" href="#example" title="Pageturn: a second-hand bookshop"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 5.5C7 4.5 10 4.5 12 6c2-1.5 5-1.5 8-.5v13c-3-1-6-1-8 .5-2-1.5-5-1.5-8-.5ZM12 6v13"/></svg><span>Pageturn</span></a></li>
+                <li><a tabindex="-1" href="#example" title="Shellbox: a terminal for teaching"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="4.5" width="18" height="15" rx="2"/><path d="m7 10 3 2-3 2M12.5 15h4"/></svg><span>Shellbox</span></a></li>
+                <li><a tabindex="-1" href="#example" title="Northstar: a small observatory"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m12 3.5 2.6 5.3 5.8.8-4.2 4.1 1 5.8L12 16.8l-5.2 2.7 1-5.8-4.2-4.1 5.8-.8L12 3.5Z"/></svg><span>Northstar</span></a></li>
+              </ul>
+            </luz-showcase>
+            </div>
+          </div>
+          <p class="docs-demo__note">The marquee stops while the pointer is over it or a link has the focus, and it stays still when the reader asks for reduced motion. LUZ ships no logos: the marks here are drawn for the example, and the names are made up.</p>
+          </div>
+          <h2 id="known-issues">Known issues</h2>
+          <p>With <code>scroll</code>, on a touch screen there is no hover, so only focusing a link stops the marquee. WCAG 2.2 success criterion 2.2.2 (Pause, Stop, Hide) asks for a way to pause moving content that lasts more than five seconds, and the marquee has no button. That is why the still row is the default: use <code>scroll</code> only where the band is a decoration and every link is also somewhere else on the page, or do not use it.</p>
+          <p>LUZ ships no brand logos: everything it serves is MIT, and a logo is not. The logos are yours, and so is the right to show them.</p>
+          <nav class="luz-tabs docs-view-tabs" aria-label="Showcase documentation">
+            <a class="luz-tab" href="#code-panel" data-docs-view="code">Code</a>
+            <a class="luz-tab" href="#design-panel" data-docs-view="design">Design</a>
+          </nav>
+          <div class="luz-tabpanel docs-view" id="code-panel">
+            <h2 class="docs-view__title" id="code">Code</h2>
+            <h3 id="markup">Copy the markup</h3>
+            <p>A <code>&lt;luz-showcase&gt;</code> around a <code>&lt;ul&gt;</code> of links. Each link holds a decorative <code>&lt;svg&gt;</code> and the name in a <code>&lt;span&gt;</code>. Link <code>components/showcase.css</code> of <code>@luz-ds/catalog</code> after core.</p>
+            <div class="docs-snippet">
+              <div class="docs-snippet__bar">
+                <span class="docs-snippet__lang">HTML</span>
+                <button class="luz-copy-btn" type="button" data-copy-from="code-showcase" aria-label="Copy the showcase markup">Copy</button>
+              </div>
+              <pre class="luz-code-block" data-lang="html" tabindex="0" role="region" aria-label="Showcase markup"><code id="code-showcase">&lt;luz-showcase&gt;
+  &lt;ul&gt;
+    &lt;li&gt;
+      &lt;a href=&quot;https://greenleaf.example/&quot; title=&quot;Greenleaf: a gardening journal&quot;&gt;
+        &lt;svg viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.5&quot;
+          stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot; aria-hidden=&quot;true&quot; focusable=&quot;false&quot;&gt;…&lt;/svg&gt;
+        &lt;span&gt;Greenleaf&lt;/span&gt;
+      &lt;/a&gt;
+    &lt;/li&gt;
+    &lt;!-- one li for each site --&gt;
+  &lt;/ul&gt;
+&lt;/luz-showcase&gt;</code></pre>
+            </div>
+            <p>For the marquee, add <code>scroll</code> and write the list twice. The copy is <code>aria-hidden="true"</code> and each of its links has <code>tabindex="-1"</code>.</p>
+            <div class="docs-snippet">
+              <div class="docs-snippet__bar">
+                <span class="docs-snippet__lang">HTML</span>
+                <button class="luz-copy-btn" type="button" data-copy-from="code-showcase-scroll" aria-label="Copy the showcase marquee markup">Copy</button>
+              </div>
+              <pre class="luz-code-block" data-lang="html" tabindex="0" role="region" aria-label="Showcase marquee markup"><code id="code-showcase-scroll">&lt;luz-showcase scroll&gt;
+  &lt;ul&gt;
+    &lt;li&gt;&lt;a href=&quot;https://greenleaf.example/&quot;&gt;&lt;svg aria-hidden=&quot;true&quot;&gt;…&lt;/svg&gt;&lt;span&gt;Greenleaf&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href=&quot;https://tidewater.example/&quot;&gt;&lt;svg aria-hidden=&quot;true&quot;&gt;…&lt;/svg&gt;&lt;span&gt;Tidewater&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+  &lt;ul aria-hidden=&quot;true&quot;&gt;
+    &lt;li&gt;&lt;a tabindex=&quot;-1&quot; href=&quot;https://greenleaf.example/&quot;&gt;&lt;svg aria-hidden=&quot;true&quot;&gt;…&lt;/svg&gt;&lt;span&gt;Greenleaf&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a tabindex=&quot;-1&quot; href=&quot;https://tidewater.example/&quot;&gt;&lt;svg aria-hidden=&quot;true&quot;&gt;…&lt;/svg&gt;&lt;span&gt;Tidewater&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/luz-showcase&gt;</code></pre>
+            </div>
+            <h3 id="variants">Variants and options</h3>
+            <div class="luz-table-wrap" role="region" aria-label="Showcase tag, attribute and property" tabindex="0">
+              <table class="luz-table">
+                <thead>
+                  <tr><th scope="col">Tag, attribute or property</th><th scope="col">Effect</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td data-label="Tag, attribute or property"><div><code>&lt;luz-showcase&gt;</code></div></td><td data-label="Effect"><div>Around a native list of links. The links sit in a row that wraps, centred, in small bold sans text. A tag that no script defines: no class, no role of its own</div></td></tr>
+                  <tr><td data-label="Tag, attribute or property"><div><code>scroll</code></div></td><td data-label="Effect"><div>On the tag, a boolean attribute: the row becomes a marquee that loops. Write the list twice, the copy with <code>aria-hidden="true"</code> and its links with <code>tabindex="-1"</code>. Without <code>scroll</code> the copy is never shown</div></td></tr>
+                  <tr><td data-label="Tag, attribute or property"><div><code>--luz-showcase-duration</code></div></td><td data-label="Effect"><div>On the tag, how long one loop takes. The default is 40 s. Give a longer list more time, so it moves at the same speed</div></td></tr>
+                  <tr><td data-label="Tag, attribute or property"><div><code>title</code></div></td><td data-label="Effect"><div>On a link, optional: the name and one line about the site. It is the browser’s tooltip and is not read as the name of the link</div></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <h3 id="how">How it works</h3>
+            <p>CSS from <code>components/showcase.css</code> of <code>@luz-ds/catalog</code>. No JavaScript: <code>&lt;luz-showcase&gt;</code> is a tag that no script ever defines.</p>
+            <ul>
+              <li>The list is a native <code>&lt;ul&gt;</code>, so a screen reader says how many sites there are. The logo is an <code>&lt;svg aria-hidden="true"&gt;</code> or an <code>&lt;img alt=""&gt;</code> before the name, and the name is the name of the link.</li>
+              <li>The logo is <code>1.5em</code> square and does not shrink. LUZ gives it a size, not a drawing: an <code>&lt;svg&gt;</code> sets its own <code>fill</code> or <code>stroke</code>, and with <code>currentColor</code> it takes the colour of the link.</li>
+              <li>A link is quiet, in the secondary text colour, and takes the primary one under the pointer and with the keyboard focus. It never wraps its name: the row wraps between links.</li>
+              <li>With <code>scroll</code> each list moves by its own width, so the loop has no seam. The band hides what overflows and fades at both ends.</li>
+              <li>The copy is not <code>inert</code>: a pointer can still click a link in it, while the keyboard and a screen reader meet each link once.</li>
+              <li>The marquee stops while the pointer is over it or a link has the focus. Under reduced motion and on paper it is the still row again, and the copy is not shown.</li>
+              <li>In a right-to-left page the marquee runs the other way.</li>
+            </ul>
+            <h3 id="no-js">Without JavaScript</h3>
+            <p>Nothing changes: there is no script, and the marquee is CSS.</p>
+            <h3 id="keyboard">Keyboard and ARIA</h3>
+            <ul>
+              <li><strong>Tab:</strong> moves through the links in source order, each once. The links of the copy have <code>tabindex="-1"</code>.</li>
+              <li><strong>Enter:</strong> follows the link, as any link.</li>
+              <li><strong>Name:</strong> the text of the <code>&lt;span&gt;</code>. The <code>&lt;svg&gt;</code> is <code>aria-hidden="true"</code>, and <code>title</code> is not read as the name.</li>
+              <li><strong>The copy:</strong> <code>aria-hidden="true"</code> hides it from a screen reader. Do not use <code>inert</code>, which would also stop the pointer.</li>
+              <li><strong>Target:</strong> a link is at least <code>--luz-control-md</code> (36 px) high, over WCAG 2.5.8’s 24 px.</li>
+              <li><strong>Language:</strong> a name in another language than the page carries its own <code>lang</code>, on its <code>&lt;span&gt;</code>.</li>
+              <li>Not tested with a screen reader.</li>
+            </ul>
+            <p class="docs-view__xref"><a href="#contrast">Contrast and focus</a> are in the Design tab.</p>
+          </div>
+          <div class="luz-tabpanel docs-view" id="design-panel">
+            <h2 class="docs-view__title" id="design">Design</h2>
+            <h3 id="when">When to use</h3>
+            <p>Use it to show who uses, buys, sponsors or backs what the page is about, when the names are the proof: “Built with LUZ”, the customers of a product, the sponsors of an event, the partners of a school.</p>
+            <ul>
+              <li>Use the still row. It is the default, and every name can be read without waiting for it.</li>
+              <li>Use <code>scroll</code> only when the band is a decoration and every link is also elsewhere on the page.</li>
+            </ul>
+            <h3 id="when-not">When not to use</h3>
+            <p>Do not use it for the links of the site itself, for people’s profiles or for a gallery of work.</p>
+            <ul>
+              <li>For the site’s links, use <a href="/docs/catalog/site-footer/">site-footer</a> or the <a href="/docs/catalog/navbar/">navbar</a>.</li>
+              <li>For profiles and feeds, use <a href="/docs/catalog/social/">social links</a>.</li>
+              <li>For what customers say, in their words, use a <a href="/docs/components/card/">card</a> with a quote.</li>
+              <li>Do not show a site, a company or a person that has not agreed to it.</li>
+            </ul>
+            <h3 id="do-dont">Do and don't</h3>
+            <div class="luz-do-dont">
+              <figure class="luz-do-dont__item luz-do-dont__item--do">
+                <figcaption><strong class="luz-do-dont__verdict">Do</strong> Give every link its name as text, and hide the logo from assistive technology: the name names the link.</figcaption>
+                <div class="luz-do-dont__stage" inert aria-hidden="true">
+                  <luz-showcase>
+                  <ul>
+                    <li><a href="#example"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 19c0-8 5-14 14-14 0 9-6 14-14 14ZM5 19l8-8"/></svg><span>Greenleaf</span></a></li>
+                    <li><a href="#example"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 9c3-3 6-3 9 0s6 3 9 0M3 15c3-3 6-3 9 0s6 3 9 0"/></svg><span>Tidewater</span></a></li>
+                    <li><a href="#example"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 5.5C7 4.5 10 4.5 12 6c2-1.5 5-1.5 8-.5v13c-3-1-6-1-8 .5-2-1.5-5-1.5-8-.5ZM12 6v13"/></svg><span>Pageturn</span></a></li>
+                  </ul>
+                  </luz-showcase>
+                </div>
+              </figure>
+              <figure class="luz-do-dont__item luz-do-dont__item--dont">
+                <figcaption><strong class="luz-do-dont__verdict">Don't</strong> Leave the name out and the <code>alt</code> off: a link with only a logo and no text has no name for a screen reader to say.</figcaption>
+                <pre class="luz-code-block" data-lang="html" tabindex="0" role="region" aria-label="Don't: a link with no name"><code>&lt;a href=&quot;https://greenleaf.example/&quot;&gt;&lt;img src=&quot;greenleaf.svg&quot;&gt;&lt;/a&gt;</code></pre>
+              </figure>
+              <figure class="luz-do-dont__item luz-do-dont__item--do">
+                <figcaption><strong class="luz-do-dont__verdict">Do</strong> Hide the copy of a marquee from a screen reader and out of the Tab order, so each link is met once.</figcaption>
+                <pre class="luz-code-block" data-lang="html" tabindex="0" role="region" aria-label="Do: the copy of a marquee"><code>&lt;luz-showcase scroll&gt;
+  &lt;ul&gt;
+    &lt;li&gt;&lt;a href=&quot;https://greenleaf.example/&quot;&gt;…&lt;span&gt;Greenleaf&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+  &lt;ul aria-hidden=&quot;true&quot;&gt;
+    &lt;li&gt;&lt;a tabindex=&quot;-1&quot; href=&quot;https://greenleaf.example/&quot;&gt;…&lt;span&gt;Greenleaf&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/luz-showcase&gt;</code></pre>
+              </figure>
+              <figure class="luz-do-dont__item luz-do-dont__item--dont">
+                <figcaption><strong class="luz-do-dont__verdict">Don't</strong> Copy the list as it is: a screen reader reads every site twice, and the keyboard has to pass every link twice.</figcaption>
+                <pre class="luz-code-block" data-lang="html" tabindex="0" role="region" aria-label="Don't: a marquee with a copy that is not hidden"><code>&lt;luz-showcase scroll&gt;
+  &lt;ul&gt;
+    &lt;li&gt;&lt;a href=&quot;https://greenleaf.example/&quot;&gt;…&lt;span&gt;Greenleaf&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+  &lt;ul&gt;
+    &lt;li&gt;&lt;a href=&quot;https://greenleaf.example/&quot;&gt;…&lt;span&gt;Greenleaf&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/luz-showcase&gt;</code></pre>
+              </figure>
+            </div>
+            <h3 id="content">Writing the content</h3>
+            <p>The name is the site’s own, as it writes it, in one to three words. Say what it is in the <code>title</code> if a reader may not know it.</p>
+            <ul>
+              <li>Write “Greenleaf”, not “Visit Greenleaf” and not “Logo of Greenleaf”: the link is a name, not a call to action.</li>
+              <li>Keep the capitals the site uses, and put a <code>lang</code> on a name in another language.</li>
+              <li>The <code>title</code> is one line: the name, a colon and what it is. It is a help for the pointer, so nothing a reader needs may be only there.</li>
+              <li>Show the sites you can name and that have said yes. Five to ten read as a band; more, and the row is a wall.</li>
+            </ul>
+            <h3 id="contrast">Contrast and focus</h3>
+            <p>The names and the logos take the secondary text colour, and the primary one under the pointer and with the focus. The band has no surface of its own: it sits on the one the page gives it.</p>
+            <div class="luz-table-wrap" role="region" aria-label="Showcase contrast in each mode" tabindex="0">
+              <table class="luz-table docs-contrast">
+                <thead>
+                  <tr><th scope="col">Part</th><th scope="col">Colour on background</th><th scope="col">Light</th><th scope="col">Dark</th><th scope="col">High contrast</th><th scope="col">Needs</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td data-label="Part"><div>Name and logo</div></td><td data-label="Colour on background"><div><code>--luz-text-secondary</code> on <code>--luz-surface-page</code></div></td><td data-label="Light"><div>6.2:1</div></td><td data-label="Dark"><div>7.5:1</div></td><td data-label="High contrast"><div>19.3:1</div></td><td data-label="Needs"><div>4.5:1</div></td></tr>
+                  <tr><td data-label="Part"><div>Name and logo under the pointer or with the focus</div></td><td data-label="Colour on background"><div><code>--luz-text-primary</code> on <code>--luz-surface-page</code></div></td><td data-label="Light"><div>15.8:1</div></td><td data-label="Dark"><div>15.1:1</div></td><td data-label="High contrast"><div>21.0:1</div></td><td data-label="Needs"><div>4.5:1</div></td></tr>
+                  <tr><td data-label="Part"><div>Name and logo on a muted band</div></td><td data-label="Colour on background"><div><code>--luz-text-secondary</code> on <code>--luz-surface-muted</code></div></td><td data-label="Light"><div>6.2:1</div></td><td data-label="Dark"><div>7.5:1</div></td><td data-label="High contrast"><div>18.4:1</div></td><td data-label="Needs"><div>4.5:1</div></td></tr>
+                  <tr><td data-label="Part"><div>Name and logo in a card</div></td><td data-label="Colour on background"><div><code>--luz-text-secondary</code> on <code>--luz-surface</code></div></td><td data-label="Light"><div>6.4:1</div></td><td data-label="Dark"><div>6.9:1</div></td><td data-label="High contrast"><div>19.3:1</div></td><td data-label="Needs"><div>4.5:1</div></td></tr>
+                  <tr><td data-label="Part"><div>Focus ring</div></td><td data-label="Colour on background"><div><code>--luz-focus-ring</code> on <code>--luz-surface-page</code></div></td><td data-label="Light"><div>5.6:1</div></td><td data-label="Dark"><div>7.7:1</div></td><td data-label="High contrast"><div>21.0:1</div></td><td data-label="Needs"><div>3:1</div></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p class="docs-demo__note">Measured from the token values of each mode, rounded down. Needs is the WCAG 2.2 AA minimum: 4.5:1 for text, 3:1 for focus rings.</p>
+            <ul>
+              <li><strong>Focus:</strong> each link keeps core’s 2 px <code>--luz-focus-ring</code> outline, and with <code>scroll</code> the focus stops the marquee.</li>
+              <li>The logo is never the only signal: the name is always text beside it.</li>
+            </ul>
+            <h3 id="tokens">Tokens it uses</h3>
+            <p>The 9 tokens that the rules of catalog’s <code>components/showcase.css</code> read, by family. Each family links to its page, with the values in every mode. In Figma they are variables with the same names: see <a href="/docs/tokens/figma/">Tokens in Figma</a>.</p>
+            <dl class="docs-uses">
+              <div><dt><a href="/docs/tokens/color/">Color</a></dt><dd><a href="/docs/tokens/color/#luz-text-primary"><code>--luz-text-primary</code></a>, <a href="/docs/tokens/color/#luz-text-secondary"><code>--luz-text-secondary</code></a></dd></div>
+              <div><dt><a href="/docs/tokens/spacing/">Spacing and sizing</a></dt><dd><code>--luz-control-md</code>, <code>--luz-space-2xl</code>, <code>--luz-space-sm</code></dd></div>
+              <div><dt><a href="/docs/tokens/typography/">Typography</a></dt><dd><code>--luz-font-sans</code>, <code>--luz-text-xl</code></dd></div>
+              <div><dt><a href="/docs/tokens/motion/">Motion</a></dt><dd><code>--luz-duration-base</code>, <code>--luz-duration-lazy</code></dd></div>
+            </dl>
+            <p class="docs-view__xref"><a href="#keyboard">Keyboard and ARIA</a> are in the Code tab.</p>
+          </div>
+    </div>

@@ -1,0 +1,156 @@
+/* ==========================================================================
+	 LUZ Catalog: showcase, <luz-showcase>.
+	 A band of the sites, products or people a page wants to show: each one a
+	 link with its logo and its name, in a row that wraps, centred. The list
+	 is a native ul of links; the logo is a decorative svg or img before the
+	 name, and the name is the link's name. A CSS-only tag: no script defines
+	 it, so every selector that names it is wholly inside :where().
+
+	 With the scroll attribute the row becomes a marquee: the list is written
+	 twice, the copy with aria-hidden="true" and its links tabindex="-1", so a
+	 reader and the keyboard meet each link once while a pointer can follow
+	 any. Each copy moves by its own width, so the loop has no seam. It stops
+	 while the pointer is over it or a link in it has the focus, and it does
+	 not move at all under reduced motion or on paper, where it is the still
+	 row again and the copy is not shown. Without scroll a copy is never shown.
+	 --luz-showcase-duration is how long one loop takes (40s): give a longer
+	 list more time, so it moves at the same speed.
+
+	 @element luz-showcase - CSS-only: no script defines this tag. A row of links, each a logo and a name: the sites built with something, its users or its sponsors.
+	 @attr {boolean} scroll - A marquee: the row moves and loops; write the list twice, the copy aria-hidden="true" with its links tabindex="-1".
+	 ========================================================================== */
+
+:where(luz-showcase) {
+	--luz-showcase-duration: calc(var(--luz-duration-lazy) * 50);
+
+	display: block;
+	font-family: var(--luz-font-sans);
+}
+
+/* The still row: wraps, centred */
+:where(luz-showcase > ul) {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: center;
+	gap: var(--luz-space-sm) var(--luz-space-2xl);
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+/* Core's rule for a bare list adds a margin between its items: none here */
+:where(luz-showcase li) {
+	margin: 0;
+}
+
+/* The copy is for the marquee alone */
+:where(luz-showcase > ul[aria-hidden="true"]) {
+	display: none;
+}
+
+/* A link: its logo and its name, quiet until it is pointed at or focused */
+:where(luz-showcase a) {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5em;
+	min-block-size: var(--luz-control-md);
+	color: var(--luz-text-secondary);
+	font-size: var(--luz-text-xl);
+	font-weight: 600;
+	line-height: 1.2;
+	text-decoration: none;
+	white-space: nowrap;
+	transition: color var(--luz-duration-base);
+}
+
+:where(luz-showcase a:hover, luz-showcase a:focus-visible) {
+	color: var(--luz-text-primary);
+}
+
+/* The logo follows the text: an svg in currentColor takes the link's colour */
+:where(luz-showcase a > svg, luz-showcase a > img) {
+	flex: none;
+	inline-size: 1.5em;
+	block-size: 1.5em;
+	object-fit: contain;
+}
+
+/* scroll: the two lists side by side in a band that hides what overflows,
+   fading at both ends */
+:where(luz-showcase[scroll]) {
+	display: flex;
+	overflow: hidden;
+	mask-image: linear-gradient(to right, transparent, currentcolor 12%, currentcolor 88%, transparent);
+}
+
+:where(luz-showcase[scroll] > ul) {
+	flex: none;
+	flex-wrap: nowrap;
+	justify-content: flex-start;
+	padding-inline-end: var(--luz-space-2xl);
+	animation: luz-showcase-run var(--luz-showcase-duration) linear infinite;
+}
+
+:where(luz-showcase[scroll] > ul[aria-hidden="true"]) {
+	display: flex;
+}
+
+/* Right to left, the row runs the other way */
+:where(luz-showcase[scroll]:dir(rtl) > ul) {
+	animation-name: luz-showcase-run-rtl;
+}
+
+:where(luz-showcase[scroll]:hover > ul, luz-showcase[scroll]:focus-within > ul) {
+	animation-play-state: paused;
+}
+
+@keyframes luz-showcase-run {
+	to {
+		translate: -100% 0;
+	}
+}
+
+@keyframes luz-showcase-run-rtl {
+	to {
+		translate: 100% 0;
+	}
+}
+
+/* Reduced motion: the still row, one list, no fade */
+@media (prefers-reduced-motion: reduce) {
+	:where(luz-showcase[scroll]) {
+		display: block;
+		mask-image: none;
+	}
+
+	:where(luz-showcase[scroll] > ul) {
+		flex-wrap: wrap;
+		justify-content: center;
+		padding-inline-end: 0;
+		animation: none;
+	}
+
+	:where(luz-showcase[scroll] > ul[aria-hidden="true"]) {
+		display: none;
+	}
+}
+
+/* Print: the still row, every link once */
+@media print {
+	:where(luz-showcase[scroll]) {
+		display: block;
+		mask-image: none;
+	}
+
+	:where(luz-showcase[scroll] > ul) {
+		flex-wrap: wrap;
+		justify-content: center;
+		padding-inline-end: 0;
+		animation: none;
+	}
+
+	:where(luz-showcase[scroll] > ul[aria-hidden="true"]) {
+		display: none;
+	}
+}

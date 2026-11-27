@@ -67,6 +67,8 @@ dist/components/search.css
 dist/components/search.min.css
 dist/components/section.css
 dist/components/section.min.css
+dist/components/showcase.css
+dist/components/showcase.min.css
 dist/components/sidebar.css
 dist/components/sidebar.min.css
 dist/components/site-footer.css

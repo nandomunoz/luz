@@ -1,8 +1,8 @@
 <!-- luz:page
 title: Landing
-description: La página de un producto o de un evento: recetas para su cabecera, hero, secciones, datos destacados y pie de página.
+description: La página de un producto o de un evento: recetas para su cabecera, hero, secciones, datos destacados, escaparate y pie de página.
 keywords: página de producto, página de evento, marketing, página de inicio
-source: 1815c2a8fb8c
+source: 84dc192bc742
 reviewed: false
 -->
     <div class="docs-block" id="k-landing">
@@ -214,6 +214,37 @@ reviewed: false
       &lt;/div&gt;
     &lt;/li&gt;
   &lt;/ul&gt;
+&lt;/section&gt;</code></pre>
+        </div>
+      </div>
+      <div class="docs-block">
+        <h2 id="showcase">Escaparate</h2>
+        <p>Los sitios, clientes o patrocinadores que usan el producto, cada uno un enlace con su logo y su nombre, en un <a href="/docs/catalog/showcase/">escaparate</a>. Déjalo quieto: una fila que se mueve se lee peor y, en una pantalla táctil, nada la para.</p>
+        <div class="docs-example" data-docs-specimen>
+          <div class="docs-demo__stage">
+            <luz-showcase>
+              <ul>
+              <li><a href="#showcase"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 19c0-8 5-13 14-14 0 9-5 14-13 14M5 19l7-7"/></svg><span>Greenleaf</span></a></li>
+              <li><a href="#showcase"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 14c2-3 4-3 6 0s4 3 6 0 4-3 6 0"/></svg><span>Tidewater</span></a></li>
+              <li><a href="#showcase"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 4 2.4 5 5.6.8-4 3.9.9 5.5-4.9-2.6-4.9 2.6.9-5.5-4-3.9 5.6-.8Z"/></svg><span>Northstar</span></a></li>
+              </ul>
+            </luz-showcase>
+          </div>
+        </div>
+        <div class="docs-snippet">
+          <div class="docs-snippet__bar">
+            <span class="docs-snippet__lang">HTML</span>
+            <button class="luz-copy-btn" type="button" data-copy-from="code-k-landing-showcase" aria-label="Copy the showcase markup">Copy</button>
+          </div>
+          <pre class="luz-code-block" data-lang="html" tabindex="0" role="region" aria-label="Showcase markup"><code id="code-k-landing-showcase">&lt;section class=&quot;o-stack luz-section&quot; aria-labelledby=&quot;built-title&quot;&gt;
+  &lt;h2 id=&quot;built-title&quot;&gt;Built with Acme&lt;/h2&gt;
+  &lt;luz-showcase&gt;
+    &lt;ul&gt;
+      &lt;li&gt;&lt;a href=&quot;https://example.com/&quot;&gt;&lt;svg viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.5&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot; aria-hidden=&quot;true&quot;&gt;&lt;path d=&quot;M5 19c0-8 5-13 14-14 0 9-5 14-13 14M5 19l7-7&quot;/&gt;&lt;/svg&gt;&lt;span&gt;Greenleaf&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;https://example.com/&quot;&gt;&lt;svg viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.5&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot; aria-hidden=&quot;true&quot;&gt;&lt;path d=&quot;M3 14c2-3 4-3 6 0s4 3 6 0 4-3 6 0&quot;/&gt;&lt;/svg&gt;&lt;span&gt;Tidewater&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;https://example.com/&quot;&gt;&lt;svg viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.5&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot; aria-hidden=&quot;true&quot;&gt;&lt;path d=&quot;m12 4 2.4 5 5.6.8-4 3.9.9 5.5-4.9-2.6-4.9 2.6.9-5.5-4-3.9 5.6-.8Z&quot;/&gt;&lt;/svg&gt;&lt;span&gt;Northstar&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/luz-showcase&gt;
 &lt;/section&gt;</code></pre>
         </div>
       </div>
