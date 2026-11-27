@@ -60,15 +60,17 @@ async function open(page, route) {
 
 /**
  * The page of the skill, its tab Use Claude open (with JavaScript Install opens first; without it every pane shows).
- * Opening the tab starts Autoplay (tests/ai-page-tabs.spec.js): it is paused here, so the visitor plays by hand.
+ * Opening the tab starts Autoplay (tests/ai-page-tabs.spec.js) unless the visitor asks for reduced motion, and then
+ * only its button does: the visitor here plays by hand, so the page is opened with reduced motion and nothing moves
+ * on its own. Pausing Autoplay after the click instead raced it: the first line lingers 1.1 s, a click under load
+ * took longer, and the second line was already there (10 of 90 runs at 8 workers).
  */
 async function openSkill(page, route) {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
   await open(page, route);
   const tab = page.locator('#hero a.luz-tab[href="#hero-claude"][role="tab"]');
   if (!(await tab.count())) return;
   await tab.click();
-  const stop = page.locator('#hero-claude .landing-cli__auto [data-cli-stop]');
-  if (await stop.isVisible()) await page.locator('#hero-claude .landing-cli__auto').click();
   await page.locator('#hero-claude .landing-cli__screen > :not([hidden])').first().waitFor();
 }
 
