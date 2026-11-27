@@ -36,13 +36,19 @@ for (const [route, lang] of SKILL) {
   const panel = (page) => page.locator('#hero .landing-clitabs');
   const pane = (page, id) => page.locator(`#hero-${id}`);
 
-  test(`${route}: four tabs, Install, Use Claude, Use Codex and Use Cursor; Install has npm and the usual commands`, async ({ page, javaScriptEnabled }) => {
+  test(`${route}: four tabs, Install, Use Claude, Use Codex and Use Cursor; Install has npm and the commands that install, list, add and remove`, async ({ page, javaScriptEnabled }) => {
     await page.goto(route);
     const tabs = panel(page).locator('.luz-tabs .luz-tab');
     await expect(tabs).toHaveText([words['inside.tab.install'], words['level.ai.tab.claude'], words['level.ai.tab.codex'], words['level.ai.tab.cursor']]);
     expect(await tabs.evaluateAll((all) => all.map((a) => a.getAttribute('href')))).toEqual(['#hero-install', '#hero-claude', '#hero-codex', '#hero-cursor']);
     await expect(pane(page, 'install').locator('pre code').first()).toHaveText('npx @luz-ds/ai init');
-    await expect(pane(page, 'install').locator('pre code').nth(1)).toContainText('luz-ai doctor');
+    // the second block is the install commands: everything for one assistant, then list, add and remove one agent
+    await expect(pane(page, 'install').locator('pre code').nth(1)).toHaveText([
+      'npx @luz-ds/ai init --target claude --all',
+      'npx @luz-ds/ai list',
+      'npx @luz-ds/ai add luz-agent-ux',
+      'npx @luz-ds/ai remove luz-agent-ux',
+    ].join('\n'));
     await expect(pane(page, 'install').locator('.luz-copy-btn')).toHaveCount(1);
     if (javaScriptEnabled) {
       await expect(tabs.first()).toHaveAttribute('aria-selected', 'true');
