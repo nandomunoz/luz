@@ -79,6 +79,15 @@ const animations = (page, id) => page.evaluate((i) => [...document.querySelector
 const states = async (page, id) => (await animations(page, id)).map(([a]) => a?.state ?? 'no animation');
 
 /** The first link of the first copy of a row: the one a reader meets first. */
+/**
+ * The left edge of two moving elements, read in one script call: the two boxes are of the same frame, so the distance between
+ * them is what the layout says. Two calls read them some milliseconds apart, and a row that moves at ~100 px/s skews them by px.
+ * @param {import('@playwright/test').Locator} a
+ * @param {import('@playwright/test').Locator} b
+ */
+async function lefts(a, b) {
+  return a.evaluate((el, other) => ({ a: el.getBoundingClientRect().left, b: other.getBoundingClientRect().left }), await b.elementHandle());
+}
 const first = (page, id) => page.locator(`#${id} > :first-child a`).first();
 const copyOf = (page, id) => page.locator(`#${id} > [aria-hidden="true"]`);
 
@@ -247,10 +256,11 @@ test.describe('marquee: it moves', () => {
     for (const id of ['ticker', 'logos']) {
       const link = id === 'ticker' ? page.locator(`#${id} > :first-child li`).first() : first(page, id);
       const copy = id === 'ticker' ? page.locator(`#${id} > [aria-hidden="true"] li`).first() : copyOf(page, id).locator('a').first();
-      const start = { link: (await box(link)).left, copy: (await box(copy)).left };
-      await expect.poll(async () => (await box(link)).left, `#${id}: the first item moves left`).toBeLessThan(start.link - 1);
-      const now = { link: (await box(link)).left, copy: (await box(copy)).left };
-      expect(Math.abs((now.link - start.link) - (now.copy - start.copy)), `#${id}: the copy keeps its place after the first`).toBeLessThanOrEqual(EPS);
+      const start = await lefts(link, copy);
+      await expect.poll(async () => (await box(link)).left, `#${id}: the first item moves left`).toBeLessThan(start.a - 1);
+      const now = await lefts(link, copy);
+      // Both boxes are read in one call, so what they moved is compared at the same instant: the copy keeps its distance from the first
+      expect(Math.abs((now.a - start.a) - (now.b - start.b)), `#${id}: the copy keeps its place after the first`).toBeLessThanOrEqual(EPS);
     }
   });
 
