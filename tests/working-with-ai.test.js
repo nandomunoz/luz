@@ -435,8 +435,9 @@ describe("skill: Install /luz", () => {
   const help = () => spawnSync(process.execPath, [join(repo, "packages/ai/skills/luz/scripts/luz.mjs"), "init", "--help"], { encoding: "utf-8" }).stdout;
   const text = () => `${textOf(section("skill"))}\n${preOf(section("skill")).join("\n")}`;
 
-  it("shows the command as npx @luz-ds/ai init, with the scope and a target", () => {
-    expect(preOf(section("skill")).join("\n")).toContain("npx @luz-ds/ai init --target claude");
+  it("shows the command as npx @luz-ds/ai@<version> init, with the scope, the version of the package and a target", () => {
+    const { version } = JSON.parse(readFileSync(join(repo, "packages/ai/package.json"), "utf-8"));
+    expect(preOf(section("skill")).join("\n")).toContain(`npx @luz-ds/ai@${version} init --target claude`);
   });
 
   it("names only options and targets that `init --help` has", () => {
@@ -449,10 +450,10 @@ describe("skill: Install /luz", () => {
     }
   });
 
-  it("says init writes the folder each assistant reads, and says the package is not on npm yet; the folders are in the README, since llms-full names no .claude/ path", () => {
+  it("says init writes the folder each assistant reads, and does not say the package is not on npm; the folders are in the README, since llms-full names no .claude/ path", () => {
     expect(text()).toMatch(/writes the folder each one reads/);
     expect(text()).not.toMatch(/\.claude\//);
-    expect(text()).toMatch(/not on npm yet/);
+    expect(text()).not.toMatch(/not on npm/);
   });
 
   it("says what to type in each assistant: /luz, $luz for Codex, and plain words for AGENTS.md, as init --help does", () => {
