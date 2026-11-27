@@ -1,14 +1,14 @@
 // @ts-check
 /**
- * Two things of the home's first screen and the page's rhythm, in English, Spanish and Arabic.
+ * The type of the home's first screen and the page's rhythm, in English, Spanish and Arabic (it was
+ * tests/landing-hero-lead.spec.js while the hero had a lead).
  *
- * The lead of the hero (the tunnel hero, owner 2026-11-26): "Tokens, CSS and a little vanilla JavaScript, built on
- * what the browser already does. Light, Usable and Zero-dependency: start a project, or migrate it page by page."
- * The three words Light, Usable and Zero-dependency are <strong> (weight 600, the strong ink); "Zero-dependency" never
- * breaks at its hyphen, nor leaves the colon after it alone on the next line; there are no parentheses. Spanish and
- * Arabic keep the three words in English (lang="en"). Its size is clamp(1.25rem, 0.8vw + 1.05rem, 1.5rem), line
- * height 1.45, in a column of 36rem at most; the title is a section's title (--luz-text-4xl) from 769 px, and
- * clamp(2.75rem, 13vw, 3.75rem) at line height 1 below.
+ * The hero (the tunnel hero, owner 2026-11-27) is the word LUZ, the title and two buttons. It has no lead: the three
+ * words Light, Usable and Zero-dependency are the head of Who we are, in English in every language. The title
+ * follows the window's width in rem and vw, so the reader's text size still scales it (WCAG 1.4.4): from 2.75rem on
+ * every phone to 4.5rem, clamp(2.75rem, 1.25rem + 5vw, 4.5rem), at line height 1.05 (1.25 in Arabic, whose letters
+ * reach higher and lower), a column of 14em at most, centred and balanced. The word above it is clamp(8rem, 2rem +
+ * 40vw, 14rem), so it is larger than the title at every width.
  *
  * The sections of the home stand four times the package's gap apart (4 x --luz-space-3xl, 256 px at the default size).
  *
@@ -17,150 +17,80 @@
 import { test, expect } from '@playwright/test';
 
 const ROUTES = [['/', 'en'], ['/es/', 'es'], ['/ar/', 'ar']];
-const WORDS = ['Light', 'Usable', 'Zero-dependency'];
 
-for (const [route, code] of ROUTES) {
-  test.describe(`the lead of ${route}`, () => {
-    test('has three strong words, in the strong ink at weight 600, and no parentheses', async ({ page }) => {
-      await page.goto(route);
-      const strong = page.locator('.luz-hero__lead strong');
-      await expect(strong).toHaveText(WORDS);
-      const found = await strong.evaluateAll((all) => {
-        const probe = document.createElement('span');
-        probe.style.color = 'var(--luz-text-primary)';
-        document.body.append(probe);
-        const ink = getComputedStyle(probe).color;
-        probe.remove();
-        return all.map((el) => ({ weight: Number(getComputedStyle(el).fontWeight), color: getComputedStyle(el).color, ink }));
-      });
-      for (const word of found) {
-        expect(word.weight).toBe(600);
-        expect(word.color).toBe(word.ink);
-      }
-      const text = await page.locator('.luz-hero__lead').innerText();
-      expect(text).not.toMatch(/[()]/);
-    });
+/** The computed size, in px, of a CSS length written in the page (a clamp of rem and vw, for one). */
+const px = (page, value) => page.evaluate((v) => {
+  const probe = document.createElement('span');
+  probe.style.fontSize = v;
+  document.body.append(probe);
+  const size = parseFloat(getComputedStyle(probe).fontSize);
+  probe.remove();
+  return size;
+}, value);
 
-    test('keeps Zero-dependency whole, and the colon after it on its line, at 320, 375, 700 and 1280 px', async ({ page }) => {
-      for (const width of [320, 375, 700, 1280]) {
-        await page.setViewportSize({ width, height: 900 });
-        await page.goto(route);
-        const word = page.locator('.luz-hero__lead strong', { hasText: 'Zero-dependency' });
-        const found = await word.evaluate((el) => {
-          // The colon is the first character after the word (after the lang="en" span and the isolate, in Spanish and Arabic)
-          const walker = document.createTreeWalker(el.closest('.luz-hero__lead'), NodeFilter.SHOW_TEXT);
-          walker.currentNode = el.lastChild;
-          let colon = null;
-          while (walker.nextNode()) {
-            const at = walker.currentNode.textContent.indexOf(':');
-            if (at > -1) {
-              colon = document.createRange();
-              colon.setStart(walker.currentNode, at);
-              colon.setEnd(walker.currentNode, at + 1);
-              break;
-            }
-          }
-          const lines = new Set([...el.getClientRects()].map((r) => Math.round(r.top))).size;
-          return { lines, word: el.getBoundingClientRect().bottom, colon: colon?.getBoundingClientRect().bottom ?? NaN };
-        });
-        expect(found.lines, `${width}px: one line`).toBe(1);
-        expect(Math.abs(found.colon - found.word), `${width}px: the colon on the line of the word`).toBeLessThanOrEqual(4);
-      }
-    });
-
-    if (code !== 'en') {
-      test('keeps LUZ\'s three words in English: lang="en" around Light, Usable and Zero-dependency', async ({ page }) => {
-        await page.goto(route);
-        const english = page.locator('.luz-hero__lead [lang="en"]');
-        await expect(english).toHaveCount(1);
-        await expect(english.locator('strong')).toHaveText(['Light', 'Usable', 'Zero-dependency']);
-      });
-    }
-  });
-}
-
-test.describe('the hero on a phone', () => {
+test.describe('the hero has no lead', () => {
   for (const [route] of ROUTES) {
-    for (const [width, height] of [[320, 568], [360, 640], [390, 844]]) {
-      test(`${route} at ${width} x ${height}: the lead is short and no smaller than the base text, the title as large as on a tall phone`, async ({ page }) => {
-        await page.setViewportSize({ width, height });
-        await page.goto(route);
-        const sizes = () => page.evaluate(() => {
-          const px = (selector) => parseFloat(getComputedStyle(document.querySelector(selector)).fontSize);
-          const probe = document.createElement('span');
-          probe.style.fontSize = 'var(--luz-text-base)';
-          document.body.append(probe);
-          const base = parseFloat(getComputedStyle(probe).fontSize);
-          probe.remove();
-          return { lead: px('.luz-hero__lead'), title: px('.luz-hero__title'), base, length: document.querySelector('.luz-hero__lead').textContent.trim().length };
-        });
-        const phone = await sizes();
-        expect(phone.lead, 'lead >= base').toBeGreaterThanOrEqual(phone.base);
-        expect(phone.length, 'lead characters').toBeLessThanOrEqual(190);
-        await page.setViewportSize({ width, height: 1000 });
-        const tall = await sizes();
-        expect(phone.title, 'title keeps its size on a short phone').toBe(tall.title);
-      });
-    }
+    test(`${route}: no lead paragraph, and nothing but the title and the buttons in the copy`, async ({ page }) => {
+      await page.goto(route);
+      await expect(page.locator('.luz-hero__lead')).toHaveCount(0);
+      expect(await page.locator('#hero .luz-hero__copy > *').evaluateAll((all) => all.map((el) => el.localName + (el.className ? `.${el.className.split(' ')[0]}` : '')))).toEqual(['h1.luz-hero__title', 'div.o-actions']);
+    });
   }
+
+  test.describe('without JavaScript', () => {
+    test.use({ javaScriptEnabled: false });
+
+    test('the hero is the same: the title and two buttons, no lead', async ({ page }) => {
+      await page.goto('/');
+      await expect(page.locator('.luz-hero__lead')).toHaveCount(0);
+      await expect(page.locator('#hero a.luz-btn')).toHaveCount(2);
+    });
+  });
 });
 
-test.describe('the hero title and lead', () => {
-  const px = (page, value) => page.evaluate((v) => {
-    const probe = document.createElement('span');
-    probe.style.fontSize = v;
-    document.body.append(probe);
-    const size = parseFloat(getComputedStyle(probe).fontSize);
-    probe.remove();
-    return size;
-  }, value);
-
+test.describe('the hero title and the word LUZ', () => {
   for (const [route] of ROUTES) {
-    for (const [width, height] of [[1280, 800], [1024, 768]]) {
-      test(`${route} at ${width} x ${height}: the title is a section's title, the lead the hero's clamp`, async ({ page }) => {
-        await page.setViewportSize({ width, height });
-        await page.goto(route);
-        const size = (selector) => page.locator(selector).first().evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
-        expect(await size('.luz-hero__title'), 'title').toBe(await size('.landing-inside__title'));
-        expect(await size('.luz-hero__lead'), 'lead').toBeCloseTo(await px(page, 'clamp(1.25rem, 0.8vw + 1.05rem, 1.5rem)'), 1);
-      });
-    }
-
-    for (const [width, height] of [[320, 568], [390, 844], [768, 1024]]) {
-      test(`${route} at ${width} x ${height}: the title is clamp(2.75rem, 13vw, 3.75rem) at line height 1 (more room in Arabic), the lead the hero's clamp`, async ({ page }) => {
+    for (const [width, height] of [[320, 568], [390, 844], [768, 1024], [1024, 768], [1280, 800], [1920, 1080]]) {
+      test(`${route} at ${width} x ${height}: the title is clamp(2.75rem, 1.25rem + 5vw, 4.5rem) at line height 1.05 (1.25 in Arabic), the word clamp(8rem, 2rem + 40vw, 14rem)`, async ({ page }) => {
         await page.setViewportSize({ width, height });
         await page.goto(route);
         const title = await page.locator('.luz-hero__title').evaluate((el) => ({ size: parseFloat(getComputedStyle(el).fontSize), line: parseFloat(getComputedStyle(el).lineHeight) }));
-        expect(title.size).toBeCloseTo(await px(page, 'clamp(2.75rem, 13vw, 3.75rem)'), 1);
-        expect(title.line / title.size).toBeCloseTo(route === '/ar/' ? 1.25 : 1, 2);
-        expect(await page.locator('.luz-hero__lead').evaluate((el) => parseFloat(getComputedStyle(el).fontSize))).toBeCloseTo(await px(page, 'clamp(1.25rem, 0.8vw + 1.05rem, 1.5rem)'), 1);
+        expect(title.size, 'title').toBeCloseTo(await px(page, 'clamp(2.75rem, 1.25rem + 5vw, 4.5rem)'), 1);
+        expect(title.line / title.size, 'line height').toBeCloseTo(route === '/ar/' ? 1.25 : 1.05, 2);
+        const brand = await page.locator('.landing-hero__brand').evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
+        expect(brand, 'the word').toBeCloseTo(await px(page, 'clamp(8rem, 2rem + 40vw, 14rem)'), 1);
+        expect(brand, 'the word is larger than the title').toBeGreaterThan(title.size);
       });
     }
   }
 
-  test('the lead is a column of 36rem at most, line height 1.45, centred under the title', async ({ page }) => {
+  test('the title is a column of 14em at most, centred, balanced', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto('/');
-    const lead = await page.locator('.luz-hero__lead').evaluate((el) => {
+    const found = await page.locator('.luz-hero__title').evaluate((el) => {
       const cs = getComputedStyle(el);
       const r = el.getBoundingClientRect();
-      const t = el.closest('.luz-hero').querySelector('.luz-hero__title').getBoundingClientRect();
-      return { width: r.width, line: parseFloat(cs.lineHeight) / parseFloat(cs.fontSize), wrap: cs.textWrapStyle, centre: (r.left + r.right) / 2, title: (t.left + t.right) / 2 };
+      const hero = el.closest('.luz-hero').getBoundingClientRect();
+      return { width: r.width, em: parseFloat(cs.fontSize), wrap: cs.textWrapStyle, align: cs.textAlign, centre: (r.left + r.right) / 2, hero: (hero.left + hero.right) / 2 };
     });
-    expect(lead.width).toBeLessThanOrEqual(36 * 16 + 0.5);
-    expect(lead.line).toBeCloseTo(1.45, 2);
-    expect(lead.wrap).toBe('pretty');
-    expect(Math.abs(lead.centre - lead.title)).toBeLessThanOrEqual(1);
+    expect(found.width).toBeLessThanOrEqual(14 * found.em + 0.5);
+    expect(found.wrap).toBe('balance');
+    expect(found.align).toBe('center');
+    expect(Math.abs(found.centre - found.hero)).toBeLessThanOrEqual(1);
   });
-});
 
-test.describe('without JavaScript', () => {
-  test.use({ javaScriptEnabled: false });
-
-  test('the lead keeps its three strong words', async ({ page }) => {
-    await page.goto('/');
-    await expect(page.locator('.luz-hero__lead strong')).toHaveText(WORDS);
-  });
+  for (const [route] of ROUTES) {
+    for (const [width, height] of [[320, 568], [360, 640], [390, 844]]) {
+      test(`${route} at ${width} x ${height}: the title keeps its size on a short phone, as on a tall one`, async ({ page }) => {
+        await page.setViewportSize({ width, height });
+        await page.goto(route);
+        const size = () => page.locator('.luz-hero__title').evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
+        const phone = await size();
+        await page.setViewportSize({ width, height: 1000 });
+        expect(await size()).toBe(phone);
+      });
+    }
+  }
 });
 
 test.describe('the gap between the sections', () => {
