@@ -285,14 +285,14 @@ test.describe('the header at the top of a wide screen', () => {
 test.describe('the four sections of the site in the row', () => {
   for (const width of [769, 900, 1024, 1280]) {
     for (const path of ['/', '/es/', '/ar/', '/docs/', '/catalog/', '/es/ai/']) {
-      test(`${path} at ${width}px: Tokens, Core, Catalog and AI come after the logo and before the Documentation icon, in one row, with nothing over anything`, async ({ page, javaScriptEnabled }) => {
+      test(`${path} at ${width}px: AI, Tokens, Core and Catalog come after the logo and before the Documentation icon, in one row, with nothing over anything`, async ({ page, javaScriptEnabled }) => {
         await page.setViewportSize({ width, height: 700 });
         await open(page, path, javaScriptEnabled);
         const nav = page.locator('#site-header .site-header__nav a');
         await expect(nav).toHaveCount(4);
         await expect(page.locator('#site-header .site-header__docs')).toBeVisible();
         const home = path.startsWith('/docs/') ? '/' : path.match(/^\/(?:es\/|ar\/)?/)[0];
-        expect(await nav.evaluateAll((all) => all.map((a) => a.getAttribute('href')).slice(0, 4))).toEqual(['tokens/', 'core/', 'catalog/', 'ai/'].map((p) => home + p));
+        expect(await nav.evaluateAll((all) => all.map((a) => a.getAttribute('href')).slice(0, 4))).toEqual(['ai/', 'tokens/', 'core/', 'catalog/'].map((p) => home + p));
         for (let i = 0; i < 4; i++) await expect(nav.nth(i)).toBeVisible();
         const shown = await drawnControls(page);
         for (const s of shown) {
@@ -540,7 +540,7 @@ test.describe('the header on a phone', () => {
     });
   }
 
-  test('the home drawer lists the sections, then the four sections of the site, Documentation and GitHub, then the languages, top to bottom', async ({ page, javaScriptEnabled }) => {
+  test('the home drawer lists the sections, then the four sections of the site (AI first), Documentation and GitHub, then the languages, top to bottom', async ({ page, javaScriptEnabled }) => {
     await page.setViewportSize({ width: 375, height: 900 });
     await open(page, HOME, javaScriptEnabled);
     await controls(page, javaScriptEnabled).menu.click();
@@ -549,8 +549,8 @@ test.describe('the header on a phone', () => {
     const links = await drawer.locator('a').evaluateAll((els) => els.map((a) => ({ href: a.getAttribute('href'), top: a.getBoundingClientRect().top, text: (a.textContent ?? '').trim() })));
     const hrefs = links.map((l) => l.href);
     const sections = hrefs.filter((h) => h?.startsWith('#'));
-    expect(sections, 'the page\'s sections').toEqual(['#tokens', '#faq']);
-    expect(hrefs).toEqual([...sections, '/tokens/', '/core/', '/catalog/', '/ai/', '/docs/', GITHUB, '/', '/es/', '/ar/']);
+    expect(sections, 'the page\'s sections').toEqual(['#who', '#ai', '#faq']);
+    expect(hrefs).toEqual([...sections, '/ai/', '/tokens/', '/core/', '/catalog/', '/docs/', GITHUB, '/', '/es/', '/ar/']);
     expect(links.find((l) => l.href === '/docs/')?.text).toBe('Documentation');
     const tops = links.map((l) => l.top);
     for (let i = 1; i < tops.length; i++) expect(tops[i], `${links[i].href} is not above ${links[i - 1].href}`).toBeGreaterThanOrEqual(tops[i - 1] - 1);
