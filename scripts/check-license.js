@@ -10,7 +10,8 @@
  *    and the check says so in the report.
  * 3. The Pages site (docs/assets) holds no third-party code without its notice
  *    (`checkPagesSite`): Vite's `__vitePreload` helper and module-preload polyfill
- *    need docs/LICENSE-vite.txt.
+ *    need docs/LICENSE-vite.txt, and a docs/assets/ETBook-*.woff2 needs
+ *    LICENSE-ETBook.txt in its folder (ET Book's MIT notice).
  * 4. dev/LICENSES.md is the generated list of those dependencies and is up to
  *    date. `--update` rewrites it; it never legitimises a problem of 1 or 2.
  *
@@ -198,6 +199,14 @@ function* jsFiles(dir) {
   }
 }
 
+function* etbookFonts(dir) {
+  for (const name of readdirSync(dir).sort()) {
+    const file = join(dir, name);
+    if (statSync(file).isDirectory()) yield* etbookFonts(file);
+    else if (/^ETBook-.*\.woff2$/.test(name)) yield file;
+  }
+}
+
 /**
  * Third-party code the Pages build emits into docs/assets: Vite's `__vitePreload`
  * helper and its module-preload polyfill (MIT, VoidZero Inc. and Vite
@@ -227,6 +236,22 @@ export function checkPagesSite(root) {
     if (status === "ok") continue;
     const what = helper ? "Vite's __vitePreload helper" : "Vite's module-preload polyfill";
     problems.push(`${relative(root, file).split(sep).join("/")}: it holds ${what} (MIT) and docs/LICENSE-vite.txt ${status}; the pages build emits it (red line 13).`);
+  }
+  // ET Book (MIT): each folder that serves one of its fonts serves its notice too
+  const etbookNotice = new Map();
+  for (const file of etbookFonts(assets)) {
+    const folder = dirname(file);
+    if (etbookNotice.has(folder)) continue;
+    const notice = join(folder, "LICENSE-ETBook.txt");
+    const rel = relative(root, notice).split(sep).join("/");
+    let why = null;
+    if (!existsSync(notice)) why = "is missing";
+    else {
+      const text = readFileSync(notice, "utf-8");
+      if (!(text.includes("MIT License") && text.includes("Dmitry Krasny"))) why = "is not ET Book's licence notice (it needs the text of packages/tokens/fonts/LICENSE-ETBook.txt)";
+    }
+    etbookNotice.set(folder, why);
+    if (why) problems.push(`${relative(root, file).split(sep).join("/")}: it is ET Book (MIT, Dmitry Krasny, Bonnie Scranton, Edward Tufte) and ${rel} ${why}; the pages build emits it (red line 13).`);
   }
   return problems;
 }

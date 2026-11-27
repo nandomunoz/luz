@@ -136,6 +136,26 @@ function viteLicence() {
   };
 }
 
+/**
+ * The Pages site serves ET Book (MIT, Dmitry Krasny, Bonnie Scranton, Edward Tufte) in
+ * docs/assets, and the home's wordmark is outlined from it: it serves the notice beside the
+ * fonts, assets/LICENSE-ETBook.txt, from the one the tokens package ships (RL-13).
+ * `pnpm check:license` fails on a font without it.
+ */
+function etbookLicence() {
+  return {
+    name: "pages-etbook-licence",
+    apply: "build",
+    generateBundle() {
+      this.emitFile({
+        type: "asset",
+        fileName: "assets/LICENSE-ETBook.txt",
+        source: readFileSync(resolve(__dirname, "packages/tokens/fonts/LICENSE-ETBook.txt"), "utf-8"),
+      });
+    },
+  };
+}
+
 export default defineConfig(({ mode }) => {
   const pages = mode === "pages";
   const outRoot = pages ? pagesRoot : distRoot;
@@ -147,7 +167,7 @@ export default defineConfig(({ mode }) => {
     publicDir: false,
     // The site's routes, dev server, layouts and partials, link check and the
     // move of each HTML file to its route: scripts/docs-site/plugin.js
-    plugins: [coreLanguages(), docsSite({ repoRoot: __dirname, relative: pages, outRoot, pagesBase: PAGES_BASE, siteUrl: SITE_URL, csp: PAGES_CSP }), ...(pages ? [pagesCsp(), viteLicence()] : [])],
+    plugins: [coreLanguages(), docsSite({ repoRoot: __dirname, relative: pages, outRoot, pagesBase: PAGES_BASE, siteUrl: SITE_URL, csp: PAGES_CSP }), ...(pages ? [pagesCsp(), viteLicence(), etbookLicence()] : [])],
     server: {
       open: "/",
       fs: {
