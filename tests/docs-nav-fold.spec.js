@@ -6,7 +6,8 @@
  * <details name="nav"> per area with pages, the area link beside it, an empty summary named
  * by the link, `open` only for the area of the current page). This file holds what needs a browser:
  *
- *   1  only the area of the page is open on /docs/components/button/, /docs/html/forms/ and the
+ *   1  only the area of the page is open on /docs/components/button/, /docs/html/forms/ (Catalog: the HTML
+ *      elements are a group inside its fold, `nestIn`, with no area link or fold of their own) and the
  *      docs home (none), in English and Spanish; the pages of a closed fold are not rendered, the
  *      area links always are, and aria-current is where it was
  *   2  the area link is navigable whether its fold is open or closed
@@ -36,9 +37,17 @@ const FORMS = '/docs/html/forms/';
 const order = readingOrder(site).map((p) => p.route);
 const areaOfRoute = (/** @type {string} */ route) => site.byRoute.get(route)?.meta.area;
 const indexOf = (/** @type {{ slug: string }} */ area) => `/docs/${area.slug}/`;
-/** The pages an area lists under its link: its pages but its index, in reading order. */
-const listedOf = (/** @type {{ id: string, slug: string }} */ area) => order.filter((r) => areaOfRoute(r) === area.id && r !== indexOf(area));
-const folded = site.areas.filter((a) => listedOf(a).length > 0);
+// An area with `nestIn` (the HTML elements, in Catalog; owner, 2026-11-25) has no link or fold of its own: its index and its pages are a
+// labelled group at the end of the fold of the area it is nested in, and that fold is the one open on them (tests/docs-nav-nested.test.js)
+const sidebarAreas = site.areas.filter((a) => !a.nestIn);
+const hostOf = (/** @type {{ id: string, nestIn?: string }} */ area) => (area.nestIn ? /** @type {any} */ (site.areas.find((a) => a.id === area.nestIn)) : area);
+/**
+ * The pages an area lists under its link, in reading order: its pages but its index, and the index and the pages of every area
+ * nested in it.
+ */
+const listedOf = (/** @type {{ id: string, slug: string }} */ area) =>
+  order.filter((r) => (areaOfRoute(r) === area.id && r !== indexOf(area)) || site.areas.some((n) => n.nestIn === area.id && areaOfRoute(r) === n.id));
+const folded = sidebarAreas.filter((a) => listedOf(a).length > 0);
 
 const LANGUAGES = [
   { code: '', prefix: '' },
@@ -105,7 +114,7 @@ test.describe('which fold is open', () => {
     const where = code || 'en';
     for (const [route, open] of /** @type {const} */ ([
       [BUTTON, 'components'],
-      [FORMS, 'html'],
+      [FORMS, 'catalog'],
       ['/docs/tokens/color/', 'tokens'],
       ['/docs/', null],
     ])) {
@@ -113,8 +122,12 @@ test.describe('which fold is open', () => {
         await page.goto(`${prefix}${route}`);
         expect(await openAreas(page)).toEqual(open ? [open] : []);
         // Every area link is visible, open or not
-        for (const area of site.areas) {
+        for (const area of sidebarAreas) {
           await expect(nav(page).locator(`a.docs-nav__area[href="${prefix}${indexOf(area)}"]`), area.id).toBeVisible();
+        }
+        // A nested area has no area link: its index is a link of the group inside the fold of its host
+        for (const area of site.areas.filter((a) => a.nestIn)) {
+          await expect(nav(page).locator(`a.docs-nav__area[href="${prefix}${indexOf(area)}"]`), `${area.id} has no area link`).toHaveCount(0);
         }
         for (const area of folded) {
           const pages = listedOf(area);
@@ -183,7 +196,7 @@ test.describe('the button of a fold', () => {
         expect(ax.name, `${area.id}: named by the area link`).toBe(label);
       }
       // The areas without pages have a link and nothing else
-      for (const area of site.areas.filter((a) => !folded.includes(a))) {
+      for (const area of sidebarAreas.filter((a) => !folded.includes(a))) {
         const li = nav(page).locator(`ul.docs-nav > li:has(> a.docs-nav__area[href="${prefix}${indexOf(area)}"])`);
         await expect(li.locator('details, summary')).toHaveCount(0);
       }
@@ -200,11 +213,11 @@ test.describe('the button of a fold', () => {
     test(`${where}: Tab goes area link, button, the pages of the open area, next area link; the closed areas' pages are skipped`, async ({ page }) => {
       await page.setViewportSize({ width: 1024, height: 800 });
       await page.goto(`${prefix}${BUTTON}`);
-      const first = site.areas[0];
+      const first = sidebarAreas[0];
       await nav(page).locator(`a.docs-nav__area[href="${prefix}${indexOf(first)}"]`).focus();
       /** @type {string[]} */
       const expected = [];
-      for (const area of site.areas) {
+      for (const area of sidebarAreas) {
         expected.push(`${prefix}${indexOf(area)}`);
         if (folded.includes(area)) expected.push(`summary:a-${area.id}`);
         if (area.id === 'components') for (const route of listedOf(area)) expected.push(`${prefix}${route}`);
@@ -248,17 +261,17 @@ test.describe('the button of a fold', () => {
 
     test(`${where}: a click on another area's button opens it and closes the current one; a click on the open one closes it`, async ({ page }) => {
       await page.goto(`${prefix}${FORMS}`);
-      expect(await openAreas(page)).toEqual(['html']);
-      await button(page, 'catalog').click();
-      expect(await openAreas(page)).toEqual(['catalog']);
-      await expect(nav(page).locator(`a[href="${prefix}/docs/catalog/hero/"]`).first()).toBeVisible();
+      expect(await openAreas(page), 'the HTML elements are listed in the fold of Catalog, the one open on them').toEqual(['catalog']);
+      await button(page, 'tokens').click();
+      expect(await openAreas(page)).toEqual(['tokens']);
+      await expect(nav(page).locator(`a[href="${prefix}/docs/tokens/color/"]`).first()).toBeVisible();
       await expect(nav(page).locator(`a[href="${prefix}${FORMS}"]`)).toBeHidden();
       await button(page, 'components').click();
       expect(await openAreas(page)).toEqual(['components']);
       await button(page, 'components').click();
       expect(await openAreas(page)).toEqual([]);
-      // A page keeps its own area link visible and marked while every fold is shut
-      await expect(nav(page).locator('a[aria-current="true"]:not(.page-nav__site a)')).toHaveAttribute('href', `${prefix}${indexOf(/** @type {any} */ (site.areas.find((a) => a.id === 'html')))}`);
+      // A page keeps the link of its area visible and marked while every fold is shut; for a page of the HTML elements the area is Catalog, which holds them
+      await expect(nav(page).locator('a[aria-current="true"]:not(.page-nav__site a)')).toHaveAttribute('href', `${prefix}${indexOf(hostOf(/** @type {any} */ (site.areas.find((a) => a.id === 'html'))))}`);
     });
   }
 });
@@ -476,14 +489,14 @@ test.describe('the drawer at 375 px', () => {
       await toggle.focus();
       await page.keyboard.press('Enter');
       await expect(drawer).toBeVisible();
-      expect(await openAreas(page)).toEqual(['html']);
-      const catalogFold = button(page, 'catalog');
-      await catalogFold.scrollIntoViewIfNeeded();
-      await expect(catalogFold).toBeVisible();
+      expect(await openAreas(page), 'the HTML elements are in the fold of Catalog').toEqual(['catalog']);
+      const tokensFold = button(page, 'tokens');
+      await tokensFold.scrollIntoViewIfNeeded();
+      await expect(tokensFold).toBeVisible();
       await expect(drawer.locator(`a[href="${prefix}${FORMS}"]`)).toBeVisible();
-      await catalogFold.focus();
+      await tokensFold.focus();
       await page.keyboard.press('Enter');
-      expect(await openAreas(page)).toEqual(['catalog']);
+      expect(await openAreas(page)).toEqual(['tokens']);
       await expect(drawer, 'the drawer stays open while a fold opens').toBeVisible();
       await expect(drawer.locator(`a[href="${prefix}${FORMS}"]`)).toBeHidden();
       await page.keyboard.press('Escape');
