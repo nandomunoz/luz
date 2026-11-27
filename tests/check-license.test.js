@@ -503,6 +503,56 @@ describe("checkPagesSite", () => {
   });
 });
 
+/* ---- The Pages site: ET Book's notice beside its fonts (RL-13) ------------------------- */
+
+/**
+ * Also: a docs/assets/ETBook-*.woff2 (MIT, Dmitry Krasny, Bonnie Scranton, Edward Tufte; the
+ * home's wordmark is outlined from it) needs a real LICENSE-ETBook.txt in the same folder: its
+ * text names "MIT License" and "Dmitry Krasny". The problem names the font's folder notice,
+ * `docs/assets/LICENSE-ETBook.txt`, and the file is reported once per folder.
+ */
+const ETBOOK_NOTICE = "ET Book\nhttps://github.com/edwardtufte/et-book\n\nThe MIT License (MIT)\n\nCopyright (c) 2015 Dmitry Krasny, Bonnie Scranton, Edward Tufte.\n";
+
+describe("checkPagesSite: ET Book's notice", () => {
+  it("fails a served ETBook font when docs/assets/LICENSE-ETBook.txt is missing, naming font and notice", async () => {
+    const { checkPagesSite } = await load();
+    const root = fixture();
+    put(root, "docs/assets/ETBook-Roman-BVnIje3h.woff2", "wOF2");
+    put(root, "docs/assets/ETBook-Bold-D9aYExEQ.woff2", "wOF2");
+    const problems = checkPagesSite(root);
+    expect(problems).toHaveLength(1);
+    expect(problems[0]).toContain("docs/assets/ETBook-");
+    expect(problems[0]).toContain("docs/assets/LICENSE-ETBook.txt");
+  });
+
+  it("is quiet with the notice beside the fonts", async () => {
+    const { checkPagesSite } = await load();
+    const root = fixture();
+    put(root, "docs/assets/ETBook-Roman-BVnIje3h.woff2", "wOF2");
+    put(root, "docs/assets/LICENSE-ETBook.txt", ETBOOK_NOTICE);
+    expect(checkPagesSite(root)).toEqual([]);
+  });
+
+  it.each([["empty", ""], ["unrelated text", "Do what you like.\n"], ["MIT without ET Book's authors", "The MIT License (MIT)\n\nCopyright (c) someone else\n"]])("rejects a notice that is %s, naming it", async (_label, text) => {
+    const { checkPagesSite } = await load();
+    const root = fixture();
+    put(root, "docs/assets/ETBook-Roman-BVnIje3h.woff2", "wOF2");
+    put(root, "docs/assets/LICENSE-ETBook.txt", text);
+    expect(checkPagesSite(root).join("\n")).toContain("docs/assets/LICENSE-ETBook.txt");
+  });
+
+  it("the command fails on a font with no notice and passes once the notice is there", () => {
+    const root = fixture();
+    put(root, "docs/assets/ETBook-Roman-BVnIje3h.woff2", "wOF2");
+    const failing = cli(root, "--update");
+    expect(failing.code).toBe(1);
+    expect(failing.out).toContain("docs/assets/LICENSE-ETBook.txt");
+    put(root, "docs/assets/LICENSE-ETBook.txt", ETBOOK_NOTICE);
+    const ok = cli(root, "--update");
+    expect(ok.code, ok.out).toBe(0);
+  });
+});
+
 /* ---- The report ------------------------------------------------------------------ */
 
 describe("renderReport", () => {
