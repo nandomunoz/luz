@@ -10,8 +10,10 @@
  *    them from, the shape's own attribute, then the symbol's, then what the `<use>` inherits from the svg around it
  *    (the page's `.ic`), so an icon that drew 1.6 or 2 fails whichever way it was written;
  *  - every `<use>` points to a symbol on the 24 grid.
- * Not part of it: the logo (a filled mark on 32), the sky filter and the shared header, whose icons
- * tests/site-header-repo-icon.spec.js and tests/icons-page.spec.js own.
+ * Not part of it: the logo (a filled mark on 32), the word LUZ of the hero (`.landing-wordmark`, three filled paths
+ * outlined from ET Book), the frames of the hero's tunnel (`.landing-tunnel__back`, a drawing behind the copy that
+ * tests/landing-tunnel.spec.js owns: its strokes are 1.5 and, on a phone, 1.25), the sky filter and the shared
+ * header, whose icons tests/site-header-repo-icon.spec.js and tests/icons-page.spec.js own.
  * Runs in `chromium` and `chromium-nojs` (no script draws any of them). nojs needs the spec in the project's
  * `testMatch` of playwright.config.js.
  */
@@ -29,6 +31,7 @@ function measure() {
   // Inline: the shapes straight in an svg of the page's body
   for (const svg of document.querySelectorAll('main svg, footer svg')) {
     if (svg.closest('symbol') || svg.getAttribute('viewBox') === '0 0 32 32') continue;
+    if (svg.matches('.landing-wordmark') || svg.closest('.landing-tunnel__back')) continue;
     const shapes = [...svg.querySelectorAll(SHAPES)].filter((s) => !s.closest('symbol, defs, filter, clipPath, mask'));
     if (shapes.length === 0 || svg.querySelector('use')) continue;
     for (const shape of shapes) {
@@ -38,7 +41,7 @@ function measure() {
   }
 
   // Used: for each <use>, the shapes of its symbol with the value they get in the clone
-  // (the sprite's ids are i0 and up; the globe of the light draws its own, from script)
+  // (the sprite's ids are i0 and up)
   for (const use of document.querySelectorAll('use[href^="#i"]')) {
     const id = (use.getAttribute('href') ?? '').replace(/^#/, '');
     if (!/^i\d+$/.test(id)) continue;
@@ -85,7 +88,9 @@ test.describe('the icons of the home page', () => {
     test(`${route}: every inline outline icon is drawn at 1.5 with round ends and no fill`, async ({ page }) => {
       await page.goto(route);
       const { inline } = await page.evaluate(measure);
-      expect(inline.length, 'the levels, the kinds and the eyebrows are inline').toBeGreaterThanOrEqual(15);
+      // 9 shapes since the redesign of 2026-11-27 (the page has fewer inline icons than before); the
+      // frames of the tunnel and the word are not icons and are left out above
+      expect(inline.length, 'the points and the eyebrows are inline').toBeGreaterThanOrEqual(8);
       expect(faults(inline)).toEqual([]);
     });
 
@@ -99,7 +104,8 @@ test.describe('the icons of the home page', () => {
     test(`${route}: every <use> points to a symbol on the 24 grid`, async ({ page }) => {
       await page.goto(route);
       const { symbols } = await page.evaluate(measure);
-      expect(symbols.length).toBeGreaterThanOrEqual(30);
+      // 29 are drawn since the redesign of 2026-11-27 (it has fewer sections than the page before it)
+      expect(symbols.length).toBeGreaterThanOrEqual(28);
       expect(symbols.filter((s) => s.viewBox !== '0 0 24 24').map((s) => s.id)).toEqual([]);
       // The sprite holds no symbol that nothing draws (the tick and the cross of the fit lists went with them)
       const drawn = new Set(symbols.map((s) => s.id));
