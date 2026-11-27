@@ -67,7 +67,9 @@
   }
 
   /* Nothing moves on paper, and a theme change must not be in mid-transition */
-  :where(*, *::before, *::after) {
+  *,
+  *::before,
+  *::after {
     box-shadow: none;
     text-shadow: none;
     transition: none;
