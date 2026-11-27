@@ -1,0 +1,13 @@
+{
+  "example": "doctor",
+  "case": "doctor",
+  "model": "sonnet",
+  "date": "2026-11-25",
+  "skillVersion": "0.1.0",
+  "turns": [
+    {
+      "user": "/luz doctor",
+      "assistant": "`/luz doctor` finished with no problems and no warnings. It checked 1 file.\n\nThe script printed only that summary, so I can't tell you which file it checked. It also listed no skills or agents for the project, so I won't claim the project has any.\n\nThe script can't tell you whether the front matter says what you intend, so that part is yours to review. `doctor` only reads, so it wrote nothing.\n\nTo start a site, run `/luz` or `/luz new <landing, blog, app or docs>`."
+    }
+  ]
+}

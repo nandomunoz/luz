@@ -1,0 +1,99 @@
+    <!-- The page of the catalog: the home's template with this <main> (levelTemplate() in scripts/docs-site/site.js).
+         For a developer who does not yet know what the catalog is: a stylesheet per piece (the hero, one line, and a demo
+         of the stylesheets a kind of site links), how to use it (three steps), what there is (four blocks of pieces),
+         and what comes next -->
+    <div class="landing-level">
+      <section class="landing-intro landing-demo landing-views" id="hero" aria-labelledby="hero-title">
+        <div class="landing-intro__head">
+          <p class="landing-inside__eyebrow"><svg aria-hidden="true"><use href="#i0"/></svg><span>{{t:inside.l3.eyebrow}}</span></p>
+          <h1 class="landing-intro__title" id="hero-title">{{html:inside.l3.title}}</h1>
+          <p class="landing-intro__what">{{t:level.catalog.what}}</p>
+          <div class="o-actions">
+            <a class="luz-btn luz-btn--primary" href="#steps">{{t:level.catalog.cta.steps}}</a>
+            <a class="luz-btn luz-btn--outline" href="/docs/catalog/">{{t:level.catalog.docs}}</a>
+          </div>
+          <ul class="landing-intro__facts">
+            <li><strong>{{ncatalog}}</strong> {{t:level.catalog.stat.components}}</li>
+            <li><strong>{{nchunks}}</strong> {{t:level.catalog.stat.chunks}}</li>
+            <li><strong>{{weight3}}</strong> {{t:level.catalog.stat.weight}}</li>
+            <li><strong>{{ndepscatalog}}</strong> {{t:level.catalog.stat.deps}}</li>
+          </ul>
+        </div>
+        <div class="landing-intro__stage">
+          {{catalogdemo}}
+        </div>
+      </section>
+
+      <section class="o-stack luz-section landing-path" id="steps" aria-labelledby="steps-title">
+        <h2 class="luz-section__title" id="steps-title">{{t:level.catalog.steps.title}}</h2>
+        <ol class="landing-path__list">
+          <li class="landing-path__step landing-path__step--1" id="install">
+            <p class="landing-path__title">{{t:level.catalog.steps.1.title}}</p>
+            <p class="landing-path__text">{{t:level.catalog.steps.1.text}}</p>
+        <div class="landing-install">
+          <div class="landing-install__bar">
+            <span class="landing-install__label">{{t:inside.install.npm}}</span>
+            <button class="luz-copy-btn" type="button" data-copy-from="catalog-npm" aria-label="{{t:inside.copy.npm}}" hidden>{{t:see.copy}}</button>
+          </div>
+          <pre class="luz-code-block" data-lang="bash" dir="ltr" tabindex="0" role="region" aria-label="{{t:inside.install.npm}}"><code id="catalog-npm">npm install @luz-ds/tokens @luz-ds/core @luz-ds/catalog</code></pre>
+        </div>
+        <div class="landing-install">
+          <div class="landing-install__bar">
+            <span class="landing-install__label">{{t:inside.install.cdn}}</span>
+            <button class="luz-copy-btn" type="button" data-copy-from="catalog-cdn" aria-label="{{t:inside.copy.cdn}}" hidden>{{t:see.copy}}</button>
+          </div>
+          <pre class="luz-code-block" data-lang="html" dir="ltr" tabindex="0" role="region" aria-label="{{t:inside.install.cdn}}"><code id="catalog-cdn">&lt;link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@luz-ds/tokens@{{version}}/dist/luz-tokens.min.css">
+&lt;link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@luz-ds/core@{{version}}/dist/luz.min.css">
+&lt;script type="module" src="https://cdn.jsdelivr.net/npm/@luz-ds/core@{{version}}/dist/luz.min.js">&lt;/script></code></pre>
+        </div>
+          </li>
+          <li class="landing-path__step landing-path__step--2">
+            <p class="landing-path__title">{{t:level.catalog.steps.2.title}}</p>
+            <p class="landing-path__text">{{t:level.catalog.steps.2.text}}</p>
+            <div class="landing-install">
+              <div class="landing-install__bar">
+                <span class="landing-install__label">HTML</span>
+                <button class="luz-copy-btn" type="button" data-copy-from="cat-link" aria-label="{{t:level.catalog.copy.link}}" hidden>{{t:see.copy}}</button>
+              </div>
+              <pre class="luz-code-block" data-lang="html" dir="ltr" tabindex="0" role="region" aria-label="{{t:level.catalog.steps.2.title}}"><code id="cat-link">&lt;link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@luz-ds/catalog@{{version}}/dist/components/search.min.css">
+&lt;link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@luz-ds/catalog@{{version}}/dist/components/lang-switch.min.css"></code></pre>
+            </div>
+          </li>
+          <li class="landing-path__step landing-path__step--3">
+            <p class="landing-path__title">{{t:level.catalog.steps.3.title}}</p>
+            <p class="landing-path__text">{{t:level.catalog.steps.3.text}}</p>
+            <div class="landing-install">
+              <div class="landing-install__bar">
+                <span class="landing-install__label">HTML</span>
+                <button class="luz-copy-btn" type="button" data-copy-from="cat-script" aria-label="{{t:level.catalog.copy.script}}" hidden>{{t:see.copy}}</button>
+              </div>
+              <pre class="luz-code-block" data-lang="html" dir="ltr" tabindex="0" role="region" aria-label="{{t:level.catalog.steps.3.title}}"><code id="cat-script">&lt;script type="module" src="https://cdn.jsdelivr.net/npm/@luz-ds/catalog@{{version}}/dist/catalog.min.js">&lt;/script>
+
+&lt;luz-search>…&lt;/luz-search></code></pre>
+            </div>
+          </li>
+          <li class="landing-path__step landing-path__step--result">
+            <p class="landing-path__title">{{t:level.catalog.steps.result.title}}</p>
+            <ul class="landing-path__outcomes">
+              <li>{{t:level.catalog.steps.result.1}}</li>
+              <li>{{t:level.catalog.steps.result.2}}</li>
+              <li>{{t:level.catalog.steps.result.3}}</li>
+            </ul>
+          </li>
+        </ol>
+      </section>
+
+      <div class="landing-level__blocks">
+        {{catalogblocks}}
+      </div>
+
+      <section class="landing-level__next" id="next" aria-labelledby="next-title">
+        <h2 class="luz-section__title" id="next-title">{{t:level.catalog.next.title}}</h2>
+        <p class="landing-inside__lead">{{t:level.catalog.next.lead}}</p>
+        <div class="o-actions">
+          <a class="luz-btn luz-btn--primary" href="/docs/ai/">{{t:level.catalog.next.kinds}}</a>
+          <a class="luz-btn luz-btn--outline" href="/docs/catalog/">{{t:level.catalog.docs}}</a>
+        </div>
+      </section>
+
+    </div>

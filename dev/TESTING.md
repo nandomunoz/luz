@@ -1,6 +1,6 @@
 # Testing
 
-How to write and run the tests of LUZ. The rules they enforce are in [PRINCIPLES.md](../PRINCIPLES.md). [How LUZ is built](https://nandovejer.github.io/luz/docs/get-started/how-luz-is-built/#tests-first) says why the test comes first.
+How to write and run the tests of LUZ. The rules they enforce are in [PRINCIPLES.md](../PRINCIPLES.md). [How LUZ is built](https://luzds.com/docs/get-started/how-luz-is-built/#tests-first) says why the test comes first.
 
 ## Quick start
 
@@ -14,7 +14,7 @@ pnpm check:all              # everything, in order
 
 Install the browser once with `pnpm test:ui:install`.
 
-`pnpm check:all` runs `scripts/qa-release.js`. It writes a report to `test-results/qa-release/`. Two flags make it faster:
+`pnpm check:all` runs `scripts/qa-release.js`. It writes a report to `test-results/qa-release/`. Among its steps, `pnpm smoke:consumer` packs the tarballs and runs the `luz-ai`, `luz-check` and `luz-tokens` bins from them, so a broken tarball fails here, before the Version PR; it needs the build, so `--fast` runs it on the last build. Two flags make it faster:
 
 ```bash
 pnpm check:all -- --skip-ui   # no Playwright
@@ -245,7 +245,7 @@ familyOf('--luz-text-muted'); // [label, route] of the token page that documents
 
 ## Size budgets
 
-`budgets.json` holds the ceiling of every built file (minified, then gzipped). It is a red line: never raise a ceiling. The rows with `"warn": true` (the docs pages, `llms.txt` and `llms-full.txt`, the five prompts, the debug page; owner, 2026-11-02) only print a `!` warning over their ceiling and never fail; the numbers stay as the targets to optimise. If a file does not fit, make it smaller or remove something. `@luz-ds/catalog` is the exception (owner, 2026-11-02): it has no weight limit and no row; `check:size` prints the size of each of its files under "catalog (no limit, reported)" and fails only on its structural checks (SEC-CHUNK-1/2).
+`budgets.json` holds the ceiling of every built file (minified, then gzipped). It is a red line: never raise a ceiling. The rows with `"warn": true` (the docs pages, `llms.txt` and `llms-full.txt`, the debug page; owner, 2026-11-02) only print a `!` warning over their ceiling and never fail; the numbers stay as the targets to optimise. If a file does not fit, make it smaller or remove something. `@luz-ds/catalog` is the exception (owner, 2026-11-02): it has no weight limit and no row; `check:size` prints the size of each of its files under "catalog (no limit, reported)" and fails only on its structural checks (SEC-CHUNK-1/2).
 
 ```bash
 pnpm build

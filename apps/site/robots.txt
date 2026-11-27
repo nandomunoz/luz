@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+# For AI agents: /llms.txt and /llms-full.txt

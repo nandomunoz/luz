@@ -38,7 +38,7 @@
  * and the accessibility reviewer `luz-check agent` prints (f5-ai-ready.md 5.8,
  * 8 "The published agent"):
  *
- *   packages/check/dist/agents/luz-accessibility-reviewer.md
+ *   packages/check/dist/agents/luz-agent-accessibility.md
  *
  * Built from ONE file, read by its literal path, and never from the rest of
  * the repo's agent folder or of its private notes: the sections of
@@ -210,7 +210,7 @@ function writeData(folder) {
 
 // The one file the agent is built from, by its literal path
 const AGENT_SOURCE = resolve(repoRoot, ".claude/agents/accessibility-engineer.md");
-const AGENT_NAME = "luz-accessibility-reviewer";
+const AGENT_NAME = "luz-agent-accessibility";
 const FENCE_START = "<!-- luz:publish:start -->";
 const FENCE_END = "<!-- luz:publish:end -->";
 const AGENT_MAX_BYTES = 12288;

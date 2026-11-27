@@ -1,6 +1,6 @@
 ---
 name: qa-release
-description: Run the LUZ release QA checklist: lint, size/strings/exceptions/pack/contrast checks, unit tests and Playwright (chromium and chromium-nojs), then write an evidence report and list what needs manual or browser review. Use before a release or when asked for "QA", "release check" or "evidence". Never runs firefox or webkit.
+description: "Run the LUZ release QA checklist: lint, size/strings/exceptions/pack/contrast checks, unit tests and Playwright (chromium and chromium-nojs), then write an evidence report and list what needs manual or browser review. Use before a release or when asked for \"QA\", \"release check\" or \"evidence\". Never runs firefox or webkit."
 ---
 
 # QA release
@@ -17,7 +17,7 @@ Runs the same gates as CI plus the Playwright suites, and writes an evidence rep
    node scripts/qa-release.js --skip-ui  # no Playwright
    ```
 
-   It runs, in order: `pnpm pages:build` (the packages and the Pages site), `lint:css`, `lint:js`, `check:size`, `check:strings`, `check:prompts`, `check:exceptions`, `check:license`, `check:pack`, `check:contrast`, `check:ai`, `test:unit`, and Playwright with `--project=chromium --project=chromium-nojs` (3 workers: more can overload the dev server and give false failures).
+   It runs, in order: `pnpm pages:build` (the packages and the Pages site), `lint:css`, `lint:js`, `check:size`, `check:strings`, `check:exceptions`, `check:license`, `check:pack`, `check:contrast`, `check:ai`, `test:unit`, and Playwright with `--project=chromium --project=chromium-nojs` (3 workers: more can overload the dev server and give false failures).
 
 2. **Read the report**, `test-results/qa-release/report-<timestamp>.md`. Do not paste the whole file back: give the owner the table and the list of failures.
 

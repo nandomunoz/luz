@@ -11,12 +11,12 @@
  *              docs, were four packages of their own until plan
  *              ai-and-catalog-only, F5b; they are components of catalog now.)
  *   TOOLS      published and with no CSS of their own: dev tools with a bin
- *              (check). Own version, out of the `fixed` group, no layer.
+ *              (check, ai). Own version, out of the `fixed` group, no layer.
  *   PUBLISHED  PACKAGES then TOOLS: what check-pack, publish and
  *              smoke-consumer pack, check and upload. A tool comes last: its
  *              tarball is built from the others' dist and nothing depends on it.
  */
 export const BASE = ["tokens", "core", "catalog"];
 export const PACKAGES = [...BASE];
-export const TOOLS = ["check"];
+export const TOOLS = ["check", "ai"];
 export const PUBLISHED = [...PACKAGES, ...TOOLS];

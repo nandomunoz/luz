@@ -1,0 +1,22 @@
+<!-- luz:page
+title: Los comandos de /luz
+description: Cada comando de /luz, con una conversación real de cada uno.
+keywords: luz, skill, comandos, /luz, claude, codex, gemini, cursor, subcomando
+source: fcdc3275dca4
+reviewed: false
+-->
+    <section class="docs-block" aria-labelledby="commands">
+      <h2 class="docs-chapter__title" id="commands">Los comandos</h2>
+      <p class="docs-lead">Escribe <code>/luz</code> en tu asistente, con un subcomando o sin él. La palabra que sigue es el subcomando, y una palabra que no está en la tabla recibe la tabla. Los mismos nombres se ejecutan en una terminal con <code>luz-ai</code>.</p>
+      <p>Las conversaciones son reales: cada una es el texto de una ejecución de la skill que pasó sus comprobaciones, congelado tal como se dijo, con el modelo y la fecha. Están en inglés, sea cual sea el idioma de esta página, porque es lo que dijo el asistente. La salida de la terminal es lo que imprime el script cuando se construye este sitio. <a href="/docs/ai/#skill">Cómo instalar la skill</a> está en la página sobre trabajar con IA. La skill se prueba solo en Claude Code: los demás asistentes siguen su propia documentación. Si alguno falla, <a href="https://github.com/nandomunoz/luz/issues/new?template=ai-target.yml">cuéntanoslo</a>.</p>
+      <!-- luz:commands -->
+    </section>
+
+    <section class="docs-block" aria-labelledby="others">
+      <h2 class="docs-chapter__title" id="others">Otros comandos</h2>
+      <p class="docs-lead">Dos comandos para la terminal.</p>
+      <ul>
+        <li><code>npx @luz-ds/ai init --target &lt;assistant&gt;</code> instala la skill para <code>claude</code>, <code>codex</code>, <code>gemini</code>, <code>cursor</code> o <code>agents-md</code>. Solo se ejecuta en una terminal, nunca en el chat, y nunca sobrescribe un archivo sin <code>--force</code>.</li>
+        <li><code>npx @luz-ds/ai init --target &lt;assistant&gt; --all</code> instala la skill, los cinco agentes y todas las skills pequeñas. Los agentes se escriben con sus campos aún por rellenar, así que se paran y preguntan hasta que los rellenas. Para quitar una pieza, ejecuta <code>npx @luz-ds/ai remove &lt;name&gt;</code>: solo borra los archivos que escribió luz-ai.</li>
+      </ul>
+    </section>

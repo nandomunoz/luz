@@ -4,7 +4,7 @@
  * each package that ships a tag, in the Custom Elements Manifest format, schema
  * version 2.1.0: catalog ships `<luz-search>`, `<luz-cookie-consent>`, `<luz-theme-time>`,
  * `<luz-timeline>` (it was core's until F7) and the CSS-only `<luz-lang-switch>`,
- * `<luz-submenu>`, `<luz-announcement>`, `<luz-faq>`. Core ships one, `<luz-theme-mode>`
+ * `<luz-submenu>`, `<luz-announcement>`, `<luz-faq>`, `<luz-showcase>`, `<luz-marquee>`. Core ships one, `<luz-theme-mode>`
  * (since the theme-mode plan, 2026-10-29). Tokens ship none.
  *
  * The facts come from the code, not from this file: the expected sets are read
@@ -135,6 +135,10 @@ const TAGS = [
   { tag: "luz-submenu", pkg: "catalog", file: "components/submenu.css", script: false },
   { tag: "luz-announcement", pkg: "catalog", file: "components/announcement.css", script: false },
   { tag: "luz-faq", pkg: "catalog", file: "components/faq.css", script: false },
+  // A row of links, each a logo and a name
+  { tag: "luz-showcase", pkg: "catalog", file: "components/showcase.css", script: false },
+  // Content that loops along one line, written twice; no attribute
+  { tag: "luz-marquee", pkg: "catalog", file: "components/marquee.css", script: false },
 ];
 const SHIPPING = [...new Set(TAGS.map((t) => t.pkg))];
 const tagsOf = (pkg) => TAGS.filter((t) => t.pkg === pkg).map((t) => t.tag);
@@ -306,7 +310,7 @@ describe("which tags exist (the scan of the sources agrees with the spec)", () =
     expect([...defined].sort()).toEqual(TAGS.filter((t) => t.script).map((t) => [t.tag, t.pkg]).sort());
   });
 
-  it("the tags no script defines are lang-switch, submenu, announcement and faq, in catalog", () => {
+  it("the tags no script defines are lang-switch, submenu, announcement, faq, showcase and marquee, in catalog", () => {
     const cssOnly = cssOnlyTags(definedTags());
     expect([...cssOnly].sort()).toEqual(TAGS.filter((t) => !t.script).map((t) => [t.tag, t.pkg]).sort());
   });

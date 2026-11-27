@@ -46,7 +46,7 @@ npx @luz-ds/tokens@0.4.1 check-contrast my-theme.css
 npx @luz-ds/tokens@0.4.1 check-contrast base.css my-theme.css --json
 ```
 
-Exit code `0` when every pair passes, `1` when one fails or a color could not be read, `2` for a usage or file error. What it reads, and what it reports as not read, is on [the contrast page of the docs](https://nandovejer.github.io/luz/docs/tokens/contrast/).
+Exit code `0` when every pair passes, `1` when one fails or a color could not be read, `2` for a usage or file error. What it reads, and what it reports as not read, is on [the contrast page of the docs](https://luzds.com/docs/tokens/contrast/).
 
 ## What's included
 
@@ -99,7 +99,7 @@ Three tokens set the size of the whole type and space scales. Set them on `:root
 }
 ```
 
-Every `--luz-text-*` and `--luz-space-*` step is computed from them. At the defaults the sizes are the same as before the knobs existed. A knob set on `body` or on a section changes nothing: the steps are resolved on `:root`. Components read the steps, never the knobs. The page [Make it yours](https://nandovejer.github.io/luz/docs/get-started/make-it-yours/) has the tested ranges and a table of presets.
+Every `--luz-text-*` and `--luz-space-*` step is computed from them. At the defaults the sizes are the same as before the knobs existed. A knob set on `body` or on a section changes nothing: the steps are resolved on `:root`. Components read the steps, never the knobs. The page [Make it yours](https://luzds.com/docs/get-started/make-it-yours/) has the tested ranges and a table of presets.
 
 ## Fonts
 
@@ -123,14 +123,14 @@ ET Book ships roman, italic, semi-bold and bold. Sans and mono are system stacks
 
 No breaking changes in 0.4.1.
 
-Older versions: https://github.com/nandovejer/luz/blob/main/packages/tokens/CHANGELOG.md
+Older versions: https://github.com/nandomunoz/luz/blob/main/packages/tokens/CHANGELOG.md
 
 ### Read first
 
 1. `dist/classes.json` in this package: the classes and custom properties its CSS defines. Write only those.
-2. https://nandovejer.github.io/luz/llms.txt: the index of the documentation, short enough for a small context.
-3. https://nandovejer.github.io/luz/llms-full.txt: the same pages in full.
-4. https://nandovejer.github.io/luz/examples/: one standalone page of markup for each component and pattern.
+2. https://luzds.com/llms.txt: the index of the documentation, short enough for a small context.
+3. https://luzds.com/llms-full.txt: the same pages in full.
+4. https://luzds.com/examples/: one standalone page of markup for each component and pattern.
 
 ### Load order
 
@@ -138,7 +138,7 @@ Older versions: https://github.com/nandovejer/luz/blob/main/packages/tokens/CHAN
 
 ### Check what you write
 
-Run `npx @luz-ds/check@0.3.2 <files>` on every HTML and CSS file you write, and fix what it reports. To copy the accessibility reviewer into your project: `npx @luz-ds/check@0.3.2 agent > .claude/agents/luz-accessibility-reviewer.md`.
+Run `npx @luz-ds/check@0.3.2 <files>` on every HTML and CSS file you write, and fix what it reports. To copy the accessibility reviewer into your project: `npx @luz-ds/check@0.3.2 agent > .claude/agents/luz-agent-accessibility.md`.
 
 <!-- luz:ai-agents:end -->
 

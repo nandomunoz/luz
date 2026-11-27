@@ -170,11 +170,11 @@ layer("the READMEs", "`node scripts/ai-readme.js --write`, then commit the READM
 
 /* ---- 4. The snapshot of the published agent ------------------------------------- */
 
-layer("the agent of @luz-ds/check", `\`node scripts/build-check.js\`, then copy packages/check/dist/agents/luz-accessibility-reviewer.md to ${SNAPSHOT} and read the diff`, () => {
+layer("the agent of @luz-ds/check", `\`node scripts/build-check.js\`, then copy packages/check/dist/agents/luz-agent-accessibility.md to ${SNAPSHOT} and read the diff`, () => {
   compare(
     SNAPSHOT,
     buildAgent(),
-    `\`node scripts/build-check.js\`, then copy packages/check/dist/agents/luz-accessibility-reviewer.md to ${SNAPSHOT} and read the diff`,
+    `\`node scripts/build-check.js\`, then copy packages/check/dist/agents/luz-agent-accessibility.md to ${SNAPSHOT} and read the diff`,
   );
 });
 

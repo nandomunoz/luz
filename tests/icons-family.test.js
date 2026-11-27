@@ -2,7 +2,7 @@
  * The site's icons are one family: a 24 grid, a 1.5 px stroke in the text colour
  * (`currentColor`), round caps and joins, no fill, no colour typed in the markup.
  * The Icons page (apps/docs/pages/components/icons.html and its Spanish page) is
- * where they are shown and copied; the header, footer, prompt dialog, language
+ * where they are shown and copied; the header, footer, language
  * switch, search and colour mode draw the same shapes. What a browser paints and
  * what the copy buttons put on the clipboard are tests/icons-page.spec.js and
  * tests/site-header-repo-icon.spec.js; this file reads the sources.
@@ -13,7 +13,7 @@
  *  - the page carries each icon once: no `data-copy` in the HTML (a script fills it from
  *    the icon beside the button), the sprite block is a short sample, and no number of
  *    icons is typed in the prose (the count is the page's own);
- *  - the icons of the header, the footer and the prompt dialog are the ones of the page
+ *  - the icons of the header and the footer are the ones of the page
  *    (RL-13: the repository link draws LUZ's own git-branch, never GitHub's mark), with
  *    a 1.5 stroke wherever one is written, in the markup and in the CSS that styles them;
  *  - no octocat path in `apps/` or `packages/*\/src`;
@@ -257,8 +257,8 @@ describe("the Spanish Icons page has the icons of the English one", () => {
   });
 });
 
-describe("the icons of the header, the footer and the prompt dialog are the family's", () => {
-  const PARTIALS = ["header", "footer", "prompt-dialog"].map((name) => ({ name, root: parse(read(`apps/site/_partials/${name}.html`), name) }));
+describe("the icons of the header and the footer are the family's", () => {
+  const PARTIALS = ["header", "footer"].map((name) => ({ name, root: parse(read(`apps/site/_partials/${name}.html`), name) }));
   /** The svgs of the partials on the 24 grid, and the logo (32) apart. */
   const svgs = () => PARTIALS.flatMap(({ name, root }) => queryAll(root, "svg").map((svg) => ({ name, svg })));
   const onGrid = () => svgs().filter(({ svg }) => svg.attrs.get("viewbox") === "0 0 24 24");
@@ -293,7 +293,7 @@ describe("the icons of the header, the footer and the prompt dialog are the fami
     for (const svg of triggers) expect(drawing(svg), "a search trigger draws search").toEqual(set.get("search"));
     const github = queryAll(query(header, "a.site-header__github"), "svg");
     expect(github.map(drawing), "the repository link draws git-branch").toEqual([set.get("git-branch")]);
-    const docs = queryAll(query(header, "nav.site-header__nav"), "svg");
+    const docs = queryAll(query(header, "a.site-header__docs"), "svg");
     expect(docs.map(drawing), "Documentation draws the book").toEqual([set.get("book")]);
     const modes = queryAll(footer, "input.luz-theme-mode__input").map((input) => [input.attrs.get("value"), drawing(find(input.parent, (n) => n.name === "svg"))]);
     expect(Object.fromEntries(modes)).toEqual({ auto: set.get("auto"), light: set.get("sun"), dark: set.get("moon"), "high-contrast": set.get("contrast") });
@@ -392,14 +392,14 @@ describe("no third-party mark in what is published or served", () => {
     const header = parse(read("apps/site/_partials/header.html"), "header");
     const link = query(header, "a.site-header__github");
     expect(link, "a.site-header__github").toBeTruthy();
-    expect(link.attrs.get("href")).toBe("https://github.com/nandovejer/luz");
+    expect(link.attrs.get("href")).toBe("https://github.com/nandomunoz/luz");
     const svgs = queryAll(link, "svg");
     expect(svgs, "one icon").toHaveLength(1);
     expect(svgs[0].attrs.get("viewbox")).toBe("0 0 24 24");
     expect(svgs[0].attrs.get("aria-hidden")).toBe("true");
     expect(query(link, "span.site-header__github-label")?.html.slice(query(link, "span.site-header__github-label").open.end, query(link, "span.site-header__github-label").close.index)).toBe("GitHub");
     // The same size as the other icons of the row: one class, one rule
-    expect(svgs[0].attrs.get("class")).toBe(queryAll(query(header, "nav.site-header__nav"), "svg")[0].attrs.get("class"));
+    expect(svgs[0].attrs.get("class")).toBe(queryAll(query(header, "a.site-header__docs"), "svg")[0].attrs.get("class"));
     expect(find(link, matcher("circle")), "git-branch has circles").toBeTruthy();
   });
 });

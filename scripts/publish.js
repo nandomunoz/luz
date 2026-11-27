@@ -58,6 +58,14 @@ function isPublished(name, version) {
   }
 }
 
+// A package still at its workspace placeholder has no release behind it (its changeset is missing or was not versioned):
+// publishing it would put 0.0.0 on the registry, so nothing is published
+const placeholders = PUBLISHED.filter((dir) => /^0\.0\.0(-|$)/.test(JSON.parse(readFileSync(resolve(repoRoot, "packages", dir, "package.json"), "utf-8")).version));
+if (placeholders.length) {
+  console.error(`✗ ${placeholders.map((d) => `@luz-ds/${d}`).join(", ")} is at 0.0.0, the placeholder of a package with no release: add its changeset and run the version step first. Nothing was published.`);
+  process.exit(1);
+}
+
 for (const dir of PUBLISHED) {
   const pkgRoot = resolve(repoRoot, "packages", dir);
   const { name, version } = JSON.parse(readFileSync(resolve(pkgRoot, "package.json"), "utf-8"));

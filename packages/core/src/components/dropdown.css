@@ -46,7 +46,6 @@
 
 .luz-dropdown__item:hover {
   background: var(--luz-surface-hover);
-  text-decoration: none;
 }
 
 .luz-dropdown__item:active {

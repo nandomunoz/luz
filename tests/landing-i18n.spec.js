@@ -127,7 +127,9 @@ for (const { route, lang, dir, name, label } of LANGUAGES) {
       await expect(logo).toHaveAccessibleName(`LUZ ${JSON.parse(read(`apps/landing/i18n/${lang}.json`))['footer.beta']} v${VERSION}`);
       expect(new URL(await logo.evaluate((a) => a.href)).pathname).toBe(route);
       await expect(page.locator('.site-header__nav a[aria-current="page"]')).toHaveCount(0);
-      await expect(page.locator('.site-header__nav a')).toHaveCount(1);
+      // Where to go: the four sections of the site; the docs are an icon beside GitHub
+      await expect(page.locator('.site-header__nav a')).toHaveCount(4);
+      await expect(page.locator('.site-header__docs')).toHaveCount(1);
     });
   });
 }
@@ -250,11 +252,15 @@ test.describe('the language switch', () => {
     });
   }
 
-  test('from 769px the button shows the language\'s name', async ({ page }) => {
+  test('from 769px the button is only its icon, and the language\'s name stays for a reader', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 700 });
     await open(page, '/es/');
-    await expect(switcher(page).locator('.luz-lang-switch__name')).toBeVisible();
-    expect(await switcher(page).locator('.luz-lang-switch__name').evaluate((el) => el.getBoundingClientRect().width)).toBeGreaterThan(20);
+    const name = switcher(page).locator('.luz-lang-switch__name');
+    await expect(name).not.toBeEmpty();
+    // Drawn the way u-sr-only draws it: one pixel, clipped, never display: none, so it is in the accessibility tree
+    expect(await name.evaluate((el) => el.getBoundingClientRect().width)).toBeLessThanOrEqual(1);
+    const text = (await name.textContent())?.trim() ?? '';
+    await expect(switcher(page).locator('.luz-lang-switch__button')).toHaveAccessibleName(new RegExp(text));
   });
 
   test('a browser without the popover API gets the languages as a row of links', async ({ page }) => {
@@ -282,7 +288,7 @@ test.describe('Arabic typography', () => {
     const style = (selector) =>
       page.locator(selector).first().evaluate((el) => ({ font: getComputedStyle(el).fontFamily, spacing: getComputedStyle(el).letterSpacing }));
     const sans = await page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--luz-font-sans').trim());
-    for (const selector of ['h1', '.luz-section__title', '.luz-section__eyebrow', '.luz-section__lead', '.landing-install__label', '.landing-cut__label', '.luz-site-footer__col-title', '.site-badge']) {
+    for (const selector of ['h1', '.landing-inside__title', '.landing-inside__eyebrow', '.landing-inside__lead', '.landing-install__label', '.luz-site-footer__col-title', '.site-badge']) {
       await expect(page.locator(selector).first(), selector).toBeAttached();
       const { font, spacing } = await style(selector);
       expect(font, selector).not.toMatch(/ET Book/i);
@@ -291,8 +297,7 @@ test.describe('Arabic typography', () => {
       expect(plain(font), selector).toBe(plain(sans));
       expect(['normal', '0px'], `${selector} letter-spacing`).toContain(spacing);
     }
-    // The three English words of "Why" stay marked as English inside the Arabic page; code keeps its mono face
-    await expect(page.locator('.landing-word[lang="en"]')).toHaveCount(3);
+    // Code keeps its mono face
     const { font } = await style('pre code');
     expect(font).toMatch(/mono/i);
   });

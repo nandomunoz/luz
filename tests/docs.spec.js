@@ -171,8 +171,12 @@ test.describe('Documentation site', () => {
     test('the header has Documentation and GitHub, with Documentation current on the hub (no Home link: the logo is it)', async ({ page }) => {
       await open(page);
 
-      await expect(page.locator('.site-header__nav a')).toHaveText(['Documentation']);
-      await expect(page.locator('.site-header__nav a[aria-current="page"]')).toHaveText('Documentation');
+      await expect(page.locator('.site-header__docs')).toHaveText('Documentation');
+      await expect(page.locator('.site-header__docs[aria-current="page"]')).toHaveText('Documentation');
+      // Documentation is an icon beside GitHub, in the tools at the end
+      const [docs, github] = await Promise.all(['.site-header__docs', '.site-header__github'].map((s) => page.locator(s).boundingBox()));
+      expect(Math.abs(github.x - (docs.x + docs.width))).toBeLessThanOrEqual(16);
+      expect(docs.width).toBeLessThanOrEqual(48);
       await expect(page.locator('#site-header').getByRole('link', { name: 'GitHub' })).toBeVisible();
       await expect(page.locator('#site-header').getByRole('link', { name: 'Home' })).toHaveCount(0);
       // Exactly one radio group drives the tokens on this page
@@ -183,8 +187,8 @@ test.describe('Documentation site', () => {
 
     test('on a component page, Documentation is the current section', async ({ page }) => {
       await gotoId(page, 'c-button');
-      await expect(page.locator('.site-header__nav a[aria-current="true"]')).toHaveText(['Documentation']);
-      await expect(page.locator('.site-header__nav a[aria-current="page"]')).toHaveCount(0);
+      await expect(page.locator('.site-header__docs[aria-current="true"]')).toHaveText('Documentation');
+      await expect(page.locator('.site-header__docs[aria-current="page"]')).toHaveCount(0);
     });
 
     test('the round button in the footer steps through the three modes and Auto (the system\'s), under core\'s key', async ({ page }) => {
@@ -273,17 +277,22 @@ test.describe('Documentation site', () => {
   });
 
   test.describe('navigation', () => {
-    test('the sidebar shows the seven areas, an accordion with only the current one open, every page listed, and HTML elements as an area of its own', async ({ page }) => {
+    test('the sidebar shows the seven areas as six links, an accordion with only the current one open, every page listed, and the HTML elements as a group in the fold of Catalog', async ({ page }) => {
       await page.setViewportSize({ width: 1440, height: 900 });
       await gotoId(page, 'c-button');
       const areas = page.locator('.docs-nav a.docs-nav__area');
-      await expect(areas).toHaveText(['Get started', 'Kinds of site', 'Tokens', 'Core', 'Catalog', 'HTML elements', 'Accessibility']);
-      // HTML elements is an area like the others, not nested in Catalog
-      await expect(page.locator('.docs-nav > li > a.docs-nav__area[href="/docs/html/"]')).toHaveText('HTML elements');
+      // The HTML elements keep their area, routes and index, but have no link or fold of their own (owner, 2026-11-25; `nestIn` in site.json)
+      await expect(areas).toHaveText(['Get started', 'AI', 'Tokens', 'Core', 'Catalog', 'Accessibility']);
+      await expect(page.locator('.docs-nav > li > a.docs-nav__area[href="/docs/html/"]')).toHaveCount(0);
+      // ... they are a labelled group at the end of the fold of Catalog, with their index and their pages
+      const htmlGroup = page.locator('.docs-nav > li:has(> a#a-catalog) li.docs-nav__group:has(#nav-html)');
+      await expect(htmlGroup.locator('#nav-html')).toHaveText('HTML elements');
+      await expect(htmlGroup.locator('a[href="/docs/html/"]')).toHaveCount(1);
+      await expect(htmlGroup.locator('a[href="/docs/html/forms/"]')).toHaveCount(1);
       await expect(page.locator('.docs-nav .docs-nav__sub')).toHaveCount(0);
       await expect(page.locator('.docs-nav a.docs-nav__subarea')).toHaveCount(0);
       // An accordion: a fold per area with pages (all of one name), only Core's open, and every page of every area is a link in the markup
-      await expect(page.locator('nav.luz-docs-nav details[name="nav"]')).toHaveCount(site.areas.filter((a) => readingOrder(site).some((p) => p.meta.area === a.id && p.route !== `/docs/${a.slug}/`)).length);
+      await expect(page.locator('nav.luz-docs-nav details[name="nav"]')).toHaveCount(site.areas.filter((a) => !a.nestIn && readingOrder(site).some((p) => (p.meta.area === a.id && p.route !== `/docs/${a.slug}/`) || site.areas.some((n) => n.nestIn === a.id && p.meta.area === n.id))).length);
       await expect(page.locator('nav.luz-docs-nav details[open]')).toHaveCount(1);
       await expect(page.locator('nav.luz-docs-nav details[open] a[aria-current="page"]')).toHaveText('Button');
       await expect(page.locator('.docs-nav a[aria-current="true"]')).toHaveText('Core');
@@ -318,7 +327,7 @@ test.describe('Documentation site', () => {
       await page.goto('/docs/tokens/');
       const end = page.getByRole('navigation', { name: 'Keep going' });
       const pager = page.locator('.luz-pager');
-      await expect(pager.getByRole('link', { name: 'Previous Documentation site', exact: true })).toHaveAttribute('href', /\/docs\/kinds\/docs\/$/);
+      await expect(pager.getByRole('link', { name: 'Previous Documentation site', exact: true })).toHaveAttribute('href', /\/docs\/ai\/docs\/$/);
       await expect(pager.getByRole('link', { name: 'Next Color', exact: true })).toHaveAttribute('href', /\/docs\/tokens\/color\/$/);
       await expect(end.locator('.docs-end__links a')).toHaveText(['Color modes and themes', 'Core', 'Tokens in Figma']);
     });
@@ -894,7 +903,8 @@ test.describe('Documentation site', () => {
       // for theme authors, and the accessibility statement names the shipped themes
       const THEMES_PAGE = routeOf('themes');
       const MAKE_PAGE = '/docs/tokens/themes/';
-      const EXEMPT = [THEMES_PAGE, MAKE_PAGE, routeOf('t-primitives'), routeOf('h-a11y-checked')];
+      // The pages of /docs/ai/ list luz-theme, a small skill that makes the theme of a brand: a custom theme is its subject there too
+      const EXEMPT = [THEMES_PAGE, MAKE_PAGE, routeOf('t-primitives'), routeOf('h-a11y-checked'), ...ALL.filter((r) => r.startsWith('/docs/ai/'))];
       for (const route of ALL.filter((r) => !EXEMPT.includes(r))) {
         await page.goto(route);
         const offenders = await page.evaluate(([themesPage, exempt]) => {
@@ -1116,7 +1126,7 @@ test.describe('Documentation site', () => {
       await expect(drawer).toHaveAttribute('popover', '');
       await expect(page.locator('.luz-nav-toggle[popovertarget="page-nav"]')).toHaveCount(1);
       const hrefs = await drawer.locator('a').evaluateAll((all) => all.map((a) => a.getAttribute('href')));
-      expect(hrefs).toEqual(['/docs/', 'https://github.com/nandovejer/luz']);
+      expect(hrefs).toEqual(['/ai/', '/tokens/', '/core/', '/catalog/', '/docs/', 'https://github.com/nandomunoz/luz']);
     });
 
     test('at 390px the menu button opens the drawer and the two site links are reachable', async ({ page }) => {
@@ -1567,16 +1577,17 @@ test.describe('Site header and navigation toggle', () => {
     expect(HEADER).toContain('popovertarget="page-nav"');
     expect(HEADER).not.toContain('aria-current');
     const row = HEADER.match(/<nav class="site-header__nav"[\s\S]*?<\/nav>/)[0];
-    // The row holds Documentation; GitHub is the control after it, and the logo ({{home}}) is the link to the home page
-    expect([...row.matchAll(/href="([^"]+)"/g)].map((m) => m[1])).toEqual(['/docs/']);
-    expect(HEADER).toContain('href="https://github.com/nandovejer/luz"');
+    // The row holds the four sections of the site, AI first; Documentation and GitHub are the icons after it, and the logo ({{home}}) is the link to the home page
+    expect([...row.matchAll(/href="([^"]+)"/g)].map((m) => m[1])).toEqual(['{{home}}ai/', '{{home}}tokens/', '{{home}}core/', '{{home}}catalog/']);
+    expect(HEADER).toMatch(/class="site-header__docs" href="\/docs\/"/);
+    expect(HEADER).toContain('href="https://github.com/nandomunoz/luz"');
     expect(HEADER).toMatch(/class="site-header__brand" href="\{\{home\}\}"/);
     expect(HEADER).toContain('data-luz-search-open');
     // The drawer's site links are the header's, in the same order: a labelled
     // list inside the drawer's nav, not a nav in a nav (a11y.md F4)
     expect(SITE_LINKS).toMatch(/<ul class="page-nav__row" aria-label="\{\{t:site\.label\}\}">/);
     expect(SITE_LINKS).not.toContain('<nav');
-    expect([...SITE_LINKS.matchAll(/href="([^"]+)"/g)].map((m) => m[1])).toEqual(['/docs/', 'https://github.com/nandovejer/luz']);
+    expect([...SITE_LINKS.matchAll(/href="([^"]+)"/g)].map((m) => m[1])).toEqual(['{{home}}ai/', '{{home}}tokens/', '{{home}}core/', '{{home}}catalog/', '/docs/', 'https://github.com/nandomunoz/luz']);
     for (const [file, partials] of Object.entries(INCLUDERS)) {
       for (const name of partials) expect(read(file), file).toContain(`<!-- luz:include ${name} -->`);
       // tabindex="-1": a scrollable nav is a Tab stop of its own in Firefox
@@ -1635,6 +1646,31 @@ test.describe('Site header and navigation toggle', () => {
     });
   }
 
+  // From 1024px the sections sit in the middle of the header itself; below it they sit in the middle of the free space between the logo
+  // and the tools, so they never cover them (tests/site-header.spec.js, 769 to 1024px)
+  for (const width of [1024, 1100, 1440]) {
+    test(`the header centres the sections and shows its tools as icons at ${width}px`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 700 });
+      await page.goto('/');
+      const m = await page.evaluate(() => {
+        const box = (s) => { const r = document.querySelector(s).getBoundingClientRect(); return { x: r.x, w: r.width }; };
+        const tool = document.querySelector('.site-header__search:not([hidden]), .site-header__az:not([hidden])');
+        return {
+          vw: innerWidth,
+          nav: box('.site-header__nav'),
+          tools: [tool, document.querySelector('.site-header__github'), document.querySelector('.site-header .luz-lang-switch__button')]
+            .filter(Boolean)
+            .map((e) => e.getBoundingClientRect().width),
+        };
+      });
+      // the middle of the sections is the middle of the header
+      expect(Math.abs(m.nav.x + m.nav.w / 2 - m.vw / 2)).toBeLessThanOrEqual(1);
+      // an icon and no word: 44px (the target size), never wider
+      expect(m.tools.length).toBeGreaterThanOrEqual(2);
+      for (const w of m.tools) expect(w).toBeLessThanOrEqual(48);
+    });
+  }
+
   for (const { path, current } of PAGES) {
     test(`one row, about 56px, with no overflow at every width: ${path}`, async ({ page }) => {
       test.slow();
@@ -1652,7 +1688,7 @@ test.describe('Site header and navigation toggle', () => {
 
     test(`the current page link is marked by more than color: ${path}`, async ({ page }) => {
       await page.goto(path);
-      const link = page.locator('.site-header__nav a[aria-current]');
+      const link = page.locator('.site-header__nav a[aria-current], .site-header__docs[aria-current]');
       if (!current) {
         await expect(link).toHaveCount(0);
         return;
@@ -1669,6 +1705,10 @@ test.describe('Site header and navigation toggle', () => {
         '.luz-skip-link',
         '.site-header__brand',
         '.site-header__nav a >> nth=0',
+        '.site-header__nav a >> nth=1',
+        '.site-header__nav a >> nth=2',
+        '.site-header__nav a >> nth=3',
+        '.site-header__docs',
         '.site-header__github',
         '.site-header__search',
       ]],
@@ -1694,13 +1734,13 @@ test.describe('Site header and navigation toggle', () => {
       await menu.focus();
       await page.keyboard.press('Enter');
       const site = page.getByRole('list', { name: 'Site', exact: true });
-      await expect(site.getByRole('link')).toHaveText(['Documentation', 'GitHub']);
+      await expect(site.getByRole('link')).toHaveText(['AI', 'Tokens', 'Core', 'Catalog', 'Documentation', 'GitHub']);
       await expect(page.locator('#page-nav').getByRole('link', { name: 'Home' })).toHaveCount(0);
       if (current) {
         await expect(site.locator('[aria-current]')).toHaveText(current);
-        // first in the docs drawer: the first Tab from the button lands on Documentation
+        // the drawer starts with the sections of the site: the first Tab from the button lands on AI, the first section
         await page.keyboard.press('Tab');
-        await expect(site.getByRole('link', { name: 'Documentation' })).toBeFocused();
+        await expect(site.getByRole('link', { name: 'AI', exact: true })).toBeFocused();
         const underline = await site.locator('[aria-current]').evaluate((el) => getComputedStyle(el).textDecorationLine);
         expect(underline).toBe('underline');
       } else {

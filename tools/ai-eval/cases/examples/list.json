@@ -1,0 +1,13 @@
+{
+  "example": "list",
+  "case": "list",
+  "model": "sonnet",
+  "date": "2026-11-26",
+  "skillVersion": "0.1.0",
+  "turns": [
+    {
+      "user": "/luz list",
+      "assistant": "Only 1 of the 12 luz-ai pieces is installed in this project.\n\n**Installed**\n- `luz` (skill) at `.claude/skills/luz`\n\n**Agents, not installed**\n- `luz-agent-accessibility`\n- `luz-agent-legal`\n- `luz-agent-optimiza`\n- `luz-agent-seogeo`\n- `luz-agent-ux`\n\n**Small skills, not installed**\n- `luz-license`\n- `luz-meta`\n- `luz-migrate`\n- `luz-readme`\n- `luz-theme`\n- `luz-translate`\n\nThis command only reads, so it wrote nothing. To install one, run `/luz add <name>`. You'll see a dry run first, and nothing is written until you say \"go\". To start a site, run `/luz`."
+    }
+  ]
+}

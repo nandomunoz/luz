@@ -10,10 +10,11 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterEach, describe, expect, it } from "vitest";
 import { decodeEntities, readHtml } from "../scripts/docs-site/html.js";
-import { PROMPT_KINDS, promptRoute } from "../scripts/docs-site/prompts.js";
+import { FITS_KINDS } from "../scripts/docs-site/kinds.js";
 import { classesOf, findAll, hasClass, isInside, isLive, parse, query, queryAllLive, textOf } from "./helpers/html-dom.js";
 import { PATTERN_AREAS } from "./helpers/package-areas.js";
 import { quoted } from "./helpers/quoted-attributes.js";
+import { levelPagesOf } from "./helpers/level-pages.js";
 import { readIndex, search } from "../packages/catalog/src/search.js";
 import {
   SEARCH_INDEX_ROUTE,
@@ -485,17 +486,25 @@ describe("the LUZ docs site", () => {
   const site = scanSite(join(repo, "apps/docs"), repo);
   const landing = landingDocuments(site, "apps/landing/index.html", readFileSync(join(repo, "apps/landing/index.html"), "utf-8"));
   const homes = landing.map((d) => d.route);
-  const { rendered, problems } = buildSite(site, { extra: landing });
+  // The pages of the levels (/tokens/, /core/, /components/) are built so every link and every key is checked, and left out of what
+  // the tests below walk: they are start pages like the home, not docs pages
+  const levels = levelPagesOf(site);
+  const levelRoutes = new Set(levels.map((d) => d.route));
+  const withoutLevels = (built) => ({ ...built, rendered: new Map([...built.rendered].filter(([route]) => !levelRoutes.has(route))) });
+  const { rendered, problems } = withoutLevels(buildSite(site, { extra: [...landing, ...levels] }));
   // /debug/ is a tool page of the real site (scripts/docs-site/debug.js), not a docs page: no site header, sidebar, h1 of .docs-title or pager.
   // The tests about the docs pages leave it out on purpose; its own tests (tests/debug-*.test.js) and the one below say what it has instead.
   const DEBUG = "/debug/";
-  const pages = [...rendered].filter(([route]) => !homes.includes(route) && route !== DEBUG);
+  // /manifesto/ is a standalone page of the real site too (scripts/docs-site/manifesto.js): its own tests are tests/manifesto-page.test.js
+  const MANIFESTO = "/manifesto/";
+  const STANDALONE = new Set([DEBUG, MANIFESTO]);
+  const pages = [...rendered].filter(([route]) => !homes.includes(route) && !STANDALONE.has(route));
 
   it("builds with every source well nested, every internal link resolving and every catalog key used", () => {
     expect(problems).toEqual([]);
     expect(homes).toEqual(["/", "/es/", "/ar/"]);
     // The pages of the docs, the not-found page, the homes and /debug/ (the one route that is no page of apps/docs/pages/)
-    expect([...rendered.keys()].sort()).toEqual([...homes, "/404.html", DEBUG, ...site.pages.map((p) => p.route)].sort());
+    expect([...rendered.keys()].sort()).toEqual([...homes, "/404.html", DEBUG, MANIFESTO, ...site.pages.map((p) => p.route)].sort());
     expect(site.byRoute.has(DEBUG)).toBe(false);
   });
 
@@ -534,8 +543,8 @@ describe("the LUZ docs site", () => {
     const switcherOf = (html) => header(html).match(/<luz-lang-switch>[\s\S]*?<\/luz-lang-switch>/)?.[0] ?? "";
     const docsHeader = flat(header(rendered.get("/docs/")));
     for (const [route, html] of rendered) {
-      // /debug/ has no site header on purpose (tested above)
-      if (route === DEBUG) continue;
+      // /debug/ and /manifesto/ have no site header on purpose
+      if (STANDALONE.has(route)) continue;
       const own = header(html);
       if (route === "/" || !homes.includes(route)) expect(flat(own), route).toBe(docsHeader);
       // A docs page has the switcher (the not-found page, which is no page in any language, does not: its text names the languages)
@@ -587,8 +596,10 @@ describe("the LUZ docs site", () => {
       const area = site.areas.find((a) => a.id === page?.meta.area);
       expect(current, route).toEqual(area ? [route] : []);
       const parents = links.filter((a) => a.attrs.get("aria-current") === "true").map((a) => a.attrs.get("href"));
-      // No area is nested in another: the area link is marked "true" unless the page is the area index
-      expect(parents, route).toEqual(area ? (route !== `/docs/${area.slug}/` ? [`/docs/${area.slug}/`] : []) : []);
+      // The area link is marked "true" unless the page is the area index; a page of an area nested in another (the HTML elements,
+      // in Catalog) marks the link of the area it is nested in, and the index of a nested area is a link of the group, not an area link
+      const host = area?.nestIn ? site.areas.find((a) => a.id === area.nestIn) : area;
+      expect(parents, route).toEqual(host ? (route !== `/docs/${host.slug}/` ? [`/docs/${host.slug}/`] : []) : []);
       expect(links.filter((a) => (a.attrs.get("class") ?? "").includes("is-active")), route).toEqual([]);
       // Flat: not only the current area's pages, every page of every area
       const hrefs = links.map((a) => a.attrs.get("href"));
@@ -613,7 +624,7 @@ describe("the LUZ docs site", () => {
     // F7: the navbar, the sidebar, the terminal and the timeline are pages of the Catalog area now; so are the bar list and the three charts since 2026-11-03, and the select became a control of Choice, one of the four pages of Form fields, since 2026-11-05 (the old form page became Inputs, Choice, Values and Field parts: 31 pages of components)
     const components = site.pages.filter((p) => p.meta.area === "components" && p.meta.group && p.meta.group !== "helpers");
     expect(components).toHaveLength(31);
-    const withLanguages = buildSite(site, { extra: landing, languages: true, unchecked: homes });
+    const withLanguages = withoutLevels(buildSite(site, { extra: [...landing, ...levels], languages: true, unchecked: homes }));
     // Every language of the home page is a start page; only Spanish has docs, so a link from the Arabic home goes to the English docs
     const homeCodes = homes.filter((h) => h !== "/").map((h) => h.replaceAll("/", ""));
     const codes = docsLanguages();
@@ -624,7 +635,8 @@ describe("the LUZ docs site", () => {
       const main = quoted(html).match(/<main[\s\S]*?<\/main>/)[0].replace(/<nav class="luz-page-rail__onpage"[\s\S]*?<\/nav>/, "");
       return new Set([...main.matchAll(/href="((?:\/[a-z]{2,3})?\/docs\/[^"#]*)/g)].map((m) => m[1]));
     };
-    const starts = [...withLanguages.rendered].filter(([route]) => route !== "/404.html");
+    // The manifesto stands alone: its one way on is the home page
+    const starts = [...withLanguages.rendered].filter(([route]) => route !== "/404.html" && route !== MANIFESTO);
     // Every language is a start page, its home and, when it has docs, its docs pages
     for (const code of homeCodes) expect(starts.some(([route]) => route === `/${code}/`), `${code} home`).toBe(true);
     for (const code of codes) {
@@ -649,7 +661,7 @@ describe("the LUZ docs site", () => {
     const viewPages = site.pages.filter(
       (p) => (p.meta.area === "components" && p.meta.group && p.meta.group !== "helpers") || (PATTERN_AREAS.includes(p.meta.area) && p.meta.group && p.meta.group !== "reference"),
     );
-    expect(viewPages).toHaveLength(70);
+    expect(viewPages).toHaveLength(72);
     const CODE = ["markup", "variants", "how", "no-js", "keyboard"];
     const DESIGN = ["when", "when-not", "do-dont", "content", "contrast", "tokens"];
     // A page of controls (`parts: controls`, the four pages of Form fields) has this structure for each control, not for the page:
@@ -812,10 +824,11 @@ describe("the LUZ docs site", () => {
       const area = site.areas.find((a) => a.id === site.byRoute.get(route).meta.area);
       expect(order.indexOf(route), route).toBeGreaterThanOrEqual(order.indexOf(`/docs/${area.slug}/`));
     }
-    // F4 (D7) and F5 (f5-ai-ready.md 6): Install, Choose your snippet, organised, how to read,
-    // Make it yours, bundler, JavaScript, layers, print, Working with AI, Migrate a project to LUZ, then (F7 step 7,
-    // f7-open-source.md) How LUZ is built, then More questions (the FAQ the home sends the rest of its questions to), then the area Kinds of site (the plan ai-and-catalog-only, F3), which follows Get started
-    expect(order.slice(0, 18)).toEqual([
+    // F4 (D7): Install, Choose your snippet, organised, how to read, Make it yours, bundler, JavaScript, layers, print,
+    // Migrate a project to LUZ, then (F7 step 7, f7-open-source.md) How LUZ is built, then More questions (the FAQ the home
+    // sends the rest of its questions to), then the area AI (Working with AI, the commands, the agents and the four kinds of
+    // site), which follows Get started
+    expect(order.slice(0, 19)).toEqual([
       "/docs/get-started/",
       "/docs/get-started/snippet/",
       "/docs/get-started/structure/",
@@ -825,21 +838,22 @@ describe("the LUZ docs site", () => {
       "/docs/get-started/javascript/",
       "/docs/get-started/layers/",
       "/docs/get-started/print/",
-      "/docs/get-started/ai/",
       "/docs/get-started/migrate/",
       "/docs/get-started/how-luz-is-built/",
       "/docs/get-started/faq/",
-      "/docs/kinds/",
-      "/docs/kinds/landing/",
-      "/docs/kinds/blog/",
-      "/docs/kinds/app/",
-      "/docs/kinds/docs/",
+      "/docs/ai/",
+      "/docs/ai/commands/",
+      "/docs/ai/agents/",
+      "/docs/ai/landing/",
+      "/docs/ai/blog/",
+      "/docs/ai/app/",
+      "/docs/ai/docs/",
     ]);
-    expect(order.slice(18, 19)).toEqual(["/docs/tokens/"]);
+    expect(order.slice(19, 20)).toEqual(["/docs/tokens/"]);
     expect(order.at(-1)).toBe("/docs/accessibility/");
   });
 
-  it("numbers the Get started pages 1 to 13 (12 pages: 11 is Migrate a project to LUZ, 12 is How LUZ is built, 13 is More questions) in the reading order, with these titles", () => {
+  it("numbers the Get started pages 1 to 12 (12 pages: 10 is Migrate a project to LUZ, 11 is How LUZ is built, 12 is More questions; Working with AI and the commands are the area AI) in the reading order, with these titles", () => {
     const pages = readingOrder(site).filter((p) => p.meta.area === "get-started" && p.route !== "/docs/get-started/");
     const all = [site.byRoute.get("/docs/get-started/"), ...pages];
     expect(all.map((p) => [p.meta.order, p.meta.title])).toEqual([
@@ -852,20 +866,19 @@ describe("the LUZ docs site", () => {
       ["7", "JavaScript modules"],
       ["8", "Cascade layers"],
       ["9", "Print styles"],
-      ["10", "Working with AI"],
-      ["11", "Migrate a project to LUZ"],
-      ["12", "How LUZ is built"],
-      ["13", "More questions"],
+      ["10", "Migrate a project to LUZ"],
+      ["11", "How LUZ is built"],
+      ["12", "More questions"],
     ]);
   });
 
-  it("generates the AI files and rules tables on its page: generate: ai, Working with AI, after Print styles", () => {
-    const page = site.byRoute.get("/docs/get-started/ai/");
+  it("generates the AI files and rules tables on its page: generate: ai, Working with AI, the index of the area AI", () => {
+    const page = site.byRoute.get("/docs/ai/");
     expect(page?.meta.generate).toBe("ai");
-    expect(page?.meta.area).toBe("get-started");
+    expect(page?.meta.area).toBe("ai");
     expect(page?.meta.title).toBe("Working with AI");
     // the generator wrote the two tables under the hand-written sections
-    const html = rendered.get("/docs/get-started/ai/") ?? "";
+    const html = rendered.get("/docs/ai/") ?? "";
     expect(html, "the files table").toContain('id="files"');
     expect(html, "the rules table").toContain('id="rules"');
   });
@@ -902,17 +915,22 @@ describe("the LUZ docs site", () => {
         expect(link[2], `${route}: ${kind} has an aria-label`).toBe(false);
       }
     }
-    // Get started → Kinds of site → Tokens → Components → Catalog → HTML elements → Accessibility
-    expect(endOf(rendered.get("/docs/tokens/")).prev?.[0]).toBe("/docs/kinds/docs/");
-    expect(endOf(rendered.get("/docs/kinds/")).prev?.[0]).toBe("/docs/get-started/faq/");
+    // Get started → AI → Tokens → Components → Catalog → HTML elements → Accessibility
+    expect(endOf(rendered.get("/docs/tokens/")).prev?.[0]).toBe("/docs/ai/docs/");
+    expect(endOf(rendered.get("/docs/ai/")).prev?.[0]).toBe("/docs/get-started/faq/");
     expect(endOf(rendered.get("/docs/tokens/")).next?.[0]).toBe("/docs/tokens/color/");
-    expect(endOf(rendered.get("/docs/get-started/ai/")).next?.[0]).toBe("/docs/get-started/migrate/");
-    expect(endOf(rendered.get("/docs/get-started/migrate/")).prev?.[0]).toBe("/docs/get-started/ai/");
+    expect(endOf(rendered.get("/docs/ai/")).next?.[0]).toBe("/docs/ai/commands/");
+    expect(endOf(rendered.get("/docs/ai/commands/")).prev?.[0]).toBe("/docs/ai/");
+    expect(endOf(rendered.get("/docs/ai/commands/")).next?.[0]).toBe("/docs/ai/agents/");
+    expect(endOf(rendered.get("/docs/ai/agents/")).prev?.[0]).toBe("/docs/ai/commands/");
+    expect(endOf(rendered.get("/docs/ai/agents/")).next?.[0]).toBe("/docs/ai/landing/");
+    expect(endOf(rendered.get("/docs/get-started/print/")).next?.[0]).toBe("/docs/get-started/migrate/");
+    expect(endOf(rendered.get("/docs/get-started/migrate/")).prev?.[0]).toBe("/docs/get-started/print/");
     expect(endOf(rendered.get("/docs/get-started/migrate/")).next?.[0]).toBe("/docs/get-started/how-luz-is-built/");
     expect(endOf(rendered.get("/docs/get-started/how-luz-is-built/")).prev?.[0]).toBe("/docs/get-started/migrate/");
     expect(endOf(rendered.get("/docs/get-started/how-luz-is-built/")).next?.[0]).toBe("/docs/get-started/faq/");
     expect(endOf(rendered.get("/docs/get-started/faq/")).prev?.[0]).toBe("/docs/get-started/how-luz-is-built/");
-    expect(endOf(rendered.get("/docs/get-started/faq/")).next?.[0]).toBe("/docs/kinds/");
+    expect(endOf(rendered.get("/docs/get-started/faq/")).next?.[0]).toBe("/docs/ai/");
     expect(endOf(rendered.get("/docs/html/")).prev?.[0]).toMatch(/^\/docs\/catalog\//);
     expect(endOf(rendered.get("/docs/components/")).prev?.[0]).toMatch(/^\/docs\/tokens\//);
     expect(endOf(rendered.get("/docs/accessibility/")).prev?.[0]).toMatch(/^\/docs\/html\//);
@@ -954,7 +972,7 @@ describe("the LUZ docs site", () => {
     // A stylesheet with no class and no tag (one at-rule) has a page of its own, in the group site-wide
     const sheets = ["page-transition"];
     const layout = ["navbar", "sidebar", "terminal", "timeline"];
-    const elements = ["announcement", "cookie-consent", "embed", "chart", "theme-time", "faq", "lang-switch", "search", "submenu"];
+    const elements = ["announcement", "cookie-consent", "embed", "chart", "theme-time", "faq", "showcase", "marquee", "lang-switch", "search", "submenu"];
     expect(routes).toEqual(["/docs/catalog/", ...["classes", ...elements, ...layout, ...sheets, ...patterns].sort().map((slug) => `/docs/catalog/${slug}/`)]);
     const groups = site.pages.filter((p) => p.meta.area === "catalog" && p.meta.group && p.meta.group !== "reference").map((p) => p.route);
     expect(groups.sort()).toEqual([...elements, ...layout, ...sheets, ...patterns].sort().map((slug) => `/docs/catalog/${slug}/`));
@@ -1000,11 +1018,11 @@ describe("the LUZ docs site", () => {
     expect(chain, "catalog is no optional peer of anything now").not.toMatch(/optional peer|catalog optional/i);
   });
 
-  describe("the area Kinds of site (the plan ai-and-catalog-only, decisions 7 to 9)", () => {
-    // The four kinds that have a preset, each with its prompt and the docs area of its patterns
-    const KINDS = PROMPT_KINDS.filter((kind) => kind.preset);
+  describe("the area AI (the skill, its commands and agents, and the recipes of the four kinds of site)", () => {
+    // The four kinds of site, each with its page of recipes and the catalog patterns that fit it
+    const KINDS = FITS_KINDS.map((id) => ({ id }));
     const TITLES = { landing: "Landing page", blog: "Blog or newspaper", app: "Web application", docs: "Documentation site" };
-    const routeOfKind = (kind) => `/docs/kinds/${kind.id}/`;
+    const routeOfKind = (kind) => `/docs/ai/${kind.id}/`;
     const bodyOf = (page) => parse(page.body, page.file);
 
     // Every class a package publishes, from the manifests the build writes
@@ -1015,55 +1033,37 @@ describe("the LUZ docs site", () => {
         .flatMap((file) => JSON.parse(readFileSync(file, "utf-8")).classes.map((c) => c.name)),
     );
 
-    it("is an area of its own right after Get started, Kind of site in the A–Z index", () => {
+    it("is an area of its own right after Get started, AI in the A–Z index", () => {
       expect(KINDS.map((kind) => kind.id)).toEqual(["landing", "blog", "app", "docs"]);
       const ids = site.areas.map((a) => a.id);
-      expect(ids.slice(0, 2)).toEqual(["get-started", "kinds"]);
-      expect(site.areas.find((a) => a.id === "kinds")).toMatchObject({ label: "Kinds of site", slug: "kinds" });
-      expect(indexEntries(site)).toContainEqual({ name: "Landing page", href: "/docs/kinds/landing/", kind: "Kind of site" });
+      expect(ids.slice(0, 2)).toEqual(["get-started", "ai"]);
+      expect(site.areas.find((a) => a.id === "ai")).toMatchObject({ label: "AI", slug: "ai", package: "@luz-ds/ai" });
+      expect(site.areas.find((a) => a.id === "kinds")).toBeUndefined();
+      expect(indexEntries(site)).toContainEqual({ name: "Landing page", href: "/docs/ai/landing/", kind: "AI" });
     });
 
-    it("has a hub and one page for each kind, with these titles, in the order landing, blog, app, docs", () => {
-      const pages = site.pages.filter((p) => p.meta.area === "kinds").sort((a, b) => Number(a.meta.order) - Number(b.meta.order));
-      expect(pages.map((p) => p.route)).toEqual(["/docs/kinds/", ...KINDS.map(routeOfKind)]);
+    it("has the index (Working with AI), the commands, the agents and one page for each kind, with these titles, in this order", () => {
+      const pages = site.pages.filter((p) => p.meta.area === "ai").sort((a, b) => Number(a.meta.order) - Number(b.meta.order));
+      expect(pages.map((p) => p.route)).toEqual(["/docs/ai/", "/docs/ai/commands/", "/docs/ai/agents/", ...KINDS.map(routeOfKind)]);
+      expect(pages.slice(0, 3).map((p) => p.meta.title)).toEqual(["Working with AI", "The commands of /luz", "The agents and skills of /luz"]);
       for (const kind of KINDS) expect(site.byRoute.get(routeOfKind(kind)).meta.title, kind.id).toBe(TITLES[kind.id]);
-      expect(site.byRoute.get("/docs/kinds/").meta.title).toBe("Kinds of site");
     });
 
-    it("opens the prompt of its kind with one opener at the top: a link to /prompts/<id>.txt that JavaScript turns into the dialog", () => {
-      for (const kind of KINDS) {
-        const page = site.byRoute.get(routeOfKind(kind));
-        const openers = findAll(bodyOf(page), (n) => n.attrs.has("data-prompt-open"));
-        expect(openers, kind.id).toHaveLength(1);
-        const [opener] = openers;
-        expect(opener.name, kind.id).toBe("a");
-        expect(opener.attrs.get("href"), kind.id).toBe(promptRoute(kind.id));
-        expect(opener.attrs.get("data-prompt-title")?.trim().length, `${kind.id}: the title of the dialog`).toBeGreaterThan(5);
-        expect(textOf(opener).length, `${kind.id}: the name of the link`).toBeGreaterThan(3);
-        // At the top: before the first recipe
-        const firstRecipe = queryAllLive(bodyOf(page), "h2")[0];
-        expect(opener.open.index, kind.id).toBeLessThan(firstRecipe.open.index);
+    it("has no prompt left: no opener of a prompt, no dialog, no link to /prompts/ on any page of the area", () => {
+      for (const page of site.pages.filter((p) => p.meta.area === "ai")) {
+        expect(page.body, page.route).not.toContain("data-prompt-open");
+        expect(page.body, page.route).not.toContain("luz:include prompt-dialog");
+        expect(page.body, page.route).not.toMatch(/\/prompts\/[a-z]+\.txt/);
+        expect(rendered.get(page.route), page.route).not.toContain("site-prompt-dialog");
       }
     });
 
-    it("includes the dialog of the prompts once, and the rendered page holds one", () => {
-      for (const kind of KINDS) {
-        const page = site.byRoute.get(routeOfKind(kind));
-        expect(page.body.match(/<!-- luz:include prompt-dialog -->/g), kind.id).toHaveLength(1);
-        expect(rendered.get(routeOfKind(kind)).match(/<template id="site-prompt-dialog"/g), kind.id).toHaveLength(1);
-      }
-    });
-
-    it("has the prompt opener of the general prompt, start.txt, on the hub, and the dialog once", () => {
-      const page = site.byRoute.get("/docs/kinds/");
-      const openers = findAll(bodyOf(page), (n) => n.attrs.has("data-prompt-open"));
-      expect(openers.map((n) => n.attrs.get("href"))).toEqual([promptRoute("start")]);
-      expect(page.body.match(/<!-- luz:include prompt-dialog -->/g)).toHaveLength(1);
-      // The hub is a gallery of the four, in order
-      const links = queryAllLive(parse(rendered.get("/docs/kinds/"), "/docs/kinds/"), "a").map((a) => a.attrs.get("href"));
-      const galleries = KINDS.map((kind) => links.indexOf(routeOfKind(kind)));
-      for (const index of galleries) expect(index).toBeGreaterThanOrEqual(0);
-      expect(galleries).toEqual([...galleries].sort((a, b) => a - b));
+    it("links the four kinds from the index, in order, and the commands and the agents", () => {
+      const links = queryAllLive(parse(rendered.get("/docs/ai/"), "/docs/ai/"), "a").map((a) => a.attrs.get("href"));
+      const kinds = KINDS.map((kind) => links.indexOf(routeOfKind(kind)));
+      for (const index of kinds) expect(index).toBeGreaterThanOrEqual(0);
+      expect(kinds).toEqual([...kinds].sort((a, b) => a - b));
+      expect(links).toContain("/docs/ai/commands/");
     });
 
     it("gives each recipe an h2, a docs-snippet of markup to copy and a link to its pattern in the area of the kind", () => {
@@ -1120,7 +1120,7 @@ describe("the LUZ docs site", () => {
     });
 
     it("says on the blog page that it works with any CMS", () => {
-      const page = site.byRoute.get("/docs/kinds/blog/");
+      const page = site.byRoute.get("/docs/ai/blog/");
       const text = decodeEntities(page.body.replace(/<[^>]*>/g, " ")).replace(/\s+/g, " ");
       expect(text).toMatch(/\bany CMS\b/);
       expect(page.meta.description).toMatch(/\bany CMS\b/);
@@ -1128,23 +1128,24 @@ describe("the LUZ docs site", () => {
 
     it("invents no class: every luz-*, o-* and u-* in a page, its demos and its markup is one a package publishes", () => {
       expect(published.size, "packages/*/dist/classes.json (run pnpm build)").toBeGreaterThan(200);
-      const kindsPages = site.pages.filter((p) => p.meta.area === "kinds");
-      expect(kindsPages, "the hub and the four kinds").toHaveLength(5);
+      const kindsPages = site.pages.filter((p) => p.meta.area === "ai" && KINDS.some((kind) => p.route === routeOfKind(kind)));
+      expect(kindsPages, "the four kinds").toHaveLength(4);
       for (const page of kindsPages) {
         // class="…" in a demo, and class=&quot;…&quot; in the escaped markup of a snippet
         const used = new Set();
         for (const [, plain, escaped] of page.body.matchAll(/\bclass=(?:"([^"]*)"|&quot;(.*?)&quot;)/g)) {
           for (const name of decodeEntities(plain ?? escaped ?? "").split(/\s+/)) if (/^(?:luz-|o-|u-)/.test(name)) used.add(name);
         }
-        if (page.route !== "/docs/kinds/") expect(used.size, page.route).toBeGreaterThan(5);
+        expect(used.size, page.route).toBeGreaterThan(5);
         expect([...used].filter((name) => !published.has(name)).sort(), page.route).toEqual([]);
       }
     });
 
-    it("has a Spanish page for the hub and each kind, pending review", () => {
-      for (const file of ["index", ...KINDS.map((kind) => kind.id)]) {
-        const path = join(repo, "apps/docs/i18n/es/pages/kinds", `${file}.html`);
-        expect(existsSync(path), `kinds/${file}.html in Spanish`).toBe(true);
+    it("has a Spanish page for the index, the commands, the agents and each kind, pending review, and none left in kinds/", () => {
+      expect(existsSync(join(repo, "apps/docs/i18n/es/pages/kinds")), "no Spanish kinds/ folder").toBe(false);
+      for (const file of ["index", "commands", "agents", ...KINDS.map((kind) => kind.id)]) {
+        const path = join(repo, "apps/docs/i18n/es/pages/ai", `${file}.html`);
+        expect(existsSync(path), `ai/${file}.html in Spanish`).toBe(true);
         const head = readFileSync(path, "utf-8").split("-->")[0];
         expect(head, file).toMatch(/^reviewed: false$/m);
       }
@@ -1229,7 +1230,7 @@ describe("the LUZ docs site", () => {
     expect(rendered.get("/404.html")).not.toContain("theme-light.css");
   });
 
-  it("the not-found page keeps the drawer the header's menu button opens, with the site links only", () => {
+  it("the not-found page keeps the drawer the header's menu button opens, with the site links only: the four sections, Documentation and GitHub", () => {
     const dom = parse(rendered.get("/404.html"), "/404.html");
     const drawer = query(dom, "nav.luz-sidebar.page-nav.page-nav--drawer");
     expect(drawer, "nav.page-nav--drawer").not.toBeNull();
@@ -1237,7 +1238,7 @@ describe("the LUZ docs site", () => {
     expect(drawer.attrs.has("popover")).toBe(true);
     expect(query(dom, "button.luz-nav-toggle").attrs.get("popovertarget")).toBe("page-nav");
     const hrefs = findAll(drawer, (n) => n.name === "a").map((a) => a.attrs.get("href"));
-    expect(hrefs).toEqual(["/docs/", "https://github.com/nandovejer/luz"]);
+    expect(hrefs).toEqual(["/ai/", "/tokens/", "/core/", "/catalog/", "/docs/", "https://github.com/nandomunoz/luz"]);
   });
 
   it("the not-found page has a decorative \"SYSTEM FAILURE\" first in the main, and its one h1 in a visually hidden wrapper", () => {

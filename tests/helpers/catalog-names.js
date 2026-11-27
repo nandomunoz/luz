@@ -6,7 +6,7 @@
  *
  *   PATTERNS      the 26 stylesheets of the patterns of a kind of site, `components/<block>.css`
  *   ANY_SITE      the patterns whose page says `fits-kinds: any`: no kind owns their file
- *   ELEMENTS      the nine elements, with their stylesheet and, if they have one, their chunk
+ *   ELEMENTS      the eleven elements, with their stylesheet and, if they have one, their chunk
  *   LAYOUT        the four that came from core in F7 (unchanged by F8)
  *   CLASSES       old class -> new class, row by row of table 1 of the changeset
  *   TAGS          old element -> new element
@@ -32,7 +32,7 @@ export const LAYOUT = ["navbar", "sidebar", "terminal", "timeline"];
  */
 export const SHEETS_ONLY = ["page-transition"];
 
-/** The nine elements: tag (or class) of each, its stylesheet and its chunk. */
+/** The eleven elements: tag (or class) of each, its stylesheet and its chunk. */
 export const ELEMENTS = [
   { name: "search", tag: "luz-search", css: "search", chunk: "search" },
   { name: "cookie-consent", tag: "luz-cookie-consent", css: "cookie-consent", chunk: "cookie-consent" },
@@ -42,6 +42,10 @@ export const ELEMENTS = [
   { name: "submenu", tag: "luz-submenu", css: "submenu", chunk: null },
   { name: "announcement", tag: "luz-announcement", css: "announcement", chunk: null },
   { name: "faq", tag: "luz-faq", css: "faq", chunk: null },
+  // A row of links, each a logo and a name, still (CSS-only, 2026-11)
+  { name: "showcase", tag: "luz-showcase", css: "showcase", chunk: null },
+  // Content that loops along one line, in two copies: a ticker of phrases, a row of links, a showcase (CSS-only, 2026-11)
+  { name: "marquee", tag: "luz-marquee", css: "marquee", chunk: null },
   // The facade of a player of another origin, 2026-11 (the component-gaps plan)
   { name: "embed", tag: "luz-embed", css: "embed", chunk: "embed" },
   // A line chart drawn from the author's own table, 2026-11

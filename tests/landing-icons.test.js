@@ -35,20 +35,23 @@ describe("the icons of the home page follow the one family of the Icons page", (
     const widths = [...html.matchAll(/\bstroke-width\s*=\s*"?([^"\s>]+)/g)].map((m) => m[1]);
     expect(widths.length, "the symbols of the sprite carry theirs").toBeGreaterThan(0);
     expect(widths.filter((w) => w !== "1.5")).toEqual([]);
-    // and none in a style rule of the page either, but the 1.5 of .ic
-    const inCss = [...css.matchAll(/stroke-width\s*:\s*([^;}]+)/g)].map((m) => m[1].trim());
+    // and none in a style rule of the page either, but the 1.5 of .ic. The frames of the hero's tunnel are
+    // not icons (a drawing behind the copy, not in the sprite): on a phone they are a thinner 1.25, which
+    // tests/landing-tunnel.test.js holds
+    const rules = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)].filter(([, selector]) => !selector.includes(".landing-tunnel"));
+    const inCss = rules.flatMap(([, , body]) => [...body.matchAll(/stroke-width\s*:\s*([^;}]+)/g)].map((m) => m[1].trim()));
     expect(inCss.filter((w) => w !== "1.5")).toEqual([]);
   });
 
   it("puts every symbol of the sprite on the 24 grid", () => {
     const symbols = findAll(tree, (n) => n.name === "symbol");
-    expect(symbols.length).toBeGreaterThanOrEqual(14);
+    expect(symbols.length).toBeGreaterThanOrEqual(12);
     expect(symbols.filter((s) => s.attrs.get("viewbox") !== "0 0 24 24").map((s) => s.attrs.get("id"))).toEqual([]);
   });
 
   it("draws an inline icon of the page as shapes straight in its svg, with no group that carries the stroke", () => {
     const inline = findAll(tree, (n) => n.name === "svg" && (n.attrs.get("class") ?? "").split(/\s+/).includes("ic") && !find(n, (c) => c.name === "use"));
-    expect(inline.length, "the inline icons of the levels, the kinds and the eyebrows").toBeGreaterThan(8);
+    expect(inline.length, "the inline icons of the points of the levels").toBeGreaterThan(0);
     const grouped = inline.filter((svg) => queryAll(svg, "g").length > 0);
     expect(grouped).toHaveLength(0);
     for (const svg of inline) expect(svg.attrs.get("viewbox")).toBe("0 0 24 24");

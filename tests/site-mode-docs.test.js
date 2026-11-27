@@ -324,7 +324,7 @@ describe("what Auto does that a reader would not expect: in the accessibility st
     expect(t).toMatch(/without JavaScript[^.]*\bno radio\b[^.]*\bchecked\b/i);
   });
 
-  it("the hour of the day applies only when the slider of the home page picks it", () => {
+  it("the hour of the day applies only when a slider picks it", () => {
     expect(statement()).toMatch(/\bhour\b[^.]*\bonly when\b[^.]*\bslider\b/i);
   });
 

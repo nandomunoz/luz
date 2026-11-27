@@ -25,6 +25,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import * as i18n from "../scripts/docs-site/i18n.js";
 import { buildSite, landingDocuments, scanSite } from "../scripts/docs-site/site.js";
 import { makeSite } from "./helpers/docs-i18n-size-fixture.js";
+import { LEVEL_NAMES, levelPagesOf } from "./helpers/level-pages.js";
 
 const repo = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (path) => readFileSync(join(repo, path), "utf-8");
@@ -160,13 +161,13 @@ afterEach(() => {
 
 /**
  * The real home and its docs in a throwaway repository (the generator writes the home's weights,
- * lists and checks from the repository for every language), whose English `hero.lead` says `value`.
+ * lists and checks from the repository for every language), whose English `hero.docs` (the hero's second button, a text written as it is) says `value`.
  */
 function fixture(value) {
   const site = makeSite({ languages: [] });
   temps.push(site.repoRoot);
   const path = join(site.repoRoot, "apps/landing/i18n/en.json");
-  writeFileSync(path, JSON.stringify({ ...JSON.parse(readFileSync(path, "utf-8")), "hero.lead": value }, null, 2));
+  writeFileSync(path, JSON.stringify({ ...JSON.parse(readFileSync(path, "utf-8")), "hero.docs": value }, null, 2));
   return site.repoRoot;
 }
 
@@ -176,7 +177,7 @@ const BUILD_TIMEOUT = 30_000;
 const buildFixture = (root) => {
   const site = scanSite(join(root, "apps/docs"), root);
   const html = readFileSync(join(root, "apps/landing/index.html"), "utf-8");
-  return buildSite(site, { extra: landingDocuments(site, "apps/landing/index.html", html) });
+  return buildSite(site, { extra: [...landingDocuments(site, "apps/landing/index.html", html), ...levelPagesOf(site, html, root)] });
 };
 
 describe("an unknown {n:name} fails the build with file:line", () => {
@@ -202,7 +203,7 @@ describe("the numbers in the pages of the LUZ home, in every language", () => {
   const site = scanSite(join(repo, "apps/docs"), repo);
   const template = read("apps/landing/index.html");
   const docs = landingDocuments(site, "apps/landing/index.html", template);
-  const { rendered, problems } = buildSite(site, { extra: docs });
+  const { rendered, problems } = buildSite(site, { extra: [...docs, ...levelPagesOf(site, template)] });
   const counts = countsFromPackages();
   const esc = (value) => String(value).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   const expand = (value) => value.replace(/\{n:(\w+)\}/g, (_, name) => String(counts[name]));
@@ -227,7 +228,8 @@ describe("the numbers in the pages of the LUZ home, in every language", () => {
 
   it("each page has the count written by the build where the catalog has its placeholder, and no placeholder left", () => {
     for (const doc of docs) {
-      const html = rendered.get(doc.route);
+      // the home of the language and the pages of its levels, which share its catalog
+      const html = [doc.route, ...LEVEL_NAMES.map((name) => `${doc.route}${name}/`)].map((route) => rendered.get(route) ?? "").join("\n");
       const code = doc.locale.code;
       expect(html, code).not.toMatch(/\{n:/);
       for (const [key, value] of withNumbers(code)) {

@@ -38,12 +38,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/nandovejer/luz.git",
+    "url": "https://github.com/nandomunoz/luz.git",
     "directory": "packages/core"
   },
-  "homepage": "https://github.com/nandovejer/luz#readme",
+  "homepage": "https://github.com/nandomunoz/luz#readme",
   "bugs": {
-    "url": "https://github.com/nandovejer/luz/issues"
+    "url": "https://github.com/nandomunoz/luz/issues"
   },
   "keywords": [
     "design-system",
@@ -65,7 +65,7 @@
     "access": "public"
   },
   "peerDependencies": {
-    "@luz-ds/tokens": "^0.1.0 || ^0.2.0 || ^0.3.0 || ^0.4.0"
+    "@luz-ds/tokens": "^0.1.0 || ^0.2.0 || ^0.3.0 || ^0.4.0 || ^0.5.0"
   },
   "devDependencies": {
     "@luz-ds/tokens": "workspace:*"

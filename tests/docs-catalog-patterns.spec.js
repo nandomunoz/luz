@@ -8,7 +8,7 @@
  *      Charts, Site-wide, Documentation and Reference, each with its pages (in English and in Spanish); since F7 the navbar and
  *      the sidebar are in Navigation, and the terminal and the timeline in Content (they came from core)
  *   2  a pattern page says where it fits best, "Fits best: <kinds> - <sentence>", under the lead and above the
- *      chips, each kind a link to /docs/kinds/<kind>/ and "any site" no link; the card of the gallery says it too;
+ *      chips, each kind a link to /docs/ai/<kind>/ and "any site" no link; the card of the gallery says it too;
  *      in Spanish, in the words of the language; a page of core has no such line
  *   3  the four areas of the packages that are gone (/docs/landing/, /docs/cms/, /docs/app/, /docs/documentation/),
  *      their pages and their templates answer 404, in English and in Spanish, and neither the search index
@@ -31,7 +31,7 @@ const read = (/** @type {string} */ path) => readFileSync(fromRepo(path), 'utf-8
 const GROUPS = [
   { id: 'navigation', en: 'Navigation', pages: ['app-bar', 'lang-switch', 'masthead', 'navbar', 'sidebar', 'site-header', 'submenu'] },
   { id: 'page-structure', en: 'Page structure', pages: ['article-header', 'hero', 'page-header', 'section', 'site-footer'] },
-  { id: 'content', en: 'Content', pages: ['embed', 'faq', 'post-list', 'social', 'stat', 'terminal', 'timeline', 'toc'] },
+  { id: 'content', en: 'Content', pages: ['embed', 'faq', 'marquee', 'post-list', 'showcase', 'social', 'stat', 'terminal', 'timeline', 'toc'] },
   { id: 'charts', en: 'Charts', pages: ['bar-list', 'chart', 'column-chart', 'dashboard', 'heat-map', 'ring', 'stacked-bar'] },
   { id: 'site-wide', en: 'Site-wide', pages: ['announcement', 'theme-time', 'cookie-consent', 'search', 'page-transition'] },
   { id: 'documentation', en: 'Documentation', pages: ['do-dont', 'doc-header', 'docs-layout', 'example', 'page-footer', 'page-rail', 'pager'] },
@@ -57,6 +57,10 @@ const KIND_OF = {
   navbar: ['any'], sidebar: ['docs', 'app'], terminal: ['docs'], timeline: ['blog', 'landing'],
   // The components with data of the site fit any
   search: ['any'], 'cookie-consent': ['any'], 'theme-time': ['any'], 'lang-switch': ['any'], submenu: ['any'], announcement: ['any'], faq: ['any'], embed: ['any'], chart: ['any'],
+  // A row of the sites built with LUZ, as logos and names: the landing page's band of users
+  showcase: ['landing'],
+  // Content that loops along one line (a ticker, or the showcase): the landing page's band of users moves in it
+  marquee: ['landing'],
   // Link a stylesheet and the pages fade into one another: no class, no tag, any site
   'page-transition': ['any'],
 };
@@ -96,7 +100,11 @@ test.describe('Catalog has seven groups, in the sidebar and in the gallery', () 
       const fold = page.locator('nav.luz-docs-nav ul.docs-nav > li', { has: page.locator('> a#a-catalog') });
       await expect(fold.locator('details[open]')).toHaveCount(1);
       const labels = fold.locator('li.docs-nav__group > .luz-sidebar__section-label');
-      await expect(labels).toHaveText(GROUPS.map((group) => groupLabel(code, group)));
+      // The HTML elements are nested in Catalog (`nestIn`, owner 2026-11-25): a labelled group at the end of the fold, after the seven of Catalog
+      const htmlLabel = code === 'en' ? 'HTML elements' : strings(code)['area.html'];
+      await expect(labels).toHaveText([...GROUPS.map((group) => groupLabel(code, group)), htmlLabel]);
+      await expect(fold.locator('li.docs-nav__group').last().locator('> .luz-sidebar__section-label'), 'the HTML elements are the last group').toHaveText(htmlLabel);
+      await expect(fold.locator('ul[aria-labelledby="nav-html"] a').first(), 'its first link is the index of the area').toHaveAttribute('href', `${prefix}/docs/html/`);
       for (const group of GROUPS) {
         const list = fold.locator(`ul[aria-labelledby="nav-${group.id}"]`);
         await expect(list, group.id).toBeVisible();
@@ -104,7 +112,7 @@ test.describe('Catalog has seven groups, in the sidebar and in the gallery', () 
         expect([...hrefs].sort(), `the pages of ${group.id}`).toEqual(group.pages.map((slug) => `${prefix}/docs/catalog/${slug}/`).sort());
       }
       // Each page is in one group only
-      const all = await fold.locator('ul.docs-nav__pages a').evaluateAll((links) => links.map((a) => a.getAttribute('href')));
+      const all = await fold.locator('li.docs-nav__group:not(:has(#nav-html)) ul.docs-nav__pages a').evaluateAll((links) => links.map((a) => a.getAttribute('href')));
       expect(new Set(all).size, 'no page twice').toBe(all.length);
       expect(all.length).toBe(PATTERNS.length + 1);
     });
@@ -152,7 +160,7 @@ test.describe('every pattern page says where it fits best', () => {
         else {
           await expect(links).toHaveCount(kinds.length);
           for (const [i, kind] of kinds.entries()) {
-            await expect(links.nth(i)).toHaveAttribute('href', `${prefix}/docs/kinds/${kind}/`);
+            await expect(links.nth(i)).toHaveAttribute('href', `${prefix}/docs/ai/${kind}/`);
             await expect(links.nth(i)).toHaveText(kindWord(code, kind));
           }
         }
@@ -183,12 +191,12 @@ test.describe('every pattern page says where it fits best', () => {
   test('the lines of the pages are the lines of the kinds: landing is a link on the page of the Hero and any site is not one on the Announcement', async ({ page }) => {
     await page.goto('/docs/catalog/hero/');
     await expect(page.locator('p.docs-fits')).toHaveText('Fits best: landing — the top of a landing page, under the header');
-    await expect(page.locator('p.docs-fits a')).toHaveAttribute('href', '/docs/kinds/landing/');
+    await expect(page.locator('p.docs-fits a')).toHaveAttribute('href', '/docs/ai/landing/');
     await page.goto('/docs/catalog/announcement/');
     await expect(page.locator('p.docs-fits')).toHaveText('Fits best: any site — a short notice for every visitor, such as a sale or planned maintenance');
     await page.goto('/docs/catalog/masthead/');
     await expect(page.locator('p.docs-fits a')).toHaveText('blog');
-    await expect(page.locator('p.docs-fits a')).toHaveAttribute('href', '/docs/kinds/blog/');
+    await expect(page.locator('p.docs-fits a')).toHaveAttribute('href', '/docs/ai/blog/');
     await page.goto('/docs/catalog/site-header/');
     await expect(page.locator('p.docs-fits a')).toHaveText(['landing', 'blog']);
   });
@@ -229,7 +237,8 @@ test.describe('the four areas of the packages that are gone are not served', () 
     await page.goto('/docs/catalog/hero/');
     const hrefs = await page.locator('nav.luz-docs-nav a').evaluateAll((links) => links.map((a) => a.getAttribute('href') ?? ''));
     expect(hrefs.filter((href) => /^\/docs\/(landing|cms|app|documentation)\//.test(href))).toEqual([]);
-    await expect(page.locator('a.docs-nav__area')).toHaveText(['Get started', 'Kinds of site', 'Tokens', 'Core', 'Catalog', 'HTML elements', 'Accessibility']);
+    // The HTML elements have no area link: they are a group in the fold of Catalog (tests/docs-nav-nested.test.js)
+    await expect(page.locator('a.docs-nav__area')).toHaveText(['Get started', 'AI', 'Tokens', 'Core', 'Catalog', 'Accessibility']);
   });
 
   test('the files of the four packages are not served', async ({ request }) => {

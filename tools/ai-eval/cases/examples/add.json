@@ -1,0 +1,17 @@
+{
+  "example": "add",
+  "case": "add",
+  "model": "sonnet",
+  "date": "2026-11-25",
+  "skillVersion": "0.1.0",
+  "turns": [
+    {
+      "user": "/luz add luz-agent-accessibility",
+      "assistant": "`luz-agent-accessibility` exists, and it has no fields to fill. It reads your project's HTML, CSS and JavaScript and reviews them against WCAG 2.2 AA and EN 301 549. It reads source files only and writes nothing. I haven't written anything yet.\n\n**Plan**\n- Write one file, `.claude/agents/luz-agent-accessibility.md` (9461 bytes). The dry-run confirmed the path and size.\n- Run this command after your \"go\":\n  `node .claude/skills/luz/scripts/luz.mjs agent add luz-agent-accessibility --for claude`\n- Nothing is overwritten, because I won't pass `--force`.\n- The agent is also available for `gemini` and `codex`. The dry-run above was for `claude` only.\n\n**Questions**\n1. Which assistants should get the agent? I recommend `claude`, since you're working in Claude Code. If you want `gemini` or `codex` too, tell me and I'll dry-run those. Codex can't limit the agent's tools in its file.\n2. Say \"go\" to write it.\n\nAfter it's written, the script's check can confirm the file's front matter. It can't tell you whether the agent's accessibility findings are right, so a person still has to review those."
+    },
+    {
+      "user": "go",
+      "assistant": "I added the agent for Claude. It's now at `.claude/agents/luz-agent-accessibility.md` (9461 bytes), and nothing else was written or overwritten.\n\n`doctor` now checks 2 files with 0 problems and 0 warnings. That check covers the front matter only.\n\n**What's left for you:**\n- The agent has no fields to fill, so it's ready to use. It reads your project's files and writes nothing.\n- Its findings are a review aid, not a conformance result. Contrast, alt text, labels and screen reader behavior still need a person to check them.\n- I wrote it for `claude` only. If you also want `gemini` or `codex`, say so and I'll dry-run those first."
+    }
+  ]
+}

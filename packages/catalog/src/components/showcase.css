@@ -1,0 +1,62 @@
+/* ==========================================================================
+	 LUZ Catalog: showcase, <luz-showcase>.
+	 A band of the sites, products or people a page wants to show: each one a
+	 link with its logo and its name, in a row that wraps, centred. The list
+	 is a native ul of links; the logo is a decorative svg or img before the
+	 name, and the name is the link's name. A CSS-only tag: no script defines
+	 it, so every selector that names it is wholly inside :where().
+
+	 To make it move, put it in a <luz-marquee> (written twice, the copy
+	 aria-hidden="true"): the marquee holds the motion, this tag only the row.
+
+	 @element luz-showcase - CSS-only: no script defines this tag. A row of links, each a logo and a name: the sites built with something, its users or its sponsors.
+	 ========================================================================== */
+
+:where(luz-showcase) {
+	display: block;
+	font-family: var(--luz-font-sans);
+}
+
+/* The still row: wraps, centred */
+:where(luz-showcase > ul) {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: center;
+	gap: var(--luz-space-sm) var(--luz-space-2xl);
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+/* Core's rule for a bare list adds a margin between its items: none here */
+:where(luz-showcase li) {
+	margin: 0;
+}
+
+/* A link: its logo and its name, quiet until it is pointed at or focused */
+:where(luz-showcase a) {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5em;
+	min-block-size: var(--luz-control-md);
+	color: var(--luz-text-secondary);
+	font-size: var(--luz-text-xl);
+	font-weight: 600;
+	line-height: 1.2;
+	text-decoration: none;
+	white-space: nowrap;
+	transition: color var(--luz-duration-base);
+}
+
+:where(luz-showcase a:hover, luz-showcase a:focus-visible) {
+	color: var(--luz-text-primary);
+}
+
+/* The logo follows the text: an svg in currentColor takes the link's colour */
+:where(luz-showcase a > svg, luz-showcase a > img) {
+	flex: none;
+	inline-size: 1.5em;
+	block-size: 1.5em;
+	object-fit: contain;
+}

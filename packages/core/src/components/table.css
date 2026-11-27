@@ -76,8 +76,7 @@
    end is the left edge. In the stacked card layout the value is already
    at the end of its row; only the figures stay tabular.
 --------------------------------------------------------------------- */
-.luz-table th.luz-table__numeric,
-.luz-table td.luz-table__numeric {
+.luz-table :is(th, td).luz-table__numeric {
   text-align: end;
   font-variant-numeric: tabular-nums;
 }
@@ -89,12 +88,7 @@
    stays, so the text is no harder to read. Placed before the container
    query below on purpose, so a stacked card keeps its own padding.
 --------------------------------------------------------------------- */
-.luz-table--compact th {
-  padding-block: var(--luz-space-2xs);
-  padding-inline: var(--luz-space-sm);
-}
-
-.luz-table--compact td {
+.luz-table--compact :is(th, td) {
   padding-block: var(--luz-space-2xs);
   padding-inline: var(--luz-space-sm);
 }
@@ -105,8 +99,7 @@
    The wrapper should also have:
    role="region"  aria-label="…"  tabindex="0"
 --------------------------------------------------------------------- */
-.luz-table--sticky-col th:first-child,
-.luz-table--sticky-col td:first-child {
+.luz-table--sticky-col :is(th, td):first-child {
   position: sticky;
   inset-inline-start: 0;
 }
@@ -135,14 +128,12 @@
   /* Visually hidden thead — kept in DOM for screen readers */
   .luz-table thead {
     position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
+    inline-size: 1px;
+    block-size: 1px;
     margin: -1px;
     overflow: hidden;
-    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
     white-space: nowrap;
-    border: 0;
   }
 
   /* A heading that holds a link or a button, such as a column you sort,
@@ -156,6 +147,7 @@
     block-size: auto;
     margin: 0 0 var(--luz-space-sm);
     overflow: visible;
+    clip-path: none;
     white-space: normal;
   }
 
@@ -198,7 +190,7 @@
     justify-content: space-between;
     align-items: baseline;
     gap: var(--luz-space-md);
-    padding: var(--luz-space-xs) var(--luz-space-sm);
+    padding: var(--luz-space-xs);
     border-block-end: 1px solid var(--luz-divider);
   }
 
@@ -223,20 +215,14 @@
   }
 
   /* No sticky column — no horizontal overflow in stacked mode */
-  .luz-table--sticky-col th:first-child,
-  .luz-table--sticky-col td:first-child {
+  .luz-table--sticky-col :is(th, td):first-child {
     position: static;
   }
-}
 
-/* Cell padding follows the same container as the stacking above, not the
-   window: a narrow table in a wide page reduces its padding too */
-@container (max-width: 480px) {
+  /* Cell padding follows the same container as the stacking, not the
+     window: a narrow table in a wide page reduces its padding too (the
+     cells' own is in the key-value rule above) */
   .luz-table th {
     padding: var(--luz-space-2xs) var(--luz-space-xs);
-  }
-
-  .luz-table td {
-    padding: var(--luz-space-xs);
   }
 }

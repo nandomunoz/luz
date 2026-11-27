@@ -8,7 +8,9 @@
  *              (the rail is before main in the markup, and the grid places it: the
  *              third column from 80rem, above the content below it)
  *   sidebar    an accordion: every area of site.json with pages is a native details (one name), open only for
- *              the area of the current page, every page listed (tests/docs-nav-fold.test.js holds the markup)
+ *              the area of the current page, every page listed (tests/docs-nav-fold.test.js holds the markup); an area
+ *              with `nestIn` (the HTML elements, in Catalog) has no link or fold of its own: its pages are a group in
+ *              the fold of its host, which is the open one on them (tests/docs-nav-nested.test.js)
  *   page head  header.luz-doc-header: eyebrow "Area · Group", h1, lead and,
  *              on a component or pattern page, the chips
  *   rail       "On this page" (outside main) and the three actions
@@ -46,8 +48,8 @@ import { find, findAll, hasClass, isInside, matcher, parse, query, queryAll, que
 import { PATTERN_AREAS, eyebrowPackageOf } from "./helpers/package-areas.js";
 
 const repo = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const EDIT = "https://github.com/nandovejer/luz/edit/main/";
-const ISSUES = "https://github.com/nandovejer/luz/issues/new?title=";
+const EDIT = "https://github.com/nandomunoz/luz/edit/main/";
+const ISSUES = "https://github.com/nandomunoz/luz/issues/new?title=";
 
 /* ---- Helpers ---------------------------------------------------------------- */
 
@@ -303,6 +305,9 @@ describe("the shell: body.o-shell.luz-docs-layout, the sidebar, the rail, then m
  * =================================================================================== */
 
 describe("the sidebar: every area a fold, only the current one open, every page listed", () => {
+  /** The area whose item holds the area of a page: itself, or the area it is nested in (the HTML elements, in Catalog). */
+  const hostOf = (area) => (area?.nestIn ? site.areas.find((a) => a.id === area.nestIn) : area);
+
   /** The page links of the sidebar, without the site links (Home, Docs, GitHub) the drawer starts with. */
   const pageLinks = (root) => {
     // Until the shell classes exist (the first describe) the sidebar is the core one: the list is checked on it
@@ -328,8 +333,14 @@ describe("the sidebar: every area a fold, only the current one open, every page 
       const nav = queryLive(treeOf(p.route), "nav.luz-docs-nav") ?? query(treeOf(p.route), "nav.luz-sidebar");
       expect(query(nav, "ul.docs-nav"), `${p.route} ul.docs-nav`).toBeTruthy();
       const areas = queryAll(nav, "a.docs-nav__area").map((a) => a.attrs.get("href"));
-      // Every area, HTML elements included, is an area link of the list: no area is nested in another
-      expect(areas, p.route).toEqual(site.areas.map((a) => `/docs/${a.slug}/`));
+      // Every area is an area link of the list but the nested one, which is a group in the fold of its host
+      expect(areas, p.route).toEqual(site.areas.filter((a) => !a.nestIn).map((a) => `/docs/${a.slug}/`));
+      for (const nested of site.areas.filter((a) => a.nestIn)) {
+        expect(areas, `${p.route}: ${nested.id} has no area link`).not.toContain(`/docs/${nested.slug}/`);
+        const host = queryAll(nav, "a.docs-nav__area").find((a) => a.attrs.get("id") === `a-${nested.nestIn}`).parent;
+        const group = findAll(host, (n) => hasClass(n, "docs-nav__group")).find((g) => query(g, ".luz-sidebar__section-label").attrs.get("id") === `nav-${nested.id}`);
+        expect(group, `${p.route}: ${nested.id} is a group in the fold of ${nested.nestIn}`).toBeTruthy();
+      }
       expect(queryAll(nav, "a.docs-nav__subarea"), `${p.route} sub-areas`).toEqual([]);
     }
   });
@@ -340,7 +351,8 @@ describe("the sidebar: every area a fold, only the current one open, every page 
       const folds = findAll(nav, (n) => n.name === "details");
       expect(folds.length, `${p.route}: the areas with pages are folds`).toBeGreaterThan(0);
       expect(folds.map((n) => n.attrs.get("name")), `${p.route}: one name makes it an accordion`).toEqual(folds.map(() => "nav"));
-      const area = areaOf(site, p);
+      // The fold of the page's area is the open one; for a nested area (the HTML elements) it is the fold of its host
+      const area = hostOf(areaOf(site, p));
       const open = folds.filter((n) => n.attrs.has("open")).map((n) => query(n.parent, "a.docs-nav__area").attrs.get("href"));
       expect(open, `${p.route}: only the fold of the page's area is open`).toEqual(area && folds.some((n) => query(n.parent, "a.docs-nav__area").attrs.get("href") === `/docs/${area.slug}/`) ? [`/docs/${area.slug}/`] : []);
       // The state is the browser's: nothing is hidden by the markup and no aria-expanded is written
@@ -349,14 +361,16 @@ describe("the sidebar: every area a fold, only the current one open, every page 
     }
   });
 
-  it("marks the current page with aria-current=\"page\" and its area with \"true\" (the area link itself on an area index)", () => {
+  it("marks the current page with aria-current=\"page\" and its area with \"true\" (the area link itself on an area index; the host's, for a nested area)", () => {
     for (const p of site.pages) {
       const links = pageLinks(treeOf(p.route));
       const current = links.filter((a) => a.attrs.get("aria-current") === "page").map((a) => a.attrs.get("href"));
       const parents = links.filter((a) => a.attrs.get("aria-current") === "true").map((a) => a.attrs.get("href"));
       const area = areaOf(site, p);
+      const host = hostOf(area);
       expect(current, `${p.route} page`).toEqual(area ? [p.route] : []);
-      expect(parents, `${p.route} area`).toEqual(area ? (p.route !== `/docs/${area.slug}/` ? [`/docs/${area.slug}/`] : []) : []);
+      // The page of a nested area is never its host's index, so its host is always "true"; the index of the nested area is "page" in the group
+      expect(parents, `${p.route} area`).toEqual(area ? (p.route !== `/docs/${host.slug}/` ? [`/docs/${host.slug}/`] : []) : []);
       expect(links.filter((a) => hasClass(a, "is-active")), p.route).toEqual([]);
     }
   });
@@ -510,11 +524,12 @@ describe("the page head: eyebrow, h1, lead, then the chips", () => {
     }
   });
 
-  it("names the package of an area on its index: Components · @luz-ds/core, Tokens · @luz-ds/tokens, Catalog · @luz-ds/catalog, and no other (the packages of the kinds of site are gone)", () => {
+  it("names the package of an area on its index: Components · @luz-ds/core, Tokens · @luz-ds/tokens, Catalog · @luz-ds/catalog, AI · @luz-ds/ai, and no other (the packages of the kinds of site are gone)", () => {
     const expected = {
       components: "@luz-ds/core",
       tokens: "@luz-ds/tokens",
       catalog: "@luz-ds/catalog",
+      ai: "@luz-ds/ai",
     };
     for (const [id, pkg] of Object.entries(expected)) {
       const area = site.areas.find((a) => a.id === id);
@@ -744,7 +759,7 @@ describe("the rail: \"On this page\" outside main, then Copy page, Copy link, Ed
       expect(links[0].attrs.get("href"), `${p.route} copy`).toBe(`${p.route}index.md`);
       expect(links[1].attrs.get("href"), `${p.route} copy link: the page itself`).toBe(p.route);
       expect(links[2].attrs.get("href"), `${p.route} edit`).toBe(`${EDIT}${p.file}`);
-      expect(links[2].attrs.get("href"), `${p.route} edit`).toMatch(/^https:\/\/github\.com\/nandovejer\/luz\/edit\/main\/apps\/docs\/pages\/.+\.html$/);
+      expect(links[2].attrs.get("href"), `${p.route} edit`).toMatch(/^https:\/\/github\.com\/nandomunoz\/luz\/edit\/main\/apps\/docs\/pages\/.+\.html$/);
       expect(links[3].attrs.get("href"), `${p.route} report`).toBe(`${ISSUES}${encodeURIComponent(p.meta.title)}`);
     }
   });
@@ -868,7 +883,7 @@ describe("the rail: \"On this page\" outside main, then Copy page, Copy link, Ed
       const [copy, copyLink, edit, report] = links;
       expect(copy.attrs.get("href")).toBe("/docs/get-started/fish/index.md");
       expect(copyLink.attrs.get("href")).toBe("/docs/get-started/fish/");
-      expect(edit.attrs.get("href")).toBe("https://github.com/nandovejer/luz/edit/main/apps/docs/pages/get-started/fish.html");
+      expect(edit.attrs.get("href")).toBe("https://github.com/nandomunoz/luz/edit/main/apps/docs/pages/get-started/fish.html");
       expect(report.attrs.get("href")).toBe(`${ISSUES}Fish%20%26%20Chips%3A%20a%2Fb%3F%20Don't`);
     });
   });
@@ -1011,7 +1026,7 @@ describe("the page foot: Last updated <time>, then Edit and Report", () => {
       const pager = queryLive(root, ".luz-pager");
       if (pager) expect(foot.open.index, p.route).toBeGreaterThan(pager.open.index);
     }
-  });
+  }, 60_000); // one git log per page of the site
 
   it("is followed by Edit and Report, the same URLs as the rail", () => {
     for (const p of site.pages) {

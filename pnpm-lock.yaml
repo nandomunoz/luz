@@ -85,6 +85,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/tokens
 
+  packages/ai: {}
+
   packages/catalog:
     devDependencies:
       '@luz-ds/core':
@@ -113,6 +115,8 @@ importers:
         version: link:../tokens
 
   packages/tokens: {}
+
+  tools/ai-eval: {}
 
 packages:
 

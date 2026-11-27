@@ -1,0 +1,379 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Manifiesto LUZ</title>
+<meta name="description" content="Manifiesto LUZ. Sistema de diseño para humanos, preparado para IA. Cómo construimos LUZ.">
+<meta name="color-scheme" content="light dark">
+<style>
+  :root {
+    --bg: #f7f6f2;
+    --ink: #151b26;
+    --ink-soft: #5a6475;
+    --rule: #e1ddd3;
+    --accent: #1f5fa3;
+    --accent-ink: #ffffff;
+    --focus: #151b26;
+
+    --font-serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+    --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+    --font-arabic: "Geeza Pro", "Noto Naskh Arabic", "Noto Sans Arabic", "Segoe UI", Tahoma, sans-serif;
+
+    --space-1: 0.5rem;
+    --space-2: 1rem;
+    --space-3: 1.5rem;
+    --space-4: 2.5rem;
+    --space-5: 4rem;
+    --space-6: 6rem;
+
+    --container: 38rem;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #10141a;
+      --ink: #edf1f6;
+      --ink-soft: #a3adbd;
+      --rule: #273040;
+      --accent: #8fc4f2;
+      --accent-ink: #0c1420;
+      --focus: #edf1f6;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #10141a;
+    --ink: #edf1f6;
+    --ink-soft: #a3adbd;
+    --rule: #273040;
+    --accent: #8fc4f2;
+    --accent-ink: #0c1420;
+    --focus: #edf1f6;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: 1.6;
+    overflow-wrap: break-word;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  :focus-visible { outline: 3px solid var(--focus); outline-offset: 4px; border-radius: 4px; }
+
+  .wrap {
+    max-width: var(--container);
+    margin-inline: auto;
+    padding: var(--space-3) var(--space-2) var(--space-5);
+  }
+
+  .sr-only {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  /* ---------- Language switch: three radios, no script ---------- */
+  .langs {
+    display: flex;
+    justify-content: center;
+    margin: 0 0 var(--space-5);
+    padding: 0;
+    border: 0;
+  }
+
+  .langs .options {
+    display: inline-flex;
+    padding: 0.2rem;
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+  }
+
+  .langs input {
+    position: absolute;
+    opacity: 0;
+    inline-size: 1px;
+    block-size: 1px;
+  }
+
+  .langs label {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 2.75rem;
+    padding-inline: var(--space-2);
+    border-radius: 999px;
+    color: var(--ink-soft);
+    font-size: 0.9rem;
+    cursor: pointer;
+  }
+
+  .langs label:hover { color: var(--ink); }
+
+  .langs input:checked + label {
+    background: var(--accent);
+    color: var(--accent-ink);
+  }
+
+  .langs input:focus-visible + label {
+    outline: 3px solid var(--focus);
+    outline-offset: 2px;
+  }
+
+  /* Only the chosen language shows. Without :has() the three show, one after another */
+  @supports selector(:has(*)) {
+    .t { display: none; }
+    body:has(#l-es:checked) .t[data-l="es"],
+    body:has(#l-en:checked) .t[data-l="en"],
+    body:has(#l-ar:checked) .t[data-l="ar"] { display: block; }
+  }
+
+  .t + .t { margin-block-start: var(--space-6); }
+
+  /* ---------- Header: the mark, the title, the motto, one line ---------- */
+  header { text-align: center; margin-block-end: var(--space-5); }
+
+  .mark {
+    display: inline-block;
+    width: 2.5rem;
+    height: 2.5rem;
+    color: var(--accent);
+  }
+
+  h1 {
+    margin: var(--space-3) 0 0;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .claim {
+    margin: var(--space-2) 0 0;
+    font-family: var(--font-serif);
+    font-size: clamp(2rem, 8vw, 2.75rem);
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+  }
+
+  .sub {
+    margin: var(--space-2) 0 0;
+    color: var(--ink-soft);
+    font-size: 1.05rem;
+  }
+
+  /* ---------- The five points: text only, a hairline between ---------- */
+  ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    counter-reset: point;
+  }
+
+  li {
+    counter-increment: point;
+    display: grid;
+    grid-template-columns: 2.5rem 1fr;
+    column-gap: var(--space-2);
+    padding-block: var(--space-4);
+    border-block-start: 1px solid var(--rule);
+  }
+  li:last-child { border-block-end: 1px solid var(--rule); }
+
+  li::before {
+    content: counter(point);
+    grid-row: span 3;
+    font-family: var(--font-serif);
+    font-size: 2.25rem;
+    line-height: 1;
+    color: var(--accent);
+    font-variant-numeric: lining-nums;
+  }
+
+  h2 {
+    margin: 0;
+    font-family: var(--font-serif);
+    font-weight: 400;
+    font-size: 1.6rem;
+    line-height: 1.2;
+  }
+
+  li p { margin: var(--space-1) 0 0; }
+
+  .why {
+    color: var(--ink-soft);
+    font-family: var(--font-serif);
+    font-style: italic;
+  }
+
+  /* ---------- Arabic: its own face, its own figures, no italic, no tracking ---------- */
+  .t:lang(ar),
+  .t:lang(ar) h2,
+  .t:lang(ar) .why,
+  .t:lang(ar) .sub { font-family: var(--font-arabic); }
+  .t:lang(ar) h1 { font-family: var(--font-arabic); letter-spacing: 0; font-size: 0.9rem; }
+  .t:lang(ar) .why { font-style: normal; }
+  .t:lang(ar) li::before { content: counter(point, arabic-indic); font-family: var(--font-arabic); }
+  .t:lang(ar) .claim { font-family: var(--font-arabic); line-height: 1.4; }
+
+  footer {
+    margin-block-start: var(--space-5);
+    text-align: center;
+    font-size: 0.9rem;
+  }
+
+  footer a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 2.75rem;
+    color: var(--ink-soft);
+    text-underline-offset: 0.25em;
+  }
+
+  footer a:hover { color: var(--accent); }
+
+  @media (min-width: 40rem) {
+    .wrap { padding-block: var(--space-4) var(--space-6); padding-inline: var(--space-4); }
+    li { grid-template-columns: 3.5rem 1fr; }
+  }
+
+  @media (forced-colors: active) {
+    li { border-color: CanvasText; }
+    .langs input:checked + label { outline: 2px solid CanvasText; }
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <fieldset class="langs">
+      <legend class="sr-only">Idioma · Language · اللغة</legend>
+      <div class="options">
+        <input type="radio" name="lang" id="l-en"><label for="l-en" lang="en">English</label>
+        <input type="radio" name="lang" id="l-es" checked><label for="l-es" lang="es">Español</label>
+        <input type="radio" name="lang" id="l-ar"><label for="l-ar" lang="ar" dir="rtl">العربية</label>
+      </div>
+    </fieldset>
+
+    <main>
+    <!-- English -->
+    <div class="t" data-l="en" lang="en">
+      <header>
+        <svg class="mark" viewBox="0 0 32 32" role="img" aria-label="LUZ" focusable="false"><path fill="currentColor" fill-opacity="0.25" d="M20.8 10.46 7.04 17.66 23.36 14.89Z"/><path fill="currentColor" fill-opacity="0.45" d="M23.36 14.89 7.04 17.66 25.92 19.33Z"/><path fill="currentColor" fill-opacity="0.65" d="M25.92 19.33 7.04 17.66 28.48 23.76Z"/><path fill="currentColor" fill-rule="evenodd" d="M20.8 10.46 16 2.14 7.04 17.66ZM32 29.86 28.48 23.76 7.04 17.66 0 29.86Z"/></svg>
+        <h1>LUZ manifesto</h1>
+        <p class="claim">Design system for humans, ready for AI.</p>
+        <p class="sub">How we build LUZ.</p>
+      </header>
+      <div class="points">
+        <ol>
+          <li>
+            <h2>Lightweight.</h2>
+            <p>Zero dependencies, more optimization.</p>
+          </li>
+          <li>
+            <h2>Accessible, always.</h2>
+            <p>Accessibility is not optional in a starting point.</p>
+          </li>
+          <li>
+            <h2>Native first.</h2>
+            <p>The standard is the path, and the browser the means.</p>
+          </li>
+          <li>
+            <h2>AI is the means, not the end.</h2>
+            <p>AI helps, but does not decide for us.</p>
+          </li>
+          <li>
+            <h2>Keep it simple.</h2>
+            <p>If it needs explaining, it is not simple yet.</p>
+          </li>
+        </ol>
+      </div>
+      <footer><a href="/">Back to the LUZ home page</a></footer>
+    </div>
+
+    <!-- Español -->
+    <div class="t" data-l="es" lang="es">
+      <header>
+        <svg class="mark" viewBox="0 0 32 32" role="img" aria-label="LUZ" focusable="false"><path fill="currentColor" fill-opacity="0.25" d="M20.8 10.46 7.04 17.66 23.36 14.89Z"/><path fill="currentColor" fill-opacity="0.45" d="M23.36 14.89 7.04 17.66 25.92 19.33Z"/><path fill="currentColor" fill-opacity="0.65" d="M25.92 19.33 7.04 17.66 28.48 23.76Z"/><path fill="currentColor" fill-rule="evenodd" d="M20.8 10.46 16 2.14 7.04 17.66ZM32 29.86 28.48 23.76 7.04 17.66 0 29.86Z"/></svg>
+        <h1>Manifiesto LUZ</h1>
+        <p class="claim">Sistema de diseño para humanos, preparado para IA.</p>
+        <p class="sub">Cómo construimos LUZ.</p>
+      </header>
+      <div class="points">
+        <ol>
+          <li>
+            <h2>Ligero.</h2>
+            <p>Cero dependencias y más optimización.</p>
+          </li>
+          <li>
+            <h2>Accesible siempre.</h2>
+            <p>La accesibilidad no es opcional en un punto de partida.</p>
+          </li>
+          <li>
+            <h2>Lo nativo primero.</h2>
+            <p>El estándar es el camino y el navegador el medio.</p>
+          </li>
+          <li>
+            <h2>La IA es el medio, no el fin.</h2>
+            <p>La IA ayuda, pero no decide por nosotros.</p>
+          </li>
+          <li>
+            <h2>Hazlo simple.</h2>
+            <p>Si hay que explicarlo, aún no es simple.</p>
+          </li>
+        </ol>
+      </div>
+      <footer><a href="/">Volver a la portada de LUZ</a></footer>
+    </div>
+
+    <!-- العربية -->
+    <div class="t" data-l="ar" lang="ar" dir="rtl">
+      <header>
+        <svg class="mark" viewBox="0 0 32 32" role="img" aria-label="LUZ" focusable="false"><path fill="currentColor" fill-opacity="0.25" d="M20.8 10.46 7.04 17.66 23.36 14.89Z"/><path fill="currentColor" fill-opacity="0.45" d="M23.36 14.89 7.04 17.66 25.92 19.33Z"/><path fill="currentColor" fill-opacity="0.65" d="M25.92 19.33 7.04 17.66 28.48 23.76Z"/><path fill="currentColor" fill-rule="evenodd" d="M20.8 10.46 16 2.14 7.04 17.66ZM32 29.86 28.48 23.76 7.04 17.66 0 29.86Z"/></svg>
+        <h1>بيان <span lang="en" dir="ltr">LUZ</span></h1>
+        <p class="claim">نظام تصميم للبشر، جاهز للذكاء الاصطناعي.</p>
+        <p class="sub">كيف نبني <span lang="en" dir="ltr">LUZ</span>.</p>
+      </header>
+      <div class="points">
+        <ol>
+          <li>
+            <h2>خفيف.</h2>
+            <p>بلا اعتماديات، ومزيد من التحسين.</p>
+          </li>
+          <li>
+            <h2>إمكانية الوصول دائمًا.</h2>
+            <p>إمكانية الوصول ليست اختيارية في نقطة الانطلاق.</p>
+          </li>
+          <li>
+            <h2>الحلول الأصلية أولًا.</h2>
+            <p>المعيار هو الطريق، والمتصفح هو الوسيلة.</p>
+          </li>
+          <li>
+            <h2>الذكاء الاصطناعي وسيلة، لا غاية.</h2>
+            <p>الذكاء الاصطناعي يساعد، لكنه لا يقرّر نيابةً عنّا.</p>
+          </li>
+          <li>
+            <h2>اجعله بسيطًا.</h2>
+            <p>إن احتاج إلى شرح، فليس بسيطًا بعد.</p>
+          </li>
+        </ol>
+      </div>
+      <footer><a href="/">العودة إلى الصفحة الرئيسية لـ <span lang="en" dir="ltr">LUZ</span></a></footer>
+    </div>
+
+    </main>
+  </div>
+</body>
+</html>

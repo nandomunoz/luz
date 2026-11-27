@@ -230,7 +230,7 @@ test.describe('HTML elements reference, in the documentation', () => {
 
   test('is reachable from the landing and works in every color mode', async ({ page }) => {
     await page.goto('/');
-    await expect(page.locator('.site-header__nav a[href="/docs/"]')).toHaveCount(1);
+    await expect(page.locator('.site-header__docs[href="/docs/"]')).toHaveCount(1);
 
     await seedMode(page, 'light');
     await open(page, CATEGORY_PAGES[0]);

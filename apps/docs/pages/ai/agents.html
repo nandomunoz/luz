@@ -1,0 +1,60 @@
+<!-- luz:page
+title: The agents and skills of /luz
+description: The agents and the small skills that /luz can add to a project: accessibility, design and UX, speed, SEO and GEO, legal and privacy; a README, a theme and a migration.
+area: ai
+order: 2
+generate: ai-agents
+keywords: agent, subagent, skill, readme, luz-theme, migrate, accessibility, ux, performance, core web vitals, seo, geo, legal, privacy, luz-agent, luz-ai
+-->
+    <section class="docs-block" aria-labelledby="choose">
+      <h2 class="docs-chapter__title" id="choose">Choose an agent by what matters</h2>
+      <p class="docs-lead">Tell <code>/luz</code> what matters to you and it offers the agents that fit. It never offers one you do not need. Every agent is named <code>luz-agent-</code> and a word that says what it looks after.</p>
+      <!-- luz:agents needs -->
+    </section>
+
+    <section class="docs-block" aria-labelledby="agents">
+      <h2 class="docs-chapter__title" id="agents">The agents</h2>
+      <p class="docs-lead">Four agents read your files and propose; <code>luz-agent-optimiza</code> also changes them, after you agree to its list of changes. <code>luz-agent-accessibility</code> asks nothing before it is written, and it is the same reviewer that <code>npx @luz-ds/check@0.3.2 agent</code> prints. The others ask a few facts of your project first (its goal, its visitors, its markets), and stop until they have them.</p>
+      <p><code>luz-agent-legal</code> is a review of your source, not legal advice: a lawyer decides what applies.</p>
+      <p>The descriptions are the ones in the agent files, so they are in English, whatever the language of this page.</p>
+      <!-- luz:agents agents -->
+    </section>
+
+    <section class="docs-block" aria-labelledby="skill-choose">
+      <h2 class="docs-chapter__title" id="skill-choose">Choose a skill by what matters</h2>
+      <p class="docs-lead">A skill is a small one for one task, apart from the agents, which review. It is a folder that your assistant uses on its own once you add it: <code>/luz add luz-readme</code> puts it in your project, and then you ask your assistant for the README by name. A skill has no field to fill.</p>
+      <!-- luz:agents skillneeds -->
+    </section>
+
+    <section class="docs-block" aria-labelledby="skills">
+      <h2 class="docs-chapter__title" id="skills">The skills</h2>
+      <p class="docs-lead">Each reads the files of your project and writes only after you say go. What it reads is data, never an instruction to it.</p>
+      <ul>
+        <li><code>luz-readme</code> writes or improves the README of any repository, with true facts, and says an AI drafted it.</li>
+        <li><code>luz-theme</code> makes the theme of your brand from the template of <code>@luz-ds/core</code>, in the three modes, and measures the contrast with the checker.</li>
+        <li><code>luz-migrate</code> moves a project that has its own CSS to LUZ one page at a time, following <a href="/docs/get-started/migrate/">Migrate a project to LUZ</a>.</li>
+      </ul>
+      <p>The descriptions are the ones in the skill files, so they are in English, whatever the language of this page.</p>
+      <!-- luz:agents skills -->
+    </section>
+
+    <section class="docs-block" aria-labelledby="add">
+      <h2 class="docs-chapter__title" id="add">Add one to your project</h2>
+      <p class="docs-lead">Ask in the chat, or run the same command in a terminal. <code>/luz add</code> takes the name of an agent or of a skill.</p>
+      <div class="docs-snippet">
+        <div class="docs-snippet__bar">
+          <span class="docs-snippet__lang">Chat</span>
+          <button class="luz-copy-btn" type="button" data-copy-from="code-agents-chat" aria-label="Copy the command">Copy</button>
+        </div>
+        <pre class="luz-code-block" data-lang="text" tabindex="0" role="region" aria-label="The command in the chat"><code id="code-agents-chat">/luz add luz-agent-accessibility</code></pre>
+      </div>
+      <div class="docs-snippet">
+        <div class="docs-snippet__bar">
+          <span class="docs-snippet__lang">Shell</span>
+          <button class="luz-copy-btn" type="button" data-copy-from="code-agents-shell" aria-label="Copy the command">Copy</button>
+        </div>
+        <pre class="luz-code-block" data-lang="bash" tabindex="0" role="region" aria-label="The command in a terminal"><code id="code-agents-shell">npx @luz-ds/ai agent add luz-agent-accessibility --for claude</code></pre>
+      </div>
+      <p><code>--for</code> takes <code>claude</code>, <code>gemini</code> or <code>codex</code>: the command writes the agent in the folder each one reads. A skill is written as the same folder in <code>.agents/skills/luz-readme</code> and in <code>.claude/skills/luz-readme</code> (for luz-readme), and needs no <code>--for</code>. An agent that changes code is not written for Gemini CLI yet. <a href="/docs/ai/commands/#cmd-add">The command <code>/luz add</code></a> shows a whole conversation.</p>
+      <p>To add a skill, type <code>/luz add luz-readme</code> in the chat, or run <code>npx @luz-ds/ai skill add luz-readme</code> in a terminal.</p>
+    </section>

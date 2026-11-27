@@ -40,11 +40,19 @@ import { existsSync, lstatSync, readFileSync, readdirSync, realpathSync, statSyn
 import { gzipSync } from "node:zlib";
 import { dirname, join, relative, resolve, sep } from "node:path";
 import { HtmlError, compactHtml, readHtml, tags } from "./html.js";
-import { BASE, PACKAGES } from "../luz-packages.js";
-import { fileKinds, fitsKindsOf, isKindFile } from "./kinds.js";
+import { panel as chartsBlock } from "./catalog-blocks/charts.js";
+import { panel as contentBlock } from "./catalog-blocks/content.js";
+import { panel as sitewideBlock } from "./catalog-blocks/sitewide.js";
+import { panel as structureBlock } from "./catalog-blocks/structure.js";
+import { CASCADE, FITS_KINDS, fileKinds, fitsKindsOf, isKindFile, kindPatterns } from "./kinds.js";
 import { fillAiMarkers } from "./ai.js";
+import { fillCommandMarkers } from "./ai-commands.js";
+import { fillAgentMarkers } from "./ai-agents.js";
+import { aiSections } from "./ai-page.js";
+import { cliDemo } from "./cli-demo.js";
 import { DEBUG_FILE, DEBUG_ROUTE, hasDebugPage, renderDebug } from "./debug.js";
-import { catalogComponents, catalogFilesIn, renderComponentLinks, renderSnippets, snippetData } from "./snippets.js";
+import { MANIFESTO_FILE, MANIFESTO_ROUTE, readManifesto } from "./manifesto.js";
+import { FILES, catalogComponents, catalogFilesIn, renderComponentLinks, renderSnippets, snippetData } from "./snippets.js";
 import { assertInlineHtml, loadLocales, localizeDocsLinks, lookup, markDocsLinks, renderAlternates, renderLangLinks, renderPageLinks, renderSwitcher, unusedKeys } from "./i18n.js";
 import { isDemo, loadDocsLocales, localizeLinks, localize } from "./docs-i18n.js";
 import { bundledEnglish, englishT, makeT } from "./strings.js";
@@ -94,7 +102,7 @@ const FRONT_MATTER = {
   lead: { default: "true" },
   // A block the generator writes after the content: "gallery", "a-z" or "snippets"; "notfound" (the
   // 404) one block per other docs language; "ai" writes its tables where the content has
-  // `<!-- luz:ai files -->` and `<!-- luz:ai rules -->`
+  // `<!-- luz:ai files -->` and `<!-- luz:ai rules -->`; "ai-commands" writes the commands of the luz skill at `<!-- luz:commands -->`, "ai-agents" its agents and skills at `<!-- luz:agents needs|agents|skills -->`
   generate: { default: "" },
 };
 
@@ -111,22 +119,22 @@ const PLACEHOLDERS = new Set([
   "notice", "contentattrs",
   // The version the packages share (packages/core/package.json): the CDN snippets and the footer of the home
   "version",
-  // The home's weights (budgets.json against packages/*/dist), a list written by the build
-  "weights",
-  // The home's layers of packages and their dependencies (packages/*/package.json)
-  "packages",
-  // The home's checks: the test files of tests/ by what they check
-  "checks",
   // The weight of each of the home's levels of adoption (budgets.json against dist)
   "weight1", "weight2", "weight3",
   // What each level of the home brings, as a list of names read from the packages
-  "list1", "list2", "list3",
+  "list1", "list2", "list3", "tokendemo", "tokenlooks", "tokenblocks", "ntokens", "nmodes", "ndeps",
+  "coredemo", "coreblocks", "ncomponents", "nobjects", "ndepscore",
+  "catalogdemo", "catalogblocks", "catalogsheets", "ncatalog", "nchunks", "ndepscatalog",
+  "aiblocks", "naiagents", "naiskills", "naitargets", "ndepsai", "cli", "clicodex", "clicursor", "cliinstall",
 ]);
 /** Values inserted as HTML, not escaped. Only the generator produces them. */
-const RAW_VALUES = new Set(["content", "nav", "pagehead", "rail", "endnav", "pagefoot", "generated", "alternates", "langswitch", "langlinks", "endir", "notice", "contentattrs", "weights", "packages", "checks", "list1", "list2", "list3"]);
+const RAW_VALUES = new Set(["content", "nav", "pagehead", "rail", "endnav", "pagefoot", "generated", "alternates", "langswitch", "langlinks", "endir", "notice", "contentattrs", "list1", "list2", "list3", "tokendemo", "tokenblocks", "coredemo", "coreblocks", "catalogdemo", "catalogblocks", "catalogsheets", "aiblocks", "cli", "clicodex", "clicursor", "cliinstall"]);
 
 /** Where the home page's languages live, from the repository root. */
 export const I18N_DIR = "apps/landing/i18n";
+
+/** The sections of the site the header links to, under each home: the pages of the three levels and of the skill. */
+const SECTION_PATHS = ["tokens", "core", "catalog", "ai"];
 
 /** Partials whose links to the current page and its parents get aria-current. */
 const CURRENT_PARTIALS = new Set(["header", "site-links"]);
@@ -168,7 +176,7 @@ const isCatalogPattern = ({ area, group }) => PACKAGE_AREAS.has(area) && group !
  */
 const AREA_KIND = {
   "get-started": "Get started",
-  kinds: "Kind of site",
+  ai: "AI",
   components: "Component",
   tokens: "Token page",
   catalog: "Catalog pattern",
@@ -237,13 +245,16 @@ export function routeOfPage(path, file = path) {
 /**
  * The site links that are current on a route, with their aria-current
  * value: "page" for the link to the route itself, "true" for its parents.
- * Home on "/" (and on each home page of `homes`, "/es/"…); Docs on every
+ * Home on "/" (and on each home page of `homes`, "/es/"…); a section of the
+ * site on its page ("/tokens/", "/es/ai/"…); Docs on every
  * docs page ("page" only on the hub); Components on the gallery ("page") and
  * on every page of the Components area ("true").
  */
 export function currentOf(route, homes = ["/"]) {
   const marks = new Map();
   if (route === "/" || homes.includes(route)) marks.set(route, "page");
+  // A section of the site (/tokens/, /es/ai/…): its link in the header and the drawer
+  for (const home of homes.length ? homes : ["/"]) if (SECTION_PATHS.some((path) => route === `${home}${path}/`)) marks.set(route, "page");
   if (route.startsWith(DOCS_ROUTE)) {
     marks.set(DOCS_ROUTE, route === DOCS_ROUTE ? "page" : "true");
     const components = `${DOCS_ROUTE}components/`;
@@ -284,7 +295,7 @@ export function parseFrontMatter(source, file, areas = null) {
   }
   if (!["h2", "h2,h3", "false"].includes(meta.toc)) throw new Error(`${file}: toc is "h2", "h2,h3" or "false"`);
   if (!["", "controls"].includes(meta.parts)) throw new Error(`${file}: parts is "controls" or empty`);
-  if (!["", "gallery", "a-z", "snippets", "ai", "notfound"].includes(meta.generate)) throw new Error(`${file}: generate is "gallery", "a-z", "snippets", "ai" or "notfound"`);
+  if (!["", "gallery", "a-z", "snippets", "ai", "ai-commands", "ai-agents", "notfound"].includes(meta.generate)) throw new Error(`${file}: generate is "gallery", "a-z", "snippets", "ai", "ai-commands", "ai-agents" or "notfound"`);
   if (meta.group && !NAME.test(meta.group)) throw new Error(`${file}: group "${meta.group}" is not a valid name`);
   // "Fits best" (decision 71): both keys on a pattern page of catalog, on no other page
   const fitsPage = isCatalogPattern(meta);
@@ -592,7 +603,9 @@ export function renderNav(site, page) {
     `<li>${link(p.route, p.meta.title, ` class="luz-sidebar__link"${p.fallback && !listIsEnglish ? enLang(site) : ""}${p.route === page.route ? ' aria-current="page"' : ""}`)}</li>`;
   const mark = (area) => {
     const route = areaRoute(area, root);
-    return current?.id !== area.id ? "" : page.route === route ? ' aria-current="page"' : ' aria-current="true"';
+    // The area of the current page, and the area it is nested in (the HTML elements, in Catalog), are the ones marked "true"
+    if (current?.id !== area.id && current?.nestIn !== area.id) return "";
+    return page.route === route ? ' aria-current="page"' : ' aria-current="true"';
   };
   const areaHead = (area, attrs) => {
     const route = areaRoute(area, root);
@@ -615,15 +628,31 @@ export function renderNav(site, page) {
         "</ul></li>",
       ];
     });
-  const items = site.areas.map((area) => {
+  // An area with `nestIn` has no fold of its own: its index and its pages are a labelled group at the end of the fold of the
+  // area it is nested in (the HTML elements, in Catalog), and the fold of that area is the one open on its pages
+  const nestedIn = (area) => site.areas.filter((a) => a.nestIn === area.id);
+  const nestedGroup = (nested) => {
+    const own = listOf(nested);
+    const index = indexOf(site, nested);
+    const pages = [...(index ? [index] : []), ...own.sections.flatMap((s) => s.pages)];
+    const english = pages.every((p) => p.fallback);
+    return [
+      `<li class="docs-nav__group"><span class="luz-sidebar__section-label" id="nav-${nested.id}">${escapeHtml(nested.label)}</span>`,
+      `<ul class="docs-nav__pages"${english ? enLang(site) : ""} aria-labelledby="nav-${nested.id}">`,
+      ...pages.map((p) => item(p, english)),
+      "</ul></li>",
+    ];
+  };
+  const items = site.areas.filter((area) => !area.nestIn).map((area) => {
     const own = listOf(area);
-    const children = pagesOf(own);
+    const nested = nestedIn(area);
+    const children = [...pagesOf(own), ...nested.flatMap(nestedGroup)];
     if (!children.length) return `<li>${areaHead(area, ' class="luz-sidebar__link docs-nav__area"')}</li>`;
     // The area's link goes to its index; the fold beside it opens and closes its pages. Only the area of the
     // current page is open, and one name makes the folds an accordion: opening one closes the others
     const id = `a-${area.id}`;
     return [
-      `<li>${areaHead(area, ` class="luz-sidebar__link docs-nav__area" id="${id}"`)}<details name="nav"${current?.id === area.id ? " open" : ""}><summary aria-labelledby="${id}"></summary><ul${own.allEnglish ? enLang(site) : ""}>`,
+      `<li>${areaHead(area, ` class="luz-sidebar__link docs-nav__area" id="${id}"`)}<details name="nav"${current?.id === area.id || nested.some((n) => n.id === current?.id) ? " open" : ""}><summary aria-labelledby="${id}"></summary><ul${own.allEnglish ? enLang(site) : ""}>`,
       ...children,
       "</ul></details></li>",
     ].join("\n");
@@ -652,7 +681,7 @@ export function renderBreadcrumb(site, page) {
 }
 
 /** Where the source of the site is: the rail's and the page foot's Edit and Report. */
-export const REPO_URL = "https://github.com/nandovejer/luz";
+export const REPO_URL = "https://github.com/nandomunoz/luz";
 
 /**
  * A component or a pattern page: the pages whose head ends with the chips.
@@ -710,7 +739,7 @@ function chipsOf(site, page) {
  * of site a catalog pattern fits best, then one sentence. The kinds are
  * written as the reader says them (`kind.<id>` of the strings: blog, not
  * cms), `any` as "any site". On the page each kind links to its page of
- * /docs/kinds/<kind>/ in the language of the view; on the card of the
+ * /docs/ai/<kind>/ in the language of the view; on the card of the
  * gallery, whose link is the whole card, they are plain words. The kinds come
  * from the English page in every language; the sentence from the page's own,
  * which is English on a page that is not translated yet (`lang="en"`).
@@ -722,7 +751,7 @@ export function renderFits(site, page, { links = true } = {}) {
   const t = !links && page.fallback ? englishT() : tOf(site);
   const root = docsRootOf(site);
   const kinds = fitsKindsOf(english.meta["fits-kinds"]).map((kind) =>
-    kind === "any" ? say(t, "fits.any") : links ? link(`${root}kinds/${kind}/`, t(`kind.${kind}`)) : say(t, `kind.${kind}`),
+    kind === "any" ? say(t, "fits.any") : links ? link(`${root}ai/${kind}/`, t(`kind.${kind}`)) : say(t, `kind.${kind}`),
   );
   const sentence = links ? `<span${enAttr(site, page)}>${escapeHtml(page.meta.fits)}</span>` : escapeHtml(page.meta.fits);
   return `${say(t, "fits.label")} ${kinds.join(", ")} — ${sentence}`;
@@ -1221,7 +1250,8 @@ export function renderAZ(site, page) {
  */
 export function markCurrent(html, marks) {
   if (!marks?.size) return html;
-  return html.replace(/<(nav|ul)\b[\s\S]*?<\/\1>/g, (list) =>
+  // The lists of links, and the header's Documentation icon, which sits beside GitHub and not in a list
+  return html.replace(/<(nav|ul)\b[\s\S]*?<\/\1>|<a class="site-header__docs"[^>]*>/g, (list) =>
     list.replace(/<a\b([^>]*?)\shref="([^"]*)"([^>]*)>/g, (whole, before, value, after) =>
       marks.has(value) && !/\saria-current=|\shreflang=/.test(before + after) ? `<a${before} href="${value}"${after} aria-current="${marks.get(value)}">` : whole,
     ),
@@ -1490,7 +1520,7 @@ function renderPageIn(page, site, options) {
   const strings = { locale, used: options.used };
   const expanded = expand(page.body, { file: page.file, firstLine: page.bodyLine, partial: reader.partial, current, placeholders: false, ...strings });
   // "ai" is written inside the content, at its two markers, so it is known to the table of contents
-  const filled = withComponentLinks(page.meta.generate === "ai" ? fillAiMarkers(expanded, site, { file: page.file }) : expanded, page, site, options);
+  const filled = withComponentLinks(page.meta.generate === "ai" ? fillAiMarkers(expanded, site, { file: page.file }) : page.meta.generate === "ai-commands" ? fillCommandMarkers(expanded, site, { file: page.file }) : page.meta.generate === "ai-agents" ? fillAgentMarkers(expanded, site, { file: page.file }) : expanded, page, site, options);
   // `<!-- luz:generated -->` in the content puts the generated block where it stands, once
   const block = renderGenerated(page, site, options);
   const marked = filled.includes(GENERATED_MARKER);
@@ -1558,26 +1588,26 @@ function renderNotice(site, page) {
 
 /**
  * The language values of a template: {{lang}}, {{dir}}, {{home}} and, on a
- * home page (`home: true`), {{alternates}}, {{langswitch}} and {{langlinks}}.
+ * home page (`home: true`), {{alternates}}, {{langswitch}} and {{langlinks}}
+ * (`suffix`: the path of a page of a level after the language's home, "tokens/").
  * On a docs `page` (the not-found page apart) {{alternates}} is its canonical
  * link and the alternates of the languages that translated it, and
  * {{langswitch}} the switcher, when the docs have more than one language.
  */
-function languageValues(site, locale, { home = false, siteUrl = "", page = null, used = null } = {}) {
+function languageValues(site, locale, { home = false, siteUrl = "", page = null, used = null, suffix = "" } = {}) {
   const i18n = site.i18n;
   const translated = home && i18n && locale;
+  // A page of a level (/tokens/) is in each language at the language's home plus its own path: the alternates and the switch say so
+  const hrefOf = (l) => l.route + suffix;
   const values = {
     lang: locale?.code ?? "en",
     dir: locale?.dir ?? "ltr",
     // On a docs page only: the home page's catalogs and tests pin the lists of its dialog as they are
     endir: page && locale?.dir === "rtl" ? ' dir="ltr"' : "",
     home: locale?.route ?? "/",
-    alternates: translated ? renderAlternates(i18n, locale, siteUrl) : "",
-    langswitch: translated ? renderSwitcher(i18n, locale, lookup(locale, "lang.label", `${I18N_DIR}/${locale.code}.json`, null)) : "",
-    langlinks: translated ? renderLangLinks(i18n, locale) : "",
-    weights: translated ? renderWeights(site, locale, used ?? site.usage?.used) : "",
-    packages: translated ? renderPackages(site, locale, used ?? site.usage?.used) : "",
-    checks: translated ? renderChecks(site, locale, used ?? site.usage?.used) : "",
+    alternates: translated ? (suffix ? renderPageLinks(hrefOf(locale), [...i18n.locales.map((l) => [l.code, hrefOf(l)]), ["x-default", hrefOf(i18n.default)]], siteUrl) : renderAlternates(i18n, locale, siteUrl)) : "",
+    langswitch: translated ? renderSwitcher(i18n, locale, lookup(locale, "lang.label", `${I18N_DIR}/${locale.code}.json`, null), { hrefOf }) : "",
+    langlinks: translated ? renderLangLinks(i18n, locale, { hrefOf }) : "",
     ...(translated ? levelWeights(site, locale, used ?? site.usage?.used) : {}),
     ...(translated ? levelLists(site, locale, used ?? site.usage?.used) : {}),
   };
@@ -1589,22 +1619,6 @@ function languageValues(site, locale, { home = false, siteUrl = "", page = null,
   const version = sharedVersion(site.repoRoot);
   if (version) values.version = version;
   return values;
-}
-
-/**
- * A row of the home's bar charts: a name, a figure and a bar under them, the
- * bar's length the value against `max` (a native <meter>, hidden from the
- * accessibility tree: the figure is the text). `kind` marks a row: "zero"
- * for a count of none.
- */
-function barRow(name, figure, value, max, kind = "") {
-  return [
-    `  <li class="luz-bar-list__row${kind ? ` luz-bar-list__row--${kind}` : ""}">`,
-    `    <span class="luz-bar-list__name">${escapeHtml(name)}</span>`,
-    `    <span class="luz-bar-list__figure"><strong>${escapeHtml(figure)}</strong></span>`,
-    `    <meter class="luz-bar-list__meter" min="0" max="${max}" value="${value}" aria-hidden="true">${escapeHtml(figure)}</meter>`,
-    "  </li>",
-  ].join("\n");
 }
 
 /**
@@ -1689,155 +1703,6 @@ function packageBytes(root, budgets, name, what) {
 }
 
 /**
- * What the home's "Light" card shows about weight, measured when the page is
- * built and never typed: a bar per base package (BASE: tokens, core, catalog;
- * the packages for one kind of site are not on the home) with the min+gzip
- * size of everything it publishes (packageBytes), the longest bar the
- * heaviest package, and under them the sum.
- * Fails when a file is missing: run `pnpm build` first.
- */
-function renderWeights(site, locale, used) {
-  const file = `${I18N_DIR}/${locale.code}.json`;
-  const say = (key) => lookup(locale, key, file, used);
-  const budgets = JSON.parse(readFileSync(resolve(site.repoRoot, "budgets.json"), "utf-8")).budgets;
-  const number = new Intl.NumberFormat(`${locale.code}-u-nu-latn`, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
-  const kb = (bytes) => `${number.format(bytes / 1024)} ${say("why.weight.unit")}`;
-  const packages = BASE.map((name) => ({ name, size: packageBytes(site.repoRoot, budgets, name, "the home page's weights") }));
-  const total = packages.reduce((sum, p) => sum + p.size, 0);
-  const max = Math.max(...packages.map((p) => p.size));
-  return [
-    '<figure class="luz-bar-list luz-bar-list--cells">',
-    `  <ul class="luz-bar-list__rows" aria-label="${escapeHtml(say("why.weight.list"))}">`,
-    ...packages.map((p) => barRow(p.name, kb(p.size), p.size, max)),
-    "  </ul>",
-    `  <figcaption class="u-text-muted"><strong>${escapeHtml(say("why.weight.total").replace("{total}", kb(total)))}</strong> ${escapeHtml(say("why.weight.caption"))}</figcaption>`,
-    "</figure>",
-  ].join("\n");
-}
-
-/**
- * The kinds of dependency the home's "Zero-dependency" card counts, each with
- * the package names that would be one (lower-case, matched against the start
- * of a dependency's name, or the whole name for a scoped one). The order is
- * the order of the rows; the words come from the catalog (`why.zero.cat.*`).
- */
-const ZERO_KINDS = [
-  ["css-frameworks", ["bootstrap", "tailwindcss", "bulma", "foundation-sites", "open-props", "uikit", "materialize-css"]],
-  ["css-preprocessors", ["sass", "node-sass", "sass-embedded", "less", "stylus", "postcss"]],
-  ["js-frameworks", ["react", "react-dom", "vue", "svelte", "@angular/", "preact", "solid-js", "lit", "alpinejs", "htmx.org", "jquery"]],
-  ["highlighters", ["prismjs", "highlight.js", "shiki", "@shikijs/", "codemirror", "monaco-editor"]],
-  ["icon-libraries", ["@fortawesome/", "lucide", "@heroicons/", "@tabler/icons", "feather-icons", "@phosphor-icons/", "@mdi/"]],
-  ["utilities", ["lodash", "underscore", "moment", "dayjs", "date-fns", "luxon", "axios", "core-js", "@babel/runtime"]],
-  ["search-and-motion", ["fuse.js", "lunr", "flexsearch", "minisearch", "gsap", "framer-motion", "animejs", "motion"]],
-];
-
-/**
- * What the home's "Zero-dependency" card shows, counted when the page is built
- * and never typed: for each kind of dependency a page usually drags in (CSS
- * frameworks, preprocessors, JS frameworks, highlighters, icon sets, utility
- * libraries, search and motion libraries), how many the CSS libraries
- * (PACKAGES) ask for at run time, in `dependencies` or in `peerDependencies`
- * outside @luz-ds. Every count is read, so the card cannot say zero while a
- * package.json says otherwise; and the build fails outright on any
- * `dependencies` at all, so the claim and the code cannot drift apart.
- */
-function renderPackages(site, locale, used) {
-  const file = `${I18N_DIR}/${locale.code}.json`;
-  const say = (key) => lookup(locale, key, file, used);
-  const number = new Intl.NumberFormat(`${locale.code}-u-nu-latn`);
-  const runtime = [];
-  const withDeps = [];
-  for (const name of PACKAGES) {
-    const manifest = JSON.parse(readFileSync(resolve(site.repoRoot, "packages", name, "package.json"), "utf-8"));
-    const deps = Object.keys(manifest.dependencies ?? {});
-    if (deps.length) withDeps.push(`@luz-ds/${name}`);
-    runtime.push(...deps, ...Object.keys(manifest.peerDependencies ?? {}).filter((peer) => !peer.startsWith("@luz-ds/")));
-  }
-  if (withDeps.length) throw new Error(`the home page says "zero dependencies", but ${withDeps.join(", ")} has dependencies in its package.json`);
-  const matches = (dep, names) => names.some((n) => (n.endsWith("/") ? dep.toLowerCase().startsWith(n) : dep.toLowerCase() === n));
-  const rows = ZERO_KINDS.map(([kind, names]) => ({ name: say(`why.zero.cat.${kind}`), count: runtime.filter((dep) => matches(dep, names)).length }));
-  const max = Math.max(1, ...rows.map((r) => r.count));
-  return [
-    '<figure class="luz-bar-list luz-bar-list--cells">',
-    `  <ul class="luz-bar-list__rows" aria-label="${escapeHtml(say("why.zero.list"))}">`,
-    ...rows.map((r) => barRow(r.name, number.format(r.count), r.count, max, r.count ? "" : "zero")),
-    "  </ul>",
-    `  <figcaption class="u-text-muted"><strong>${escapeHtml(say("why.zero.total").replace("{n}", number.format(runtime.length)))}</strong> ${escapeHtml(say("why.zero.caption"))}</figcaption>`,
-    "</figure>",
-  ].join("\n");
-}
-
-/**
- * What the home's "Usable" card shows, counted when the page is built and
- * never typed: seven shares, each a measure of the repository as it is. The
- * components are the pages of apps/docs/pages/components whose `files` is a
- * stylesheet of components/ (not a `_` file); the tests are tests/*.spec.js
- * and *.test.js; the colour pairs are what scripts/check-contrast.js
- * measures (it fails the build when one does not meet its ratio, so the
- * first share is whole or the page does not build). The words come from
- * the catalog (`why.usable.m.*`).
- */
-const contrastPairs = new Map();
-
-function renderChecks(site, locale, used) {
-  const file = `${I18N_DIR}/${locale.code}.json`;
-  const say = (key) => lookup(locale, key, file, used);
-  const number = new Intl.NumberFormat(`${locale.code}-u-nu-latn`);
-  const percent = new Intl.NumberFormat(`${locale.code}-u-nu-latn`, { style: "percent", maximumFractionDigits: 0 });
-  const root = site.repoRoot;
-  // The components, from their docs pages
-  const pagesDir = resolve(root, "apps/docs/pages/components");
-  const components = readdirSync(pagesDir)
-    .filter((name) => name.endsWith(".html"))
-    .map((name) => ({ route: `/docs/components/${name.slice(0, -5)}/`, source: readFileSync(resolve(pagesDir, name), "utf-8") }))
-    .filter((page) => /^files: components\/[a-z0-9-]+\.css$/m.test(page.source));
-  if (!components.length) throw new Error("apps/docs/pages/components has no component pages to count the home page's shares from");
-  // The pages the right-to-left test skips, from its own source
-  const rtlSpec = readFileSync(resolve(root, "tests/rtl.spec.js"), "utf-8");
-  const skipped = new Set([...(rtlSpec.match(/SKIP_PAGES = new Set\(\[([^\]]*)\]\)/)?.[1] ?? "").matchAll(/'([^']+)'/g)].map((m) => m[1]));
-  // The component stylesheets
-  const cssDir = resolve(root, "packages/core/src/components");
-  const stylesheets = readdirSync(cssDir)
-    .filter((name) => name.endsWith(".css") && name !== "index.css" && !name.startsWith("_"))
-    .map((name) => readFileSync(resolve(cssDir, name), "utf-8"));
-  // The tests
-  const testsDir = resolve(root, "tests");
-  const tests = readdirSync(testsDir)
-    .filter((name) => /\.(spec|test)\.js$/.test(name))
-    .map((name) => readFileSync(resolve(testsDir, name), "utf-8"));
-  // The colour pairs, measured by the script (once per build)
-  if (!contrastPairs.has(root)) {
-    const out = execFileSync(process.execPath, [resolve(root, "scripts/check-contrast.js")], { encoding: "utf-8" });
-    const pairs = Number(out.match(/(\d+) token pairs/)?.[1]);
-    if (!pairs) throw new Error("scripts/check-contrast.js did not say how many token pairs it measured");
-    contrastPairs.set(root, pairs);
-  }
-  const pairs = contrastPairs.get(root);
-  const share = (part, whole) => ({ part, whole, pct: Math.round((100 * part) / whole) });
-  const rows = [
-    ["contrast", share(pairs, pairs)],
-    ["rtl", share(components.filter((p) => p.source.includes("data-docs-specimen") && !skipped.has(p.route)).length, components.length)],
-    ["no-js", share(components.filter((p) => !/^module: /m.test(p.source)).length, components.length)],
-    ["focus", share(stylesheets.filter((css) => css.includes(":focus-visible")).length, stylesheets.length)],
-    ["forced", share(stylesheets.filter((css) => css.includes("forced-colors")).length, stylesheets.length)],
-    ["issues", share(components.filter((p) => p.source.includes("None known")).length, components.length)],
-    ["tests", share(tests.filter((src) => /javaScriptEnabled: false|chromium-nojs|nojs/.test(src)).length, tests.length)],
-  ];
-  const total = say("why.usable.total")
-    .replace("{components}", number.format(components.length))
-    .replace("{tests}", number.format(tests.length))
-    .replace("{pairs}", number.format(pairs));
-  return [
-    '<figure class="luz-bar-list luz-bar-list--cells">',
-    `  <ul class="luz-bar-list__rows" aria-label="${escapeHtml(say("why.usable.list"))}">`,
-    ...rows.map(([kind, s]) => barRow(say(`why.usable.m.${kind}`), percent.format(s.pct / 100), s.pct, 100)),
-    "  </ul>",
-    `  <figcaption class="u-text-muted"><strong>${escapeHtml(total)}</strong> ${escapeHtml(say("why.usable.caption"))}</figcaption>`,
-    "</figure>",
-  ].join("\n");
-}
-
-/**
  * The names each of the home's levels brings, read from the packages when
  * the page is built and never typed, as {{list1}}…{{list3}}: tags under a
  * heading with their count, each a link to where the documentation
@@ -1884,6 +1749,17 @@ function levelLists(site, locale, used) {
     }
     return map;
   };
+  // How many pages of a docs area are in each of its groups (the `group:` of their front matter), and all of them as "*"
+  const docsGroups = (dir, all) => {
+    const count = new Map([["*", all]]);
+    for (const name of readdirSync(resolve(root, pages, dir)).filter((n) => n.endsWith(".html"))) {
+      const group = /^group:\s*([a-z-]+)/m.exec(read(`${pages}/${dir}/${name}`).split("-->")[0])?.[1];
+      if (group) count.set(group, (count.get(group) ?? 0) + 1);
+    }
+    return count;
+  };
+  // Every stylesheet of the catalog, those of the patterns of a kind of site too (`sheets()` leaves those out of the home's list)
+  const allCatalogSheets = readdirSync(resolve(root, "packages/catalog/src/components")).filter((n) => n.endsWith(".css") && n !== "index.css" && !n.startsWith("_")).map((n) => n.slice(0, -4));
   const coreHref = pageOf("components", "components");
   const siteHref = pageOf("catalog", "catalog");
   const layoutIds = ids("components/layout.html");
@@ -1937,6 +1813,11 @@ function levelLists(site, locale, used) {
     return `<li style="--share:${share(i)}"><a href="${href}">${escapeHtml(say(key))} <span class="landing-names__n">${counts[i]}</span></a></li>`;
   });
   return {
+    ...tokenSections({ say, tokens, groups: GROUPS, counts, families: Object.keys(tokenJson.color), root, read }),
+    ...catalogSections({ say, root, groups: docsGroups("catalog", 0), sheets: allCatalogSheets, dependencies: Object.keys(JSON.parse(read("packages/catalog/package.json")).dependencies ?? {}).length, chunks: FILES.catalog.chunks.length }),
+    ...aiSections({ say, root, escapeHtml }),
+    ...cliDemo({ say, root, escapeHtml }),
+    ...coreSections({ say, groups: docsGroups("components", sheets("packages/core/src/components").length), objects: objects.length, dependencies: Object.keys(JSON.parse(read("packages/core/package.json")).dependencies ?? {}).length }),
     list1: [
       `<div class="landing-names" style="--n:${GROUPS.length}">`,
       `  <h3 class="landing-names__title">${escapeHtml(say("inside.list.tokens"))} <span class="landing-names__n">${tokens.length}</span></h3>`,
@@ -1945,6 +1826,573 @@ function levelLists(site, locale, used) {
     ].join("\n"),
     list2: [list("inside.list.components", sheets("packages/core/src/components"), component(coreHref, "components"), sheetBytes("core")), list("inside.list.objects", objects, objectHref, objectWeight)].join("\n"),
     list3: list("inside.list.catalog", sheets("packages/catalog/src/components"), component(siteHref, "catalog"), sheetBytes("catalog")),
+  };
+}
+
+/**
+ * The page of the tokens (apps/landing/levels/tokens.html), for a developer who
+ * does not yet know what a token is: what it is and how to use it, at a glance
+ * (owner, 2026-11-23). The generator writes, from the packages and never typed:
+ *
+ *  - {{tokendemo}}, the hero's demo: a radio per look (DEMO_LOOKS) that
+ *    restyles the hero and a small product, colour, type, corners, depth and
+ *    motion, by CSS alone (landing.css, `.landing-demo:has(input[value=…]:checked)`),
+ *    with the tokens the look reads; {{tokenlooks}} is the style of the hero, a
+ *    property per look and part (`--look-<id>-<part>`), so landing.css reads no
+ *    primitive;
+ *  - {{tokenblocks}}, three sections of the home's kind, colour, scales and the
+ *    rest, each linking the groups of levelLists() it holds to their docs with
+ *    their counts, over a panel that draws a few tokens (read through `--v`, so
+ *    they follow the colour mode) and the CSS that uses them;
+ *  - {{ntokens}}, {{nmodes}} (the [data-theme] blocks of semantic.css) and
+ *    {{ndeps}} (the dependencies of @luz-ds/tokens), the hero's numbers.
+ *
+ * A token named here that luz-tokens.css does not define fails the build.
+ */
+/**
+ * A block of a level's page, the way the home's sections are: the words (h2, lead, one link per group of the docs it
+ * covers with its count) on one side and a panel on the other, the sides swapping from one block to the next so the
+ * page zigzags. `anchor` is the prefix of its id (`t-color`), `links` are [{ href, label, count }] with `label`
+ * already escaped, `panel` is the panel's inside and `aside` what follows the links in the words' column.
+ */
+function levelBlock({ i, id, anchor, title, lead, links, panel, aside = "", wide = false }) {
+  return [
+    `<section class="landing-inside${i % 2 ? " landing-inside--flip" : ""} landing-block landing-block--${id}${wide ? " landing-block--wide" : ""}" id="${anchor}-${id}" aria-labelledby="${anchor}-${id}-title">`,
+    `  <div class="landing-inside__copy">`,
+    `    <h2 class="landing-inside__title" id="${anchor}-${id}-title">${title}</h2>`,
+    `    <p class="landing-inside__lead">${lead}</p>`,
+    // a link with no count (the page of the skill links its docs) has no number; a block with no link has no list
+    `    ${links.length ? `<ul class="landing-block__groups">${links.map((l) => `<li><a class="landing-block__link" href="${l.href}">${l.label}${l.count === "" ? "" : ` <span class="landing-names__n">${l.count}</span>`}</a></li>`).join("")}</ul>` : ""}${aside}`,
+    `  </div>`,
+    // the tokens' specimens are drawn left to right; the live pieces of core and the catalog follow the page's direction
+    `  <div class="landing-panel landing-block__panel"${wide ? "" : ' dir="ltr"'}>${panel}</div>`,
+    `</section>`,
+  ].join("\n");
+}
+
+/**
+ * The looks of the hero's demo: the same markup, a whole look and feel from the
+ * tokens of every group. Any two differ in at least three of colour, type,
+ * corners, depth and motion (tests/landing-levels.test.js).
+ */
+const DEMO_LOOKS = [
+  { id: "classic", brand: "--luz-blue-60", font: "--luz-font-serif", radius: "--luz-radius-md", shadow: "--luz-shadow-sm", ease: "--luz-easing-standard", duration: "--luz-duration-base" },
+  { id: "modern", brand: "--luz-purple-60", font: "--luz-font-sans", radius: "--luz-radius-md", shadow: "--luz-shadow-lg", ease: "--luz-easing-enter", duration: "--luz-duration-slow" },
+  { id: "playful", brand: "--luz-teal-60", font: "--luz-font-sans", radius: "--luz-radius-full", shadow: "--luz-shadow-md", ease: "--luz-easing-spring", duration: "--luz-duration-slower" },
+  { id: "calm", brand: "--luz-green-60", font: "--luz-font-serif", radius: "--luz-radius-sm", shadow: "--luz-shadow-md", ease: "--luz-easing-enter", duration: "--luz-duration-lazy" },
+  { id: "brutal", brand: "--luz-red-60", font: "--luz-font-mono", radius: "--luz-radius-none", shadow: "--luz-shadow-sm", ease: "--luz-easing-linear", duration: "--luz-duration-fast" },
+];
+const LOOK_PARTS = ["brand", "font", "radius", "shadow", "ease", "duration"];
+/** The device each breakpoint is drawn as, a small wireframe as wide as the breakpoint. */
+const DEVICES = { sm: "phone", md: "tablet", lg: "laptop", xl: "laptop", xxl: "desktop", xxxl: "desktop" };
+
+function tokenSections({ say, tokens, groups, counts, families, read }) {
+  const known = new Set(tokens);
+  const values = new Map();
+  for (const m of read("packages/tokens/dist/luz-tokens.css").matchAll(/^\s*(--luz-[\w-]+):\s*([^;]+);/gm)) if (!values.has(m[1])) values.set(m[1], m[2].trim());
+  const need = (name) => {
+    if (!known.has(name)) throw new Error(`the page of the tokens names ${name}, which luz-tokens.css does not define: change tokenSections() in scripts/docs-site/site.js`);
+    return name;
+  };
+  const t = (key) => escapeHtml(say(key));
+  const v = (name) => `style="--v:var(${need(name)})"`;
+  const label = (text) => `<code class="landing-spec__label">${escapeHtml(text)}</code>`;
+  const css = (text) => {
+    for (const m of text.matchAll(/--luz-[\w-]+/g)) need(m[0]);
+    // focusable, so a block that scrolls on a narrow screen scrolls from the keyboard too
+    return `<pre class="luz-code-block" data-lang="css" dir="ltr" tabindex="0"><code>${escapeHtml(text)}</code></pre>`;
+  };
+  const byId = Object.fromEntries(groups.map(([key, href, test], i) => [key.replace("inside.list.", ""), { key, href, test, count: counts[i] }]));
+  const curve = (name) => {
+    const m = /cubic-bezier\(([^)]+)\)/.exec(values.get(need(name)));
+    const [x1, y1, x2, y2] = m ? m[1].split(",").map(Number) : [0, 0, 1, 1];
+    const at = (x, y) => `${(x * 40).toFixed(1)},${(44 - y * 40).toFixed(1)}`;
+    return `<svg class="landing-tokens__curve" viewBox="-2 -12 44 60" aria-hidden="true"><path class="landing-tokens__axis" d="M0,44 H40 M0,44 V4"/><path pathLength="1" d="M${at(0, 0)} C${at(x1, y1)} ${at(x2, y2)} ${at(1, 1)}"/></svg>`;
+  };
+  const card = (name, specimen, code) => `<div class="landing-card landing-card--${name}"><p class="landing-card__title">${t(`inside.list.${name}`)}</p>${specimen}${css(code)}</div>`;
+  const row = (cls, items) => `<ul class="landing-spec landing-spec--${cls}" aria-hidden="true">${items.join("")}</ul>`;
+  const panels = {
+    // Two cards, as the scales have: the semantic colours as chips read live (so they follow the mode), over the one
+    // line that reads them; and the primitives, every family a ramp of all its steps, over the line that points a
+    // semantic token at one of them
+    color: () => {
+      const SEMANTIC = ["--luz-surface", "--luz-surface-strong", "--luz-divider", "--luz-text-primary", "--luz-brand-primary"];
+      const json = JSON.parse(read("packages/tokens/tokens.json")).color;
+      const chips = row("colors", SEMANTIC.map((name) => `<li><span class="landing-spec__box landing-spec__box--color" ${v(name)}></span>${label(name.slice("--luz-".length))}</li>`));
+      const ramps = `<ul class="landing-tokens__ramps" aria-hidden="true">${families
+        .map((family) => `<li>${label(family)}<span class="landing-tokens__ramp">${Object.keys(json[family]).map((step) => `<span ${v(`--luz-${family}-${step}`)}></span>`).join("")}</span></li>`)
+        .join("")}</ul>`;
+      return `<div class="landing-cards">${card("semantic", chips, "background: var(--luz-surface);\ncolor: var(--luz-text-primary);")}${card("primitives", ramps, "--luz-brand-primary: var(--luz-blue-60);")}</div>`;
+    },
+    scales: () =>
+      `<div class="landing-cards">${[
+        card("spacing", row("bars", ["xs", "sm", "md", "lg", "xl", "2xl"].map((step) => `<li><span class="landing-tokens__bar" ${v(`--luz-space-${step}`)}></span>${label(step)}</li>`)), "gap: var(--luz-space-md);"),
+        card("typography", row("type", ["sm", "base", "lg", "xl", "2xl"].map((step) => `<li><span class="landing-tokens__letter" ${v(`--luz-text-${step}`)}>Aa</span>${label(step)}</li>`)), "font-size: var(--luz-text-2xl);"),
+        card("radius", row("boxes", ["none", "sm", "md", "full"].map((step) => `<li><span class="landing-spec__box landing-spec__box--radius" ${v(`--luz-radius-${step}`)}></span>${label(step)}</li>`)), "border-radius: var(--luz-radius-md);"),
+        card("shadows", row("boxes", ["sm", "md", "lg"].map((step) => `<li><span class="landing-spec__box landing-spec__box--shadow" ${v(`--luz-shadow-${step}`)}></span>${label(step)}</li>`)), "box-shadow: var(--luz-shadow-lg);"),
+      ].join("")}</div>`,
+    // Motion and breakpoints, a section each: the specimen, then its code, with no card inside the panel
+    motion: () =>
+      `${row("curves", ["standard", "enter", "exit", "spring"].map((step) => `<li><span class="landing-tokens__plot">${curve(`--luz-easing-${step}`)}<span class="landing-tokens__dot" style="--ease:var(${need(`--luz-easing-${step}`)})" aria-hidden="true"><span></span></span></span>${label(step)}</li>`))}${css("transition: opacity\n  var(--luz-duration-base)\n  var(--luz-easing-standard);")}`,
+    breakpoints: () => {
+      const mq = tokens.filter(byId.breakpoints.test);
+      const px = (n) => parseFloat(values.get(n)) || 0;
+      const widest = Math.max(...mq.map(px));
+      return `${row("devices", mq.map((n) => {
+        const step = n.slice("--luz-mq-".length);
+        if (!DEVICES[step]) throw new Error(`the page of the tokens has no device for ${n}: add it to DEVICES in scripts/docs-site/site.js`);
+        return `<li><span class="landing-tokens__device landing-tokens__device--${DEVICES[step]}" style="--share:${(px(n) / widest).toFixed(3)}"></span>${label(`${step} ${values.get(n)}`)}</li>`;
+      }))}${css("/* a media query reads no property: */\n@media (min-width: 768px) { … }")}`;
+    },
+  };
+  const BLOCKS = [
+    ["color", ["primitives", "semantic"]],
+    ["scales", ["spacing", "typography", "radius", "shadows"]],
+    ["motion", ["motion"]],
+    ["breakpoints", ["breakpoints"]],
+  ];
+  const lost = groups.map(([key]) => key.replace("inside.list.", "")).filter((id) => !BLOCKS.some(([, ids]) => ids.includes(id)));
+  if (lost.length) throw new Error(`the page of the tokens has no block for ${lost.join(", ")}: add it to BLOCKS in tokenSections()`);
+  const blocks = BLOCKS.map(([id, ids], i) =>
+    levelBlock({
+      i,
+      id,
+      anchor: "t",
+      title: t(`level.tokens.${id}.title`),
+      lead: t(`level.tokens.${id}.lead`),
+      links: ids.map((g) => ({ href: byId[g].href, label: t(byId[g].key), count: byId[g].count })),
+      panel: panels[id](),
+    }),
+  );
+  // Top down: the title and the looks, centred; then the product, drawn with the look's tokens, beside the
+  // code in an editor that says them
+  const demo = [
+    `<div class="landing-demo__top">`,
+    `<p class="landing-demo__title">${t("level.tokens.demo.title")}</p>`,
+    `<fieldset class="landing-demo__picker">`,
+    `<legend>${t("level.tokens.demo.legend")}</legend>`,
+    `<div class="landing-demo__options">`,
+    DEMO_LOOKS.map((look, i) => `<label class="landing-demo__option" style="--o-brand:var(${need(look.brand)});--o-font:var(${need(look.font)});--o-radius:var(${need(look.radius)})"><input type="radio" name="look" value="${look.id}"${i ? "" : " checked"}><span class="landing-demo__swatch" aria-hidden="true"></span><span>${t(`level.tokens.look.${look.id}`)}</span></label>`).join(""),
+    `</div>`,
+    `</fieldset>`,
+    `</div>`,
+    // One browser window: its bar, the page (the product, in the look's tokens) and, glued beside it, the
+    // devtools that say the tokens the look reads
+    `<div class="landing-demo__window">`,
+    `<div class="landing-demo__chrome" aria-hidden="true"><span></span><span></span><span></span></div>`,
+    `<div class="landing-demo__viewport">`,
+    `<div class="landing-demo__product">`,
+    `<span class="landing-demo__bar" aria-hidden="true"><span class="landing-demo__logo"></span><span class="landing-demo__nav"></span><span class="landing-demo__nav"></span><span class="landing-demo__avatar"></span></span>`,
+    `<p class="landing-demo__badge">${t("level.tokens.demo.badge")}</p>`,
+    `<p class="landing-demo__heading">${t("level.tokens.demo.heading")}</p>`,
+    `<p class="landing-demo__text">${t("level.tokens.demo.text")}</p>`,
+    `<span class="landing-demo__row" aria-hidden="true"><span class="landing-demo__button">${t("level.tokens.demo.button")}</span><span class="landing-demo__link">${t("level.tokens.demo.link")}</span></span>`,
+    `<span class="landing-demo__meter" aria-hidden="true"><span></span></span>`,
+    `</div>`,
+    `</div>`,
+    `<div class="landing-demo__editor">`,
+    `<p class="landing-demo__caption"><span>${t("level.tokens.demo.code")}</span></p>`,
+    // a <pre> that keeps its indent, but not a .luz-code-block: the highlighter would rewrite its markup, and each
+    // look's block is shown by CSS; a property and its value in the colours of the devtools
+    `<pre class="landing-demo__code" dir="ltr" tabindex="0" aria-label="${t("level.tokens.demo.code")}">${DEMO_LOOKS.map((look) => {
+      const decl = (prop, value, indent = "  ") => `${indent}<span class="landing-demo__prop">${prop}</span>: <span class="landing-demo__val">${escapeHtml(value)}</span>;`;
+      return `<code class="landing-demo__look" data-look="${look.id}">${[
+        `<span class="landing-demo__sel">.card</span> {`,
+        decl("--luz-brand-fill", `var(${look.brand})`),
+        decl("font-family", `var(${look.font})`),
+        decl("border-radius", `var(${look.radius})`),
+        decl("box-shadow", `var(${look.shadow})`),
+        decl("transition", `var(${look.duration})\n    var(${look.ease})`),
+        "}",
+      ].join("\n")}</code>`;
+    }).join("")}</pre>`,
+    `</div>`,
+    `</div>`,
+  ].join("\n");
+  const modes = new Set([...read("packages/tokens/src/semantic.css").matchAll(/\[data-theme="([a-z-]+)"\]\s*[,{]/g)].map((m) => m[1]));
+  return {
+    tokendemo: demo,
+    tokenlooks: DEMO_LOOKS.flatMap((look) => LOOK_PARTS.map((part) => `--look-${look.id}-${part}:var(${need(look[part])})`)).join(";"),
+    tokenblocks: blocks.join("\n"),
+    ntokens: String(tokens.length),
+    nmodes: String(modes.size),
+    ndeps: String(Object.keys(JSON.parse(read("packages/tokens/package.json")).dependencies ?? {}).length),
+  };
+}
+
+/** A listing of HTML in the colours of the devtools: a tag, its attributes and their values, and a comment (the text is escaped first). */
+function paintHtml(text) {
+  return escapeHtml(text)
+    .replace(/(&lt;!--[\s\S]*?--&gt;|\/\*[\s\S]*?\*\/)/g, '<span class="landing-demo__note">$1</span>')
+    .replace(/&lt;(\/?)([a-z0-9]+)/g, '&lt;$1<span class="landing-demo__sel">$2</span>')
+    .replace(/ ([a-z-]+)=&quot;([^&]*?)&quot;/g, ' <span class="landing-demo__prop">$1</span>=<span class="landing-demo__val">&quot;$2&quot;</span>');
+}
+
+/** The views of the demo of core: the same page written three ways, each a step further. */
+const CORE_VIEWS = ["bare", "classes", "yours"];
+
+/**
+ * The page of core (apps/landing/levels/core.html): for a developer who does not yet know what core gives, that the
+ * HTML they already write comes styled, that a class adds a component and that their own CSS wins. The generator
+ * writes, from the packages and never typed:
+ *
+ *  - {{coredemo}}, the hero's demo: one page written three ways (CORE_VIEWS), a radio each, shown by CSS alone: HTML
+ *    with no class (the bare elements), the same page with the classes of its components, and with one rule of the
+ *    reader's own, which wins with no `!important` because core is in a cascade layer. The page is real core markup,
+ *    inert, so the keyboard stays out of it; the HTML beside it is the same markup, in the colours of the devtools;
+ *  - {{coreblocks}}, five blocks (actions, forms, content, feedback and layout) in the order and the sides of the home, each
+ *    with cards of real components and the line of HTML that writes them, linking the docs' groups they cover with
+ *    their counts;
+ *  - {{ncomponents}}, {{nobjects}} and {{ndepscore}}, the hero's numbers.
+ */
+function coreSections({ say, groups, objects, dependencies }) {
+  const t = (key) => escapeHtml(say(key));
+  const html = (text) => `<pre class="luz-code-block" data-lang="html" dir="ltr" tabindex="0"><code>${escapeHtml(text)}</code></pre>`;
+  const card = (name, live, code) => `<div class="landing-card landing-card--${name}"><p class="landing-card__title">${t(`level.core.card.${name}`)}</p><div class="landing-core__live" inert>${live}</div>${html(code)}</div>`;
+  // The video player, as it looks paused: a drawn picture stands in for the film (the landing ships no video), with
+  // the play button over it, the seek bar, the time, the volume, the captions on, the track and full screen
+  const videoPanel = () => {
+    const w = (key) => t(`level.core.sample.${key}`);
+    const stroke = (d) => `<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${d}</g></svg>`;
+    return [
+      `<div class="luz-player" data-type="video" role="group" aria-label="${w("video")}">`,
+      `<div class="luz-player-media-wrap is-paused"><svg class="luz-player-video" viewBox="0 0 320 135" preserveAspectRatio="xMidYMid slice" role="img" aria-label="${w("poster")}"><rect width="320" height="135" fill="currentColor" opacity=".18"/><circle cx="250" cy="34" r="14" fill="currentColor" opacity=".45"/><path d="M0 135 70 60l50 45 60-70 70 60 70-35v75Z" fill="currentColor" opacity=".35"/></svg><div class="luz-player-overlay" aria-hidden="true"><svg class="luz-play-icon" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4.5v15l12-7.5L7 4.5Z"/></g></svg></div></div>`,
+      `<div class="luz-player-controls"><div class="luz-player-progress-row"><button class="luz-player-btn luz-player-playpause" type="button" aria-label="${w("play")}">${stroke('<path d="M7 4.5v15l12-7.5L7 4.5Z"/>')}</button><input class="luz-player-seekbar" type="range" min="0" max="1000" value="280" style="--luz-seek: 28%" aria-label="${w("seek")}"></div>`,
+      `<div class="luz-player-btns"><span class="luz-player-time">0:12</span><span class="luz-player-spacer"></span><span class="luz-player-time">0:45</span><div class="luz-player-vol-wrap"><button class="luz-player-btn luz-player-mute" type="button" aria-label="${w("mute")}">${stroke('<path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4v-5ZM16 9a4.5 4.5 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/>')}</button><input class="luz-player-seekbar luz-player-volbar" type="range" min="0" max="100" value="70" style="--luz-seek: 70%" aria-label="${w("volume")}"></div><button class="luz-player-btn luz-player-captions" type="button" aria-pressed="true" aria-label="${w("captions")}">CC</button><select class="luz-input luz-player-tracks" aria-label="${w("track")}"><option>${w("tracklang")}</option></select><button class="luz-player-btn luz-player-fullscreen" type="button" aria-label="${w("fullscreen")}">${stroke('<path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/>')}</button></div></div>`,
+      `</div>`,
+    ].join("");
+  };
+  // The buttons: every variant, every state (hover, pressed and focus drawn as they look, since an inert specimen is
+  // never hovered), with an icon and with an icon alone, every size, and the full width of a form or a card
+  const svg = (d) => `<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
+  const ICON = {
+    download: '<path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14"/>',
+    settings: '<circle cx="12" cy="12" r="3"/><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.8 1.8M16.6 16.6l1.8 1.8M5.6 18.4l1.8-1.8M16.6 7.4l1.8-1.8"/>',
+    search: '<circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/>',
+    arrow: '<path d="M5 12h14m0 0-5-5m5 5-5 5"/>',
+  };
+  const actionsPanel = () => {
+    const w = (key) => t(`level.core.sample.${key}`);
+    const btn = (cls, label, attrs = "") => `<button class="luz-btn luz-btn--${cls}" type="button"${attrs}>${label}</button>`;
+    const group = (key, body, cls = "o-row") => `<div class="landing-core__group"><p class="landing-core__label">${w(`btn.${key}`)}</p><div class="${cls}">${body}</div></div>`;
+    return [
+      `<div class="landing-core__buttons">`,
+      group("variants", [btn("primary", w("save")), btn("secondary", w("cancel")), btn("outline", w("skip")), btn("ghost", w("move")), btn("danger", w("delete"))].join("")),
+      group("states", [btn("primary", w("state.rest")), btn("primary", w("state.hover"), ' data-state="hover"'), btn("primary", w("state.active"), ' data-state="active" aria-pressed="true"'), btn("primary", w("state.focus"), ' data-state="focus"'), btn("primary", w("state.disabled"), " disabled")].join("")),
+      group("icons", [btn("primary", `${svg(ICON.download)}${w("download")}`), btn("outline", `${svg(ICON.settings)}${w("settings")}`), btn("ghost", `${w("share")}${svg(ICON.arrow)}`), btn("secondary", svg(ICON.search), ` aria-label="${w("search")}"`)].join("")),
+      group("sizes", [btn("primary luz-btn--sm", w("small")), btn("primary", w("medium")), btn("primary luz-btn--lg", w("large"))].join("")),
+      group("block", btn("primary luz-btn--block", w("create")), "landing-core__block"),
+      `</div>`,
+    ].join("");
+  };
+  // The layout: the plan of an application made of every object of core, each region named by its class, with the
+  // utilities and the shared keyframes at work in it (the skeleton shimmers, the status dot pulses, the save spins,
+  // the cards slide up and fade in), the markup beside it
+  const planPanel = () => {
+    const w = (key) => t(`level.core.plan.${key}`);
+    const name = (cls) => `<code class="landing-plan__name">${cls}</code>`;
+    const wire = (n, cls = "") => `<span class="landing-wire${cls}"></span>`.repeat(n);
+    const plan = [
+      `<div class="landing-plan o-shell">`,
+      `<aside class="landing-plan__side o-stack">${name("o-shell")}<span class="landing-wire landing-wire--icon"></span>${wire(4)}</aside>`,
+      `<div class="o-main o-page landing-plan__region">${name("o-main · o-page")}`,
+      `<header class="o-sticky landing-plan__bar u-flex-between">${name("o-sticky")}<span class="landing-plan__status"><span class="landing-plan__dot"></span><span class="u-text-muted">${w("status")}</span></span><button class="luz-btn luz-btn--ghost luz-btn--sm" type="button">${svg(ICON.search)}<span class="u-sr-only">${t("level.core.sample.search")}</span></button></header>`,
+      `<main class="o-container landing-plan__region">${name("o-container")}`,
+      `<div class="o-stack landing-plan__region">${name("o-stack")}`,
+      `<div class="o-media landing-plan__region">${name("o-media")}<span class="landing-wire landing-wire--icon"></span><div class="o-media__body"><p class="landing-plan__title u-truncate">${w("title")}</p><p class="u-text-muted u-text-mono landing-plan__meta">api-gateway · eu-west</p></div></div>`,
+      `<div class="o-grid o-grid--auto landing-plan__region landing-plan__grid">${name("o-grid")}${wire(5, " landing-plan__tile")}<span class="landing-wire landing-plan__tile landing-plan__skeleton"></span></div>`,
+      `<div class="o-row landing-plan__region">${name("o-row")}${wire(3)}</div>`,
+      `<div class="o-actions landing-plan__region">${name("o-actions")}<button class="luz-btn luz-btn--primary luz-btn--sm" type="button"><span class="landing-plan__spin"></span>${t("level.core.sample.save")}</button><button class="luz-btn luz-btn--outline luz-btn--sm" type="button">${t("level.core.sample.cancel")}</button></div>`,
+      `</div>`,
+      `</main>`,
+      `</div>`,
+      `<footer class="landing-plan__foot">${name("o-shell &gt; footer")}${wire(2)}</footer>`,
+      `</div>`,
+    ].join("");
+    return `<div class="landing-core__live" inert>${plan}</div>`;
+  };
+  const planCode = () => html('<div class="o-shell">\n  <aside>…</aside>\n  <div class="o-main o-page">\n    <header class="o-sticky">…</header>\n    <main class="o-container o-stack">\n      <div class="o-grid o-grid--auto">…</div>\n      <div class="o-actions">…</div>\n    </main>\n  </div>\n</div>');
+  const sample = {
+    actions: actionsPanel(),
+    copy: `<div class="o-stack">${[["npm install @luz-ds/core", "copylabel"]].map(([text, label]) => `<div class="landing-core__copy"><code>${escapeHtml(text)}</code><button class="luz-copy-btn" type="button" data-copy="${escapeHtml(text)}" aria-label="${t(`level.core.sample.${label}`)}">${t("see.copy")}</button></div>`).join("")}</div>`,
+    dropdown: `<div class="luz-dropdown"><button class="luz-btn luz-btn--secondary" type="button">${t("level.core.sample.actionsmenu")}</button><div class="luz-dropdown__menu"><ul class="luz-dropdown__list"><li><a class="luz-dropdown__item">${t("level.core.sample.edit")}</a></li><li><button class="luz-dropdown__item" type="button">${t("level.core.sample.duplicate")}</button></li><li><button class="luz-dropdown__item" type="button" aria-disabled="true">${t("level.core.sample.move")}</button></li><li><hr class="luz-dropdown__separator"></li><li><button class="luz-dropdown__item luz-dropdown__item--danger" type="button">${t("level.core.sample.deleteproject")}</button></li></ul></div></div>`,
+    alerts: `<div class="o-stack">${[["success", "alert", "m8.5 12 2.5 2.5 4.5-5"], ["info", "alert3", "M12 11v5.5M12 7.5v.01"], ["warning", "alert4", "M12 9.5v4M12 16.5v.01"], ["error", "alert2", "m9.5 9.5 5 5m0-5-5 5"]].map(([kind, key, d]) => `<div class="luz-alert luz-alert--${kind}"><div class="luz-alert__icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" focusable="false">${kind === "warning" ? '<path d="M12 4 21 19.5H3Z"/>' : '<circle cx="12" cy="12" r="8.5"/>'}<path d="${d}"/></svg></div><div><div class="luz-alert__title">${t(`level.core.sample.${key}.title`)}</div><div class="luz-alert__body">${t(`level.core.sample.${key}.body`)}</div></div></div>`).join("")}</div>`,
+    status: `<div class="o-stack"><progress class="luz-progress" value="67" max="100"></progress><progress class="luz-progress" value="25" max="100"></progress></div>`,
+    modal: `<dialog class="luz-modal" open><div class="luz-modal__header"><button class="luz-modal__close" type="button" aria-label="${t("level.core.sample.modal.close")}">×</button><h4 class="luz-modal__title">${t("level.core.sample.modal.title")}</h4></div><div class="luz-modal__body"><p>${t("level.core.sample.modal.body")}</p></div><div class="luz-modal__footer"><button class="luz-btn luz-btn--ghost" type="button">${t("level.core.sample.cancel")}</button><button class="luz-btn luz-btn--danger" type="button">${t("level.core.sample.modal.confirm")}</button></div></dialog>`,
+    toast: `<div class="luz-toast" role="status"><div class="luz-toast__content"><div class="luz-toast__kind">${t("level.core.sample.toast.kind")}</div><div class="luz-toast__msg">${t("level.core.sample.toast.msg")}</div></div><button class="luz-toast__close" type="button" aria-label="${t("level.core.sample.toast.dismiss")}">×</button></div>`,
+    tooltip: `<div class="luz-tooltip"><button class="luz-btn luz-btn--outline luz-btn--sm" type="button" aria-describedby="core-tip">${t("level.core.sample.tip.button")}</button><div class="luz-tooltip__text" role="tooltip" id="core-tip">${t("level.core.sample.tip.text")}</div></div>`,
+    image: `<div class="landing-core__ratios"><figure class="landing-core__ratio landing-core__ratio--wide"><div class="luz-image luz-image--21x9"></div><figcaption>21:9</figcaption></figure>${["4x3", "3x2", "1x1", "9x16"].map((r) => `<figure class="landing-core__ratio"><div class="luz-image luz-image--${r}"></div><figcaption>${r.replace("x", ":")}</figcaption></figure>`).join("")}</div>`,
+    video: videoPanel(),
+    player: `<div class="luz-player" data-type="audio" role="group" aria-label="${t("level.core.sample.player")}"><div class="luz-player-controls luz-player-controls--audio"><button class="luz-player-btn luz-player-playpause" type="button" aria-label="${t("level.core.sample.play")}"><svg class="icon-play" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4.5v15l12-7.5L7 4.5Z"/></g></svg></button><div class="luz-player-progress-row luz-player-progress-row--audio"><span class="luz-player-time">1:04</span><input class="luz-player-seekbar" type="range" min="0" max="1000" value="320" aria-label="${t("level.core.sample.seek")}"><span class="luz-player-time">3:20</span></div></div></div>`,
+  };
+  const lines = {
+    actions: '<button class="luz-btn luz-btn--primary luz-btn--lg">',
+    copy: '<button class="luz-copy-btn" data-copy="npm install">',
+    dropdown: '<div class="luz-dropdown">\n  <button popovertarget="menu">\n  <div class="luz-dropdown__menu" popover>',
+    alerts: '<div class="luz-alert luz-alert--error">',
+    modal: '<dialog class="luz-modal">',
+    toast: '<div class="luz-toast" role="status">',
+    tooltip: '<div class="luz-tooltip">',
+    image: '<div class="luz-image luz-image--4x3">',
+    player: '<div class="luz-player" data-type="audio">',
+    video: '<div class="luz-player" data-type="video">',
+    status: '<progress class="luz-progress" value="67">',
+  };
+  // The password holds no value, its dots are the placeholder: a filled password field makes a browser offer to save it
+  // when the visitor leaves the page.
+  // A real form, with every kind of control a form has: text, email and password (one invalid), a date, a select, a text
+  // area, a plan to choose, a range with its output, checkboxes (one disabled), a switch, and the buttons. The form
+  // is inert, so the keyboard stays out of it; the markup of a field is beside it
+  // `more` marks what a phone leaves out, so the form stays short there
+  const field = (id, label, control, extra = "", more = false) => `<div class="luz-field${more ? " landing-form__more" : ""}"><label class="luz-field__label" for="${id}">${label}</label>${control}${extra}</div>`;
+  const check = (type, name, id, label, attrs = "", more = false) => `<div class="luz-check-item${more ? " landing-form__more" : ""}"><input type="${type}"${name ? ` name="${name}"` : ""} id="${id}"${attrs}><label for="${id}">${label}</label></div>`;
+  const formPanel = () => {
+    const w = (key) => t(`level.core.sample.${key}`);
+    const form = [
+      `<form class="landing-form" action="#" autocomplete="off" inert>`,
+      `<fieldset class="luz-fieldset"><legend class="luz-legend">${w("account")}</legend>`,
+      field("core-f-name", w("name"), '<input class="luz-input" id="core-f-name" type="text" value="Ada Lovelace">'),
+      field("core-f-email", w("email"), '<input class="luz-input" id="core-f-email" type="email" value="ada@example.com">', `<div class="luz-field__helper">${w("hint")}</div>`),
+      field("core-f-password", w("password"), '<input class="luz-input luz-input--error" id="core-f-password" type="password" autocomplete="off" placeholder="••••" aria-invalid="true">', `<div class="luz-field__error"><span class="u-sr-only">Error: </span>${w("passworderror")}</div>`),
+      field("core-f-country", w("country"), `<select class="luz-select" id="core-f-country"><option>${w("opt1")}</option><option>${w("opt2")}</option><option>${w("opt3")}</option></select>`),
+      field("core-f-date", w("birthday"), '<input class="luz-input" id="core-f-date" type="date" value="1815-12-10">', "", true),
+      field("core-f-phone", w("phone"), '<input class="luz-input" id="core-f-phone" type="tel" value="+44 20 7946 0000">', "", true),
+      field("core-f-message", w("message"), `<textarea class="luz-input luz-input--textarea" id="core-f-message" rows="3">${w("messagetext")}</textarea>`, "", true),
+      `</fieldset>`,
+      `<fieldset class="luz-fieldset"><legend class="luz-legend">${w("plan")}</legend>`,
+      `<div class="luz-check-group" role="group" aria-label="${w("plan")}">${check("radio", "core-plan", "core-f-free", w("free"), " checked")}${check("radio", "core-plan", "core-f-team", w("team"))}${check("radio", "core-plan", "core-f-ent", w("enterprise"))}</div>`,
+      field("core-f-seats", `${w("seats")} <output class="luz-output">12</output>`, '<input class="luz-input" id="core-f-seats" type="range" min="1" max="50" value="12">', "", true),
+      `<div class="luz-check-group" role="group" aria-label="${w("notify")}">${check("checkbox", "", "core-f-by-email", w("byemail"), " checked")}${check("checkbox", "", "core-f-by-push", w("bypush"))}${check("checkbox", "", "core-f-by-sms", w("bysms"), " disabled", true)}</div>`,
+      `<label class="luz-toggle"><input class="luz-toggle__input" type="checkbox" role="switch" checked><span class="luz-toggle__track" aria-hidden="true"><span class="luz-toggle__thumb"></span></span><span class="luz-toggle__label">${w("digest")}</span></label>`,
+      check("checkbox", "", "core-f-terms", w("terms"), "", true),
+      `</fieldset>`,
+      `<div class="o-actions"><button class="luz-btn luz-btn--primary" type="submit">${w("create")}</button><button class="luz-btn luz-btn--outline" type="button">${w("cancel")}</button></div>`,
+      `</form>`,
+    ]
+      .join("")
+      // the name and the email are required: the label says so with its asterisk, the field with the attribute
+      .replace(/<label class="luz-field__label" for="(core-f-(?:name|email))">([^<]*)<\/label><input ([^>]*)>/g, '<label class="luz-field__label luz-field__label--required" for="$1">$2</label><input $3 required>');
+    return `<div class="landing-core__live" inert>${form.replace(' inert>', ">")}</div>`;
+  };
+  // The markup of a field, under the words beside the form
+  const formCode = () =>
+    `${html('<form>\n  <fieldset class="luz-fieldset">\n    <legend>…</legend>\n    <div class="luz-field">\n      <label class="luz-field__label">…</label>\n      <input class="luz-input">\n    </div>\n  </fieldset>\n  <button class="luz-btn luz-btn--primary">…</button>\n</form>')}`;
+  // A real page of a project, made of every piece of the content and navigation groups: the skip link (drawn as it
+  // shows on focus), the breadcrumb and the colour mode in its bar; the avatar, the meta line and a tag; the tabs; the
+  // prose with its inline code, a figure, a card with a meter and an accordion; a table, a code block, the icon grid,
+  // a band and the pagination. Inert, so the keyboard stays out of it
+  const pagePanel = () => {
+    const w = (key) => t(`level.core.page.${key}`);
+    const icon = (name, d) => `<li class="luz-icon-item"><span class="luz-icon-display"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${d}</svg></span><span class="luz-icon-name">${name}</span></li>`;
+    const chev = (cls, d, flip = "") => `<svg class="luz-accordion__${cls}"${flip} aria-hidden="true" focusable="false" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="${d}"/></svg>`;
+    const chevron = chev("end", "M9 6l6 6-6 6", " data-luz-flip") + chev("down", "M6 9l6 6 6-6");
+    const themeVars = 'style="--luz-theme-mode-line: var(--luz-outline); --luz-theme-mode-hover: var(--luz-surface-hover); --luz-theme-mode-focus: var(--luz-focus-ring); --luz-theme-mode-on: var(--luz-brand-fill); --luz-theme-mode-on-text: var(--luz-text-on-fill); --luz-theme-mode-bg: var(--luz-surface); --luz-theme-mode-edge: var(--luz-divider); --luz-theme-mode-text: var(--luz-text-secondary)"';
+    const mode = (value, key, d, checked = "") => `<label class="luz-theme-mode__option"><input class="luz-theme-mode__input" type="radio" name="core-mode" value="${value}"${checked}><svg class="luz-theme-mode__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">${d}</svg>${t(`footer.${key}`)}</label>`;
+    const tag = (tone, key) => `<span class="luz-tag luz-tag--${tone}">${w(`tag.${key}`)}</span>`;
+    const row = (name, tag, tone, cpu) => `<tr><td data-label="${w("col.service")}">${name}</td><td data-label="${w("col.status")}"><span class="luz-tag luz-tag--${tone} luz-tag--dot">${w(tag)}</span></td><td class="luz-table__numeric" data-label="${w("col.cpu")}">${cpu}%<meter class="luz-meter" value="${cpu}" min="0" max="100" aria-hidden="true"></meter></td></tr>`;
+    const page = [
+      `<div class="landing-page">`,
+      `<div class="landing-page__bar"><a class="luz-skip-link">${t("skip")}</a><ol class="luz-breadcrumb"><li><a class="luz-breadcrumb__item">${w("crumb")}</a></li><li><a class="luz-breadcrumb__item" aria-current="page">${t("level.core.sample.title")}</a></li></ol><button class="luz-theme-mode__button" ${themeVars} type="button" aria-label="${w("mode")}"><svg class="luz-theme-mode__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M19.5 14.5A8 8 0 1 1 9.5 4.5a6.5 6.5 0 0 0 10 10Z"/></svg></button></div>`,
+      `<div class="landing-page__head"><span class="luz-avatar luz-avatar--lg" role="img" aria-label="Ana Ruiz">AR</span><div class="landing-page__title"><h3>${t("level.core.sample.title")} <span class="luz-tag luz-tag--green luz-tag--dot">${t("level.core.sample.tag")}</span></h3><p class="luz-meta"><span>${w("meta.by")}</span> <time datetime="2026-10-12">${w("meta.date")}</time> <span>${w("meta.read")}</span></p><p class="landing-page__tags">${tag("gray", "internal")}${tag("blue", "beta")}${tag("teal", "documented")}${tag("purple", "new")}</p></div><span class="landing-page__team"><span class="luz-avatar luz-avatar--sm" role="img" aria-label="Luis Gómez">LG</span><span class="luz-avatar luz-avatar--md" role="img" aria-label="Mia Chen">MC</span></span></div>`,
+      `<dl class="luz-meta luz-meta--facts"><div><dt>${w("fact.region")}</dt><dd>eu-west</dd></div><div><dt>${w("fact.plan")}</dt><dd>${t("level.core.sample.team")}</dd></div><div><dt>${w("fact.requests")}</dt><dd>${w("fact.requests.value")}</dd></div></dl>`,
+      `<nav class="luz-tabs"><a class="luz-tab" aria-current="page">${t("level.core.sample.tab1")} <span class="luz-badge luz-badge--primary">4</span></a><a class="luz-tab">${t("level.core.sample.tab2")} <span class="luz-badge luz-badge--gray">12</span></a><a class="luz-tab">${t("level.core.sample.tab3")} <span class="luz-badge luz-badge--danger">3</span></a></nav>`,
+      `<div class="landing-page__grid">`,
+      `<div class="o-stack"><div class="luz-prose"><p>${w("prose")}</p><ul><li>${w("li1")}</li><li>${w("li2")}</li></ul><p>${w("limit")} <code class="luz-code-inline">rate_limit</code>.</p></div>`,
+      `<figure class="luz-figure"><div class="luz-figure__media"><svg viewBox="0 0 320 96" role="img" aria-label="${w("figure")}" fill="currentColor"><rect x="8" y="64" width="40" height="32"/><rect x="60" y="52" width="40" height="44"/><rect x="112" y="40" width="40" height="56"/><rect x="164" y="30" width="40" height="66"/><rect x="216" y="16" width="40" height="80"/><rect x="268" y="4" width="40" height="92"/></svg></div><figcaption class="luz-figure__caption">${w("figure")}</figcaption></figure></div>`,
+      `<div class="o-stack"><div class="luz-card"><h4 class="luz-card__title">${w("uptime")}</h4><p class="luz-card__body">${w("uptime.body")}</p><meter class="luz-meter" value="99" min="0" max="100" aria-hidden="true"></meter></div>`,
+      `<div class="luz-accordion"><details open><summary><span>${w("q1")}</span>${chevron}</summary><p>${w("a1")}</p></details><details><summary><span>${w("q2")}</span>${chevron}</summary><p>${w("a2")}</p></details></div></div>`,
+      `</div>`,
+      `<div class="luz-table-wrap"><table class="luz-table luz-table--compact luz-table--sticky-col"><caption>${w("services")}</caption><thead><tr><th scope="col">${w("col.service")}</th><th scope="col">${w("col.status")}</th><th class="luz-table__numeric" scope="col">${w("col.cpu")}</th></tr></thead><tbody>${row("api-gateway", "running", "green", 12)}${row("data-pipeline", "degraded", "yellow", 78)}${row("mailer", "stopped", "red", 0)}</tbody></table></div>`,
+      `<div class="landing-page__cards">`,
+      `<article class="luz-card luz-card--media"><div class="luz-card__media luz-image luz-image--21x9"></div><div class="luz-card__body o-stack"><span>${tag("gray", "guide")}</span><h4 class="luz-card__title">${w("guide.title")}</h4><p>${w("guide.text")}</p></div><div class="luz-card__actions o-actions"><a class="luz-btn luz-btn--primary">${w("guide.read")}</a></div></article>`,
+      `<div class="luz-card luz-card--featured"><h4 class="luz-card__title">${t("level.core.sample.team")}</h4><p class="luz-card__body">${w("plan.text")} <span class="luz-tag luz-tag--blue">${w("plan.chosen")}</span></p><p class="luz-card__price"><span class="u-sr-only">${w("price.now")} </span><data value="12">${w("price")}</data> <s><span class="u-sr-only">${w("price.was")} </span>${w("price.old")}</s></p><div class="luz-card__actions o-actions"><a class="luz-btn luz-btn--primary luz-btn--block">${w("plan.upgrade")}</a></div></div>`,
+      `</div>`,
+      `<nav class="luz-tabs luz-tabs--pill"><a class="luz-tab" aria-current="page">CSS</a><a class="luz-tab">HTML</a><a class="luz-tab">JS</a></nav>`,
+      `<div class="luz-tabpanel"><pre class="luz-code-block" data-lang="css" dir="ltr"><code>.route {\n  rate_limit: 100/min;\n}</code></pre></div>`,
+      `<ul class="luz-icon-grid">${icon("menu", '<path d="M4 6h16M4 12h16M4 18h16"/>')}${icon("search", '<circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/>')}${icon("close", '<path d="M6 6l12 12M18 6L6 18"/>')}${icon("check", '<path d="m5 12.5 4.5 4.5L19 7"/>')}</ul>`,
+      `<div class="o-stack luz-band"><h4>${w("band.title")}</h4><p>${w("band.text")}</p></div>`,
+      `<nav><ul class="luz-pagination"><li><a class="luz-pagination__link" rel="prev">${w("prev")}</a></li><li><a class="luz-pagination__link" aria-current="page">1</a></li><li><a class="luz-pagination__link">2</a></li><li><a class="luz-pagination__link">3</a></li><li class="luz-pagination__gap" aria-hidden="true">…</li><li><a class="luz-pagination__link">12</a></li><li><a class="luz-pagination__link" rel="next">${w("next")}</a></li></ul></nav>`,
+      `<fieldset class="luz-theme-mode__group" ${themeVars}><legend class="luz-theme-mode__legend">${t("footer.mode")}</legend>${mode("auto", "auto", '<path d="M12 7.5a4.5 4.5 0 0 0 0 9ZM12 7.5a4.5 4.5 0 0 1 0 9M12 2.5v2M12 19.5v2M2.5 12h2M5.3 5.3l1.4 1.4M5.3 18.7l1.4-1.4"/><path d="M12 7.5a4.5 4.5 0 0 0 0 9Z" fill="currentColor"/>', " checked")}${mode("light", "light", '<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/>')}${mode("dark", "dark", '<path d="M19.5 14.5A8 8 0 1 1 9.5 4.5a6.5 6.5 0 0 0 10 10Z"/>')}${mode("high-contrast", "contrast", '<circle cx="12" cy="12" r="8.5"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17Z" fill="currentColor"/>')}</fieldset>`,
+      `</div>`,
+    ].join("");
+    return `<div class="landing-core__live" inert>${page}</div>`;
+  };
+  const pageCode = () => html('<nav class="luz-tabs">\n  <a class="luz-tab" aria-current="page">…</a>\n</nav>\n<div class="luz-card">…</div>\n<table class="luz-table">…</table>\n<ul class="luz-pagination">…</ul>');
+  const BLOCKS = [
+    ["actions", ["actions", "copy", "dropdown"], [["actions"]]],
+    ["forms", [], [["forms"]]],
+    ["content", [], [["content"], ["navigation"]]],
+    ["feedback", ["alerts", "status", "modal", "toast", "tooltip", "image", "player", "video"], [["feedback"], ["media"]]],
+    ["layout", [], [["helpers"]]],
+  ];
+  const linkOf = (id) => ({
+    href: id === "objects" ? "/docs/components/layout/" : `/docs/components/#group-${id}`,
+    label: t(id === "objects" ? "inside.list.objects" : `level.core.group.${id}`),
+    count: id === "objects" ? objects : groups.get(id) ?? 0,
+  });
+  const blocks = BLOCKS.map(([id, cards, covers], i) =>
+    levelBlock({
+      i,
+      id,
+      anchor: "c",
+      wide: true,
+      title: t(`level.core.${id}.title`),
+      lead: t(`level.core.${id}.lead`),
+      links: [...covers.flat(), ...(id === "layout" ? ["objects"] : [])].map(linkOf),
+      aside: id === "forms" ? formCode() : id === "content" ? pageCode() : id === "layout" ? planCode() : "",
+      panel: id === "forms" ? formPanel() : id === "content" ? pagePanel() : id === "layout" ? planPanel() : `<div class="landing-cards">${cards.map((name) => card(name, sample[name], lines[name])).join("")}</div>`,
+    }),
+  );
+  // The page, once per view: the same words, the markup a step further each time
+  const word = (key) => t(`level.core.demo.${key}`);
+  const page = {
+    bare: [
+      `<h3>${word("heading")}</h3>`,
+      `<label>${word("label")} <input type="email" value="you@example.com"></label>`,
+      `<p><button type="submit">${word("submit")}</button> <button type="button">${word("cancel")}</button></p>`,
+    ],
+    classes: [
+      `<span class="luz-tag luz-tag--blue luz-tag--dot">${word("tag")}</span>`,
+      `<h3>${word("heading")}</h3>`,
+      `<div class="luz-field"><label class="luz-field__label" for="core-demo-email">${word("label")}</label><input class="luz-input" id="core-demo-email" type="email" value="you@example.com"></div>`,
+      `<div class="o-actions"><button class="luz-btn luz-btn--primary" type="submit">${word("submit")}</button><button class="luz-btn luz-btn--outline" type="button">${word("cancel")}</button></div>`,
+    ],
+  };
+  page.yours = page.classes.map((line) => line.replaceAll("core-demo-email", "core-demo-email-yours"));
+  const source = {
+    bare: `<h3>${word("heading")}</h3>\n<label>${word("label")}\n  <input type="email">\n</label>\n<p>\n  <button type="submit">${word("submit")}</button>\n  <button type="button">${word("cancel")}</button>\n</p>`,
+    classes: `<span class="luz-tag luz-tag--blue">${word("tag")}</span>\n<h3>${word("heading")}</h3>\n<div class="luz-field">\n  <label class="luz-field__label">${word("label")}</label>\n  <input class="luz-input" type="email">\n</div>\n<button class="luz-btn luz-btn--primary">${word("submit")}</button>\n<button class="luz-btn luz-btn--outline">${word("cancel")}</button>`,
+  };
+  source.yours = `${source.classes}\n\n/* ${say("level.core.demo.yours.note")} */\n.luz-btn {\n  border-radius: var(--luz-radius-full);\n  text-transform: uppercase;\n}`;
+  // The listing in the colours of the devtools, and the rule of the reader's own CSS the third view adds
+  const paint = (text) =>
+    paintHtml(text)
+      .replace(/^(\.luz-btn)/m, '<span class="landing-demo__sel">$1</span>')
+      .replace(/^ {2}(border-radius|text-transform)/gm, '  <span class="landing-demo__prop">$1</span>')
+      .replace(/(var\(--luz-radius-full\)|uppercase)/g, '<span class="landing-demo__val">$1</span>');
+  const demo = [
+    `<div class="landing-demo__top">`,
+    `<p class="landing-demo__title">${word("title")}</p>`,
+    `<fieldset class="landing-demo__picker">`,
+    `<legend>${word("legend")}</legend>`,
+    `<div class="landing-demo__options">`,
+    CORE_VIEWS.map((view, i) => `<label class="landing-demo__option"><input type="radio" name="view" value="${view}"${i ? "" : " checked"}><span>${t(`level.core.look.${view}`)}</span></label>`).join(""),
+    `</div>`,
+    `</fieldset>`,
+    `</div>`,
+    `<div class="landing-demo__window">`,
+    `<div class="landing-demo__chrome" aria-hidden="true"><span></span><span></span><span></span></div>`,
+    `<div class="landing-demo__viewport">`,
+    `<div class="landing-demo__product landing-views__product" inert>`,
+    CORE_VIEWS.map((view) => `<div class="landing-views__page" data-view="${view}">${page[view].join("")}</div>`).join(""),
+    `</div>`,
+    `</div>`,
+    `<div class="landing-demo__editor">`,
+    `<p class="landing-demo__caption"><span>${word("code")}</span></p>`,
+    `<pre class="landing-demo__code" dir="ltr" tabindex="0" aria-label="${word("code")}">${CORE_VIEWS.map((view) => `<code class="landing-demo__look" data-look="${view}">${paint(source[view])}</code>`).join("")}</pre>`,
+    `</div>`,
+    `</div>`,
+  ].join("\n");
+  return {
+    coredemo: demo,
+    coreblocks: blocks.join("\n"),
+    ncomponents: String(groups.get("*")),
+    nobjects: String(objects),
+    ndepscore: String(dependencies),
+  };
+}
+
+/** The kinds of site of the catalog's demo, each a wireframe of regions named after the patterns it uses: [row/column/row/column, name]. */
+const KIND_WIRES = {
+  landing: [["1/1/2/7", "site-header"], ["2/1/4/7", "hero"], ["4/1/5/3", "section"], ["4/3/5/5", "section"], ["4/5/5/7", "section"], ["5/1/6/7", "stat"], ["6/1/7/7", "site-footer"]],
+  blog: [["1/1/2/7", "site-header"], ["2/1/3/7", "masthead"], ["3/1/4/7", "page-header"], ["4/1/6/5", "post-list"], ["4/5/6/7", "toc"], ["6/1/7/7", "site-footer"]],
+  app: [["1/1/2/7", "app-bar"], ["2/1/7/2", "sidebar"], ["2/2/4/4", "bar-list"], ["2/4/4/7", "column-chart"], ["4/2/7/5", "heat-map"], ["4/5/7/7", "ring"]],
+  docs: [["1/1/7/2", "sidebar"], ["1/2/2/6", "doc-header"], ["2/2/4/6", "example"], ["4/2/6/6", "do-dont"], ["6/2/7/6", "page-footer"], ["1/6/7/7", "page-rail"]],
+};
+
+/**
+ * The page of the catalog (apps/landing/levels/catalog.html): for a developer who does not yet know that the catalog
+ * is a stylesheet per piece, that a page links only what it uses and that the script of a piece loads when the piece
+ * is on the page. The generator writes, from the packages and never typed:
+ *
+ *  - {{catalogdemo}}, the hero's demo: a radio per kind of site (FITS_KINDS), each a wireframe of the regions it is
+ *    made of, named after the patterns of that kind (kinds.js, `fits-kinds`), with the `<link>` of each stylesheet
+ *    the kind needs beside it, in cascade order. A region that is not a pattern of its kind fails the build;
+ *  - {{catalogblocks}}, four blocks (structure, content, charts, site-wide) in the sides of the home, each a card per
+ *    piece (a wireframe and the stylesheet that draws it), linking the docs' groups they cover with their counts;
+ *  - {{ncatalog}}, {{nchunks}} and {{ndepscatalog}}, the hero's numbers.
+ */
+function catalogSections({ say, root, groups, sheets, dependencies, chunks }) {
+  const t = (key) => escapeHtml(say(key));
+  const link = (name) => `<link rel="stylesheet" href="…/components/${name}.min.css">`;
+  const html = (code) => `<pre class="luz-code-block" data-lang="html" dir="ltr" tabindex="0"><code>${escapeHtml(code)}</code></pre>`;
+  // Each block shows every piece of the docs' groups it covers, live (scripts/docs-site/catalog-blocks/)
+  const BLOCKS = [
+    ["structure", structureBlock, ["navigation", "page-structure"]],
+    ["content", contentBlock, ["content"]],
+    ["charts", chartsBlock, ["charts"]],
+    ["sitewide", sitewideBlock, ["site-wide", "documentation"]],
+  ];
+  const blocks = BLOCKS.map(([id, make, covers], i) => {
+    const { panel, aside } = make({ t, html });
+    return levelBlock({
+      i,
+      id,
+      anchor: "k",
+      wide: true,
+      aside,
+      title: t(`level.catalog.${id}.title`),
+      lead: t(`level.catalog.${id}.lead`),
+      links: covers.map((g) => ({ href: `/docs/catalog/#group-${g}`, label: t(`level.catalog.group.${g}`), count: groups.get(g) ?? 0 })),
+      panel,
+    });
+  });
+  const word = (key) => t(`level.catalog.demo.${key}`);
+  const kinds = FITS_KINDS.map((kind) => {
+    const { files, pages } = kindPatterns(kind, root, null);
+    const regions = KIND_WIRES[kind];
+    for (const [, name] of regions) if (!pages.includes(name)) throw new Error(`the wireframe of ${kind} draws ${name}, which is not a pattern of that kind (${pages.join(", ")}): change KIND_WIRES in scripts/docs-site/site.js`);
+    const lines = [...files.map((file) => link(file.slice("components/".length, -".css".length))), '<script type="module" src="…/catalog.min.js"></script>'];
+    return {
+      kind,
+      page: `<span class="landing-wf landing-wf--page" style="--rows:6;--cols:6" aria-hidden="true">${regions.map(([area, name]) => `<span class="landing-wf__cell landing-wf__cell--named" style="grid-area:${area}"><code>${name}</code></span>`).join("")}</span>`,
+      listing: lines.join("\n"),
+    };
+  });
+  const demo = [
+    `<div class="landing-demo__top">`,
+    `<p class="landing-demo__title">${word("title")}</p>`,
+    `<fieldset class="landing-demo__picker">`,
+    `<legend>${word("legend")}</legend>`,
+    `<div class="landing-demo__options">`,
+    kinds.map(({ kind }, i) => `<label class="landing-demo__option"><input type="radio" name="view" value="${kind}"${i ? "" : " checked"}><span>${t(`level.catalog.kind.${kind}`)}</span></label>`).join(""),
+    `</div>`,
+    `</fieldset>`,
+    `</div>`,
+    `<div class="landing-demo__window">`,
+    `<div class="landing-demo__chrome" aria-hidden="true"><span></span><span></span><span></span></div>`,
+    `<div class="landing-demo__viewport">`,
+    `<div class="landing-demo__product landing-views__product" inert>`,
+    kinds.map(({ kind, page }) => `<div class="landing-views__page landing-views__page--site" data-view="${kind}">${page}</div>`).join(""),
+    `</div>`,
+    `</div>`,
+    `<div class="landing-demo__editor">`,
+    `<p class="landing-demo__caption"><span>${word("code")}</span></p>`,
+    `<pre class="landing-demo__code" dir="ltr" tabindex="0" aria-label="${word("code")}">${kinds.map(({ kind, listing }) => `<code class="landing-demo__look" data-look="${kind}">${paintHtml(listing)}</code>`).join("")}</pre>`,
+    `</div>`,
+    `</div>`,
+  ].join("\n");
+  return {
+    catalogdemo: demo,
+    catalogblocks: blocks.join("\n"),
+    // every stylesheet of the catalog the home does not link, in the order of the cascade, then the rest by name
+    catalogsheets: [...CASCADE.filter((name) => sheets.includes(name)), ...sheets.filter((name) => !CASCADE.includes(name)).sort()]
+      .filter((name) => !readFileSync(resolve(root, "apps/landing/index.html"), "utf-8").includes(`/packages/catalog/dist/components/${name}.css"`))
+      .map((name) => `<link rel="stylesheet" href="/packages/catalog/dist/components/${name}.css">`)
+      .join("\n  "),
+    ncatalog: String(sheets.length),
+    nchunks: String(chunks),
+    ndepscatalog: String(dependencies),
   };
 }
 
@@ -2060,7 +2508,7 @@ export function renderDocument(html, file, route, site, options = {}) {
     placeholders: true,
     locale,
     used: options.used,
-    values: languageValues(site, locale, { home: true, siteUrl: options.siteUrl, used: options.used }),
+    values: languageValues(site, locale, { home: true, siteUrl: options.siteUrl, used: options.used, suffix: options.suffix }),
   }).replace(/<!--[\s\S]*?-->/g, ""));
   // The transforms that read quoted attributes (the links to the docs of a language, then, in the pages build, the
   // relative links, the boot script and the CSP) come first; the quotes go last. `options.unquote: false` leaves them to
@@ -2076,6 +2524,55 @@ export function renderDocument(html, file, route, site, options = {}) {
 export function landingDocuments(site, file, html) {
   if (!site.i18n) return [{ route: "/", file, html }];
   return site.i18n.locales.map((locale) => ({ route: locale.route, file, html, locale }));
+}
+
+/**
+ * The template of a page of a level (tokens, core, catalog): the home's, with the
+ * inside of its <main> up to the icons replaced by `fragment`, the title and the
+ * description by the level's own (`level.<name>.meta.*`), and the links to a section
+ * of the home (`#tokens`, `#faq`) by the same links on the language's home, because the
+ * page does not have those sections. Nothing else is written twice: the head, the
+ * header, the drawer, the icons and the footer are the home's.
+ */
+export function levelTemplate(home, fragment, name, file = "the home's template") {
+  const open = /<main\b[^>]*>\n/.exec(home);
+  const icons = home.indexOf("<!-- Icons used more than once");
+  if (!open || icons < open.index) throw new Error(`${file}: a level page needs the <main> and the comment "Icons used more than once" of the home's template`);
+  // The page of the catalog shows its pieces live, so it links every stylesheet of the catalog the home does not
+  // (catalogSections() writes them, in the order of the cascade), before the landing's own
+  const landingCss = '<link rel="stylesheet" href="/apps/landing/landing.css">';
+  if (name === "catalog" && !home.includes(landingCss)) throw new Error(`${file}: the page of the catalog links its stylesheets before ${landingCss}, which the home's template lacks`);
+  const before = home.slice(0, open.index + open[0].length).replace(landingCss, name === "catalog" ? `{{catalogsheets}}\n  ${landingCss}` : landingCss);
+  const after = home.slice(icons);
+  // The links (<a>) to a section of the home, outside the skip link; the icons (<use>) stay the page's own
+  const toHome = (html) => html.replace(/<a\b[^>]*>/g, (tag) => tag.replace(/\shref="#(?!main-content")/, ' href="{{home}}#'));
+  const named = (html) => html.replace("{{t:meta.title}}", `{{t:level.${name}.meta.title}}`).replace("{{t:meta.description}}", `{{t:level.${name}.meta.description}}`);
+  return `${toHome(named(before))}\n${fragment.trim()}\n\n    ${toHome(after)}`;
+}
+
+/**
+ * The address of the page of each level in every language of the registry: the
+ * language's home plus `<name>/`, and `file`, the virtual file a build entry has,
+ * which never exists on disk. No template: the routes of the build and of the links.
+ */
+export function levelRoutes(site, names) {
+  const locales = site.i18n ? site.i18n.locales : [undefined];
+  return names.flatMap((name) =>
+    locales.map((locale) => {
+      const route = `${locale?.route ?? "/"}${name}/`;
+      return { route, file: `apps/landing${route}index.html`, locale, suffix: `${name}/`, level: name };
+    }),
+  );
+}
+
+/**
+ * The pages of the levels as `extra` documents of buildSite(), after the home's:
+ * `levels` is [{ name, html }] (the fragment of apps/landing/levels/<name>.html),
+ * `home` is { file, html }.
+ */
+export function levelDocuments(site, home, levels) {
+  const fragments = new Map(levels.map(({ name, html }) => [name, html]));
+  return levelRoutes(site, levels.map(({ name }) => name)).map((doc) => ({ ...doc, html: levelTemplate(home.html, fragments.get(doc.level), doc.level, home.file) }));
 }
 
 /**
@@ -2219,7 +2716,7 @@ export function buildSite(site, { extra = [], unchecked = [], root, languages = 
     for (const page of view.pages) add(page, view);
   }
   for (const doc of extra) {
-    const html = renderDocument(doc.html, doc.file, doc.route, site, { reader, locale: doc.locale, used });
+    const html = renderDocument(doc.html, doc.file, doc.route, site, { reader, locale: doc.locale, used, suffix: doc.suffix });
     const links = [...sourceLinks(doc.html, doc.file, 1, false), ...partialLinks(doc.html)];
     const { ids, links: renderedLinks } = readHtml(html, `${doc.file} (rendered as ${doc.route})`);
     // Links written by the generator or a catalog: the language's home, the switcher, links inside a string
@@ -2238,10 +2735,22 @@ export function buildSite(site, { extra = [], unchecked = [], root, languages = 
     docs.push({ route: DEBUG_ROUTE, ids: new Set(ids.keys()), links: links.map((l) => ({ ...l, file })) });
   }
 
+  // /manifesto/: a file on disk, served as it is (manifesto.js); its ids and links are checked like any page's
+  if (site.repoRoot && existsSync(resolve(site.repoRoot, MANIFESTO_FILE))) {
+    const html = readManifesto(site.repoRoot);
+    const file = MANIFESTO_FILE;
+    const { ids, links } = readHtml(html, file);
+    rendered.set(MANIFESTO_ROUTE, html);
+    docs.push({ route: MANIFESTO_ROUTE, ids: new Set(ids.keys()), links: links.map((l) => ({ ...l, file })) });
+  }
+
   // The home pages (/, /es/, /ar/) are not docs: a link to one is not checked
   const known = new Map([...docs.map((d) => [d.route, d.ids]), ...[...homesOf(site), ...unchecked].map((route) => [route, null])]);
   // /debug/ is a route of the real site (debug.js): a link to it is no mistake in a copy of the docs the build does not render it for
   if (!known.has(DEBUG_ROUTE)) known.set(DEBUG_ROUTE, null);
+  // The sections of the site under each home (/tokens/, /es/ai/…, the header's links) are routes of the real site
+  // (plugin.js writes them): a link to one is no mistake in a build that does not render them
+  for (const home of homesOf(site)) for (const path of SECTION_PATHS) if (!known.has(`${home}${path}/`)) known.set(`${home}${path}/`, null);
   // The pages of the docs languages exist even when this build does not render them (a link to one is not a mistake)
   if (!languages) {
     for (const language of docsI18n?.languages ?? []) {

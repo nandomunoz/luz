@@ -63,9 +63,6 @@ const codeOf = (html, id) => {
 
 const numberOf = (text) => Number(text.replace(/[^0-9.]/g, ""));
 
-/** The element names and classes of a node and of everything under it, in order: its shape. */
-const shapeOf = (node) => [node, ...descendants(node)].map((n) => `${n.name}${classesOf(n).map((c) => `.${c}`).join("")}`);
-
 describe("the page of the bar list has a second example, In cells", () => {
   it("is an h3 of the Example section, after the first example and before Known issues, once", () => {
     const body = english();
@@ -181,22 +178,6 @@ describe("the page of the bar list has a second example, In cells", () => {
     expect(textOf(row)).toMatch(/sizes/i);
     const when = english().split('<h3 id="when">')[1].split('<h3 id="when-not">')[0];
     expect(textOf(parse(when, ROUTE).children.find((n) => n.name === "p")), "the sentence about cells").toMatch(/cells\b.*\bfew short comparisons/i);
-  });
-});
-
-describe("the second example is the home's pattern", () => {
-  it("has the elements and the classes of the home's chart of weights, row by row and in the caption", () => {
-    const home = parse(buildReal().rendered.get("/"), "/");
-    const chart = findAll(home, (n) => n.name === "figure" && classesOf(n).includes("luz-bar-list--cells"))[0];
-    expect(chart, "the home has a chart in cells").toBeTruthy();
-    const docs = query(parse(cellsPart(english()), ROUTE), "figure");
-    expect(classesOf(docs)).toEqual(classesOf(chart));
-    const homeRow = query(chart, "li.luz-bar-list__row");
-    const docsRow = query(docs, "li.luz-bar-list__row");
-    expect(shapeOf(docsRow)).toEqual(shapeOf(homeRow));
-    expect(shapeOf(query(docs, "figcaption"))).toEqual(shapeOf(query(chart, "figcaption")));
-    expect(shapeOf(query(docs, "ul"))[0]).toEqual(shapeOf(query(chart, "ul"))[0]);
-    expect(new Set(shapeOf(docs))).toEqual(new Set(shapeOf(chart)));
   });
 });
 

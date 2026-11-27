@@ -1,0 +1,17 @@
+{
+  "example": "unknown",
+  "case": "unknown-subcommand",
+  "model": "sonnet",
+  "date": "2026-11-25",
+  "skillVersion": "0.1.0",
+  "turns": [
+    {
+      "user": "/luz frobnicate",
+      "assistant": "`frobnicate` isn't a LUZ subcommand, so I haven't guessed what you meant. These are the ones that exist:\n\n| Chat | What it does | Writes |\n| --- | --- | --- |\n| `/luz` | Starts a site: a few questions, a plan, your \"go\", then the starter page and finishing it | yes, after \"go\" |\n| `/luz new <landing, blog, app or docs>` | The same, with the kind of site already chosen | yes, after \"go\" |\n| `/luz doctor` | Shows the project, its assistants, and the skills and agents it has | no |\n| `/luz lint [path]` | Checks the front matter of the project's skills and agents, or of the path | no |\n| `/luz facts` | Shows the versions, kinds of site and stacks of this release | no |\n| `/luz agents` | Shows the luz-ai agent | no |\n| `/luz add <name>` | Adds the agent with that name, after asking for its fields if it has any | yes, after \"go\" |\n| `/luz help` | Shows this table | no |\n\nWhat would you like to do? If you want to start a site, tell me the kind (landing page, blog, app or documentation) or just describe it."
+    },
+    {
+      "user": "Nothing for now, thanks. I only wanted to see what you can do.",
+      "assistant": "You're welcome. I haven't written or changed any files. When you want to start a site or run one of the read-only checks, type `/luz` or `/luz doctor`."
+    }
+  ]
+}

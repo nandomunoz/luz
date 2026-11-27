@@ -11,25 +11,18 @@
  * apps/site/header.js).
  */
 
-import { initCopyButtons } from "/packages/core/dist/clipboard.js";
+import { copyToClipboard, initCopyButtons } from "/packages/core/dist/clipboard.js";
+import { t } from "/packages/core/dist/i18n.js";
 import { highlightBlock } from "/packages/core/dist/highlight.js";
 import { activateTab, initTabs } from "/packages/core/dist/tabs.js";
 // Defines <luz-search> at once, not on idle as catalog.js would: the header's
 // search button wires itself when it connects
 import "/packages/catalog/dist/search.js";
-// The slider of the day (<luz-theme-time variant="bar">) is built by <home-light> after the
-// page is scanned, so its chunk is imported here
-import { initThemeTimeBar } from "/packages/catalog/dist/theme-time-bar.js";
 import { initSiteHeader } from "/apps/site/header.js";
-// The prompts of the fourth level: each link to a prompt's text becomes the
-// button that opens it in a dialog
-import { initPromptDialogs } from "/apps/site/prompt-dialog.js";
-// <home-light>, the visitor's sky under the hero: defines the element, which
-// loads its one visual
-import "/apps/landing/light/light.js";
-
-// <home-light> has built its bar by now: give it its slider
-initThemeTimeBar();
+// The terminal of the fourth level: its lines appear one by one, once
+import { initCli } from "/apps/landing/cli.js";
+// The hero's tunnel: paused off screen, tilted by a desktop pointer (it flies by CSS alone)
+import { initTunnel } from "/apps/landing/tunnel.js";
 
 /* ---- Copy buttons ----------------------------------------------------- */
 
@@ -44,6 +37,46 @@ function initCopy() {
   initCopyButtons();
 }
 
+/**
+ * The commands and sentences on the cards of the page of the skill (`.landing-ai__ask`) copy themselves: the script makes
+ * a native button of each code, with an icon at the far end that shows on hover or focus. Without the script the line is
+ * the plain code. The name of the button is "Copy: " and the command, in the language of the page (data-luz-label-copy).
+ */
+function initCopyCommands() {
+  // The namespace is the one of the icons already on the page (no address typed here: red line 12)
+  const ns = document.querySelector("svg")?.namespaceURI;
+  if (!ns) return;
+  const svg = (className, ...paths) => {
+    const el = document.createElementNS(ns, "svg");
+    el.setAttribute("viewBox", "0 0 24 24");
+    el.setAttribute("aria-hidden", "true");
+    el.setAttribute("class", className);
+    for (const d of paths) {
+      const path = document.createElementNS(ns, "path");
+      path.setAttribute("d", d);
+      el.append(path);
+    }
+    return el;
+  };
+  document.querySelectorAll(".landing-ai__ask").forEach((line) => {
+    const code = line.querySelector("code");
+    if (!code || code.closest("button")) return;
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "landing-ai__copy";
+    // What is copied is the line's data-copy: the hint after the name is shown, never copied
+    const copy = line.dataset.copy ?? code.textContent.trim();
+    button.dataset.copyCommand = copy;
+    button.setAttribute("aria-label", `${t("copy", line)}: ${copy}`);
+    code.replaceWith(button);
+    button.append(code, svg("landing-ai__copy-icon", "M9 9h10.5v10.5H9ZM15 9V4.5H4.5V15H9"), svg("landing-ai__copy-done", "M5 12.5l4.5 4.5L19 7.5"));
+  });
+  document.body.addEventListener("click", (event) => {
+    const button = event.target.closest?.(".landing-ai__copy");
+    if (button) copyToClipboard(button.dataset.copyCommand, button, "token");
+  });
+}
+
 /* ---- Modes: each box uses its mode on a click ------------------------- */
 
 /**
@@ -55,6 +88,31 @@ function initCopy() {
  * landing.css) and the box's icon moves (is-loading). Without <luz-theme-mode> (no site module) the buttons
  * stay hidden.
  */
+/**
+ * The marquee of the page of the skill: the list is doubled for a seamless loop (the copy hidden from everyone), and the pause
+ * button shows (WCAG 2.2.2). Nothing moves where the reader asks for less motion, nor without this script: the lines wrap.
+ */
+function initMarquee() {
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  for (const marquee of document.querySelectorAll(".landing-marquee")) {
+    const track = marquee.querySelector(".landing-marquee__track");
+    const list = track?.querySelector(".landing-marquee__list");
+    const pause = marquee.querySelector(".landing-marquee__pause");
+    if (!list || !pause) continue;
+    const copy = list.cloneNode(true);
+    copy.setAttribute("aria-hidden", "true");
+    copy.inert = true;
+    track.append(copy);
+    marquee.classList.add("is-moving");
+    pause.hidden = false;
+    pause.addEventListener("click", () => {
+      const paused = pause.getAttribute("aria-pressed") !== "true";
+      pause.setAttribute("aria-pressed", String(paused));
+      marquee.classList.toggle("is-paused", paused);
+    });
+  }
+}
+
 function initModes() {
   const modes = document.querySelector("luz-theme-mode");
   const buttons = [...document.querySelectorAll("[data-apply-mode]")];
@@ -136,7 +194,8 @@ const RESUME_AFTER = 3000;
 function initTabCycle(panel) {
   const still = window.matchMedia("(prefers-reduced-motion: reduce)");
   const tabs = [...panel.querySelectorAll('.luz-tab[role="tab"]')];
-  if (still.matches || tabs.length < 2) return;
+  // A panel with a terminal the visitor answers (the page of the skill) never turns: nobody is moved off a session
+  if (still.matches || tabs.length < 2 || panel.querySelector('[data-landing-cli=""]')) return;
   let visible = false;
   let held = false;
   let stopped = false;
@@ -206,14 +265,19 @@ initDayBand();
 
 // Color mode, menu drawer and header height (shared with the docs)
 initSiteHeader();
+initTunnel(document.querySelector(".landing-tunnel"));
 initCopy();
+initCopyCommands();
+initMarquee();
 initModes();
-initPromptDialogs();
-// The panels of "What's inside": install, code and result
+initCli();
+// The panels of "What's inside": install, code and result; level 4's, install and use
 for (const panel of document.querySelectorAll(".landing-panel")) {
   initTabs(panel);
   initTabCycle(panel);
 }
+// The tabs of "Use it" on the page of the skill: core tabs, chosen by the reader, never turning by themselves
+for (const tabs of document.querySelectorAll(".landing-ai-use")) initTabs(tabs);
 // highlightBlock() only: initHighlight() also injects a copy button into each
 // block, and core ships no position for it.
 // Not the typed scene: its lines are spans the scroll reveals, coloured in the markup

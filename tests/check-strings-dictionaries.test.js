@@ -53,7 +53,7 @@ function files(path) {
 
 beforeAll(() => {
   dir = mkdtempSync(join(tmpdir(), "luz-check-strings-"));
-  const sources = [...files("apps"), ...files("scripts"), "scripts/docs-site/prompts.js", ...files("packages/check/src"), ...files("packages/core/src/i18n"), ...files("packages/core/src/components"), ...files("packages/core/src/elements"), ...files("packages/catalog/src/components"), ...files("packages/tokens/lib"), ...files("packages/core/src/themes"), "packages/core/src/objects/_objects.css", "packages/tokens/tokens.json", "packages/tokens/src/semantic.css", EN_FILE, "package.json", "budgets.json"];
+  const sources = [...files("apps"), ...files("scripts"), "scripts/docs-site/ai-commands.js", "scripts/docs-site/ai-agents.js", ...files("packages/ai/skills/luz"), ...readdirSync(join(repo, "tools/ai-eval/cases/examples")).map((f) => `tools/ai-eval/cases/examples/${f}`), ...files("packages/check/src"), ...files("packages/core/src/i18n"), ...files("packages/core/src/components"), ...files("packages/core/src/elements"), ...files("packages/catalog/src/components"), ...files("packages/tokens/lib"), ...files("packages/core/src/themes"), "packages/core/src/objects/_objects.css", "packages/tokens/tokens.json", "packages/tokens/src/semantic.css", EN_FILE, "package.json", "budgets.json"];
   for (const name of readdirSync(join(repo, "packages"))) sources.push(`packages/${name}/package.json`);
   for (const rel of new Set(sources)) {
     try {
@@ -194,7 +194,7 @@ describe("check:strings reads the dictionaries of core", () => {
   });
 
   it("$header of a language file is not one of its strings: a header that names handles passes", () => {
-    const header = { language: "Español", tag: "es", author: "nandovejer", reviewer: "a-reader" };
+    const header = { language: "Español", tag: "es", author: "nandomunoz", reviewer: "a-reader" };
     const result = runWith({ [dictionary("es")]: esWith({ $header: header }) });
     expect(about(result, dictionary("es")), result.output).toEqual([]);
     expect(result.status, result.output).toBe(0);

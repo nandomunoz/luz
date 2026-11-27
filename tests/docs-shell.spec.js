@@ -25,7 +25,9 @@ import { readingOrder as walkTheTabOrder } from './helpers/reading-order.js';
 
 const BUTTON = '/docs/components/button/';
 /** The areas that have pages under their index: each is a fold of the sidebar. */
-const FOLDED = site.areas.filter((a) => readingOrder(site).some((p) => p.meta.area === a.id && p.route !== `/docs/${a.slug}/`)).length;
+// An area with `nestIn` (the HTML elements, in Catalog) has no link or fold of its own: its pages are a group in the fold of its host
+const SIDEBAR_AREAS = site.areas.filter((a) => !a.nestIn);
+const FOLDED = SIDEBAR_AREAS.filter((a) => readingOrder(site).some((p) => (p.meta.area === a.id && p.route !== `/docs/${a.slug}/`) || site.areas.some((n) => n.nestIn === a.id && p.meta.area === n.id))).length;
 const rail = (page) => page.getByRole('complementary', { name: 'About this page' });
 const box = async (page, selector) => {
   const element = page.locator(selector).first();
@@ -69,8 +71,8 @@ test.describe('docs shell, with JavaScript', () => {
     await page.goto(BUTTON);
     const actions = rail(page).locator('.luz-page-rail__actions').getByText(/^(Copy page as Markdown|Copy link to this page|Edit this page|Report a problem)$/);
     await expect(actions).toHaveText(['Copy page as Markdown', 'Copy link to this page', 'Edit this page', 'Report a problem']);
-    await expect(rail(page).getByRole('link', { name: 'Edit this page', exact: true })).toHaveAttribute('href', 'https://github.com/nandovejer/luz/edit/main/apps/docs/pages/components/button.html');
-    await expect(rail(page).getByRole('link', { name: 'Report a problem', exact: true })).toHaveAttribute('href', 'https://github.com/nandovejer/luz/issues/new?title=Button');
+    await expect(rail(page).getByRole('link', { name: 'Edit this page', exact: true })).toHaveAttribute('href', 'https://github.com/nandomunoz/luz/edit/main/apps/docs/pages/components/button.html');
+    await expect(rail(page).getByRole('link', { name: 'Report a problem', exact: true })).toHaveAttribute('href', 'https://github.com/nandomunoz/luz/issues/new?title=Button');
   });
 
   test('Copy page as Markdown writes the page as Markdown to the clipboard, says so, and stays on the page', async ({ page }) => {
@@ -146,7 +148,7 @@ test.describe('docs shell, with JavaScript', () => {
     await expect(nav.locator('details[open]')).toHaveCount(1);
     await expect(nav.locator('details[open] a[href="/docs/components/button/"]')).toBeVisible();
     // Every area is a link, open or not; the pages of the closed folds are in the markup, not on the screen
-    for (const area of site.areas) await expect(nav.locator(`a.docs-nav__area[href="/docs/${area.slug}/"]`), area.id).toBeVisible();
+    for (const area of SIDEBAR_AREAS) await expect(nav.locator(`a.docs-nav__area[href="/docs/${area.slug}/"]`), area.id).toBeVisible();
     for (const href of ['/docs/tokens/color/', '/docs/get-started/snippet/', '/docs/catalog/search/', '/docs/catalog/page-rail/']) {
       await expect(nav.locator(`a[href="${href}"]`), href).toBeHidden();
     }
@@ -605,7 +607,7 @@ for (const javaScriptEnabled of [true, false]) {
         expect([...new Set(hrefs)], 'every link named "Report a problem"').toHaveLength(1);
         const issues = page.locator('#site-footer').getByRole('link', { name: 'Issues on GitHub', exact: true });
         await expect(issues).toHaveCount(1);
-        await expect(issues).toHaveAttribute('href', 'https://github.com/nandovejer/luz/issues');
+        await expect(issues).toHaveAttribute('href', 'https://github.com/nandomunoz/luz/issues');
       });
     }
   });

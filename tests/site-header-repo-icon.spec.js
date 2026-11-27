@@ -17,7 +17,7 @@
  */
 import { test, expect } from '@playwright/test';
 
-const GITHUB = 'https://github.com/nandovejer/luz';
+const GITHUB = 'https://github.com/nandomunoz/luz';
 const ICONS = '/docs/components/icons/';
 const PAGES = ['/', '/es/', '/ar/', '/docs/', '/404.html'];
 /** What the GitHub mark starts with, as Octicons and Simple Icons write it. */
@@ -80,19 +80,18 @@ test.describe('the repository link of the header', () => {
   });
 
   for (const path of ['/', '/docs/']) {
-    test(`${path}: its icon is the size of the other icons of the row, and the word beside it`, async ({ page }) => {
+    test(`${path}: its icon is the size of the other icons of the row, and its name is for a reader and the pointer`, async ({ page }) => {
       await page.goto(path);
       const own = await link(page).locator('svg').boundingBox();
-      const docs = await page.locator('#site-header .site-header__nav a svg').first().boundingBox();
-      expect(own && docs, 'both icons are drawn').toBeTruthy();
-      expect(own.width, 'width').toBeCloseTo(docs.width, 0);
-      expect(own.height, 'height').toBeCloseTo(docs.height, 0);
+      const other = await page.locator('#site-header :is(.site-header__search, .site-header__az):visible svg').first().boundingBox();
+      expect(own && other, 'both icons are drawn').toBeTruthy();
+      expect(own.width, 'width').toBeCloseTo(other.width, 0);
+      expect(own.height, 'height').toBeCloseTo(other.height, 0);
       expect(Math.min(own.width, own.height), 'an icon, not a dot').toBeGreaterThanOrEqual(16);
-      // The icon comes first, the word after it, on one line
-      const word = await link(page).locator('.site-header__github-label').boundingBox();
-      expect(word.x, 'the word after the icon').toBeGreaterThanOrEqual(own.x + own.width - 1);
-      expect(Math.abs(word.y + word.height / 2 - (own.y + own.height / 2)), 'one line').toBeLessThanOrEqual(4);
+      await expect(link(page)).toHaveAccessibleName('GitHub');
+      await expect(link(page)).toHaveAttribute('title', 'GitHub');
     });
+
   }
 
   /** The shapes of every icon of the header on the 24 grid, with what the browser paints for each. */

@@ -28,22 +28,23 @@ if (pagesRoot !== resolve(__dirname, "docs") && !insideTmp) {
 }
 
 /**
- * The site's path on GitHub Pages (https://<user>.github.io/luz/). Only the
- * not-found page uses it, as its <base href>: GitHub Pages serves /404.html
- * at whatever URL was missing, so its relative URLs need a fixed base. A fork
- * or a custom domain changes it ("/" for a domain of its own); if it is wrong,
- * the 404 page is still readable, only unstyled.
+ * The site's path on its domain: "/", because GitHub Pages serves the site at
+ * the root of luzds.com. Only the not-found page uses it, as its <base href>:
+ * GitHub Pages serves /404.html at whatever URL was missing, so its relative
+ * URLs need a fixed base. A fork served at https://<user>.github.io/<repo>/
+ * changes it to "/<repo>/"; if it is wrong, the 404 page is still readable,
+ * only unstyled.
  */
-export const PAGES_BASE = "/luz/";
+export const PAGES_BASE = "/";
 
 /**
- * The published site's root URL: GitHub Pages of the repository
- * github.com/nandovejer/luz (the git remote), at PAGES_BASE. The pages build
- * writes the home pages' canonical and hreflang alternates with it, absolute
- * as search engines ask; the dev server keeps them root-absolute. A fork or a
- * custom domain changes it with PAGES_BASE.
+ * The published site's root URL: luzds.com, the custom domain of the GitHub
+ * Pages of github.com/nandomunoz/luz (the git remote). The pages build writes
+ * the home pages' canonical and hreflang alternates with it, absolute as
+ * search engines ask, and CNAME with its host (cnameOf() in
+ * scripts/docs-site/plugin.js); the dev server keeps them root-absolute.
  */
-export const SITE_URL = `https://nandovejer.github.io${PAGES_BASE}`;
+export const SITE_URL = `https://luzds.com${PAGES_BASE}`;
 
 /**
  * Content-Security-Policy for the published GitHub Pages site. Pages cannot
@@ -135,6 +136,26 @@ function viteLicence() {
   };
 }
 
+/**
+ * The Pages site serves ET Book (MIT, Dmitry Krasny, Bonnie Scranton, Edward Tufte) in
+ * docs/assets, and the home's wordmark is outlined from it: it serves the notice beside the
+ * fonts, assets/LICENSE-ETBook.txt, from the one the tokens package ships (RL-13).
+ * `pnpm check:license` fails on a font without it.
+ */
+function etbookLicence() {
+  return {
+    name: "pages-etbook-licence",
+    apply: "build",
+    generateBundle() {
+      this.emitFile({
+        type: "asset",
+        fileName: "assets/LICENSE-ETBook.txt",
+        source: readFileSync(resolve(__dirname, "packages/tokens/fonts/LICENSE-ETBook.txt"), "utf-8"),
+      });
+    },
+  };
+}
+
 export default defineConfig(({ mode }) => {
   const pages = mode === "pages";
   const outRoot = pages ? pagesRoot : distRoot;
@@ -146,7 +167,7 @@ export default defineConfig(({ mode }) => {
     publicDir: false,
     // The site's routes, dev server, layouts and partials, link check and the
     // move of each HTML file to its route: scripts/docs-site/plugin.js
-    plugins: [coreLanguages(), docsSite({ repoRoot: __dirname, relative: pages, outRoot, pagesBase: PAGES_BASE, siteUrl: SITE_URL, csp: PAGES_CSP }), ...(pages ? [pagesCsp(), viteLicence()] : [])],
+    plugins: [coreLanguages(), docsSite({ repoRoot: __dirname, relative: pages, outRoot, pagesBase: PAGES_BASE, siteUrl: SITE_URL, csp: PAGES_CSP }), ...(pages ? [pagesCsp(), viteLicence(), etbookLicence()] : [])],
     server: {
       open: "/",
       fs: {

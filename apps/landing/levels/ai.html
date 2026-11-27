@@ -1,0 +1,78 @@
+    <!-- The page of the luz skill (@luz-ds/ai): the home's template with this <main> (levelTemplate() in
+         scripts/docs-site/site.js). For a developer who does not yet know what the skill does: the hero, one line and
+         the terminal of the skill (the cli placeholder, the same as the home's, scripts/docs-site/cli-demo.js), how to install it (three
+         choices) and use it (three tabs), what it does, the agents and skills it adds, the assistants it works with and what it never does
+         (scripts/docs-site/ai-page.js reads them from the package), and what to use until it is on npm -->
+    <div class="landing-level">
+      <section class="landing-intro landing-demo landing-ai" id="hero" aria-labelledby="hero-title">
+        <div class="landing-intro__head">
+          <p class="landing-inside__eyebrow"><svg aria-hidden="true"><use href="#i0"/></svg><span>{{t:inside.l4.eyebrow}}</span></p>
+          <h1 class="landing-intro__title" id="hero-title">{{html:inside.l4.title}}</h1>
+          <p class="landing-intro__what">{{t:level.ai.what}}</p>
+          <div class="o-actions">
+            <a class="luz-btn luz-btn--primary" href="#a-install">{{t:level.ai.cta.steps}}</a>
+            <a class="luz-btn luz-btn--outline" href="/docs/ai/#skill">{{t:level.ai.docs}}</a>
+          </div>
+          <ul class="landing-intro__facts">
+            <li><strong>{{naiagents}}</strong> {{t:level.ai.stat.agents}}</li>
+            <li><strong>{{naitargets}}</strong> {{t:level.ai.stat.targets}}</li>
+            <li><strong>{{ndepsai}}</strong> {{t:level.catalog.stat.deps}}</li>
+          </ul>
+        </div>
+        <div class="landing-intro__stage landing-ai__stage">
+          <!-- Four tabs (owner, 2026-11-25): Install, npm and the usual commands, as the home's; then the session the
+               visitor answers, once for each assistant (scripts/docs-site/cli-demo.js, CLI_HANDS). They do not turn
+               by themselves: a visitor answering a terminal is never moved to another (landing.js) -->
+          <div class="landing-panel landing-clitabs">
+            <nav class="luz-tabs luz-tabs--pill" aria-label="{{t:inside.l4.tabs}}">
+              <a class="luz-tab" href="#hero-install"><svg class="ic" aria-hidden="true"><use href="#i4"/></svg><span>{{t:inside.tab.install}}</span></a>
+              <a class="luz-tab" href="#hero-claude"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 5h15v10.5H10L6 19v-3.5H4.5Z"/></svg><span>{{t:level.ai.tab.claude}}</span></a>
+              <a class="luz-tab" href="#hero-codex"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 5h15v10.5H10L6 19v-3.5H4.5Z"/></svg><span>{{t:level.ai.tab.codex}}</span></a>
+              <a class="luz-tab" href="#hero-cursor"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 5h15v10.5H10L6 19v-3.5H4.5Z"/></svg><span>{{t:level.ai.tab.cursor}}</span></a>
+            </nav>
+            <div class="luz-tabpanel landing-clitabs__pane" id="hero-install">
+              <div class="landing-install">
+                <div class="landing-install__bar">
+                  <span class="landing-install__label">{{t:inside.install.npm}}</span>
+                  <button class="luz-copy-btn" type="button" data-copy-from="hero-npm" aria-label="{{t:inside.copy.npm}}" hidden>{{t:see.copy}}</button>
+                </div>
+                <pre class="luz-code-block" data-lang="bash" dir="ltr" tabindex="0" role="region" aria-label="{{t:inside.install.npm}}"><code id="hero-npm">npx @luz-ds/ai init</code></pre>
+              </div>
+              <div class="landing-install">
+                <div class="landing-install__bar">
+                  <span class="landing-install__label">{{t:level.ai.hero.install}}</span>
+                </div>
+                <pre class="luz-code-block" data-lang="shell" dir="ltr" tabindex="0" role="region" aria-label="{{t:level.ai.hero.install}}"><code>npx @luz-ds/ai init --target claude --all
+npx @luz-ds/ai list
+npx @luz-ds/ai add luz-agent-ux
+npx @luz-ds/ai remove luz-agent-ux</code></pre>
+              </div>
+            </div>
+            <div class="luz-tabpanel landing-clitabs__pane" id="hero-claude">
+              {{cli}}
+            </div>
+            <div class="luz-tabpanel landing-clitabs__pane" id="hero-codex">
+              <p class="landing-clitabs__note">{{t:level.ai.tab.untested}}</p>
+              {{clicodex}}
+            </div>
+            <div class="luz-tabpanel landing-clitabs__pane" id="hero-cursor">
+              <p class="landing-clitabs__note">{{t:level.ai.tab.untested}}</p>
+              {{clicursor}}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="landing-level__blocks">
+        {{aiblocks}}
+      </div>
+
+      <section class="landing-level__next" id="next" aria-labelledby="next-title">
+        <h2 class="luz-section__title" id="next-title">{{t:level.ai.next.title}}</h2>
+        <p class="landing-inside__lead">{{t:level.ai.next.lead}}</p>
+        <div class="o-actions">
+          <a class="luz-btn luz-btn--primary" href="/docs/ai/">{{t:level.ai.next.docs}}</a>
+        </div>
+      </section>
+
+    </div>

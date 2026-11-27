@@ -10,11 +10,10 @@
  * THE CONTRACT these tests pin (the spec leaves some names open; the
  * implementer follows them):
  *
- *   apps/docs/pages/get-started/ai.html
- *     front matter   title: Working with AI, area: get-started, order: 10,
+ *   apps/docs/pages/ai/index.html
+ *     front matter   title: Working with AI, area: ai (the index of the AI area), order: 0,
  *                    generate: ai, the description of spec 6 verbatim, and
- *                    keywords with llms.txt. Classless styles becomes order 11,
- *                    so `/docs/tokens/` keeps its Previous link.
+ *                    keywords with llms.txt.
  *     scripts/docs-site/site.js   `generate: ai` is allowed (a sixth value,
  *                    beside gallery, a-z and snippets) and renderPage() writes
  *                    the two generated tables into their sections.
@@ -44,7 +43,7 @@
  *                    of the rules that block and the second of the ones that
  *                    warn; each rule id of messages.js once; the severity is
  *                    the word `block` or `warn` of the registry.
- *     agent          `npx @luz-ds/check agent > .claude/agents/luz-accessibility-reviewer.md`,
+ *     agent          `npx @luz-ds/check agent > .claude/agents/luz-agent-accessibility.md`,
  *                    the three tools of the published file, read-only, that the
  *                    `>` overwrites a file, and that it does not use assistive
  *                    technology.
@@ -56,7 +55,7 @@
  *
  *   scripts/docs-site/ai.js
  *     aiArtifacts(site, { siteUrl = "" } = {}) -> [{ file, url, what, madeBy }]
- *       in this order: `llms.txt`, `llms-full.txt`, the five `prompts/<id>.txt`, `examples/<area>/<slug>.html`
+ *       in this order: `llms.txt`, `llms-full.txt`, `examples/<area>/<slug>.html`
  *       (the url of the Button example, a real one), then
  *       `manifests/<pkg>/<file>` for each route of manifestAssets(root), in its
  *       order. `url` is the route, or siteUrl + route.slice(1); `what` is one
@@ -67,7 +66,7 @@
  *
  *   packages/check/src/messages.js
  *     every `docsUrl()` is a route of the generated site and its fragment an
- *     id on that page (the note of step 8: `/docs/get-started/ai/#rules`).
+ *     id on that page (the note of step 8: `/docs/ai/#rules`).
  *
  * The text around it (spec 7.1, 10 row 13): structure.html has a row for
  * check; contrast.html says in one sentence that luz-check runs the same check;
@@ -75,10 +74,11 @@
  * rule (D14-A: declared at root scope); README.md lists @luz-ds/check and has
  * "For AI agents"; AGENTS.md names @luz-ds/check, TOOLS and the AI files;
  * packages/check/README.md says the rules exist; accessibility.html has the
- * bullet of accessibility-engineer Q3 and "Last reviewed on 7 November 2026"
+ * bullet of accessibility-engineer Q3 and "Last reviewed on 27 November 2026"
  * (this file is the pin of that date); Node 20 (D14-A) replaces Node 18 in the
  * luz-tokens text.
  */
+import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
@@ -86,7 +86,7 @@ import { decodeEntities, readHtml, tags } from "../scripts/docs-site/html.js";
 import { renderPage, scanSite } from "../scripts/docs-site/site.js";
 import { TOOLS } from "../scripts/luz-packages.js";
 import { SITE_URL } from "../vite.config.js";
-import { PROMPT_KINDS, promptRoute } from "../scripts/docs-site/prompts.js";
+import { FITS_KINDS } from "../scripts/docs-site/kinds.js";
 import { USAGE } from "../packages/check/src/cli.js";
 import { MESSAGES, docsUrl } from "../packages/check/src/messages.js";
 import { buildReport, finding } from "../packages/check/src/report.js";
@@ -95,12 +95,13 @@ import { columnOf, linksOf, preOf, readPage, repo, sectionsOf, sentencesOf, tabl
 
 /* ---- The constants the page is held against ----------------------------------- */
 
-const ROUTE = "/docs/get-started/ai/";
-const PAGE_FILE = "apps/docs/pages/get-started/ai.html";
-const IDS = ["start", "start-site", "files", "check", "rules", "agent", "limits"];
+const ROUTE = "/docs/ai/";
+const PAGE_FILE = "apps/docs/pages/ai/index.html";
+const IDS = ["start", "start-site", "skill", "files", "check", "rules", "agent", "limits"];
 const TITLES = {
   start: "Give your agent LUZ",
   "start-site": "Start a site",
+  skill: "Install /luz",
   files: "What an agent can read",
   check: "Check what an agent wrote",
   rules: "What check blocks and what it warns about",
@@ -113,12 +114,12 @@ const CHECK = JSON.parse(readFileSync(join(import.meta.dirname, "..", "packages"
 const PROMPT =
   `Use LUZ for the markup. Read ${SITE_URL}llms.txt first and use only the classes in each package's classes.json. ` +
   `After you write HTML or CSS, run \`npx @luz-ds/check@${CHECK}\` on the files and fix every finding before you answer.`;
-const AGENT_COMMAND = `npx @luz-ds/check@${CHECK} agent > .claude/agents/luz-accessibility-reviewer.md`;
+const AGENT_COMMAND = `npx @luz-ds/check@${CHECK} agent > .claude/agents/luz-agent-accessibility.md`;
 const NOT_TESTED = "/docs/accessibility/#h-a11y-not-tested";
 const STATEMENT_BULLET =
   "The accessibility reviewer that @luz-ds/check prints, and luz-check itself. They read source files and give advice; " +
   "they do not open a page, measure on screen or use assistive technology. A run with no findings does not mean a page is accessible.";
-const LAST_REVIEWED = "Last reviewed on 7 November 2026.";
+const LAST_REVIEWED = "Last reviewed on 27 November 2026.";
 
 const squash = (s) => s.replace(/\s+/g, " ").trim();
 const read = (path) => readFileSync(join(repo, path), "utf-8");
@@ -199,26 +200,27 @@ const FLAGS = [...new Set(USAGE.match(/--[a-z]+/g))];
 /* ---- Front matter and place in the reading order ------------------------------- */
 
 describe("the page: front matter and its place", () => {
-  it("is Working with AI, in Get started, generated by `ai`, with the spec's description", () => {
+  it("is Working with AI, the index of the AI area, generated by `ai`, with the spec's description", () => {
     const { meta } = pageOf();
     expect(meta.title).toBe("Working with AI");
-    expect(meta.area).toBe("get-started");
+    expect(meta.area).toBe("ai");
     expect(meta.generate).toBe("ai");
     expect(meta.description).toBe(DESCRIPTION);
     expect(meta.keywords).toContain("llms.txt");
   });
 
-  it("is order 10, and Classless styles is gone", () => {
-    expect(pageOf().meta.order).toBe("10");
+  it("is order 0, and Classless styles is gone", () => {
+    expect(pageOf().meta.order).toBe("0");
     expect(siteOf().pages.some((p) => p.route === "/docs/get-started/classless/")).toBe(false);
   });
 
-  it("comes after Print styles and before Migrate a project to LUZ, which comes before How LUZ is built, in the reading order", () => {
-    const order = siteOf().pages.filter((p) => p.meta.area === "get-started").sort((a, b) => Number(a.meta.order) - Number(b.meta.order));
-    const routes = order.map((p) => p.route);
-    expect(routes.indexOf(ROUTE)).toBe(routes.indexOf("/docs/get-started/print/") + 1);
-    expect(routes.indexOf("/docs/get-started/migrate/")).toBe(routes.indexOf(ROUTE) + 1);
-    expect(routes.indexOf("/docs/get-started/how-luz-is-built/")).toBe(routes.indexOf("/docs/get-started/migrate/") + 1);
+  it("is the first page of the AI area, which comes right after Get started, and Migrate a project to LUZ comes before How LUZ is built", () => {
+    const pages = siteOf().pages;
+    const area = pages.filter((p) => p.meta.area === "ai").sort((a, b) => Number(a.meta.order) - Number(b.meta.order));
+    expect(area[0].route).toBe(ROUTE);
+    expect(siteOf().areas.map((a) => a.id).slice(0, 2)).toEqual(["get-started", "ai"]);
+    const started = pages.filter((p) => p.meta.area === "get-started").sort((a, b) => Number(a.meta.order) - Number(b.meta.order)).map((p) => p.route);
+    expect(started.indexOf("/docs/get-started/how-luz-is-built/")).toBe(started.indexOf("/docs/get-started/migrate/") + 1);
   });
 
   it("has no script and no event handler in its source: it works as it is without JavaScript", () => {
@@ -232,7 +234,7 @@ describe("the page: front matter and its place", () => {
 /* ---- The seven sections ----------------------------------------------------------- */
 
 describe("the page: seven h2, in the order and with the titles of the ux answer", () => {
-  it("has the h2 ids start, start-site, files, check, rules, agent and limits, in that order", () => {
+  it("has the h2 ids start, start-site, skill, files, check, rules, agent and limits, in that order", () => {
     expect([...sections().keys()]).toEqual(IDS);
   });
 
@@ -302,9 +304,9 @@ describe("start: Give your agent LUZ", () => {
 describe("start-site: Start a site", () => {
   it("links the page of each kind of site, in the order of the area", () => {
     const hrefs = linksOf(section("start-site")).map((l) => l.href);
-    const kinds = PROMPT_KINDS.filter((kind) => kind.preset).map((kind) => `/docs/kinds/${kind.id}/`);
+    const kinds = FITS_KINDS.map((kind) => `/docs/ai/${kind}/`);
     expect(kinds).toHaveLength(4);
-    expect(hrefs.filter((h) => h.startsWith("/docs/kinds/"))).toEqual(kinds);
+    expect(hrefs.filter((h) => h.startsWith("/docs/ai/"))).toEqual(kinds);
   });
 });
 
@@ -371,28 +373,13 @@ describe("aiArtifacts(site): the rows of that table", () => {
     }
   });
 
-  it("lists llms.txt, llms-full.txt, the five prompts, one example and the manifests of every package, in this order", async () => {
+  it("lists llms.txt, llms-full.txt, one example and the manifests of every package, in this order, and no prompt", async () => {
     const { aiArtifacts, manifestAssets } = await load();
     const rows = aiArtifacts(siteOf());
-    const prompts = PROMPT_KINDS.map((kind) => promptRoute(kind.id).slice(1));
-    expect(prompts).toHaveLength(5);
-    const head = rows.slice(0, 3 + prompts.length).map((r) => r.file);
-    expect(head).toEqual(["llms.txt", "llms-full.txt", ...prompts, "examples/<area>/<slug>.html"]);
+    expect(rows.slice(0, 3).map((r) => r.file)).toEqual(["llms.txt", "llms-full.txt", "examples/<area>/<slug>.html"]);
     const manifests = manifestAssets(repo).map((a) => a.route.slice(1));
-    expect(rows.slice(3 + prompts.length).map((r) => r.file)).toEqual(manifests);
-  });
-
-  it("gives each prompt the route the build serves it at, in the order llms.txt lists them, and says what it is", async () => {
-    const { aiArtifacts } = await load();
-    const dev = aiArtifacts(siteOf());
-    const live = aiArtifacts(siteOf(), { siteUrl: SITE_URL });
-    PROMPT_KINDS.forEach((kind, i) => {
-      expect(dev[2 + i].url, kind.id).toBe(promptRoute(kind.id));
-      expect(live[2 + i].url, kind.id).toBe(`${SITE_URL}${promptRoute(kind.id).slice(1)}`);
-      expect(dev[2 + i].what.length, kind.id).toBeGreaterThan(10);
-    });
-    // Two prompts never share a description: the table tells them apart
-    expect(new Set(dev.slice(2, 7).map((r) => r.what)).size).toBe(5);
+    expect(rows.slice(3).map((r) => r.file)).toEqual(manifests);
+    expect(rows.filter((r) => r.file.startsWith("prompts/"))).toEqual([]);
   });
 
   it("gives the route with no site URL, and the absolute URL with one", async () => {
@@ -444,6 +431,48 @@ describe("aiArtifacts(site): the rows of that table", () => {
 
 /* ---- check: the command, the exit codes, a real sample, the JSON fields ---------- */
 
+describe("skill: Install /luz", () => {
+  const help = () => spawnSync(process.execPath, [join(repo, "packages/ai/skills/luz/scripts/luz.mjs"), "init", "--help"], { encoding: "utf-8" }).stdout;
+  const text = () => `${textOf(section("skill"))}\n${preOf(section("skill")).join("\n")}`;
+
+  it("shows the command as npx @luz-ds/ai init, with the scope and a target", () => {
+    expect(preOf(section("skill")).join("\n")).toContain("npx @luz-ds/ai init --target claude");
+  });
+
+  it("names only options and targets that `init --help` has", () => {
+    const usage = help();
+    expect(usage).toContain("--target");
+    for (const flag of new Set(text().match(/(?<![\w-])--[a-z][a-z-]*/g) ?? [])) expect(usage, `${flag} is not an option of init`).toContain(flag);
+    for (const target of ["claude", "codex", "gemini", "cursor"]) {
+      expect(text(), target).toContain(target);
+      expect(usage, target).toContain(target);
+    }
+  });
+
+  it("says init writes the folder each assistant reads, and says the package is not on npm yet; the folders are in the README, since llms-full names no .claude/ path", () => {
+    expect(text()).toMatch(/writes the folder each one reads/);
+    expect(text()).not.toMatch(/\.claude\//);
+    expect(text()).toMatch(/not on npm yet/);
+  });
+
+  it("says what to type in each assistant: /luz, $luz for Codex, and plain words for AGENTS.md, as init --help does", () => {
+    const usage = help();
+    const said = text();
+    expect(said).toMatch(/Type \/luz \(\s*\$luz in Codex; with agents-md\s*, say it in words\)/);
+    for (const target of ["claude", "codex", "gemini", "cursor", "agents-md"]) expect(usage, target).toContain(target);
+    expect(usage).toContain(".gemini/commands/luz.toml");
+  });
+
+  it("links to the page of the commands, which has every command with a real conversation", () => {
+    expect(linksOf(section("skill")).map((l) => l.href)).toContain("/docs/ai/commands/");
+  });
+
+  it("says a field left out stays [ADAPT] and the agent stops and asks", () => {
+    expect(text()).toMatch(/\[ADAPT: …\]/);
+    expect(text()).toMatch(/stops and asks/);
+  });
+});
+
 describe("check: Check what an agent wrote", () => {
   const codeText = () => `${textOf(section("check"))}\n${preOf(section("check")).join("\n")}`;
 
@@ -454,8 +483,9 @@ describe("check: Check what an agent wrote", () => {
   it("names every option of luz-check --help, and no option it does not have", () => {
     const text = codeText();
     for (const flag of FLAGS) expect(text, flag).toContain(flag);
-    // The whole page: every `--word` that is not a LUZ token is an option of the tool
-    const page = `${textOf(contentOf())}\n${preOf(contentOf()).join("\n")}`;
+    // The page but the section of the skill: every `--word` that is not a LUZ token is an option of the tool
+    const without = contentOf().replace(section("skill"), "");
+    const page = `${textOf(without)}\n${preOf(without).join("\n")}`;
     const used = [...new Set(page.match(/(?<![\w-])--[a-z][a-z-]*/g) ?? [])].filter((flag) => !flag.startsWith("--luz-"));
     const known = new Set(FLAGS);
     for (const flag of used) expect(known.has(flag), `${flag} is not an option of luz-check`).toBe(true);
@@ -571,7 +601,7 @@ describe("rules: What check blocks and what it warns about", () => {
   });
 
   it("is where the findings point: #rules is an id of this page, for every rule whose docs is the page", () => {
-    const pointing = RULE_IDS.filter((id) => docsUrl(id) === `${SITE_URL}docs/get-started/ai/#rules`);
+    const pointing = RULE_IDS.filter((id) => docsUrl(id) === `${SITE_URL}docs/ai/#rules`);
     expect(pointing.length).toBeGreaterThan(0);
     expect(sections().has("rules")).toBe(true);
   });
@@ -671,9 +701,7 @@ describe("the page: wording", () => {
 
   it("links only to routes of the site, to files the build emits, or to other hosts", async () => {
     const { AI_ROUTES, manifestAssets, exampleDocuments } = await import("../scripts/docs-site/ai.js");
-    const { PROMPT_KINDS, promptRoute } = await import("../scripts/docs-site/prompts.js");
     const emitted = new Set([
-      ...PROMPT_KINDS.map((kind) => promptRoute(kind.id)),
       AI_ROUTES.llms,
       AI_ROUTES.llmsFull,
       ...manifestAssets(repo).map((a) => a.route),
@@ -824,7 +852,7 @@ describe("README.md: for people and for agents", () => {
     const [, after] = readme().split(/^#{2,3} For AI agents\s*$/m);
     expect(after, 'a "For AI agents" heading').toBeTruthy();
     const body = after.split(/^#{1,3} /m)[0];
-    expect(body).toContain(`${SITE_URL}docs/get-started/ai/`);
+    expect(body).toContain(`${SITE_URL}docs/ai/`);
     expect(body).toContain("llms.txt");
     expect(body).toContain("npx @luz-ds/check");
   });
@@ -876,7 +904,7 @@ describe("packages/check/README.md", () => {
   });
 
   it("points at the page for the list of rules", () => {
-    expect(text()).toContain(`${SITE_URL}docs/get-started/ai/`);
+    expect(text()).toContain(`${SITE_URL}docs/ai/`);
   });
 });
 
@@ -896,7 +924,7 @@ describe("accessibility.html: the statement covers the tool and the agent", () =
     expect(textOf(known.html)).not.toContain("@luz-ds/check");
   });
 
-  it("is last reviewed on 7 November 2026, in the lead and in the description of the front matter", () => {
+  it("is last reviewed on 27 November 2026, in the lead and in the description of the front matter", () => {
     const { source, body } = page();
     expect(source).toContain(`description: LUZ aims for WCAG 2.2 level AA. What is checked on every change, what has not been tested, and the known issues. ${LAST_REVIEWED}`);
     expect(textOf(body)).toContain(`and the known issues. ${LAST_REVIEWED}`);

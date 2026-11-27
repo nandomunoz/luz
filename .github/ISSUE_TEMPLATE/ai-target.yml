@@ -1,0 +1,42 @@
+name: Assistant problem (luz-ai)
+description: The luz skill does not work in an assistant other than Claude Code (Codex, Gemini CLI, Cursor, AGENTS.md).
+labels: ["ai-target"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Only Claude Code is tested. The other assistants get the skill written from their own documentation, so a problem there is expected to be ours to fix, and a confirmed one becomes a case of the lab.
+  - type: dropdown
+    id: target
+    attributes:
+      label: Assistant
+      options:
+        - Codex
+        - Gemini CLI
+        - Cursor
+        - AGENTS.md (any assistant that reads it)
+    validations:
+      required: true
+  - type: input
+    id: cli
+    attributes:
+      label: Version of the assistant
+      description: What its `--version` prints, or the version of the editor.
+      placeholder: "1.2.3"
+    validations:
+      required: true
+  - type: input
+    id: command
+    attributes:
+      label: What you typed
+      description: The `luz-ai init` line you ran, and what you typed in the assistant (for example `/luz new landing`).
+      placeholder: "npx @luz-ds/ai init --target codex, then $luz"
+    validations:
+      required: true
+  - type: textarea
+    id: output
+    attributes:
+      label: What happened
+      description: What the assistant said or did, and what you expected. Paste its output; remove anything private.
+    validations:
+      required: true

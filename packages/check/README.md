@@ -16,7 +16,7 @@ Say `npx @luz-ds/check@0.3.2`, with the scope. The bare name `luz-check` is the 
 
 A path is a file, a folder (read recursively: `.html`, `.htm` and `.css`) or a quoted glob such as `"src/**/*.html"`; with no path it reads the current folder. `--ext .astro,.vue` reads those extensions as HTML, `--json` prints the report as JSON, `--strict` fails on a warning too, and `--config <file>` reads a configuration other than `luz-check.json`.
 
-The rules are in this version. They find a class or an element that LUZ does not have (`class/unknown`, `element/unknown`), a stylesheet that is not loaded or is loaded in the wrong order (`load/package-missing`, `load/order`), a class on an element it does not belong on (`misuse/host-element`) and, in a theme file, a colour pair that is below its contrast minimum (`theme/contrast`). A file it cannot read as HTML or CSS is reported as `parse/error`, and one it did not read as `file/skipped`: a link, a file over 1 MiB, one it may not open. A rule either blocks, and the exit code is 1, or warns. Every rule, what it finds and whether it blocks is listed on [Working with AI](https://nandovejer.github.io/luz/docs/get-started/ai/#rules). The command never follows a link and never quotes your files.
+The rules are in this version. They find a class or an element that LUZ does not have (`class/unknown`, `element/unknown`), a stylesheet that is not loaded or is loaded in the wrong order (`load/package-missing`, `load/order`), a class on an element it does not belong on (`misuse/host-element`) and, in a theme file, a colour pair that is below its contrast minimum (`theme/contrast`). A file it cannot read as HTML or CSS is reported as `parse/error`, and one it did not read as `file/skipped`: a link, a file over 1 MiB, one it may not open. A rule either blocks, and the exit code is 1, or warns. Every rule, what it finds and whether it blocks is listed on [Working with AI](https://luzds.com/docs/ai/#rules). The command never follows a link and never quotes your files.
 
 | Exit code | Meaning |
 | --- | --- |
@@ -31,7 +31,7 @@ It reads source files only. It does not check names, labels, alt text, headings 
 `agent` prints an agent definition for a project that uses an AI coding assistant: a read-only accessibility reviewer (it can read, search and list files, and write nothing) for WCAG 2.2 level AA and EN 301 549. It reads source files, so it gives advice from reading code, not test results. Copy it into your project:
 
 ```bash
-npx @luz-ds/check@0.3.2 agent > .claude/agents/luz-accessibility-reviewer.md
+npx @luz-ds/check@0.3.2 agent > .claude/agents/luz-agent-accessibility.md
 ```
 
 The `>` overwrites a file that is already there: use another path, or check the file in first, if you edited your copy. The copy is yours to read before you use it, and anyone who can write to your project can change it.
@@ -51,15 +51,15 @@ It needs Node 20 or later and nothing else: no dependency, no network, no enviro
 
 No breaking changes in 0.3.2.
 
-Older versions: https://github.com/nandovejer/luz/blob/main/packages/check/CHANGELOG.md
+Older versions: https://github.com/nandomunoz/luz/blob/main/packages/check/CHANGELOG.md
 
 ### Read first
 
 1. `README.md` in this package: what the command does and its exit codes.
 2. `npx @luz-ds/check@0.3.2 --help`: the command's options, from the version you run.
-3. https://nandovejer.github.io/luz/llms.txt: the index of the documentation, short enough for a small context.
-4. https://nandovejer.github.io/luz/llms-full.txt: the same pages in full.
-5. https://nandovejer.github.io/luz/examples/: one standalone page of markup for each component and pattern.
+3. https://luzds.com/llms.txt: the index of the documentation, short enough for a small context.
+4. https://luzds.com/llms-full.txt: the same pages in full.
+5. https://luzds.com/examples/: one standalone page of markup for each component and pattern.
 
 ### Load order
 
@@ -67,7 +67,7 @@ Older versions: https://github.com/nandovejer/luz/blob/main/packages/check/CHANG
 
 ### Check what you write
 
-Run `npx @luz-ds/check@0.3.2 <files>` on every HTML and CSS file you write, and fix what it reports. To copy the accessibility reviewer into your project: `npx @luz-ds/check@0.3.2 agent > .claude/agents/luz-accessibility-reviewer.md`.
+Run `npx @luz-ds/check@0.3.2 <files>` on every HTML and CSS file you write, and fix what it reports. To copy the accessibility reviewer into your project: `npx @luz-ds/check@0.3.2 agent > .claude/agents/luz-agent-accessibility.md`.
 
 <!-- luz:ai-agents:end -->
 

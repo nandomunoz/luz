@@ -3,7 +3,7 @@
  * can change a source file and build without touching packages/core/dist.
  * The script reads everything relative to its own location: the copy holds
  * scripts/, packages/core (src and the manifests), the package.json of every
- * package, the sources of check (ai-manifests.js reads them) and a link to the
+ * package, the sources of check (ai-manifests.js reads them), the lib of tokens (build-check.js reads it) and a link to the
  * node_modules of the repository.
  *
  *   const tree = copyOfCore();       // in beforeAll
@@ -33,6 +33,8 @@ export function copyOfCore() {
     cpSync(manifest, join(dir, "packages", name, "package.json"));
     if (name === "core" || name === "check") cpSync(join(repo, "packages", name, "src"), join(dir, "packages", name, "src"), { recursive: true, filter: keep });
   }
+  // scripts/build-ai-facts.js loads scripts/build-check.js, which reads the theme parser of tokens
+  cpSync(join(repo, "packages/tokens/lib"), join(dir, "packages/tokens/lib"), { recursive: true });
   cpSync(join(repo, "packages/core/README.md"), join(dir, "packages/core/README.md"));
   symlinkSync(join(repo, "node_modules"), join(dir, "node_modules"));
 

@@ -1,0 +1,17 @@
+{
+  "example": "remove",
+  "case": "remove",
+  "model": "sonnet",
+  "date": "2026-11-26",
+  "skillVersion": "0.1.0",
+  "turns": [
+    {
+      "user": "/luz remove luz-agent-accessibility",
+      "assistant": "`luz-agent-accessibility` isn't installed in this project, so I removed nothing and wrote no files.\n\nThe dry run (`remove luz-agent-accessibility --dry-run`) printed: \"luz-agent-accessibility is not installed: nothing to delete\".\n\nIf you expected it to be there, I can run `/luz doctor` or `/luz list` to show which skills and agents the project has. It may be under a different name, or installed for a different assistant."
+    },
+    {
+      "user": "go",
+      "assistant": "I ran the removal after your \"go\". It changed nothing, because `luz-agent-accessibility` isn't installed in this project. The script printed \"luz-agent-accessibility is not installed: nothing to delete\", the same as in the dry run. No files were written or deleted.\n\nIf you expected the agent to be there, `/luz doctor` or `/luz list` will show which agents and skills the project has. It may be installed under another name or for a different assistant."
+    }
+  ]
+}

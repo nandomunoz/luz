@@ -6,8 +6,8 @@
  *
  * - Color mode: <luz-theme-time> around core's <luz-theme-mode> in the footer
  *   owns it (core stores the choice under its "luz-theme" key; Auto is the
- *   system's, and the time of day is a moment the reader picks with the
- *   slider of the home: core's theme-boot.js and catalog's
+ *   system's, and the time of day is a moment the reader picks in the
+ *   footer's list: core's theme-boot.js and catalog's
  *   theme-time-boot.js set the same mode before the first paint); this module
  *   defines both elements, which turn the radios into core's round button.
  *   With scripting on, that button is fixed at the bottom right of the window

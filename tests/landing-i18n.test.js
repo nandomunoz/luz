@@ -19,6 +19,7 @@ import { generatorStrings, giveHomeSources } from "./helpers/home-sources.js";
 import { findAll, parse, query, textOf } from "./helpers/html-dom.js";
 import { quoted } from "./helpers/quoted-attributes.js";
 import { warnIfOver } from "./helpers/warn-if-over.js";
+import { levelPagesOf } from "./helpers/level-pages.js";
 
 // The home is written without the quotes a value does not need: these tests read it with them restored
 const renderQuoted = (...args) => quoted(renderDocument(...args));
@@ -191,13 +192,13 @@ describe("languages of the home page: generated markup", () => {
   });
 
   it("writes them absolute from the site's URL in the pages build, and refuses a URL that is not https or has no final slash", () => {
-    const url = "https://nandovejer.github.io/luz/";
+    const url = "https://luzds.com/";
     expect(renderAlternates(i18n, i18n.byCode.get("ar"), url).split(/\n\s*/)).toEqual([
-      '<link rel="canonical" href="https://nandovejer.github.io/luz/ar/">',
-      '<link rel="alternate" hreflang="en" href="https://nandovejer.github.io/luz/">',
-      '<link rel="alternate" hreflang="es" href="https://nandovejer.github.io/luz/es/">',
-      '<link rel="alternate" hreflang="ar" href="https://nandovejer.github.io/luz/ar/">',
-      '<link rel="alternate" hreflang="x-default" href="https://nandovejer.github.io/luz/">',
+      '<link rel="canonical" href="https://luzds.com/ar/">',
+      '<link rel="alternate" hreflang="en" href="https://luzds.com/">',
+      '<link rel="alternate" hreflang="es" href="https://luzds.com/es/">',
+      '<link rel="alternate" hreflang="ar" href="https://luzds.com/ar/">',
+      '<link rel="alternate" hreflang="x-default" href="https://luzds.com/">',
     ]);
     const html = renderQuoted(LANDING, "apps/landing/index.html", "/es/", site, { locale: i18n.byCode.get("es"), siteUrl: "https://example.org/" });
     expect(html).toContain('<link rel="canonical" href="https://example.org/es/">');
@@ -332,12 +333,12 @@ describe("the LUZ home page in every language", () => {
   const render = (doc) => renderQuoted(doc.html, doc.file, doc.route, site, { locale: doc.locale });
 
   it("publishes at the GitHub Pages URL of the repository, whose path is PAGES_BASE", () => {
-    expect(SITE_URL).toBe("https://nandovejer.github.io/luz/");
+    expect(SITE_URL).toBe("https://luzds.com/");
     expect(new URL(SITE_URL).pathname).toBe(PAGES_BASE);
     const options = { repoRoot: repo, relative: true, outRoot: join(repo, "docs"), pagesBase: PAGES_BASE };
     expect(() => docsSite({ ...options, siteUrl: SITE_URL })).not.toThrow();
-    expect(() => docsSite({ ...options, siteUrl: "https://nandovejer.github.io/other/" })).toThrow(/whose path is pagesBase/);
-    expect(() => docsSite({ ...options, siteUrl: "http://nandovejer.github.io/luz/" })).toThrow(/https URL/);
+    expect(() => docsSite({ ...options, siteUrl: "https://luzds.com/other/" })).toThrow(/whose path is pagesBase/);
+    expect(() => docsSite({ ...options, siteUrl: "http://luzds.com/" })).toThrow(/https URL/);
   });
 
   it("ships English (default), Spanish and Arabic, each named in itself", () => {
@@ -394,10 +395,12 @@ describe("the new home page: catalogs and rendered pages (F5)", () => {
   const site = scanSite(join(repo, "apps/docs"), repo);
   const template = readFileSync(join(repo, "apps/landing/index.html"), "utf-8");
   const docs = landingDocuments(site, "apps/landing/index.html", template);
-  const { rendered: written, problems } = buildSite(site, { extra: docs });
+  const { rendered: written, problems } = buildSite(site, { extra: [...docs, ...levelPagesOf(site, template)] });
   // What the build wrote (its size is what the ceiling weighs) and the same page with the quotes of its values restored
   const rendered = new Map([...written].map(([route, page]) => [route, quoted(page)]));
-  const SECTIONS = ["hero", "light", "inside", "inside-2", "inside-3", "inside-4", "why", "native", "modes", "faq"];
+  const SECTIONS = ["hero", "who", "ai", "tokens", "core", "catalog", "faq", "users"];
+  /** Sections the home no longer has (owner, 2026-11-23): the home is the hero, the four levels and the FAQ. */
+  const GONE = ["why", "native", "modes"];
   const placeholders = (value) => [...value.matchAll(/\{[a-z]+(?::[a-z]+)?\}/g)].map((m) => m[0]).sort();
   /** Values that are the same word in the three languages: a brand, a command, a symbol. */
   /**
@@ -448,30 +451,29 @@ describe("the new home page: catalogs and rendered pages (F5)", () => {
     }
   });
 
-  it("the hero's brand is LUZ in every language, and the three words of the name stay English (lang=\"en\") in Why", () => {
+  it("the hero's brand is LUZ in every language", () => {
     for (const doc of docs) {
       const html = rendered.get(doc.route);
-      // The word is drawn with CSS: its letters are hidden from the tree and a visually hidden LUZ is what is read
+      // The word is the wordmark partial's SVG (hidden from the tree, one path per letter) and a visually hidden LUZ is what is read
       const h1 = query(parse(html, doc.route), "h1");
       const brand = query(h1, "span.landing-hero__brand.landing-imago");
       expect(brand, `${doc.route} the brand is in the h1`).not.toBeNull();
       expect(brand.attrs.get("lang"), doc.route).toBe("en");
-      const word = query(brand, "span.landing-imago__word");
-      expect(word.attrs.get("dir"), doc.route).toBe("ltr");
+      expect(brand.attrs.get("dir"), doc.route).toBe("ltr");
+      const word = query(brand, "svg.landing-wordmark");
+      expect(word, `${doc.route} the wordmark`).not.toBeNull();
       expect(word.attrs.get("aria-hidden"), doc.route).toBe("true");
-      expect(findAll(word, (node) => node.name === "span" && node.attrs.has("class")).map((node) => textOf(node)), doc.route).toEqual(["L", "U", "Z"]);
+      expect(findAll(word, (node) => node.name === "path").map((node) => node.attrs.get("class")), doc.route).toEqual(["landing-wordmark__l", "landing-wordmark__u", "landing-wordmark__z"]);
       expect(textOf(query(brand, "span.u-sr-only")), doc.route).toBe("LUZ");
-      for (const [id, word] of [["why-light", "Light"], ["why-usable", "Usable"], ["why-zero", "Zero-dependency"]]) {
-        expect(html, `${doc.route} ${id}`).toMatch(new RegExp(`<h3\\b[^>]*\\sid="${id}"[^>]*\\slang="en"[^>]*>${word}</h3>`));
-      }
     }
   });
 
-  it("each language renders the ten sections in order (the fit lists are inside why), one h1 and no template syntax left", () => {
+  it("each language renders the eight sections in order and none other at the top level, one h1 and no template syntax left", () => {
     for (const doc of docs) {
       const html = rendered.get(doc.route);
       const at = SECTIONS.map((id) => html.search(new RegExp(`<section\\b[^>]*\\sid="${id}"`)));
       expect(at.every((place) => place > -1), `${doc.route} has ${SECTIONS.join(", ")}: ${at.join()}`).toBe(true);
+      for (const id of GONE) expect(html, `${doc.route} has no #${id}`).not.toMatch(new RegExp(`\\sid="${id}"|href="#${id}"`));
       expect([...at].sort((a, b) => a - b), `${doc.route} in order`).toEqual(at);
       expect(html.match(/<h1\b/g), doc.route).toHaveLength(1);
       expect(html, doc.route).not.toMatch(/\{\{|\}\}|\{n:/);
@@ -501,34 +503,20 @@ describe("the new home page: catalogs and rendered pages (F5)", () => {
     }
   });
 
-  it("the hero's lead keeps the TDD statement in every language: the lead is one sentence about what works and how it changes", () => {
-    // The sentence says what to do with LUZ (start a project, or migrate it page by page) and keeps the promise of the tests;
-    // it spells the name: LUZ, the Light, Usable and Zero-dependency design system (the four words are strong)
-    const lead = catalogs.en["hero.lead"];
-    expect(lead.replace(/<[^>]*>/g, "")).toMatch(/start a project with LUZ, the Light, Usable and Zero-dependency design system, or migrate it page by page/);
-    expect(lead).not.toMatch(/\(|\)/);
-    expect([...lead.matchAll(/<strong\b[^>]*>([^<]*)<\/strong>/g)].map((m) => m[1])).toEqual(["LUZ", "Light", "Usable", "Zero-dependency"]);
-    expect(lead).toMatch(/<strong class="landing-nowrap">Zero-dependency<\/strong>/);
-    expect(catalogs.en["hero.lead"]).toMatch(/every change starts with a failing test/);
-    // Spanish and Arabic keep LUZ and the three words in English: the three are marked lang="en" (in Arabic inside an isolate)
-    for (const code of ["es", "ar"]) {
-      const text = catalogs[code]["hero.lead"];
-      expect([...text.matchAll(/<strong\b[^>]*>([^<]*)<\/strong>/g)].map((m) => m[1]), code).toEqual(["LUZ", "Light", "Usable", "Zero-dependency"]);
-      expect(text, code).toMatch(/<span lang="en"><strong>Light<\/strong>, <strong>Usable<\/strong> and <strong class="landing-nowrap">Zero-dependency<\/strong><\/span>/);
-      expect(text, code).not.toMatch(/\(|\)/);
+  it("the hero has a title and two actions, no lead (owner, 2026-11-27) and no key left of the old first screen: no hero.start, no light.* of the globe", () => {
+    for (const code of ["en", "es", "ar"]) {
+      const keys = Object.keys(catalogs[code]);
+      expect(keys.filter((key) => key.startsWith("hero.")).sort(), code).toEqual(["hero.docs", "hero.start-ai", "hero.title"]);
+      expect(keys, code).not.toContain("hero.start");
+      expect(keys.filter((key) => /^light\.(?:nojs|open|fact\.|alt\.|scrub|saved|sep)/.test(key)), code).toEqual([]);
     }
-    expect(catalogs.ar["hero.lead"], "ar: the English words sit in an isolate").toMatch(/[\u2066-\u2068]<span lang="en">[\s\S]*<\/span>\u2069/);
-    for (const code of ["en", "es", "ar"]) expect(catalogs[code]["hero.lead"].replace(/<[^>]*>/g, "").length, code).toBeGreaterThan(120);
+    expect(catalogs.en["hero.docs"]).toBe("Read the docs");
+    expect(catalogs.en["hero.start-ai"]).toBe("Get started with AI");
   });
 
   describe("Spanish", () => {
     /** A value as a reader meets it: tags gone, and what is marked as English (lang="en") left out. */
     const spanish = (value) => value.replace(/<span\b[^>]*\blang="en"[^>]*>[\s\S]*?<\/span>/g, "").replace(/<[^>]*>/g, "");
-
-    it("the hero's lead says framework once at most", () => {
-      const mentions = catalogs.es["hero.lead"].replace(/<[^>]*>/g, "").match(/framework/gi) ?? [];
-      expect(mentions.length).toBeLessThanOrEqual(1);
-    });
 
     it("a design system is \"sistema de diseño\" everywhere: no \"design system\" outside a lang=\"en\" span", () => {
       const offenders = Object.entries(catalogs.es).filter(([, value]) => /design system/i.test(spanish(value))).map(([key]) => key);
@@ -552,5 +540,12 @@ describe("the new home page: catalogs and rendered pages (F5)", () => {
     // Where the Pages build has run, the file itself
     const built = join(repo, "docs/ar/index.html");
     if (existsSync(built)) warnIfOver("docs/ar/index.html", readFileSync(built).length, ON_DISK);
+  });
+});
+
+describe("the home's slogan in Spanish", () => {
+  it("reads 'Sistema de diseño para humanos, preparado para IA.' with the same emphasis as the English", () => {
+    const es = JSON.parse(readFileSync(join(repo, "apps/landing/i18n/es.json"), "utf-8"));
+    expect(es["hero.title"]).toBe("Sistema de diseño para <em>humanos</em>, preparado para <em>IA</em>.");
   });
 });

@@ -7,9 +7,9 @@
  *
  *  - the source: the weights go through one function that runs `gzip` with
  *    `-9` and `-n`, falls back to zlib, and nothing else compresses.
- *  - the page: the meter of each package on docs/index.html holds exactly the
- *    bytes `gzip -9 -n -c` gives for the budgeted files of its dist (skipped
- *    without dist/ or without a gzip program).
+ *  - the page: the weight of each level on docs/index.html is the sum of the packages
+ *    below it, in the bytes `gzip -9 -n -c` gives for the budgeted files of their dist
+ *    (skipped without dist/ or without a gzip program).
  */
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync, readdirSync } from "node:fs";
@@ -18,7 +18,7 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { BASE } from "../scripts/luz-packages.js";
 import { ANY_SITE, PATTERNS } from "./helpers/catalog-names.js";
-import { findAll, parse, query, queryAll, textOf } from "./helpers/html-dom.js";
+import { findAll, parse, queryAll, textOf } from "./helpers/html-dom.js";
 
 const repo = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (path) => readFileSync(join(repo, path), "utf-8");
@@ -37,12 +37,16 @@ describe("scripts/docs-site/site.js: the weights are measured with the system gz
     expect(js).toMatch(/catch\s*(\([^)]*\))?\s*\{[^}]*gzipSync\(/);
   });
 
+  it("keeps no generator for the charts the home no longer has (owner, 2026-11-23): the weights, the packages and the checks", () => {
+    expect(js).not.toMatch(/function (?:renderWeights|renderPackages|renderChecks|barRow)\b/);
+    expect(js).not.toMatch(/\b(?:weights|packages|checks): translated/);
+  });
+
   it("measures every weight of the home through that one function", () => {
     const calls = js.match(/\bgzipSync\(/g) ?? [];
     expect(calls).toHaveLength(1);
     // a package weighs the sum of its budgeted files, and of the files a glob row matches; catalog has no row
     // and no bundle: it weighs the files of its dist, all measured by gzipBytes
-    expect(js).toMatch(/function renderWeights[\s\S]*?\b(?:gzipBytes|packageBytes)\(/);
     expect(js).toMatch(/function levelWeights[\s\S]*?\b(?:gzipBytes|packageBytes)\(/);
     expect(js).toMatch(/function packageBytes[\s\S]*?\bgzipBytes\(/);
   });
@@ -91,14 +95,6 @@ const built = BASE.every((name) => files(name).length > 0 && files(name).every((
 describe.skipIf(!built || !hasGzip() || !existsSync(join(repo, "docs/index.html")))("docs/index.html: the weights equal gzip -9 -n", () => {
   const gz = (file) => execFileSync("gzip", ["-9", "-n", "-c"], { input: readFileSync(join(repo, file)), maxBuffer: 64 * 1024 * 1024 }).length;
   const html = read("docs/index.html");
-  // The page is written without the quotes a value does not need: read it as a tree, not with a regex of quotes
-  const bars = queryAll(parse(html, "docs/index.html"), "ul.luz-bar-list__rows").find((ul) => ul.attrs.get("aria-label") === "Packages by size");
-  const barOf = (name) => {
-    const row = bars && queryAll(bars, "li").find((li) => textOf(query(li, "span.luz-bar-list__name")) === name);
-    const meter = row && findAll(row, (node) => node.name === "meter")[0];
-    return meter ? Number(meter.attrs.get("value")) : null;
-  };
-
   it("catalog weighs the sum of its files in dist, not of a budgets.json row (it has none), not a bundle, and not the 20 patterns of the kinds of site", () => {
     expect(budgets.filter((b) => [b.file, b.glob].some((v) => v?.startsWith("packages/catalog/"))), "catalog has no row to read").toEqual([]);
     const parts = files("catalog").filter((f) => f.startsWith("packages/catalog/dist/components/"));
@@ -108,20 +104,9 @@ describe.skipIf(!built || !hasGzip() || !existsSync(join(repo, "docs/index.html"
     expect(files("catalog").some((f) => /catalog\.min\.css$/.test(f))).toBe(false);
   });
 
-  for (const name of BASE) {
-    it(`${name} weighs what gzip -9 -n says`, () => {
-      const bar = barOf(name);
-      expect(bar, `no bar for ${name} in the weights of docs/index.html`).not.toBeNull();
-      const bytes = files(name).reduce((sum, f) => sum + gz(f), 0);
-      expect(bar).toBe(bytes);
-    });
-  }
-
-  it("core's bar leaves out luz.conditional.css: a page links one of the two files, not both", () => {
-    expect(budgets.some((b) => b.file === CONDITIONAL), "the conditional file is budgeted, so only the bar can leave it out").toBe(true);
+  it("core's figure leaves out luz.conditional.css: a page links one of the two files, not both", () => {
+    expect(budgets.some((b) => b.file === CONDITIONAL), "the conditional file is budgeted, so only the figure can leave it out").toBe(true);
     expect(files("core"), "the figure sums luz.css and the rest, not the conditional file").not.toContain(CONDITIONAL);
-    expect(barOf("core")).toBe(files("core").reduce((sum, f) => sum + gz(f), 0));
-    expect(barOf("core"), "core's bar is not the sum with the conditional file").not.toBe(files("core").concat(CONDITIONAL).reduce((sum, f) => sum + gz(f), 0));
   });
 
   it("the weight of each level is the sum of the packages below it, with core leaving out luz.conditional.css", () => {
@@ -134,7 +119,7 @@ describe.skipIf(!built || !hasGzip() || !existsSync(join(repo, "docs/index.html"
     };
     const bytes = (name) => files(name).reduce((sum, f) => sum + gz(f), 0);
     const kb = (n) => (n / 1024).toFixed(1);
-    expect([weightOf("inside"), weightOf("inside-2"), weightOf("inside-3")]).toEqual([
+    expect([weightOf("tokens"), weightOf("core"), weightOf("catalog")]).toEqual([
       kb(bytes("tokens")),
       kb(bytes("tokens") + bytes("core")),
       kb(bytes("tokens") + bytes("core") + bytes("catalog")),

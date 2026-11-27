@@ -10,7 +10,8 @@
  *    and the check says so in the report.
  * 3. The Pages site (docs/assets) holds no third-party code without its notice
  *    (`checkPagesSite`): Vite's `__vitePreload` helper and module-preload polyfill
- *    need docs/LICENSE-vite.txt.
+ *    need docs/LICENSE-vite.txt, and a docs/assets/ETBook-*.woff2 needs
+ *    LICENSE-ETBook.txt in its folder (ET Book's MIT notice).
  * 4. dev/LICENSES.md is the generated list of those dependencies and is up to
  *    date. `--update` rewrites it; it never legitimises a problem of 1 or 2.
  *
@@ -198,6 +199,14 @@ function* jsFiles(dir) {
   }
 }
 
+function* etbookFonts(dir) {
+  for (const name of readdirSync(dir).sort()) {
+    const file = join(dir, name);
+    if (statSync(file).isDirectory()) yield* etbookFonts(file);
+    else if (/^ETBook-.*\.woff2$/.test(name)) yield file;
+  }
+}
+
 /**
  * Third-party code the Pages build emits into docs/assets: Vite's `__vitePreload`
  * helper and its module-preload polyfill (MIT, VoidZero Inc. and Vite
@@ -228,6 +237,22 @@ export function checkPagesSite(root) {
     const what = helper ? "Vite's __vitePreload helper" : "Vite's module-preload polyfill";
     problems.push(`${relative(root, file).split(sep).join("/")}: it holds ${what} (MIT) and docs/LICENSE-vite.txt ${status}; the pages build emits it (red line 13).`);
   }
+  // ET Book (MIT): each folder that serves one of its fonts serves its notice too
+  const etbookNotice = new Map();
+  for (const file of etbookFonts(assets)) {
+    const folder = dirname(file);
+    if (etbookNotice.has(folder)) continue;
+    const notice = join(folder, "LICENSE-ETBook.txt");
+    const rel = relative(root, notice).split(sep).join("/");
+    let why = null;
+    if (!existsSync(notice)) why = "is missing";
+    else {
+      const text = readFileSync(notice, "utf-8");
+      if (!(text.includes("MIT License") && text.includes("Dmitry Krasny"))) why = "is not ET Book's licence notice (it needs the text of packages/tokens/fonts/LICENSE-ETBook.txt)";
+    }
+    etbookNotice.set(folder, why);
+    if (why) problems.push(`${relative(root, file).split(sep).join("/")}: it is ET Book (MIT, Dmitry Krasny, Bonnie Scranton, Edward Tufte) and ${rel} ${why}; the pages build emits it (red line 13).`);
+  }
   return problems;
 }
 
@@ -237,15 +262,9 @@ export function checkPagesSite(root) {
  * Data the Pages site serves that is neither code nor a dependency: public
  * domain, with its origin noted next to it (PRINCIPLES.md red line 13, owner
  * decision D9, 2026-10-16). Listed in dev/LICENSES.md after the dependencies.
+ * (The land of the home's globe, Natural Earth, left with the globe on 2026-11-26.)
  */
 export const DATA = [
-  {
-    name: "Natural Earth 1:110m admin-0 countries",
-    licence: "public domain, naturalearthdata.com terms of use",
-    where: "the coast, the borders and the countries of the home's globe, re-encoded by `scripts/globe-puzzle-data.js` into `apps/landing/light/globe-data.js`",
-    file: "apps/landing/light/globe-data.js",
-    origin: "Natural Earth",
-  },
   // Media of NASA, a work of the United States government (owner decision L-01, 2026-11-07): served only by the docs site,
   // never in a package, no NASA logotype or insignia, and credited next to each file on the player's page.
   {

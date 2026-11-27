@@ -1,7 +1,8 @@
 // @ts-check
 /**
- * The tabs of the three level panels of the home (.landing-panel in #inside, #inside-2 and #inside-3) turn by
- * themselves, one after another: Install, List, Code example, then Install again.
+ * The tabs of the level panels of the home (.landing-panel in #tokens, #core and #catalog, and in #ai since the
+ * owner's 2026-11-25) turn by themselves, one after another: Install, List, Code example, then Install again (in
+ * #ai, Install and Use).
  *
  * - While the panel is at least half on screen and nothing holds it, `data-cycle="run"` is on the panel and a line
  *   fills under the open tab (the animation `landing-tab-cycle`, 3.2 s). When the line is full the next tab opens
@@ -20,7 +21,7 @@
  */
 import { test, expect } from '@playwright/test';
 
-const PANELS = ['#inside', '#inside-2', '#inside-3'];
+const PANELS = ['#tokens', '#core', '#catalog'];
 const TURN = 8000; // a turn takes 3.2 s; the wait is a ceiling, not a delay
 
 /** @param {import('@playwright/test').Page} page @param {number} n */
@@ -122,6 +123,21 @@ test('the focus inside the panel holds it, without turning a tab; 3 s after it l
   await expect(panel(page, 0)).toHaveAttribute('data-cycle', 'run', { timeout: 4000 });
 });
 
+test('#ai turns too: the line fills under Install, then Use opens, then Install again', async ({ page }) => {
+  test.setTimeout(60_000);
+  const ai = page.locator('#ai .landing-panel');
+  await expect(ai.locator('.luz-tab[role="tab"]')).toHaveCount(2);
+  await ai.evaluate((el) => el.scrollIntoView({ block: 'center' }));
+  await expect(ai).toHaveAttribute('data-cycle', 'run');
+  const open = ai.locator('.luz-tab[aria-selected="true"]');
+  const names = (await ai.locator('.luz-tab[role="tab"]').allTextContents()).map((text) => text.trim());
+  await expect(open).toHaveText(names[0]);
+  expect(await open.evaluate((tab) => getComputedStyle(tab, '::after').animationName)).toBe('landing-tab-cycle');
+  await expect(open).toHaveText(names[1], { timeout: TURN });
+  await expect(ai).toHaveAttribute('data-turned', /.*/);
+  await expect(open).toHaveText(names[0], { timeout: TURN });
+});
+
 test.describe('a choice ends it for good, in that panel only', () => {
   /** @param {import('@playwright/test').Page} page */
   async function stays(page, n = 0) {
@@ -167,7 +183,7 @@ test.describe('a choice ends it for good, in that panel only', () => {
     await page.evaluate(() => {
       const link = document.createElement('a');
       link.id = 'to-pane';
-      link.href = '#in1-code';
+      link.href = '#tokens-code';
       link.textContent = 'to the code';
       link.style.cssText = 'position:fixed;inset-block-start:0;inset-inline-start:0;z-index:99999;background:white;color:black;padding:8px';
       document.body.append(link);

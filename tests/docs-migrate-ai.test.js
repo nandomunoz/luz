@@ -46,11 +46,11 @@ describe("llms.txt lists the migration page", () => {
     expect(lines).toEqual([`- [${page.meta.title}](${url}): ${page.meta.description}`]);
   });
 
-  it("lists it in Get started after Working with AI and before How LUZ is built", () => {
+  it("lists it in Get started after Print styles and before How LUZ is built", () => {
     const urls = [...txt.matchAll(/^- \[[^\]]*\]\(([^)\s]+)\)/gm)].map((m) => m[1]);
     const at = (route) => urls.indexOf(`${SITE_URL}${route.slice(1)}`);
-    expect(at("/docs/get-started/ai/")).toBeGreaterThan(-1);
-    expect(at(ROUTE)).toBe(at("/docs/get-started/ai/") + 1);
+    expect(at("/docs/get-started/print/")).toBeGreaterThan(-1);
+    expect(at(ROUTE)).toBe(at("/docs/get-started/print/") + 1);
     expect(at("/docs/get-started/how-luz-is-built/")).toBe(at(ROUTE) + 1);
   });
 });

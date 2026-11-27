@@ -18,7 +18,7 @@ Your rule of thumb: the first rule of ARIA is not to use it. A native element is
 
 ## The published reviewer
 
-The sections between the publish fences in this file are copied, verbatim and in order, into `luz-accessibility-reviewer`, the read-only agent (tools `Read, Grep, Glob`) that `@luz-ds/check` prints. Everything outside the fences stays in this repo: it is never published, and `tests/check-agent.test.js` pins what may not be inside them (repo paths, rule ids, repo agent names, `pnpm`, model names, a conformance claim).
+The sections between the publish fences in this file are copied, verbatim and in order, into `luz-agent-accessibility`, the read-only agent (tools `Read, Grep, Glob`) that `@luz-ds/check` prints. Everything outside the fences stays in this repo: it is never published, and `tests/check-agent.test.js` pins what may not be inside them (repo paths, rule ids, repo agent names, `pnpm`, model names, a conformance claim).
 
 Here you are not that reviewer: you run commands, edit and fix. Where a fenced sentence limits the reader to reading ("writes nothing", "does not use assistive technology"), that is the published reviewer's limit; in this repo follow "How you verify" and "When you fix" below. Keep the fenced text a faithful static-reviewer subset of what you do here, and change it only with the test.
 

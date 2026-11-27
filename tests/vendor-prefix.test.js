@@ -46,8 +46,9 @@ const blocks = files.flatMap(blocksWithBackdrop);
 describe("backdrop-filter keeps its -webkit- twin", () => {
   it("finds the backdrop-filter declarations it checks", () => {
     expect(files.length).toBeGreaterThan(10);
-    // The modal's backdrop and the home light's bar: the home page's own blurs went with its redesign
-    expect(blocks.length).toBeGreaterThanOrEqual(2);
+    // The modal's backdrop is the one left: the home light's bar and the home page's own blurs went with its redesign (d6de53a1), so a lost prefix is checked on it
+    expect(blocks.length).toBeGreaterThanOrEqual(1);
+    expect(blocks.map(({ file }) => file.replace(root, ""))).toContain("packages/core/src/components/modal.css");
   });
 
   it("puts -webkit-backdrop-filter, with the same value, before every backdrop-filter in its rule", () => {

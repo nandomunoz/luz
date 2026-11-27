@@ -37,7 +37,7 @@
  *   - the accessibility statement: its summary, the outline of its headings
  *     and a pointer to it (llms.txt lists it too).
  *   - a page of templates (`/templates/`): its summary and a pointer to it.
- *   - a page of a kind of site (`/docs/kinds/<kind>/`): its summary, its
+ *   - a page of a kind of site (`/docs/ai/<kind>/`): its summary, its
  *     recipes by h2 and a pointer to it; the area index, its summary and
  *     a pointer.
  *   - a tokens page: its prose; the tables of values are `tokens.json`'s
@@ -55,7 +55,6 @@ import { BASE, PACKAGES } from "../luz-packages.js";
 import { HtmlError, VOID, decodeEntities, tags } from "./html.js";
 import { SITE_URL } from "../../packages/check/src/messages.js";
 import { ruleRows } from "./ai-rules.js";
-import { PROMPT_KINDS, promptRoute } from "./prompts.js";
 import { isFamilyNote, readingOrder } from "./site.js";
 import { FILES, catalogComponents, catalogFilesIn, minified } from "./snippets.js";
 import { englishT } from "./strings.js";
@@ -129,7 +128,7 @@ function sectionsOfSite(site) {
  * llms.txt: `# LUZ`, a summary, one details paragraph, one `##` per area in
  * site.json order (each page, in the reading order of Previous / Next, as
  * `- [title](url): description`), the hub's home under `## Documentation`,
- * the five prompts under `## Prompts`, and `## Optional`.
+ * and `## Optional`.
  */
 export function renderLlmsTxt(site, { siteUrl = "" } = {}) {
   const out = ["# LUZ", "", summaryOf(site), "", DETAILS, ""];
@@ -138,11 +137,6 @@ export function renderLlmsTxt(site, { siteUrl = "" } = {}) {
     for (const page of pages) out.push(`- [${page.meta.title}](${urlOf(page.route, siteUrl)}): ${page.meta.description}`);
     out.push("");
   }
-  out.push("## Prompts");
-  for (const kind of PROMPT_KINDS) {
-    out.push(`- [Build ${kind.title}](${urlOf(promptRoute(kind.id), siteUrl)}): ${kind.preset ? `The prompt for ${kind.title}` : "The general prompt"}: paste it into any LLM; it asks in rounds, then builds or migrates the site with LUZ.`);
-  }
-  out.push("");
   out.push("## Optional");
   out.push(`- [Full documentation for agents](${urlOf(AI_ROUTES.llmsFull, siteUrl)}): The same pages, as text: markup, variants, when to use, keyboard.`);
   const sample = site.byRoute.get("/docs/components/button/") ?? site.pages.find(hasMarkup);
@@ -539,12 +533,10 @@ const filesOf = (page, packageName) => {
 const TEMPLATES_ROUTE = /\/templates\/$/;
 const TEMPLATES_POINTER = "Whole-page templates: open its URL for the markup of each.";
 
-// A page of a kind of site (/docs/kinds/<kind>/): the h2 of its recipes and a pointer; the area index, a pointer.
-// Its prompt is in llms.txt, and the markup of each recipe is on the pattern page the recipe links to.
-const KIND_PAGE = /^\/docs\/kinds\/[a-z-]+\/$/;
-const KINDS_POINTER = "Prompt: llms.txt. Markup of each recipe: its URL.";
-// The area index: llms.txt lists its pages and the general prompt
-const KINDS_INDEX_POINTER = "A page for each kind of site; llms.txt lists them and the general prompt.";
+// A page of a kind of site (/docs/ai/<kind>/): the h2 of its recipes and a pointer; the area index, a pointer.
+// The markup of each recipe is on the pattern page the recipe links to.
+const KIND_PAGE = /^\/docs\/ai\/(?:landing|blog|app|docs)\/$/;
+const KINDS_POINTER = "Markup of each recipe: its URL.";
 
 // A page about a workflow outside the markup (importing the tokens file into a design tool), whose steps
 // an agent that writes HTML does not need: its summary, its files and a pointer, so the file keeps its ideal.
@@ -552,6 +544,7 @@ const SUMMARY_POINTERS = new Map([
   ["/docs/tokens/figma/", "How to import the tokens file into Figma and other design tools, step by step: open its URL."],
   ["/docs/get-started/migrate/", "Moves a project that has its own CSS to LUZ one page at a time, in five steps: open its URL."],
   ["/docs/get-started/bundler/", "Imports LUZ in Astro and other build tools step by step, with the layer order and the fonts: open its URL."],
+  ["/docs/ai/commands/", ""],
 ]);
 
 // The accessibility statement is about LUZ, not about the markup an agent writes (what is checked, what has
@@ -567,9 +560,9 @@ const OUTLINE_POINTERS = new Map([
 // --json are the report. The entry keeps the prose (the prompt, what the check is, the reviewer, the
 // limits) and says in a line where each table is, so the file stays under its ideal; the page itself
 // is not trimmed.
-const AI_ROUTE = "/docs/get-started/ai/";
+const AI_ROUTE = "/docs/ai/";
 const AI_POINTER =
-  "The files an agent can read are in `llms.txt`. The commands, options and exit codes (`npx @luz-ds/check@" + CHECK + " --help`), a sample of the output, the fields of `--json` and the tables of files and rules are on the page.";
+  "The files an agent can read are in `llms.txt`. The options and exit codes (`npx @luz-ds/check@" + CHECK + " --help`), an output sample, the `--json` fields and the tables are on the page.";
 
 /** The first `<p>` of a piece of markup, as markup. */
 const firstParagraph = (html) => /<p\b[\s\S]*?<\/p>/.exec(html)?.[0] ?? "";
@@ -588,7 +581,8 @@ function twoItems(html) {
  * The body of the AI page for llms-full.txt, by the id of its h2. The prompt
  * of `start` is the one the head of the file already gives, so it is left out,
  * and so is the table of `files`. `check` is its first paragraph and a line
- * that says where the commands, the options and the tables are; `rules` its lead; `agent` its lead,
+ * that says where the commands, the options and the tables are; `rules` its lead; `skill` its lead, the note on npm and the
+ * command (how `init` writes each assistant's files is on the page); `agent` its lead,
  * the command and the two items that are about overwriting and reading; the
  * rest whole.
  */
@@ -602,6 +596,7 @@ function aiBodyOf(body, headings) {
     if (h.id === "check") parts.push(head, firstParagraph(section), `<p>${AI_POINTER}</p>`);
     else if (h.id === "rules") parts.push(head, firstParagraph(section));
     else if (h.id === "agent") parts.push(head, twoItems(section), `<p>${AI_AGENT_POINTER}</p>`);
+    else if (h.id === "skill") parts.push(head, section.slice(0, section.indexOf("</div>", section.indexOf("</pre>")) + 6));
     else parts.push(head, section);
   }
   return parts.join("\n");
@@ -681,8 +676,7 @@ function bodyOf(page, options) {
   }
 
   // A page of a kind of site: its recipes by h2 and a pointer, as a page of templates (the markup is on each pattern page)
-  if (area === "kinds") {
-    if (!KIND_PAGE.test(canonical)) return KINDS_INDEX_POINTER;
+  if (area === "ai" && KIND_PAGE.test(canonical)) {
     const items = headings.filter((h) => h.level === 2 && h.text).map((h) => `- ${h.text}`);
     return [items.join("\n"), KINDS_POINTER].filter(Boolean).join("\n\n");
   }
@@ -866,8 +860,8 @@ function markupBlocks(page) {
 const LAYOUT_FIRST = ["sidebar", "navbar", "terminal", "timeline"].map((name) => `components/${name}.css`);
 const inCascadeOrder = (files) => [...LAYOUT_FIRST.filter((f) => files.includes(f)), ...files.filter((f) => !LAYOUT_FIRST.includes(f))];
 
-const escText = (text) => text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-const escAttr = (text) => escText(text).replace(/"/g, "&quot;");
+export const escText = (text) => text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+export const escAttr = (text) => escText(text).replace(/"/g, "&quot;");
 /** Text for a comment: `--` would end it. */
 const inComment = (text) => text.replace(/-{2,}/g, "-");
 
@@ -898,7 +892,7 @@ function exampleDocument(page, { csp, versions, packages, catalog = [] }) {
     `  <meta http-equiv="Content-Security-Policy" content="${escAttr(csp)}">`,
     '  <meta name="viewport" content="width=device-width, initial-scale=1">',
     `  <title>${escText(title)}: markup examples – LUZ</title>`,
-    `  <!-- Generated from ${docsUrl} by scripts/docs-site/ai.js. Do not edit. MIT licence, github.com/nandovejer/luz.`,
+    `  <!-- Generated from ${docsUrl} by scripts/docs-site/ai.js. Do not edit. MIT licence, github.com/nandomunoz/luz.`,
     `       Loads LUZ ${versions.core} from ../dist/, copied from the packages: the tokens file with no web font, so text uses the system serif.`,
     "       Links in the markup are placeholders. For npm or a CDN, with integrity hashes, see " + `${snippetUrl} -->`,
     ...links,
@@ -960,13 +954,13 @@ const WHAT = {
   "custom-elements.json": "ai.what-elements",
 };
 
-const MADE_BY = { pages: "ai.made-pages", prompts: "ai.made-prompts", manifests: "ai.made-manifests" };
+const MADE_BY = { pages: "ai.made-pages", manifests: "ai.made-manifests" };
 
-const tOf = (site) => site.t ?? englishT();
+export const tOf = (site) => site.t ?? englishT();
 
 /**
  * The AI files of the Pages site as table rows, in this order: `llms.txt`,
- * `llms-full.txt`, the five prompts (`prompts/<id>.txt`), the example of Button (a file name that is a pattern:
+ * `llms-full.txt`, the example of Button (a file name that is a pattern:
  * `examples/<area>/<slug>.html`), then the manifests of every package as
  * `manifestAssets()` copies them. `url` is the route, or `siteUrl` + the route
  * without its first slash. Pure: it reads the manifests' routes, not the files.
@@ -976,11 +970,6 @@ export function aiArtifacts(site, { siteUrl = "" } = {}) {
   const rows = [
     { file: "llms.txt", url: urlOf(AI_ROUTES.llms, siteUrl), what: t(WHAT["llms.txt"]), madeBy: t(MADE_BY.pages) },
     { file: "llms-full.txt", url: urlOf(AI_ROUTES.llmsFull, siteUrl), what: t(WHAT["llms-full.txt"]), madeBy: t(MADE_BY.pages) },
-    // The five prompts, in the order llms.txt lists them
-    ...PROMPT_KINDS.map((kind) => {
-      const route = promptRoute(kind.id);
-      return { file: route.slice(1), url: urlOf(route, siteUrl), what: t(`ai.what-prompt-${kind.id}`), madeBy: t(MADE_BY.prompts) };
-    }),
   ];
   // The files are the English site's, whatever the language the table is read in
   const english = site.base ?? site;
@@ -1000,7 +989,7 @@ export function aiArtifacts(site, { siteUrl = "" } = {}) {
 const MARKER = /^([ \t]*)<!-- luz:ai ([a-z]+) -->[ \t]*$/gm;
 
 /** A scrollable, labelled luz-table: `columns` are the headers, `rows` arrays of cell HTML. */
-function tableOf(label, columns, rows, lang = "", regionLabel = label) {
+export function tableOf(label, columns, rows, lang = "", regionLabel = label) {
   const head = columns.map((c) => `<th scope="col">${c}</th>`).join("");
   const body = rows.map((cells) => `<tr>${cells.map((cell, i) => `<td data-label="${columns[i]}"><div>${cell}</div></td>`).join("")}</tr>`);
   return [

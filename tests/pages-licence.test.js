@@ -74,6 +74,24 @@ describe("the Pages build emits Vite's notice next to the helper it keeps", () =
   });
 });
 
+describe("the Pages build emits ET Book's notice next to its fonts", () => {
+  const etbookPlugin = (mode) => plugins(mode).find((p) => /etbook/i.test(p.name ?? ""));
+
+  it("emits assets/LICENSE-ETBook.txt, an asset whose source is packages/tokens/fonts/LICENSE-ETBook.txt, in mode pages", () => {
+    const file = join(repo, "packages/tokens/fonts/LICENSE-ETBook.txt");
+    const files = emitted(etbookPlugin("pages"));
+    expect(files).toHaveLength(1);
+    expect(files[0].type).toBe("asset");
+    expect(files[0].fileName).toBe("assets/LICENSE-ETBook.txt");
+    expect(String(files[0].source)).toBe(readFileSync(file, "utf-8"));
+    expect(String(files[0].source)).toContain("Dmitry Krasny");
+  });
+
+  it("emits nothing when the mode is not pages", () => {
+    expect(emitted(etbookPlugin("production"))).toEqual([]);
+  });
+});
+
 describe("the Pages build does not emit Vite's module-preload polyfill", () => {
   it("sets build.modulePreload to false, or { polyfill: false }, in mode pages", () => {
     const { build } = config({ mode: "pages", command: "build" });

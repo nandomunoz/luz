@@ -193,7 +193,7 @@ describe("the localized site", () => {
         '<link rel="alternate" hreflang="en" href="/docs/x/">',
         '<link rel="canonical" href="/docs/x/">',
         '<a href="/docs/x/index.md">markdown</a>',
-        '<a href="https://github.com/nandovejer/luz/docs/">github</a>',
+        '<a href="https://github.com/nandomunoz/luz/docs/">github</a>',
         '<a href="#top">top</a>',
         '<a href="/packages/core/dist/luz.css">css</a>',
         '<a href="/es/docs/x/">already</a>',
@@ -232,7 +232,8 @@ describe("the localized site", () => {
               continue;
             }
             if (!path.startsWith(own)) problems.push(`${code} ${route}: ${href} leaves the language`);
-            else if (path !== own && !path.endsWith("index.md") && !built.rendered.has(path)) problems.push(`${code} ${route}: ${href} is not a page`);
+            // The header's sections of the site (/es/tokens/…) are pages of the home's build, not of the docs'
+            else if (path !== own && !path.endsWith("index.md") && !built.rendered.has(path) && !/^\/[a-z]{2}\/(?:tokens|core|catalog|ai)\/$/.test(path)) problems.push(`${code} ${route}: ${href} is not a page`);
           }
         }
       }
@@ -590,7 +591,7 @@ describe("the localized site", () => {
 
     it("points the Edit this page links of a fallback at the English file, and of a translation at the translation", async () => {
       await ready();
-      const edit = "https://github.com/nandovejer/luz/edit/main/";
+      const edit = "https://github.com/nandomunoz/luz/edit/main/";
       for (const code of CODES) {
         for (const route of routes()) {
           const expected = `${edit}${translates(code, route) ? `apps/docs/i18n/${code}/pages/` : "apps/docs/pages/"}${pathOf(route)}`;

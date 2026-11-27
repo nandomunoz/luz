@@ -156,11 +156,13 @@ export function makeSite({ languages = ["es", "ar"], probe = false } = {}) {
   });
   mkdirSync(join(repoRoot, "apps/site"), { recursive: true });
   cpSync(join(REAL_REPO, "apps/site/_partials"), join(repoRoot, "apps/site/_partials"), { recursive: true });
-  // The build also writes the five prompts for AI (/prompts/<kind>.txt) from these
-  if (existsSync(join(REAL_REPO, "apps/site/prompts"))) cpSync(join(REAL_REPO, "apps/site/prompts"), join(repoRoot, "apps/site/prompts"), { recursive: true });
+  // The page of the manifesto, a file on disk (the home links to it from Who we are, and its route exists only when the file does)
+  cpSync(join(REAL_REPO, "apps/site/manifesto"), join(repoRoot, "apps/site/manifesto"), { recursive: true });
   mkdirSync(join(repoRoot, "apps/landing"), { recursive: true });
   cpSync(join(REAL_REPO, "apps/landing/i18n"), join(repoRoot, "apps/landing/i18n"), { recursive: true });
   cpSync(join(REAL_REPO, "apps/landing/index.html"), join(repoRoot, "apps/landing/index.html"));
+  // The pages of the levels are the home's template with these fragments
+  cpSync(join(REAL_REPO, "apps/landing/levels"), join(repoRoot, "apps/landing/levels"), { recursive: true });
   // The home's weights, checks and lists are written from the repository (budgets.json against packages/*/dist,
   // the tests, scripts/check-contrast.js): the build of the home reads them in the copy as it does in the real one
   cpSync(join(REAL_REPO, "budgets.json"), join(repoRoot, "budgets.json"));
@@ -242,8 +244,11 @@ export function makeScriptRepo() {
   const sources = [
     ...tracked("apps"),
     ...tracked("scripts"),
-    // ai.js imports it (the prompts for AI); a new file is not tracked until it is committed
-    "scripts/docs-site/prompts.js",
+    // the commands page (ai/commands) runs the script of the luz skill and reads SKILL.md and the frozen examples
+    "scripts/docs-site/ai-commands.js",
+    "scripts/docs-site/ai-agents.js",
+    ...tracked("packages/ai/skills/luz"),
+    ...readdirSync(join(REAL_REPO, "tools/ai-eval/cases/examples")).map((f) => `tools/ai-eval/cases/examples/${f}`),
     ...tracked("packages/check/src"),
     ...tracked("packages/core/src/i18n"),
     ...tracked("packages/core/src/components"),

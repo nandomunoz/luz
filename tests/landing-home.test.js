@@ -89,22 +89,16 @@ describe("apps/landing/landing.css: the home's own, on tokens", () => {
     }
   });
 
-  it("only moves the hero's type to fit the first screen: its voice (family, weight, colour, leading) is the pattern's", () => {
+  it("only moves the hero's type to fit the first screen: its voice (family, weight, colour) is the pattern's, its size follows the window and its leading is the home's", () => {
+    // The hero has no lead (owner, 2026-11-27): the title, the wordmark above it and two buttons
     const rules = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)].map(([, selector, body]) => ({ selector: selector.trim(), body }));
-    const ofHero = rules.filter((rule) => /\.luz-hero__(title|lead)\b/.test(rule.selector));
+    expect(css, "no lead in the hero").not.toMatch(/\.luz-hero__lead\b/);
+    const ofHero = rules.filter((rule) => /\.luz-hero__title\b/.test(rule.selector));
     expect(ofHero.length).toBeGreaterThan(0);
-    // The four words that spell the name (LUZ, Light, Usable, Zero-dependency) are <strong>: the one voice that is the home's
-    // is the strong ink at weight 600, and nothing else
-    const ofStrong = ofHero.filter((rule) => /\bstrong\b/.test(rule.selector));
-    expect(ofStrong.length, "the strong words of the lead are drawn").toBeGreaterThan(0);
-    for (const rule of ofStrong) {
-      expect(rule.body, rule.selector).toMatch(/font-weight:\s*600/);
-      expect(rule.body, rule.selector).toMatch(/color:\s*var\(--luz-text-primary\)/);
-    }
-    for (const rule of ofHero.filter((r) => !ofStrong.includes(r))) {
-      expect(rule.body, rule.selector).not.toMatch(/(?<![\w-])(?:font-family|font-weight|font-style|line-height|letter-spacing|color|text-transform)\s*:/);
-      // A size is a step of the scale
-      for (const [, value] of rule.body.matchAll(/(?<![\w-])font-size\s*:\s*([^;]+)/g)) expect(value, rule.selector).toMatch(/^var\(--luz-text-/);
+    for (const rule of ofHero) {
+      expect(rule.body, rule.selector).not.toMatch(/(?<![\w-])(?:font-family|font-weight|font-style|letter-spacing|color|text-transform)\s*:/);
+      // The size is in rem and vw (clamp), never px, so the reader's text size still scales it (WCAG 1.4.4)
+      for (const [, value] of rule.body.matchAll(/(?<![\w-])font-size\s*:\s*([^;]+)/g)) expect(value, rule.selector).toMatch(/^clamp\([\d.]+rem, [\d.]+rem \+ [\d.]+vw, [\d.]+rem\)$|^var\(--luz-text-/);
     }
   });
 
@@ -132,7 +126,7 @@ describe("apps/landing/index.html: the template of the home", () => {
     const at = (needle) => html.indexOf(needle);
     expect(at("/packages/landing/"), "the package landing is gone").toBe(-1);
     // Every class of the landing patterns (F8 names: hero, section, stat, glow, main, site-header, site-footer) the template and the partials it includes use is in a file the page links, and the file comes first
-    const partials = ["header", "site-links", "prompt-dialog", "sky-filter", "footer"].map((name) => read(`apps/site/_partials/${name}.html`)).join("\n");
+    const partials = ["header", "site-links", "sky-filter", "footer"].map((name) => read(`apps/site/_partials/${name}.html`)).join("\n");
     const used = new Set([...(html + partials).matchAll(/\bluz-(?:hero|section|stat|glow|main|site-header|site-footer)(?:__|--)?[a-z0-9_-]*/g)].map((m) => m[0]));
     const classes = JSON.parse(read("packages/catalog/dist/classes.json")).classes;
     const files = new Set([...used].map((name) => classes.find((c) => c.name === name)?.files[0]).filter(Boolean));
@@ -143,45 +137,52 @@ describe("apps/landing/index.html: the template of the home", () => {
       expect(at(`/packages/catalog/dist/${file}"`), `${file} is linked`).toBeGreaterThan(-1);
       expect(at(`/packages/catalog/dist/${file}"`), `${file} comes before the home's own`).toBeLessThan(at("/apps/landing/landing.css"));
     }
-    expect(at("/apps/landing/light/light.css")).toBeGreaterThan(-1);
+    // The globe and its light left the home on 2026-11-26: nothing of apps/landing/light/ is linked
+    expect(html).not.toContain("/apps/landing/light/");
   });
 
-  it("writes the sections of the home in order: the hero and the light first, then the levels, why, native, modes and the FAQ", () => {
+  it("writes the sections of the home in order: the hero first, Who we are, the four levels (the AI one first), the FAQ and the Built with LUZ band", () => {
     const main = html.slice(html.indexOf("<main"), html.indexOf("</main>"));
     const ids = [...main.matchAll(/<section\b[^>]*\sid="([^"]+)"/g)].map((m) => m[1]);
-    expect(ids).toEqual(["hero", "light", "inside", "inside-2", "inside-3", "inside-4", "why", "native", "modes", "faq"]);
+    expect(ids).toEqual(["hero", "who", "ai", "tokens", "core", "catalog", "faq", "users"]);
     expect(main.match(/<h1\b/g)).toHaveLength(1);
-    expect(html, "no link to a section that went").not.toMatch(/href="#(?:fit|type|start)"/);
+    expect(html, "no link to a section that went").not.toMatch(/href="#(?:fit|type|start|why|native|modes)"/);
   });
 
-  it("the first screen holds the hero and the light, and the hero's first action goes to the levels", () => {
+  it("the why, native and modes sections went (owner, 2026-11-23): nothing is left of them", () => {
+    expect(html).not.toMatch(/<section\b[^>]*\sid="(?:why|native|modes|fit)"/);
+    expect(html).not.toMatch(/landing-(?:why|fit|modes)\b|\{\{(?:weights|checks|packages)\}\}|\{\{t:(?:why|native|modes|fit)\./);
+  });
+
+  it("the first screen holds the hero alone, the tunnel of thirteen frames behind its copy, and its first action goes to the AI section", () => {
     const first = html.slice(html.indexOf('class="landing-first"'), html.indexOf("</main>"));
     expect(first.indexOf('class="landing-first"')).toBe(0);
     const heroAt = first.search(/<section\b[^>]*\sid="hero"/);
-    const lightAt = first.search(/<section\b[^>]*\sid="light"/);
-    const insideAt = first.search(/<section\b[^>]*\sid="inside"/);
+    const insideAt = first.search(/<section\b[^>]*\sid="who"/);
     expect(heroAt).toBeGreaterThan(-1);
-    expect(lightAt).toBeGreaterThan(heroAt);
-    const closes = first.indexOf("</div>", first.indexOf("</section>", lightAt));
-    expect(closes, "the wrapper closes after the light and before the levels").toBeGreaterThan(lightAt);
-    expect(closes).toBeLessThan(insideAt);
-    expect(first.slice(heroAt, lightAt)).toContain('href="#inside"');
-  });
-
-  it("writes the two fit lists at the end of #why, each with its own h3 and its three items, no section of their own", () => {
-    const why = html.slice(html.search(/<section\b[^>]*\sid="why"/));
-    const body = why.slice(0, why.indexOf("</section>"));
-    const fit = body.slice(body.indexOf('class="landing-fit"'));
-    expect(fit.indexOf("{{t:fit.good}}")).toBeGreaterThan(-1);
-    expect(fit.indexOf("{{t:fit.bad}}")).toBeGreaterThan(fit.indexOf("{{t:fit.good}}"));
-    const lists = [...fit.matchAll(/<ul\b[\s\S]*?<\/ul>/g)].map((m) => m[0]);
-    expect(lists).toHaveLength(2);
-    for (const list of lists) expect(list.match(/<li>/g)).toHaveLength(3);
-    // The marks are drawn, not read: the text of the item says it, and the picture is hidden
-    for (const list of lists) for (const svg of list.match(/<svg\b[^>]*>/g)) expect(svg).toContain('aria-hidden="true"');
-    expect(fit.match(/<h3\b/g)).toHaveLength(2);
-    expect(body.indexOf('class="landing-why"'), "after the three words").toBeLessThan(body.indexOf('class="landing-fit"'));
-    expect(html).not.toMatch(/<section\b[^>]*\sid="fit"/);
+    const heroEnd = first.indexOf("</section>", heroAt);
+    const closes = first.indexOf("</div>", heroEnd);
+    expect(closes, "the wrapper closes after the hero and before Who we are").toBeLessThan(insideAt);
+    expect(first.slice(heroEnd + 10, closes).trim(), "nothing else in the first screen").toBe("");
+    const hero = first.slice(heroAt, heroEnd);
+    expect(hero).toMatch(/<section\b[^>]*class="[^"]*\blanding-tunnel\b/);
+    // The drawing comes first, hidden from assistive technology; the copy after it
+    const back = hero.match(/<div class="landing-tunnel__back" aria-hidden="true">([\s\S]*?)<div class="luz-hero__copy">/)?.[1];
+    expect(back, "the tunnel, before the copy").toBeTruthy();
+    expect(back.match(/<div class="landing-tunnel__frame">/g)).toHaveLength(13);
+    // Each frame is the logo's triangle, drawn in place (the stylesheet sets its stroke, non-scaling, on the polygon)
+    expect(back.match(/<svg viewBox="0 0 100 87"><polygon points="50,1 1,86 99,86"\/><\/svg>/g)).toHaveLength(13);
+    // No inline style: the place of each frame is the stylesheet's (:nth-child)
+    expect(back).not.toMatch(/\sstyle=/);
+    // The wordmark above the title is the partial's SVG (aria-hidden), with the name for assistive technology beside it
+    const title = hero.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/)?.[1] ?? "";
+    expect(title, "the wordmark partial, then LUZ for screen readers, then the title").toMatch(/<!-- luz:include luz-wordmark -->\s*<span class="u-sr-only">LUZ<\/span>[\s\S]*\{\{html:hero\.title\}\}/);
+    expect(hero, "no lead paragraph").not.toMatch(/luz-hero__lead|hero\.lead/);
+    // Two actions: the AI one first, then the docs
+    const actions = [...hero.matchAll(/<a class="([^"]*)" href="([^"]*)"/g)].map((m) => [m[1].includes("luz-btn--primary") ? "primary" : "outline", m[2]]);
+    expect(actions).toEqual([["primary", "#ai"], ["outline", "/docs/"]]);
+    expect(html).not.toContain("hero.start}}");
+    expect(html, "no globe, no light").not.toMatch(/home-light|landing-light|id="light"/);
   });
 
   it("the type section went with its quote and its scale: nothing is left of it", () => {
@@ -195,25 +196,4 @@ describe("apps/landing/index.html: the template of the home", () => {
     expect(html).not.toMatch(/style="[^"]*(#[0-9a-fA-F]{3,8}|rgb\(|hsl\()/);
   });
 
-  it("the three boxes of #modes are scopes: data-theme on a div, one each, a picture hidden from the tree", () => {
-    const modes = html.slice(html.search(/<section\b[^>]*\sid="modes"/), html.indexOf("</main>"));
-    for (const mode of ["light", "dark", "high-contrast"]) {
-      expect(modes.match(new RegExp(`<div\\b[^>]*\\sdata-theme="${mode}"`, "g")) ?? [], mode).toHaveLength(1);
-    }
-    const pictures = modes.match(/<div class="landing-cut__picture"[^>]*>/g);
-    expect(pictures).toHaveLength(3);
-    for (const picture of pictures) expect(picture).toMatch(/\binert\b[^>]*aria-hidden="true"/);
-  });
-
-  it("each box has a button for its mode, hidden until the script runs: it needs JavaScript, so it is not there without", () => {
-    const modes = html.slice(html.search(/<section\b[^>]*\sid="modes"/), html.indexOf("</main>"));
-    const buttons = [...modes.matchAll(/<button\b[^>]*>/g)].map((m) => m[0]);
-    expect(buttons.map((tag) => tag.match(/data-apply-mode="([^"]+)"/)?.[1])).toEqual(["light", "dark", "high-contrast"]);
-    for (const tag of buttons) {
-      expect(tag).toContain('type="button"');
-      expect(tag).toContain('aria-pressed="false"');
-      expect(tag).toMatch(/\shidden\b/);
-      expect(tag).toContain("data-needs-js");
-    }
-  });
 });

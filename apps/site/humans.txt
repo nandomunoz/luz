@@ -1,0 +1,19 @@
+/* TEAM */
+Maintainer: Nando Muñoz
+GitHub: https://github.com/nandomunoz
+Role: design, code and documentation
+
+/* THANKS */
+Everyone who opens an issue, reads a page with a screen reader, or proposes a change.
+
+/* SITE */
+Last update: 2026/11/27
+Language: English / Español / العربية
+Doctype: HTML
+Standards: HTML, CSS, ES modules; aims for WCAG 2.2 AA, not audited (/docs/accessibility/)
+Components: @luz-ds/tokens, @luz-ds/core, @luz-ds/catalog (zero runtime dependencies)
+Software: Vite, Vitest, Playwright, ESLint, Stylelint, esbuild
+Fonts: ET Book, MIT, Copyright (c) 2015 Dmitry Krasny, Bonnie Scranton, Edward Tufte (/assets/LICENSE-ETBook.txt)
+Wordmark: the home's LUZ is outlined from ET Book (same licence)
+Licence: MIT
+Manifesto: /manifesto/

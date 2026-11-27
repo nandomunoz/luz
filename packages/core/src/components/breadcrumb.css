@@ -45,10 +45,6 @@
   text-decoration: none;
 }
 
-.luz-breadcrumb__item:hover {
-  text-decoration: none;
-}
-
 .luz-breadcrumb__item.is-active,
 .luz-breadcrumb__item[aria-current="page"] {
   color: var(--luz-text-primary);

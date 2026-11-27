@@ -1,7 +1,7 @@
 {
   "name": "@luz-ds/catalog",
   "version": "0.4.1",
-  "description": "LUZ Design System — catalog components, one stylesheet each: the navigation of a site (navbar, sidebar), the light-DOM `<luz-*>` elements (search, cookie consent, time of day, language switch, submenu, announcement, FAQ, timeline, embed, chart), the terminal and the patterns of a landing page, a blog, an app and a documentation site, built on @luz-ds/core",
+  "description": "LUZ Design System — catalog components, one stylesheet each: the navigation of a site (navbar, sidebar), the light-DOM `<luz-*>` elements (search, cookie consent, time of day, language switch, submenu, announcement, FAQ, showcase, marquee, timeline, embed, chart), the terminal and the patterns of a landing page, a blog, an app and a documentation site, built on @luz-ds/core",
   "license": "MIT",
   "type": "module",
   "main": "dist/catalog.js",
@@ -28,12 +28,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/nandovejer/luz.git",
+    "url": "https://github.com/nandomunoz/luz.git",
     "directory": "packages/catalog"
   },
-  "homepage": "https://github.com/nandovejer/luz#readme",
+  "homepage": "https://github.com/nandomunoz/luz#readme",
   "bugs": {
-    "url": "https://github.com/nandovejer/luz/issues"
+    "url": "https://github.com/nandomunoz/luz/issues"
   },
   "keywords": [
     "design-system",
@@ -69,8 +69,8 @@
     "access": "public"
   },
   "peerDependencies": {
-    "@luz-ds/core": "^0.1.0 || ^0.2.0 || ^0.3.0 || ^0.4.0",
-    "@luz-ds/tokens": "^0.1.0 || ^0.2.0 || ^0.3.0 || ^0.4.0"
+    "@luz-ds/core": "^0.1.0 || ^0.2.0 || ^0.3.0 || ^0.4.0 || ^0.5.0",
+    "@luz-ds/tokens": "^0.1.0 || ^0.2.0 || ^0.3.0 || ^0.4.0 || ^0.5.0"
   },
   "devDependencies": {
     "@luz-ds/core": "workspace:*",

@@ -31,7 +31,7 @@ const CATALOG_PAGES = "apps/docs/pages/catalog";
  */
 export const CASCADE = [
   "navbar", "sidebar", "terminal", "timeline",
-  "site-header", "masthead", "hero", "main", "section", "stat", "site-footer", "glow", "social",
+  "site-header", "masthead", "hero", "main", "section", "stat", "site-footer", "glow", "social", "showcase", "marquee",
   "page-header", "article-header", "article", "post-list",
   "app-bar", "dashboard",
   "bar-list", "column-chart", "stacked-bar", "heat-map", "ring",
@@ -42,7 +42,7 @@ export const CASCADE = [
 /**
  * The kinds of site a catalog page may name in `fits-kinds` (decision 71), as
  * the reader says them: a blog, not cms. `any` is the other value, and stands
- * alone. The ids of the prompts and of /docs/kinds/<kind>/ are these.
+ * alone. The ids of the prompts and of /docs/ai/<kind>/ are these.
  */
 export const FITS_KINDS = ["landing", "blog", "app", "docs"];
 

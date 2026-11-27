@@ -22,7 +22,6 @@ import { exampleDocuments } from "../scripts/docs-site/ai.js";
 import { decodeEntities } from "../scripts/docs-site/html.js";
 import { parseFrontMatter } from "../scripts/docs-site/site.js";
 import { sourceHash } from "../scripts/docs-site/docs-i18n.js";
-import { assemblePrompt } from "../scripts/docs-site/prompts.js";
 import { PAGES_CSP } from "../vite.config.js";
 import { buildReal, site } from "./helpers/debug-page.js";
 import { find, findAll, hasClass, matcher, parse, query, queryAll, textOf } from "./helpers/html-dom.js";
@@ -299,28 +298,25 @@ describe("the example document made from the Dashboard page", () => {
   });
 });
 
-/* ---- The prompt for an app --------------------------------------------------------------------------------------------- */
+/* ---- The preset of an app ---------------------------------------------------------------------------------------------- */
 
-describe("the prompts for AI: data views", () => {
+describe("the presets of the skill: data views", () => {
   const SENTENCE = "Data views (bar list, column chart, stacked bar, heat map, line chart) each draw a native table or list that stays in the page; the author supplies the data.";
-  const prompt = (id) => assemblePrompt(id, { root });
 
-  it("the prompt for an app says that a data view draws a native table or list in the page and that the author supplies the data", () => {
-    const text = prompt("app").replace(/\s+/g, " ");
+  it("the preset of an app says that a data view draws a native table or list in the page and that the author supplies the data, after the cards", () => {
+    const text = read("packages/ai/src/kinds/app.md").replace(/\s+/g, " ");
     expect(text).toContain(SENTENCE);
     expect(text.indexOf("Numbers are cards;"), "in the paragraph of the skeleton, after the cards").toBeLessThan(text.indexOf(SENTENCE));
+    expect(text.match(/Data views/g)).toHaveLength(1);
   });
 
-  it.each(["start", "landing", "blog", "docs"])("the prompt %s does not carry it", (id) => {
-    expect(prompt(id)).not.toMatch(/Data views/);
-    expect(prompt(id)).not.toContain("the author supplies the data");
+  it.each(["landing", "blog", "docs"])("the preset %s does not carry it", (kind) => {
+    expect(read(`packages/ai/src/kinds/${kind}.md`)).not.toMatch(/Data views/);
+    expect(read(`packages/ai/src/kinds/${kind}.md`)).not.toContain("the author supplies the data");
   });
 
-  it("the sentence is written in words: no class, no element and no file typed in it, and it is in the preset of app only", () => {
+  it("the sentence is written in words: no class, no element and no file typed in it", () => {
     expect(SENTENCE).not.toMatch(/[`<>]|luz-|\.css|\.js/);
-    for (const preset of ["landing", "blog", "docs"]) expect(read(`apps/site/prompts/presets/${preset}.md`), preset).not.toContain("Data views");
-    expect(read("apps/site/prompts/body.md")).not.toContain("Data views");
-    expect(read("apps/site/prompts/presets/app.md").match(/Data views/g)).toHaveLength(1);
   });
 });
 

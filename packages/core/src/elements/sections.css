@@ -5,7 +5,7 @@
    ========================================================================== */
 
 /* Headings — use the heading config token (defaults to serif) */
-:where(h1, h2, h3, h4, h5, h6) {
+:where(:is(h1, h2, h3, h4, h5, h6)) {
   font-family: var(--luz-font-heading);
   font-weight: 300;
   line-height: 1.2;
@@ -14,7 +14,7 @@
 }
 
 /* Spacing between letters breaks the joins of Arabic script */
-:where(h1, h2, h3, h4, h5, h6):where(:lang(ar)) {
+:where(:is(h1, h2, h3, h4, h5, h6):lang(ar)) {
   letter-spacing: 0;
 }
 

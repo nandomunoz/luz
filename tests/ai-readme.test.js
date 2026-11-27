@@ -329,7 +329,7 @@ describe("renderAiSection({ name, manifest, changelog, siteUrl })", () => {
 
   it("links the changelog on GitHub for older versions whenever a changelog exists", () => {
     for (const changelog of [FIRST_RELEASE, TWO_VERSIONS, QUIET]) {
-      expect(render("core", CORE, changelog)).toMatch(/https:\/\/github\.com\/nandovejer\/luz\/blob\/main\/packages\/core\/CHANGELOG\.md/);
+      expect(render("core", CORE, changelog)).toMatch(/https:\/\/github\.com\/nandomunoz\/luz\/blob\/main\/packages\/core\/CHANGELOG\.md/);
     }
   });
 
@@ -378,6 +378,27 @@ describe("renderAiSection({ name, manifest, changelog, siteUrl })", () => {
 });
 
 /* ---- applyAiSection: the README around the block ------------------------- */
+
+describe("a second tool, @luz-ds/ai, next to @luz-ds/check", () => {
+  const AI = { name: "@luz-ds/ai", version: "0.0.0", license: "MIT" };
+  const block = (over = {}) => lib().renderAiSection({ name: "ai", manifest: AI, changelog: null, siteUrl: SITE, checkVersion: "0.3.2", ...over });
+
+  it("tells an agent to run the tool at its own version, not at the version of check", () => {
+    expect(block({ manifest: { ...AI, version: "0.1.0" } })).toContain("`npx @luz-ds/ai@0.1.0 --help`");
+    expect(block({ name: "check", manifest: { name: "@luz-ds/check", version: "0.3.2", license: "MIT" } })).toContain("`npx @luz-ds/check@0.3.2 --help`");
+  });
+
+  it("does not say check is not on npm when check is released, though this tool is not", () => {
+    const text = block();
+    expect(text).toContain("Not released yet");
+    expect(text).not.toMatch(/@luz-ds\/check` is not on npm yet/);
+    expect(text).toContain("npx @luz-ds/check@0.3.2 <files>");
+  });
+
+  it("still says it when neither is released", () => {
+    expect(block({ checkVersion: "0.0.0" })).toMatch(/@luz-ds\/check` is not on npm yet/);
+  });
+});
 
 describe("applyAiSection(readme, block)", () => {
   const block = () => render("core", CORE, FIRST_RELEASE);
@@ -469,6 +490,15 @@ describe("node scripts/ai-readme.js", () => {
     const changed = [...new Set([...before.keys(), ...after.keys()])].filter((path) => before.get(path) !== after.get(path));
     expect(changed.sort()).toEqual(["packages/core/README.md", "packages/tokens/README.md"]);
     for (const path of changed) expect(path).toMatch(/^packages\/[^/]+\/README\.md$/);
+  });
+
+  it("leaves a private package alone: nothing is published, so no block tells an agent how to load it", () => {
+    put("packages/ai/package.json", JSON.stringify({ name: "@luz-ds/ai", version: "0.0.0", private: true }));
+    put("packages/ai/README.md", README("ai"));
+    expect(run("--write").status).toBe(0);
+    expect(readFileSync(join(dir, "packages/ai/README.md"), "utf-8")).toBe(README("ai"));
+    run("--write");
+    expect(run("--check").status).toBe(0);
   });
 
   it("--write keeps the rest of the README, and a second --write changes nothing", () => {
@@ -587,8 +617,8 @@ describe("the script's capabilities (security-auditor Q1, condition a)", () => {
 describe("the release flow runs ai-readme in the version step, without lifecycle hooks", () => {
   const pkg = JSON.parse(read("package.json"));
 
-  it("the root package.json has a release:version script: changeset version, the versions of the install pages, then ai-readme --write", () => {
-    expect(pkg.scripts["release:version"]).toBe("changeset version && node scripts/release-sync.js && node scripts/ai-readme.js --write");
+  it("the root package.json has a release:version script: changeset version, the versions of the install pages, ai-readme --write, then the facts and starters of the luz skill", () => {
+    expect(pkg.scripts["release:version"]).toBe("changeset version && node scripts/release-sync.js && node scripts/ai-readme.js --write && node scripts/build-ai-facts.js");
   });
 
   it("has no prerelease:version or postrelease:version script (pnpm runs those hooks; --ignore-scripts does not cover them)", () => {
@@ -628,7 +658,7 @@ describe("the release flow runs ai-readme in the version step, without lifecycle
 /* ---- The real READMEs ---------------------------------------------------- */
 
 describe("the READMEs of the packages", () => {
-  const packages = readdirSync(join(repo, "packages")).filter((p) => existsSync(join(repo, "packages", p, "package.json")) && existsSync(join(repo, "packages", p, "README.md")));
+  const packages = readdirSync(join(repo, "packages")).filter((p) => existsSync(join(repo, "packages", p, "package.json")) && existsSync(join(repo, "packages", p, "README.md")) && !JSON.parse(read(`packages/${p}/package.json`)).private);
 
   it("there are packages with a README to check", () => {
     expect(packages).toEqual(expect.arrayContaining(["tokens", "core", "catalog"]));
@@ -636,7 +666,7 @@ describe("the READMEs of the packages", () => {
 
   it("there is no README of landing, cms, app or docs: they are not packages any more (F5b), their patterns are in catalog's", () => {
     expect(packages.filter((name) => ["landing", "cms", "app", "docs"].includes(name))).toEqual([]);
-    expect(readdirSync(join(repo, "packages")).sort()).toEqual(["catalog", "check", "core", "tokens"]);
+    expect(readdirSync(join(repo, "packages")).sort()).toEqual(["ai", "catalog", "check", "core", "tokens"]);
   });
 
   it.each(["tokens", "core", "catalog"])("%s has one block, between the markers, right before '## License'", (name) => {

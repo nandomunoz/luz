@@ -15,7 +15,7 @@
 import { test, expect } from '@playwright/test';
 
 // Docs pages with the footer and no hub-only content (the /docs/ hub has its own find hint, not under test here)
-const DOCS = ['/docs/', '/docs/get-started/ai/', '/docs/get-started/', '/docs/tokens/color/'];
+const DOCS = ['/docs/', '/docs/ai/', '/docs/get-started/', '/docs/tokens/color/'];
 const HOME = ['/', '/es/', '/ar/'];
 
 const sideways = (page) => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
@@ -70,7 +70,7 @@ for (const javaScript of [true, false]) {
     });
 
     test.describe("400 % text at 320 px: the footer's colour mode buttons stay inside the window", () => {
-      for (const route of ['/docs/get-started/ai/', '/']) {
+      for (const route of ['/docs/ai/', '/']) {
         test(`${route}`, async ({ page }) => {
           await open(page, route);
           const outside = await page.locator('.site-modes .luz-theme-mode__option').evaluateAll((list) => {

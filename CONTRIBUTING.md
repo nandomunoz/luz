@@ -6,7 +6,7 @@ LUZ is open source and welcomes contributions of every size. Be kind: the [Code 
 
 | I want to | How |
 | --- | --- |
-| Use it | LUZ is MIT: no registration, no telemetry. Install the packages from npm or load them from a CDN ([Get started](https://nandovejer.github.io/luz/docs/get-started/)). |
+| Use it | LUZ is MIT: no registration, no telemetry. Install the packages from npm or load them from a CDN ([Get started](https://luzds.com/docs/get-started/)). |
 | Copy it | Copy any markup, style or script you need, and keep the MIT notice with it. |
 | Fork it | MIT lets you fork, rename and ship it. Keep the notice and say what you changed. |
 | Report a bug | [Open an issue](../../issues/new/choose) with the bug or accessibility form. A security problem goes private: see [SECURITY.md](./SECURITY.md). |

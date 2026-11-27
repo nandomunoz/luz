@@ -1,0 +1,13 @@
+{
+  "example": "skills",
+  "case": "skills",
+  "model": "sonnet",
+  "date": "2026-11-26",
+  "skillVersion": "0.1.0",
+  "turns": [
+    {
+      "user": "/luz skills",
+      "assistant": "`/luz skills` found three small skills in luz-ai. Each is a folder with one task. Once it's added, your assistant uses it when you ask for it by name.\n\n| Skill | What it does | Use it when |\n| --- | --- | --- |\n| `luz-migrate` | Moves a project with its own CSS (Bootstrap, Tailwind or a hand-written stylesheet) to LUZ one page at a time. It starts with an inventory and puts the old CSS in a layer before LUZ. Each page gets a check, and you make the commits. The old CSS is removed only at the end. | You want to move an existing site to LUZ. It isn't for starting a new site, which is `/luz`. |\n| `luz-readme` | Writes or rewrites a README so it reads as written by a person. It adds a title and subtitle, a cover, section links and the repo's GitHub data. The fixed sections are what it is, usage, installation, credits and license. | You want to create, rewrite or improve a README, or remove the AI feel from one. |\n| `luz-theme` | Makes a brand theme for a LUZ site. It's a CSS file of semantic tokens for light, dark and high contrast, started from the template in `@luz-ds/core`. The LUZ checker measures the contrast of every pair. | You want LUZ in your own colours, fonts or corners. It isn't for changing a LUZ component. |\n\nI wrote nothing and ran nothing else. To add one, run `/luz add <name>`, for example `/luz add luz-theme`. I'll show a dry run first and write only after you say \"go\". It writes the same folder to `.agents/skills` and `.claude/skills`. It won't overwrite a file that already exists unless you say so.\n\nAfter you add a skill, ask for it by name. I won't run it unless you ask."
+    }
+  ]
+}

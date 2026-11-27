@@ -70,6 +70,14 @@ import { releaseNotes } from "./helpers/release-notes.js";
 const repo = fileURLToPath(new URL("../", import.meta.url));
 const read = (path) => readFileSync(join(repo, path), "utf-8");
 const exists = (path) => existsSync(join(repo, path));
+
+// llms-full.txt over its ceiling is a warning since 2026-11-02 (budgets.json, "warn": true): renderLlmsFull prints it on stderr and
+// never fails, so a run is clean when stderr holds nothing but that line
+const stderrWithoutSizeWarning = (text) =>
+  text
+    .split("\n")
+    .filter((line) => line.trim() && !/^! llms-full\.txt is \d+ bytes, over its ceiling of \d+ \(warning, to optimise\)/.test(line))
+    .join("\n");
 /** The text without comments, so a word in one is not a use of it. */
 const code = (text) => text.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
 const SCRIPT = "scripts/check-ai.js";
@@ -220,7 +228,7 @@ describe("node scripts/check-ai.js, on a copy of the repository", () => {
   it("exits 0 on a workspace that is as generated, with a line that starts with ✓ and nothing on stderr", () => {
     needsScript();
     const r = run();
-    expect(r.err).toBe("");
+    expect(stderrWithoutSizeWarning(r.err)).toBe("");
     expect(r.status).toBe(0);
     expect(r.out.trim().split("\n").at(-1)).toMatch(/^✓ /);
   }, 150_000);
@@ -229,7 +237,7 @@ describe("node scripts/check-ai.js, on a copy of the repository", () => {
     needsScript();
     // run() uses an empty folder as cwd; here the script is run from the workspace root too
     const r = spawnSync(process.execPath, [join(ws, SCRIPT)], { cwd: ws, encoding: "utf-8", timeout: 150_000 });
-    expect(r.stderr).toBe("");
+    expect(stderrWithoutSizeWarning(r.stderr)).toBe("");
     expect(r.status).toBe(0);
   }, 150_000);
 
@@ -338,7 +346,7 @@ describe("node scripts/check-ai.js, on a copy of the repository", () => {
   it("passes when the pages build output is stale in a way that is not an AI file: another page of docs/ is not its business", () => {
     needsScript();
     const r = withChanges([["docs/docs/accessibility/index.html", stale]], run);
-    expect(r.err).toBe("");
+    expect(stderrWithoutSizeWarning(r.err)).toBe("");
     expect(r.status).toBe(0);
   }, 150_000);
 
@@ -372,7 +380,7 @@ describe("pnpm check:ai on this repository", () => {
   it.skipIf(!built)("passes: dist/, docs/, the READMEs and the agent snapshot are as the generators write them", () => {
     expect(exists(SCRIPT), `${SCRIPT} exists`).toBe(true);
     const r = spawnSync(process.execPath, [join(repo, SCRIPT)], { cwd: repo, encoding: "utf-8", timeout: 150_000 });
-    expect(r.stderr).toBe("");
+    expect(stderrWithoutSizeWarning(r.stderr)).toBe("");
     expect(r.status).toBe(0);
     expect(r.stdout.trim().split("\n").at(-1)).toMatch(/^✓ /);
   }, 150_000);

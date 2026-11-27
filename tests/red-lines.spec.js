@@ -183,6 +183,9 @@ for (const app of APPS) {
         const out = [];
         for (const el of document.querySelectorAll(sel)) {
           if (el.closest('template, [hidden], [inert]')) continue;
+          // A copy for the eye only (the second list of a <luz-marquee> loop): hidden from the tree and out of the tab
+          // order (tabindex -1), so it has no accessible name to compare; the first list has the same links, named
+          if (el.closest('[aria-hidden="true"]') && el.tabIndex === -1) continue;
           const differs = el.matches('[aria-label], [aria-labelledby]') || el.querySelector('.u-sr-only, [aria-hidden="true"]');
           if (!differs) continue;
           // What is seen: the text without screen-reader-only and aria-hidden parts

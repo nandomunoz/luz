@@ -18,7 +18,10 @@
  *   4. the `luz-tokens` command runs from the installed package;
  *   5. the `luz-check` bin of @luz-ds/check, a tool with no CSS, runs from the
  *      installed package (its version, its help, tests/fixtures/check/pass,
- *      and the files of /fail whose rules this version has).
+ *      and the files of /fail whose rules this version has);
+ *   6. the `luz-ai` bin of @luz-ds/ai, run through the link npm made, installs
+ *      its skill in a project (`init`), and the installed copy writes a starter
+ *      page and adds an agent from any folder, with no file of the repository.
  *
  * Needs the packages built (`pnpm build`) and Chromium
  * (`pnpm test:ui:install`). Nothing leaves the machine: the install is
@@ -523,6 +526,47 @@ if (existsSync(checkFile)) {
       files.length === 0 ? "no file to judge" : wrongExit.map(({ file, run }) => `${file}: exit ${run.status}\n${run.stdout}${run.stderr}`).join("\n"),
     );
   }
+}
+
+/* ---- 6. The ai bin --------------------------------------------------------- */
+
+// The other tool: `npx @luz-ds/ai`. The bin npm made is a symbolic link to the script, which must run through it, offline
+const aiPkg = JSON.parse(readFileSync(join(installed("ai"), "package.json"), "utf-8"));
+const aiBin = process.platform === "win32" ? null : join(project, "node_modules", ".bin", "luz-ai");
+const aiFile = join(installed("ai"), aiPkg.bin?.["luz-ai"] ?? "dist/skills/luz/scripts/luz.mjs");
+const luzAi = (args, cwd = project) =>
+  aiBin && existsSync(aiBin)
+    ? spawnSync(aiBin, args, { cwd, encoding: "utf-8", env: { PATH: process.env.PATH } })
+    : spawnSync(process.execPath, [aiFile, ...args], { cwd, encoding: "utf-8", env: { PATH: process.env.PATH } });
+check("luz-ai is installed (the bin of @luz-ds/ai)", existsSync(aiFile), `${relative(project, aiFile)} is missing`);
+if (existsSync(aiFile)) {
+  const help = luzAi(["--help"]);
+  check("luz-ai --help prints its usage (exit 0)", help.status === 0 && /^luz-ai:/m.test(help.stdout) && help.stdout.includes("init"), `exit ${help.status}\n${help.stdout}${help.stderr}`);
+  const wrong = luzAi(["--no-such-command"]);
+  check("luz-ai with an unknown command exits 2", wrong.status === 2, `exit ${wrong.status}\n${wrong.stdout}${wrong.stderr}`);
+  const facts = luzAi(["facts", "--json"]);
+  // The tarballs are packed from the build of this tree, before `changeset version` moves the manifests, so the facts are the tree's; the release build writes them after the versions move (`release:version`)
+  const treeCore = JSON.parse(readFileSync(join(root, "packages", "core", "package.json"), "utf-8")).version;
+  check("luz-ai facts names the versions of the packages the facts were built from", facts.status === 0 && JSON.parse(facts.stdout || "{}").versions?.core === treeCore, `exit ${facts.status}\n${facts.stdout}${facts.stderr}`);
+  const doctor = luzAi(["doctor", "--json"]);
+  check("luz-ai doctor exits 0 in the project", doctor.status === 0, `exit ${doctor.status}\n${doctor.stdout}${doctor.stderr}`);
+
+  // init writes the skill in the project, from the installed package, and the copy runs by itself
+  const target = join(work, "ai-project");
+  mkdirSync(target);
+  const dry = luzAi(["init", "--target", "claude,codex", "--dir", target, "--dry-run"]);
+  check("luz-ai init --dry-run writes nothing (exit 0)", dry.status === 0 && readdirSync(target).length === 0, `exit ${dry.status}\n${dry.stdout}${dry.stderr}`);
+  const init = luzAi(["init", "--target", "claude,codex", "--dir", target]);
+  const skillOf = (place) => join(target, place, "luz");
+  check("luz-ai init --target claude,codex writes the skill in .claude/skills and .agents/skills", init.status === 0 && existsSync(join(skillOf(".claude/skills"), "SKILL.md")) && existsSync(join(skillOf(".agents/skills"), "SKILL.md")), `exit ${init.status}\n${init.stdout}${init.stderr}`);
+  check("luz-ai init leaves the evals out and ships no file that starts with a dot", !existsSync(join(skillOf(".claude/skills"), "evals")) && !readdirSync(skillOf(".claude/skills"), { recursive: true }).some((f) => f.split(sep).some((s) => s.startsWith("."))));
+  const copy = join(skillOf(".claude/skills"), "scripts", "luz.mjs");
+  const site = spawnSync(process.execPath, [copy, "site", "new", "--name", "Smoke", "--kind", "landing", "--stack", "vanilla", "--target", join(target, "site")], { cwd: tmpdir(), encoding: "utf-8", env: { PATH: process.env.PATH } });
+  check("the installed copy of the skill writes a starter page from any folder", site.status === 0 && existsSync(join(target, "site", "index.html")), `exit ${site.status}\n${site.stdout}${site.stderr}`);
+  const agent = spawnSync(process.execPath, [copy, "agent", "add", "luz-agent-accessibility", "--for", "claude,gemini,codex", "--dir", target], { cwd: tmpdir(), encoding: "utf-8", env: { PATH: process.env.PATH } });
+  check("the installed copy adds an agent for Claude Code, Gemini CLI and Codex", agent.status === 0 && existsSync(join(target, ".gemini/agents/luz-agent-accessibility.md")) && existsSync(join(target, ".codex/agents/luz-agent-accessibility.toml")), `exit ${agent.status}\n${agent.stdout}${agent.stderr}`);
+  const after = luzAi(["lint", "--json", join(target, ".claude"), join(target, ".agents"), join(target, ".gemini"), join(target, ".codex")]);
+  check("luz-ai lint finds no problem in what it installed", after.status === 0, `exit ${after.status}\n${after.stdout.slice(0, 1500)}${after.stderr}`);
 }
 
 /* ---- Done ------------------------------------------------------------------ */

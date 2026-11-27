@@ -1,0 +1,4 @@
+{
+  "$comment": "What every starter page links besides the packages' own files and the patterns of its kind: the catalog stylesheets of the colour-mode footer and the sidebar that the starters' skeletons use. Read by scripts/build-ai-facts.js; a name must be a file of a class in catalog's classes.json.",
+  "base": ["components/sidebar.css", "components/theme-time.css"]
+}

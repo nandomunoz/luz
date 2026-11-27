@@ -15,7 +15,7 @@
   position: absolute;
   bottom: calc(100% + 6px);
   inset-inline-start: 50%;
-  transform: translateX(-50%);
+  translate: -50%;
   background: var(--luz-surface-strong);
   color: var(--luz-text-primary);
   border: 1px solid var(--luz-divider);
@@ -33,9 +33,10 @@
 }
 
 /* The tooltip is centred on the trigger: inset-inline-start is the right edge
-   in right-to-left text, so the shift goes the other way */
+   in right-to-left text, so the shift goes the other way. The shift holds
+   in the anchored tooltip below too, which centres it on the same edge. */
 .luz-tooltip__text:dir(rtl) {
-  transform: translateX(50%);
+  translate: 50%;
 }
 
 /* Bridges the gap to the trigger so the pointer can move onto the tooltip
@@ -82,22 +83,14 @@
      would always flip). Outside a size container it is not clipped by an
      ancestor that scrolls or hides overflow; inside one (the table wrap, the
      player) it is placed and clipped by that box, as an absolute one is. */
-  .luz-tooltip__text,
-  .luz-tooltip__text:dir(rtl) {
+  .luz-tooltip__text {
     position: fixed;
     position-anchor: --luz-tooltip;
     inset: auto;
     inset-block-end: anchor(start);
     inset-inline-start: anchor(center);
     margin-block: var(--luz-space-2xs);
-    translate: -50% 0;
-    transform: none;
     position-try-fallbacks: flip-block;
-  }
-
-  /* inset-inline-start is the right edge in right-to-left text */
-  .luz-tooltip__text:dir(rtl) {
-    translate: 50% 0;
   }
 
   /* The gap to the trigger can be on either side once it flips: bridge both */

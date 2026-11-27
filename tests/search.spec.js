@@ -27,12 +27,16 @@ async function open(page, url = BUTTON) {
   await page.waitForLoadState('networkidle');
 }
 
-/** Open the dialog with the header button and type a query; wait for the count. */
+/**
+ * Open the dialog with the header button and type a query; wait for the count: the status says "Loading…" while the index is
+ * fetched (not empty, and no result in the list yet), so a slow runner would count zero results if this stopped at "not empty".
+ */
 async function searchFor(page, query) {
   await page.getByRole('banner').getByRole('button', { name: 'Search', exact: true }).click();
   await expect(field(page)).toBeFocused();
   await field(page).fill(query);
   await expect(status(page)).not.toBeEmpty();
+  await expect(status(page)).not.toHaveText(/^Loading/);
 }
 
 test.describe('search: opening and closing', () => {

@@ -419,7 +419,7 @@ describe("the texts that say how the site follows the system", () => {
     expect(ex12).toContain("data-moment");
   });
 
-  it("the accessibility statement says which radio is checked, that none is without JavaScript, and that the hour counts only from the slider", () => {
+  it("the accessibility statement says which radio is checked, that none is without JavaScript, and that the hour counts only from a slider", () => {
     const page = read("apps/docs/pages/accessibility.html");
     const item = page.split(/<\/li>/).find((li) => li.includes("Theme mode and theme time")) ?? "";
     const t = item.replace(/<[^>]+>/g, " ").replace(/&[a-z]+;/g, " ").replace(/\s+/g, " ");
@@ -435,7 +435,7 @@ describe("the texts that say how the site follows the system", () => {
     expect(t).toMatch(/\bAuto\b[^.]*\bchecked\b[^.]*\bonly while\b[^.]*\bhour/i);
     // Without JavaScript no radio is checked
     expect(t).toMatch(/without JavaScript[^.]*\bno radio\b[^.]*\bchecked\b/i);
-    // The hour applies only when the slider picks it
+    // The hour applies only when a slider picks it
     expect(t).toMatch(/\bhour\b[^.]*\bonly when\b[^.]*\bslider\b/i);
     // Its four lights meet the contrast of the modes
     expect(item.split(/<\/p>/).some((x) => /four lights/i.test(x) && /contrast/i.test(x))).toBe(true);

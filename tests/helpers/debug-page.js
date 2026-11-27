@@ -24,6 +24,7 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { buildSite, landingDocuments, scanSite } from "../../scripts/docs-site/site.js";
 import { classesOf, descendants, find, findAll, hasClass, parse, query, queryAll, textOf } from "./html-dom.js";
+import { levelPagesOf } from "./level-pages.js";
 
 export const repo = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 export const DEBUG_ROUTE = "/debug/";
@@ -34,7 +35,7 @@ const landing = landingDocuments(site, "apps/landing/index.html", readFileSync(j
 
 let built;
 /** Every page of the site, rendered (the docs in every language, and the home), once. */
-export const buildReal = () => (built ??= buildSite(site, { extra: landing, languages: true }));
+export const buildReal = () => (built ??= buildSite(site, { extra: [...landing, ...levelPagesOf(site)], languages: true }));
 
 /** The /debug/ document as the site renders it. Fails with a message, not a TypeError, while the page does not exist. */
 export function renderedDebug() {

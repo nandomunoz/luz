@@ -17,7 +17,7 @@ const read = (file) => readFileSync(join(repo, file), "utf-8");
 const site = scanSite(join(repo, "apps/docs"), repo);
 
 describe("the CDN sentence", () => {
-  for (const file of ["README.md", "packages/tokens/README.md", "packages/core/README.md", "packages/catalog/README.md"]) {
+  for (const file of ["README.md", "packages/tokens/README.md", "packages/core/README.md", "packages/catalog/README.md", "packages/ai/README.md"]) {
     it(`is in ${file}, once, as a paragraph of its own`, () => {
       const paragraphs = read(file).split(/\n\s*\n/).map(flat);
       expect(paragraphs.filter((p) => p.trim() === SENTENCE)).toHaveLength(1);

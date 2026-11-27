@@ -62,15 +62,15 @@
   --luz-brand-fill-active: #143d69;
 
   /* Sidebar */
-  --luz-sidebar-bg: #2a211a;
-  --luz-sidebar-text: #e3d5bf; /* 10.9:1 */
-  --luz-sidebar-text-hover: #fff;
-  --luz-sidebar-hover: #3a2f25;
-  --luz-sidebar-active-bg: #9cc8ee; /* light sky */
-  --luz-sidebar-active-text: #1a140f; /* 10.4:1 */
-  --luz-sidebar-border: #3d3127;
-  --luz-sidebar-label: #b9a78f; /* 6.8:1 */
-  --luz-sidebar-logo-bg: #9cc8ee; /* shares the active link's text colour */
+  --luz-sidebar-bg: #fbf8f2; /* the page's own colour: no panel of another one */
+  --luz-sidebar-text: #4a3c2f;
+  --luz-sidebar-text-hover: #231c16;
+  --luz-sidebar-hover: #f4ede0;
+  --luz-sidebar-active-bg: #2365a6; /* the brand fill */
+  --luz-sidebar-active-text: #fff;
+  --luz-sidebar-border: #e3d4b8;
+  --luz-sidebar-label: #6b5a48;
+  --luz-sidebar-logo-bg: #2365a6; /* shares the active link's colour */
 
   /* Status */
   --luz-color-success: #177734;
@@ -269,15 +269,15 @@
   --luz-brand-fill-active: var(--luz-blue-100);
 
   /* Sidebar */
-  --luz-sidebar-bg: #000;
-  --luz-sidebar-text: var(--luz-gray-30);
-  --luz-sidebar-text-hover: #fff;
-  --luz-sidebar-hover: var(--luz-gray-90);
-  --luz-sidebar-active-bg: #fff;
-  --luz-sidebar-active-text: #000;
-  --luz-sidebar-border: var(--luz-gray-80);
-  --luz-sidebar-label: var(--luz-gray-50);
-  --luz-sidebar-logo-bg: #fff;
+  --luz-sidebar-bg: #fff; /* the page's own colour */
+  --luz-sidebar-text: #000;
+  --luz-sidebar-text-hover: #000;
+  --luz-sidebar-hover: var(--luz-gray-10);
+  --luz-sidebar-active-bg: #000;
+  --luz-sidebar-active-text: #fff;
+  --luz-sidebar-border: #000;
+  --luz-sidebar-label: var(--luz-gray-70);
+  --luz-sidebar-logo-bg: #000;
 
   /* Status */
   --luz-color-success: #105224;

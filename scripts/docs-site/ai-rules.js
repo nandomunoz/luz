@@ -1,6 +1,6 @@
 /**
  * LUZ docs site: what each rule of @luz-ds/check finds, in words, for the
- * table of "Working with AI" (/docs/get-started/ai/#rules). Development
+ * table of "Working with AI" (/docs/ai/#rules). Development
  * tooling: nothing here ships, and the check bundle never imports it.
  *
  * The ids, the severities and the messages are the registry of

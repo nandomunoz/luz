@@ -3,7 +3,7 @@ title: Barra lateral
 description: Contiene la navegación principal de un sitio o una aplicación y se convierte en un panel lateral en pantallas pequeñas.
 keywords: panel lateral, navegación lateral
 fits: la navegación de un sitio con muchas páginas o secciones, junto al contenido, con un panel lateral en el móvil
-source: 2d7456772c34
+source: 70f4f7d5c52d
 reviewed: false
 -->
     <div class="docs-component" id="c-sidebar">
@@ -155,18 +155,18 @@ initSidebar();</code></pre>
               <li>Ordena los enlaces según la frecuencia con que se necesitan.</li>
             </ul>
             <h3 id="contrast">Contraste y foco</h3>
-            <p>La barra lateral tiene sus propios tokens: texto claro sobre un panel oscuro en todos los modos y un enlace actual con fondo.</p>
+            <p>La barra lateral tiene sus propios tokens: en claro y en contraste alto es del color de la página, en oscuro un panel un paso más oscuro que ella, y el enlace actual siempre lleva fondo.</p>
             <div class="luz-table-wrap" role="region" aria-label="Contraste de la barra lateral en cada modo" tabindex="0">
               <table class="luz-table docs-contrast">
                 <thead>
                   <tr><th scope="col">Parte</th><th scope="col">Color sobre fondo</th><th scope="col">Claro</th><th scope="col">Oscuro</th><th scope="col">Alto contraste</th><th scope="col">Mínimo necesario</th></tr>
                 </thead>
                 <tbody>
-                  <tr><td data-label="Parte"><div>Enlace</div></td><td data-label="Color sobre fondo"><div><code>--luz-sidebar-text</code> on <code>--luz-sidebar-bg</code></div></td><td data-label="Claro"><div>10.9:1</div></td><td data-label="Oscuro"><div>10.0:1</div></td><td data-label="Alto contraste"><div>14.1:1</div></td><td data-label="Mínimo necesario"><div>4.5:1</div></td></tr>
-                  <tr><td data-label="Parte"><div>Enlace al pasar el puntero</div></td><td data-label="Color sobre fondo"><div><code>--luz-sidebar-text-hover</code> on <code>--luz-sidebar-hover</code></div></td><td data-label="Claro"><div>13.0:1</div></td><td data-label="Oscuro"><div>16.4:1</div></td><td data-label="Alto contraste"><div>17.6:1</div></td><td data-label="Mínimo necesario"><div>4.5:1</div></td></tr>
-                  <tr><td data-label="Parte"><div>Enlace actual</div></td><td data-label="Color sobre fondo"><div><code>--luz-sidebar-active-text</code> on <code>--luz-sidebar-active-bg</code></div></td><td data-label="Claro"><div>10.3:1</div></td><td data-label="Oscuro"><div>10.2:1</div></td><td data-label="Alto contraste"><div>21.0:1</div></td><td data-label="Mínimo necesario"><div>4.5:1</div></td></tr>
-                  <tr><td data-label="Parte"><div>Fondo del enlace actual</div></td><td data-label="Color sobre fondo"><div><code>--luz-sidebar-active-bg</code> on <code>--luz-sidebar-bg</code></div></td><td data-label="Claro"><div>8.9:1</div></td><td data-label="Oscuro"><div>10.2:1</div></td><td data-label="Alto contraste"><div>21.0:1</div></td><td data-label="Mínimo necesario"><div>3:1</div></td></tr>
-                  <tr><td data-label="Parte"><div>Etiqueta de sección y versión</div></td><td data-label="Color sobre fondo"><div><code>--luz-sidebar-label</code> on <code>--luz-sidebar-bg</code></div></td><td data-label="Claro"><div>6.7:1</div></td><td data-label="Oscuro"><div>6.6:1</div></td><td data-label="Alto contraste"><div>6.4:1</div></td><td data-label="Mínimo necesario"><div>4.5:1</div></td></tr>
+                  <tr><td data-label="Parte"><div>Enlace</div></td><td data-label="Color sobre fondo"><div><code>--luz-sidebar-text</code> on <code>--luz-sidebar-bg</code></div></td><td data-label="Claro"><div>10.0:1</div></td><td data-label="Oscuro"><div>10.0:1</div></td><td data-label="Alto contraste"><div>21.0:1</div></td><td data-label="Mínimo necesario"><div>4.5:1</div></td></tr>
+                  <tr><td data-label="Parte"><div>Enlace al pasar el puntero</div></td><td data-label="Color sobre fondo"><div><code>--luz-sidebar-text-hover</code> on <code>--luz-sidebar-hover</code></div></td><td data-label="Claro"><div>14.4:1</div></td><td data-label="Oscuro"><div>16.4:1</div></td><td data-label="Alto contraste"><div>20.1:1</div></td><td data-label="Mínimo necesario"><div>4.5:1</div></td></tr>
+                  <tr><td data-label="Parte"><div>Enlace actual</div></td><td data-label="Color sobre fondo"><div><code>--luz-sidebar-active-text</code> on <code>--luz-sidebar-active-bg</code></div></td><td data-label="Claro"><div>6.0:1</div></td><td data-label="Oscuro"><div>10.2:1</div></td><td data-label="Alto contraste"><div>21.0:1</div></td><td data-label="Mínimo necesario"><div>4.5:1</div></td></tr>
+                  <tr><td data-label="Parte"><div>Fondo del enlace actual</div></td><td data-label="Color sobre fondo"><div><code>--luz-sidebar-active-bg</code> on <code>--luz-sidebar-bg</code></div></td><td data-label="Claro"><div>5.6:1</div></td><td data-label="Oscuro"><div>10.2:1</div></td><td data-label="Alto contraste"><div>21.0:1</div></td><td data-label="Mínimo necesario"><div>3:1</div></td></tr>
+                  <tr><td data-label="Parte"><div>Etiqueta de sección y versión</div></td><td data-label="Color sobre fondo"><div><code>--luz-sidebar-label</code> on <code>--luz-sidebar-bg</code></div></td><td data-label="Claro"><div>6.2:1</div></td><td data-label="Oscuro"><div>6.6:1</div></td><td data-label="Alto contraste"><div>9.0:1</div></td><td data-label="Mínimo necesario"><div>4.5:1</div></td></tr>
                   <tr><td data-label="Parte"><div>Botón de menú</div></td><td data-label="Color sobre fondo"><div><code>--luz-text-primary</code> on <code>--luz-surface-page</code></div></td><td data-label="Claro"><div>15.8:1</div></td><td data-label="Oscuro"><div>15.1:1</div></td><td data-label="Alto contraste"><div>21.0:1</div></td><td data-label="Mínimo necesario"><div>4.5:1</div></td></tr>
                   <tr><td data-label="Parte"><div>Borde del botón de menú</div></td><td data-label="Color sobre fondo"><div><code>--luz-outline</code> on <code>--luz-surface-page</code></div></td><td data-label="Claro"><div>4.3:1</div></td><td data-label="Oscuro"><div>3.6:1</div></td><td data-label="Alto contraste"><div>21.0:1</div></td><td data-label="Mínimo necesario"><div>3:1</div></td></tr>
                   <tr><td data-label="Parte"><div>Anillo de foco del botón de menú</div></td><td data-label="Color sobre fondo"><div><code>--luz-focus-ring</code> on <code>--luz-surface-page</code></div></td><td data-label="Claro"><div>5.6:1</div></td><td data-label="Oscuro"><div>7.7:1</div></td><td data-label="Alto contraste"><div>21.0:1</div></td><td data-label="Mínimo necesario"><div>3:1</div></td></tr>

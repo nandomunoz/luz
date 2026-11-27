@@ -1,0 +1,13 @@
+{
+  "example": "agents",
+  "case": "agents",
+  "model": "sonnet",
+  "date": "2026-11-25",
+  "skillVersion": "0.1.0",
+  "turns": [
+    {
+      "user": "/luz agents",
+      "assistant": "The script's `agents` subcommand lists one agent for luz-ai:\n\n**`luz-agent-accessibility`**\n- **What it does:** Reviews a web project's HTML, CSS and JavaScript for accessibility against WCAG 2.2 level AA and EN 301 549. It reads source files only and writes nothing.\n- **When to use it:** After you write or change a page or component.\n- **Fields:** None. It reads the project's own files and asks you nothing.\n- **Assistants it supports:** claude, gemini, codex\n\n**What's left for you to check:** The agent reads source only. It can't judge real contrast, alt text quality, or how a screen reader behaves. You still need to check those yourself.\n\nTo add it, run `/luz add luz-agent-accessibility`. I'll show a `--dry-run` first and write nothing until you say \"go\"."
+    }
+  ]
+}

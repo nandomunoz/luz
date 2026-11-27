@@ -1,6 +1,6 @@
 # @luz-ds/catalog
 
-Components that are not core's, each one stylesheet: light-DOM `<luz-*>` tags (search, cookie consent, theme time, language switch, submenu, announcement, FAQ, timeline, embed and chart), the charts drawn from a native list, table or `meter` (bar list, column chart, stacked bar, ring and heat map: no script), the navigation of a site (the navbar and the sidebar, which are classes with no tag), the terminal, the page transition (one stylesheet, no markup), and the patterns of a landing page, a blog, an app and a documentation site. Catalog is what a page links on its own when it uses it (the navigation of the site, the charts, the pieces with JS or an identity of their own); what every page needs and fits in `luz.css` is in `@luz-ds/core`, which names nothing of catalog.
+Components that are not core's, each one stylesheet: light-DOM `<luz-*>` tags (search, cookie consent, theme time, language switch, submenu, announcement, FAQ, showcase, marquee, timeline, embed and chart), the charts drawn from a native list, table or `meter` (bar list, column chart, stacked bar, ring and heat map: no script), the navigation of a site (the navbar and the sidebar, which are classes with no tag), the terminal, the page transition (one stylesheet, no markup), and the patterns of a landing page, a blog, an app and a documentation site. Catalog is what a page links on its own when it uses it (the navigation of the site, the charts, the pieces with JS or an identity of their own); what every page needs and fits in `luz.css` is in `@luz-ds/core`, which names nothing of catalog.
 
 The rest are the patterns of a kind of site: the page structure of a landing page, a blog or newspaper, a web application and a documentation site. They are catalog components too, one file each, `<block>.css`. The name says what the piece is, with no kind of site in it, and its docs page says which kinds of site it fits best. See [Patterns of a kind of site](#patterns-of-a-kind-of-site).
 
@@ -102,6 +102,8 @@ Each tag is the block; its parts are `.luz-<tag>__<part>`.
 - `<luz-submenu>` — An item of the header's links that holds more links: a tag (no class, no script, `display: contents`) around a native `<details name>`, in the flow in the menu panel and a box under its button from 769 px
 - `<luz-faq>` and its parts `.luz-faq__*` (`__title`, `__lead`, `__nav`, `__group`, `__group-title`, `__item`, `__question`, `__answer`, `__more`) — A tag (no script) around native `details`, one question each, in groups under their headings; the `id` goes on the answer, so a link to it opens the question; a plus that turns to a minus, and the answers print open
 - `.luz-social` (`--icons`) — Social links: a list of links to profiles and feeds, an icon and the name of the place each, in a row that wraps; with `--icons` the name is `.u-sr-only` and each link a 36 px square target. LUZ ships no brand logos: the icons are neutral ones from the Icons page, or the author's own
+- `<luz-showcase>` — A tag (no class, no script) around a `ul` of links, each a logo (a decorative `svg` or `img alt=""`) and a name: the sites built with something, its customers or its sponsors, in a row that wraps, centred. To make it move, put it in a `<luz-marquee>`. LUZ ships no logos: they are the author's
+- `<luz-marquee>` — A tag (no class, no script) for content that loops along one line, between two hairlines and fading at both ends: a `ul` of short phrases with a small star between them, a row of links, or a `<luz-showcase>`. Write the content twice, the second copy `aria-hidden="true"` (and its links `tabindex="-1"`); it stops while the pointer is over it or something has the focus, and is the first copy alone, wrapped and centred, under reduced motion and on paper. `--luz-marquee-duration` (40s) is how long one loop takes
 - `<luz-announcement>` (`tone="warning"`) — A tag (no class, no script) around one `<section aria-labelledby>`: a band above the header with one short announcement and one link; no close button
 - `<luz-cookie-consent>` and `.luz-cookie-consent` (`__title`, `__choices`) — The cookie banner, first after the skip link in the markup and shown as a band fixed at the bottom of the window (in the flow under 30rem tall), hidden until `cookie-consent.js` shows it; its confirmation has a `[data-luz-consent-close]` button, and while it shows `cookie-consent.js` sets `--luz-consent-h` on `:root` so the page keeps room for it
 - `.luz-navbar` (`__list`, `__link`) — The links of a header: a `nav[popover]` that is a row of the bar from 769 px and a native popover panel under it below, opened by a `.luz-nav-toggle`. No script
@@ -116,7 +118,7 @@ Each tag is the block; its parts are `.luz-<tag>__<part>`.
 
 ## Search
 
-A button shaped like a field ("Search docs…", <kbd>Ctrl K</kbd>) opens a native `<dialog>` with a field and the results as links, grouped under Pages, Sections and HTML elements (8 per group at most). Ctrl+K and ⌘K open it too, also before its script has loaded. Without JavaScript the button stays hidden and a plain link to your index page shows in its place. Every fixed text is in your markup, and the few the script writes (the count, "no results", loading, error) are `data-luz-label-*` attributes on the dialog, in the page's language. The full markup, the keyboard model and the index format are on the [Search page of the docs](https://nandovejer.github.io/luz/docs/catalog/search/).
+A button shaped like a field ("Search docs…", <kbd>Ctrl K</kbd>) opens a native `<dialog>` with a field and the results as links, grouped under Pages, Sections and HTML elements (8 per group at most). Ctrl+K and ⌘K open it too, also before its script has loaded. Without JavaScript the button stays hidden and a plain link to your index page shows in its place. Every fixed text is in your markup, and the few the script writes (the count, "no results", loading, error) are `data-luz-label-*` attributes on the dialog, in the page's language. The full markup, the keyboard model and the index format are on the [Search page of the docs](https://luzds.com/docs/catalog/search/).
 
 The index is a JSON file on the same origin (`data-luz-search-src`), format version 1, with URLs relative to the file:
 
@@ -133,7 +135,7 @@ Each item is `[text, url, meta?, lang?]`. The component fetches it only from the
 
 A band fixed at the bottom of the window asks once whether the site may use optional cookies: Accept and Reject side by side, with the same style, and a `<details>` with one checkbox per category. It is `hidden` in the markup and `cookie-consent.js` shows it when no answer is stored, when the stored one has expired (180 days by default, `data-luz-consent-days`, 395 at most), or when it offers a category the stored answer was not asked about. It does not take focus, and while it shows it reserves the page's height, so it covers nothing; Escape is not an answer. Without JavaScript it stays hidden: none of your scripts run either, and the cookie policy is a link on every page.
 
-The answer is stored in `localStorage` under `luz-consent` (or `data-luz-consent-key`, starting with `luz-`), as `{"version":1,"expires":<ms>,"asked":[…],"granted":[…]}`. Read it with `getConsent()`, which returns `{ asked, granted, expires }` or `null`, and listen for `luz:consent` on `document`, dispatched with the same object as `detail` on every new answer. A button with `data-luz-consent-open` (and `hidden`) shows the banner again. The script writes no text. Full markup on the [Cookie consent page of the docs](https://nandovejer.github.io/luz/docs/catalog/cookie-consent/).
+The answer is stored in `localStorage` under `luz-consent` (or `data-luz-consent-key`, starting with `luz-`), as `{"version":1,"expires":<ms>,"asked":[…],"granted":[…]}`. Read it with `getConsent()`, which returns `{ asked, granted, expires }` or `null`, and listen for `luz:consent` on `document`, dispatched with the same object as `detail` on every new answer. A button with `data-luz-consent-open` (and `hidden`) shows the banner again. The script writes no text. Full markup on the [Cookie consent page of the docs](https://luzds.com/docs/catalog/cookie-consent/).
 
 ```js
 import { getConsent } from "@luz-ds/catalog/cookie-consent";
@@ -144,7 +146,7 @@ document.addEventListener("luz:consent", (e) => (granted(e.detail) ? startMeasur
 
 ## Theme time
 
-`<luz-theme-time>` wraps core's [`<luz-theme-mode>`](https://nandovejer.github.io/luz/docs/components/theme-mode/) and adds the time of day to it as a choice. The moments of the day are declared in the markup, one radio each: its `value` is the name, its label the visible name, `data-from` where it starts (`HH:MM`, the visitor's clock) and `data-theme` the base it is painted over (`light` or `dark`); `data-default` marks the one a chosen mode shows. Auto is the system's, as in core, and `data-moment` on `<html>` takes the default moment of the mode in use. With no hour chosen, the radio checked is the mode in use (the system's), and core's button is named after it; nothing is stored. Auto is checked only while an hour or a moment is chosen. The hour of the day moves the page only when a reader picks it (the slider, a moment option or `pin(hour)`), and then the moment's name goes to `data-moment` and its base to the mode (the system's `prefers-contrast: more` still wins). **Auto no longer follows the clock;** a page that wants a moment sets it. The colors of each moment are yours: a rule on `:root[data-theme="light"][data-moment="morning"]`. Optional `latitude` and `longitude` use today's real sunrise and sunset of that place, worked out in the page, with no location prompt and no network. Without JavaScript the moments are not shown and Auto follows the system.
+`<luz-theme-time>` wraps core's [`<luz-theme-mode>`](https://luzds.com/docs/components/theme-mode/) and adds the time of day to it as a choice. The moments of the day are declared in the markup, one radio each: its `value` is the name, its label the visible name, `data-from` where it starts (`HH:MM`, the visitor's clock) and `data-theme` the base it is painted over (`light` or `dark`); `data-default` marks the one a chosen mode shows. Auto is the system's, as in core, and `data-moment` on `<html>` takes the default moment of the mode in use. With no hour chosen, the radio checked is the mode in use (the system's), and core's button is named after it; nothing is stored. Auto is checked only while an hour or a moment is chosen. The hour of the day moves the page only when a reader picks it (the slider, a moment option or `pin(hour)`), and then the moment's name goes to `data-moment` and its base to the mode (the system's `prefers-contrast: more` still wins). **Auto no longer follows the clock;** a page that wants a moment sets it. The colors of each moment are yours: a rule on `:root[data-theme="light"][data-moment="morning"]`. Optional `latitude` and `longitude` use today's real sunrise and sunset of that place, worked out in the page, with no location prompt and no network. Without JavaScript the moments are not shown and Auto follows the system.
 
 ```html
 <luz-theme-time>
@@ -158,7 +160,7 @@ document.addEventListener("luz:consent", (e) => (granted(e.detail) ? startMeasur
 </luz-theme-time>
 ```
 
-`variant="bar"` adds the slider of the 24 hours: dragging previews the hour on the page, letting go pins it (stored under `luz-light`, in minutes of the day) until a mode or Auto is chosen with core's button, or Escape is pressed on the slider. By default the bar is the slider alone; `show` adds `time`, `place`, `saved` and `moments`. The slider's name and the note "Saved" are `data-luz-label-scrub` and `data-luz-label-saved`, with no English fallback. The element has `hour`, `moment`, `dayMoment`, `pinned`, `place`, `preview(hour)`, `pin(hour)` and `unpin()`, and dispatches `luz-theme-time:change`, bubbling, with `{ moment, pinned }`. The optional `theme-time-boot.min.js` applies the moment before the first paint (it ignores `latitude` and `longitude`). All the options are on the [Theme time page of the docs](https://nandovejer.github.io/luz/docs/catalog/theme-time/).
+`variant="bar"` adds the slider of the 24 hours: dragging previews the hour on the page, letting go pins it (stored under `luz-light`, in minutes of the day) until a mode or Auto is chosen with core's button, or Escape is pressed on the slider. By default the bar is the slider alone; `show` adds `time`, `place`, `saved` and `moments`. The slider's name and the note "Saved" are `data-luz-label-scrub` and `data-luz-label-saved`, with no English fallback. The element has `hour`, `moment`, `dayMoment`, `pinned`, `place`, `preview(hour)`, `pin(hour)` and `unpin()`, and dispatches `luz-theme-time:change`, bubbling, with `{ moment, pinned }`. The optional `theme-time-boot.min.js` applies the moment before the first paint (it ignores `latitude` and `longitude`). All the options are on the [Theme time page of the docs](https://luzds.com/docs/catalog/theme-time/).
 
 ## Patterns of a kind of site
 
@@ -175,33 +177,33 @@ import '@luz-ds/catalog/components/hero.css'
 
 | Fits best | File in `components/` | Block | Docs page |
 | --- | --- | --- | --- |
-| Landing page, blog or newspaper | `site-header.css` | `.luz-site-header` (`--publication` for a blog) | [site-header](https://nandovejer.github.io/luz/docs/catalog/site-header/) |
-| Landing page | `hero.css` | `.luz-hero` | [hero](https://nandovejer.github.io/luz/docs/catalog/hero/) |
+| Landing page, blog or newspaper | `site-header.css` | `.luz-site-header` (`--publication` for a blog) | [site-header](https://luzds.com/docs/catalog/site-header/) |
+| Landing page | `hero.css` | `.luz-hero` | [hero](https://luzds.com/docs/catalog/hero/) |
 | Landing page | `main.css` | `.luz-main` | none |
-| Landing page | `section.css` | `.luz-section` | [section](https://nandovejer.github.io/luz/docs/catalog/section/) |
-| Landing page | `stat.css` | `.luz-stat` | [stat](https://nandovejer.github.io/luz/docs/catalog/stat/) |
-| Landing page, blog or newspaper | `site-footer.css` | `.luz-site-footer` | [site-footer](https://nandovejer.github.io/luz/docs/catalog/site-footer/) |
+| Landing page | `section.css` | `.luz-section` | [section](https://luzds.com/docs/catalog/section/) |
+| Landing page | `stat.css` | `.luz-stat` | [stat](https://luzds.com/docs/catalog/stat/) |
+| Landing page, blog or newspaper | `site-footer.css` | `.luz-site-footer` | [site-footer](https://luzds.com/docs/catalog/site-footer/) |
 | Landing page | `glow.css` | `.luz-glow` | none |
-| Any site | `social.css` | `.luz-social` (`--icons`) | [social](https://nandovejer.github.io/luz/docs/catalog/social/) |
-| Blog or newspaper | `masthead.css` | `.luz-masthead` | [masthead](https://nandovejer.github.io/luz/docs/catalog/masthead/) |
-| Blog or newspaper | `page-header.css` | `.luz-page-header` | [page-header](https://nandovejer.github.io/luz/docs/catalog/page-header/) |
-| Blog or newspaper | `article-header.css` | `.luz-article-header` | [article-header](https://nandovejer.github.io/luz/docs/catalog/article-header/) |
-| Blog or newspaper | `article.css` | `.luz-article`, `.luz-toc` | [toc](https://nandovejer.github.io/luz/docs/catalog/toc/) |
-| Blog or newspaper | `post-list.css` | `.luz-post-list` | [post-list](https://nandovejer.github.io/luz/docs/catalog/post-list/) |
-| Web application | `app-bar.css` | `.luz-app-bar` | [app-bar](https://nandovejer.github.io/luz/docs/catalog/app-bar/) |
-| Web application | `dashboard.css` | `.luz-dashboard` | [dashboard](https://nandovejer.github.io/luz/docs/catalog/dashboard/) |
-| Web application | `bar-list.css` | `.luz-bar-list` | [bar-list](https://nandovejer.github.io/luz/docs/catalog/bar-list/) |
-| Web application | `column-chart.css` | `.luz-column-chart` | [column-chart](https://nandovejer.github.io/luz/docs/catalog/column-chart/) |
-| Web application | `stacked-bar.css` | `.luz-stacked-bar` | [stacked-bar](https://nandovejer.github.io/luz/docs/catalog/stacked-bar/) |
-| Web application | `ring.css` | `.luz-ring` | [ring](https://nandovejer.github.io/luz/docs/catalog/ring/) |
-| Web application | `heat-map.css` | `.luz-heat-map` | [heat-map](https://nandovejer.github.io/luz/docs/catalog/heat-map/) |
-| Documentation site | `docs-layout.css` | `.luz-docs-layout` | [docs-layout](https://nandovejer.github.io/luz/docs/catalog/docs-layout/) |
-| Documentation site | `doc-header.css` | `.luz-doc-header` | [doc-header](https://nandovejer.github.io/luz/docs/catalog/doc-header/) |
-| Documentation site | `page-rail.css` | `.luz-page-rail` | [page-rail](https://nandovejer.github.io/luz/docs/catalog/page-rail/) |
-| Documentation site | `example.css` | `.luz-example` | [example](https://nandovejer.github.io/luz/docs/catalog/example/) |
-| Documentation site | `do-dont.css` | `.luz-do-dont` | [do-dont](https://nandovejer.github.io/luz/docs/catalog/do-dont/) |
-| Documentation site | `pager.css` | `.luz-pager` | [pager](https://nandovejer.github.io/luz/docs/catalog/pager/) |
-| Documentation site | `page-footer.css` | `.luz-page-footer` | [page-footer](https://nandovejer.github.io/luz/docs/catalog/page-footer/) |
+| Any site | `social.css` | `.luz-social` (`--icons`) | [social](https://luzds.com/docs/catalog/social/) |
+| Blog or newspaper | `masthead.css` | `.luz-masthead` | [masthead](https://luzds.com/docs/catalog/masthead/) |
+| Blog or newspaper | `page-header.css` | `.luz-page-header` | [page-header](https://luzds.com/docs/catalog/page-header/) |
+| Blog or newspaper | `article-header.css` | `.luz-article-header` | [article-header](https://luzds.com/docs/catalog/article-header/) |
+| Blog or newspaper | `article.css` | `.luz-article`, `.luz-toc` | [toc](https://luzds.com/docs/catalog/toc/) |
+| Blog or newspaper | `post-list.css` | `.luz-post-list` | [post-list](https://luzds.com/docs/catalog/post-list/) |
+| Web application | `app-bar.css` | `.luz-app-bar` | [app-bar](https://luzds.com/docs/catalog/app-bar/) |
+| Web application | `dashboard.css` | `.luz-dashboard` | [dashboard](https://luzds.com/docs/catalog/dashboard/) |
+| Web application | `bar-list.css` | `.luz-bar-list` | [bar-list](https://luzds.com/docs/catalog/bar-list/) |
+| Web application | `column-chart.css` | `.luz-column-chart` | [column-chart](https://luzds.com/docs/catalog/column-chart/) |
+| Web application | `stacked-bar.css` | `.luz-stacked-bar` | [stacked-bar](https://luzds.com/docs/catalog/stacked-bar/) |
+| Web application | `ring.css` | `.luz-ring` | [ring](https://luzds.com/docs/catalog/ring/) |
+| Web application | `heat-map.css` | `.luz-heat-map` | [heat-map](https://luzds.com/docs/catalog/heat-map/) |
+| Documentation site | `docs-layout.css` | `.luz-docs-layout` | [docs-layout](https://luzds.com/docs/catalog/docs-layout/) |
+| Documentation site | `doc-header.css` | `.luz-doc-header` | [doc-header](https://luzds.com/docs/catalog/doc-header/) |
+| Documentation site | `page-rail.css` | `.luz-page-rail` | [page-rail](https://luzds.com/docs/catalog/page-rail/) |
+| Documentation site | `example.css` | `.luz-example` | [example](https://luzds.com/docs/catalog/example/) |
+| Documentation site | `do-dont.css` | `.luz-do-dont` | [do-dont](https://luzds.com/docs/catalog/do-dont/) |
+| Documentation site | `pager.css` | `.luz-pager` | [pager](https://luzds.com/docs/catalog/pager/) |
+| Documentation site | `page-footer.css` | `.luz-page-footer` | [page-footer](https://luzds.com/docs/catalog/page-footer/) |
 
 Load `hero.css` with `section.css`: the head of a section shares its rules. The blog and the newspaper work with any CMS.
 
@@ -220,15 +222,15 @@ This package also holds four components that were core's: the navbar, the sideba
 
 No breaking changes in 0.4.1.
 
-Older versions: https://github.com/nandovejer/luz/blob/main/packages/catalog/CHANGELOG.md
+Older versions: https://github.com/nandomunoz/luz/blob/main/packages/catalog/CHANGELOG.md
 
 ### Read first
 
 1. `dist/classes.json` in this package: the classes and custom properties its CSS defines. Write only those.
 2. `dist/custom-elements.json` in this package: the `<luz-*>` elements it defines, with their attributes.
-3. https://nandovejer.github.io/luz/llms.txt: the index of the documentation, short enough for a small context.
-4. https://nandovejer.github.io/luz/llms-full.txt: the same pages in full.
-5. https://nandovejer.github.io/luz/examples/: one standalone page of markup for each component and pattern.
+3. https://luzds.com/llms.txt: the index of the documentation, short enough for a small context.
+4. https://luzds.com/llms-full.txt: the same pages in full.
+5. https://luzds.com/examples/: one standalone page of markup for each component and pattern.
 
 ### Load order
 
@@ -236,7 +238,7 @@ This package needs `@luz-ds/tokens` and `@luz-ds/core` loaded first.
 
 ### Check what you write
 
-Run `npx @luz-ds/check@0.3.2 <files>` on every HTML and CSS file you write, and fix what it reports. To copy the accessibility reviewer into your project: `npx @luz-ds/check@0.3.2 agent > .claude/agents/luz-accessibility-reviewer.md`.
+Run `npx @luz-ds/check@0.3.2 <files>` on every HTML and CSS file you write, and fix what it reports. To copy the accessibility reviewer into your project: `npx @luz-ds/check@0.3.2 agent > .claude/agents/luz-agent-accessibility.md`.
 
 <!-- luz:ai-agents:end -->
 

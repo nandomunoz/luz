@@ -4,8 +4,6 @@
  * Each test says what the page must still do without scripts.
  */
 import { test, expect } from '@playwright/test';
-import { readFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
 import { isControls, notFoundRoute, routes, routesWith } from './helpers/docs-site.js';
 import { px } from './helpers/site-loader.js';
 import { channels, colorOf, vejer } from './helpers/site-lights.js';
@@ -273,13 +271,13 @@ test('docs: the specimens carry no data-theme without JavaScript, and the radios
 
 // The drawer's names on the home page in another language (apps/landing/i18n)
 const DRAWER = {
-  '/es/': { menu: 'Menú', site: 'Sitio', links: ['Documentación', 'GitHub'] },
-  '/ar/': { menu: 'القائمة', site: 'الموقع', links: ['التوثيق', 'GitHub'] },
+  '/es/': { menu: 'Menú', site: 'Sitio', links: ['IA', 'Tokens', 'Core', 'Catálogo', 'Documentación', 'GitHub'] },
+  '/ar/': { menu: 'القائمة', site: 'الموقع', links: ['الذكاء الاصطناعي', 'الرموز', 'النواة', 'الكتالوج', 'التوثيق', 'GitHub'] },
 };
 
 for (const app of APPS) {
   test(`${app}: the menu drawer opens and closes without JavaScript`, async ({ page }) => {
-    const names = DRAWER[app] ?? { menu: 'Menu', site: 'Site', links: ['Documentation', 'GitHub'] };
+    const names = DRAWER[app] ?? { menu: 'Menu', site: 'Site', links: ['AI', 'Tokens', 'Core', 'Catalog', 'Documentation', 'GitHub'] };
     await page.setViewportSize({ width: 360, height: 640 });
     await page.goto(app);
     const toggle = page.getByRole('button', { name: names.menu, exact: true });
@@ -301,100 +299,45 @@ for (const app of APPS) {
   });
 }
 
-// <home-light> on the home (F3 of .claude/plans/luz-home-docs-identity.md): the hero is complete text, the
-// light section is an empty element under a heading, and light.css keeps its room so nothing jumps in
-// (the same boxes with JavaScript on are compared in tests/home-light.spec.js)
+// The hero of the home without JavaScript (the tunnel, 2026-11-26): complete text and two links, and the tunnel's
+// thirteen frames drawn by CSS alone, hidden from assistive technology. With motion allowed they still fly (the
+// script only pauses them off screen and tilts them); with reduced motion they stand still, spread along the tunnel
 for (const home of ['/', '/es/', '/ar/']) {
-  test(`${home}: the light section is an empty <home-light> under a heading and keeps its height`, async ({ page }) => {
+  test(`${home}: the hero is text and two links over the tunnel's thirteen frames, which need no script`, async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 800 });
     await page.goto(home);
-    await expect(page.locator('.luz-hero h1')).toBeVisible();
-    await expect(page.locator('section#light h2')).toHaveText(/\S/);
-    await expect(page.locator('section#light home-light')).toHaveCount(1);
-    expect(await page.locator('home-light').evaluate((el) => ({ children: el.childElementCount, text: (el.textContent ?? '').trim() }))).toEqual({ children: 0, text: '' });
-    expect((await page.locator('home-light').boundingBox())?.height ?? 0).toBeGreaterThan(200);
+    await expect(page.locator('#hero h1')).toBeVisible();
+    await expect(page.locator('#hero .o-actions > a.luz-btn')).toHaveCount(2);
+    await expect(page.locator('#hero .landing-tunnel__back')).toHaveAttribute('aria-hidden', 'true');
+    await expect(page.locator('#hero .landing-tunnel__frame')).toHaveCount(13);
+    expect(await page.locator('#hero .landing-tunnel__frame').first().evaluate((el) => getComputedStyle(el).animationName)).toBe('landing-tunnel-fly');
+    await expect(page.locator('home-light, #light')).toHaveCount(0);
   });
 }
 
-// The home: nine sections in a fixed order (the hero, the light, the four levels of "inside", why, native and modes), all of them
-// words and native elements; what needs a script (the buttons of Modes, the copy buttons) is not shown dead
-const SECTIONS = ['hero', 'light', 'inside', 'inside-2', 'inside-3', 'inside-4', 'why', 'native', 'modes', 'faq'];
-const HOME_CATALOG = { '/': 'en', '/es/': 'es', '/ar/': 'ar' };
-const homeCatalog = (home) => JSON.parse(readFileSync(fileURLToPath(new URL(`../apps/landing/i18n/${HOME_CATALOG[home]}.json`, import.meta.url)), 'utf-8'));
+test('/ with reduced motion and no script: the frames stand still, each in its own place', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/');
+  const frames = await page.locator('#hero .landing-tunnel__frame').evaluateAll((all) => all.map((el) => ({ name: getComputedStyle(el).animationName, transform: getComputedStyle(el).transform })));
+  expect(frames.map((f) => f.name)).toEqual(Array(13).fill('none'));
+  expect(new Set(frames.map((f) => f.transform)).size, 'thirteen places').toBe(13);
+});
+
+// The home: eight sections in a fixed order (the hero, Who we are, the four levels, the AI one first, the FAQ and the
+// Built with LUZ band; owner, 2026-11-27), all of them words and native elements; what needs a script (the copy
+// buttons) is not shown dead
+const SECTIONS = ['hero', 'who', 'ai', 'tokens', 'core', 'catalog', 'faq', 'users'];
 
 for (const home of ['/', '/es/', '/ar/']) {
-  test(`${home}: the ten sections are in the page, in order, and every one but the light has words`, async ({ page }) => {
+  test(`${home}: the eight sections are in the page, in order, and every one has words`, async ({ page }) => {
     await page.goto(home);
     expect(await page.locator('main section[id]').evaluateAll((all) => all.map((el) => el.id))).toEqual(SECTIONS);
     await expect(page.locator('h1')).toHaveCount(1);
-    for (const id of SECTIONS.filter((section) => section !== 'light')) {
+    for (const id of SECTIONS) {
       const section = page.locator(`main section#${id}`);
       await expect(section.locator('h1, h2').first(), id).toBeVisible();
       expect((await section.innerText()).trim().length, id).toBeGreaterThan(30);
     }
-  });
-
-  test(`${home}: the light section is not an empty region: a sentence of the catalog is shown in it`, async ({ page }) => {
-    await page.setViewportSize({ width: 1280, height: 800 });
-    await page.goto(home);
-    const words = Object.values(homeCatalog(home)).map((value) => value.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim());
-    const shown = await page.locator('section#light').evaluate((section) => {
-      const clean = (el) => (el.textContent ?? '').replace(/\s+/g, ' ').trim();
-      const box = section.getBoundingClientRect();
-      return [...section.querySelectorAll('*')]
-        // Not the heading for screen readers: a sentence a sighted reader can see
-        .filter((el) => !el.closest('.u-sr-only, h1, h2, h3, h4, h5, h6, script, style'))
-        .filter((el) => el.checkVisibility({ visibilityProperty: true }) && clean(el).length > 0)
-        .map((el) => ({ text: clean(el), rect: el.getBoundingClientRect() }))
-        .filter(({ rect }) => rect.width > 8 && rect.height > 8 && rect.bottom > box.top && rect.top < box.bottom)
-        .map(({ text }) => text);
-    });
-    const sentences = shown.filter((text) => words.includes(text) && /\s/.test(text) && /[.!?\u061F]$/.test(text));
-    expect(sentences, `visible text in #light: ${JSON.stringify(shown)}`).not.toEqual([]);
-  });
-
-  test(`${home}: the buttons of the three modes are not shown without a script, and the boxes are pictures`, async ({ page }) => {
-    await page.goto(home);
-    const buttons = page.locator('#modes [data-apply-mode]');
-    await expect(buttons).toHaveCount(3);
-    for (const button of await buttons.all()) await expect(button).toBeHidden();
-    // A control that is in the page and visible must be able to do something: the boxes keep their words
-    for (const picture of await page.locator('#modes .landing-cut__picture').all()) await expect(picture).toBeVisible();
-  });
-
-  test(`${home}: Native is three scenes of code and its result, plain text and native elements, with no script`, async ({ page }) => {
-    // Under reduced motion the panel rests on its first scene, on its last frame (the loop is CSS)
-    await page.emulateMedia({ reducedMotion: 'reduce' });
-    await page.goto(home);
-    const panel = page.locator('#native .landing-typed__panel');
-    await expect(panel).toBeVisible();
-    const scenes = panel.locator('.landing-typed__scene');
-    await expect(scenes).toHaveCount(3);
-    const code = scenes.nth(0).locator('pre.luz-code-block');
-    await expect(code).toBeVisible();
-    await expect(code).toContainText('<details open>');
-    // The code of the other two scenes is in the page too, as text: a field and a button with no class, then a link and a button with one
-    expect(await scenes.nth(1).locator('pre.luz-code-block').textContent()).toContain('<input');
-    expect(await scenes.nth(1).locator('pre.luz-code-block').textContent()).toContain('<button');
-    expect(await scenes.nth(2).locator('pre.luz-code-block').textContent()).toContain('luz-btn luz-btn--danger');
-    // The result is a picture of the code: native elements, inert
-    await expect(scenes.nth(0).locator('.landing-typed__result')).toHaveJSProperty('inert', true);
-    await expect(scenes.nth(0).locator('.landing-typed__state--luz details')).toBeVisible();
-    // The points and the link to every tag are plain links and text
-    await expect(page.locator('#native a.landing-inside__cta')).toBeVisible();
-  });
-
-  test(`${home}: the three mode cards are re-scoped by their own data-theme, with no script`, async ({ page }) => {
-    await page.goto(home);
-    const surfaces = [];
-    for (const mode of ['light', 'dark', 'high-contrast']) {
-      const card = page.locator(`#modes [data-theme="${mode}"]`);
-      await expect(card, mode).toHaveCount(1);
-      const surface = channels(await colorOf(card, '--luz-surface-page'));
-      expect(surface, mode).toEqual(vejer(mode, '--luz-surface-page'));
-      surfaces.push(surface.join());
-    }
-    expect(new Set(surfaces).size).toBe(3);
   });
 
   test(`${home}: the footer lists its four groups of links, the four colour modes and the legal line, and the three languages are in the header`, async ({ page }) => {

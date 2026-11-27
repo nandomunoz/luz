@@ -1,0 +1,13 @@
+{
+  "example": "magic",
+  "case": "magic",
+  "model": "opus",
+  "date": "2026-11-26",
+  "skillVersion": "0.1.0",
+  "turns": [
+    {
+      "user": "/luz magic a landing page for a small bakery called Pan Vivo that sells sourdough bread; the main button says Order for tomorrow. Put it in the folder site.",
+      "assistant": "I've built a prototype of the Pan Vivo landing page in `site/index.html`. The LUZ check finds no problems. It's a one-prompt test page, not a finished site.\n\n**What I decided:** a standard landing page in plain HTML, in English, with LUZ's default look. I made only the `site` folder and changed nothing else in the project.\n\n**What's on the page:**\n- **Header:** the name \"Pan Vivo\" and two links, \"Our bread\" and \"Order\". On small screens they fold into a menu button.\n- **Top section:** the headline \"Sourdough that's alive with flavour\", one sentence about the bakery, and the **Order for tomorrow** button. Next to it is a photo spot.\n- **Why our sourdough:** four cards: slow fermentation, a living starter, simple ingredients and baked to order.\n- **Order for tomorrow:** a short section explaining \"order today, collect tomorrow\". The main button scrolls down to it.\n- **Footer:** one line about the bakery.\n- I also added a page title and a short description for search engines, and removed the stylesheets the page doesn't use.\n\n**What you need to finish:**\n1. **There's no real way to order yet.** The button only scrolls to the order section. It needs a real destination: an order form, a shop page, an email address or a phone number. LUZ styles forms but doesn't send them.\n2. **The photo is missing.** The page expects `site/shop.jpg`. Add a photo, then check that its description (alt text) matches what it shows.\n3. **I wrote all the text from your description.** Claims like \"flour, water, salt and our starter\", \"baked overnight\" and \"baked to order\" are guesses. Correct anything that doesn't match how you work.\n4. **There's no address, phone number, opening hours or prices,** because you didn't give me any.\n5. **There are no legal pages.** I didn't write terms, a privacy notice or a cookie notice, or the business contact details some countries require a business site to show. Check what your country requires; this isn't legal advice.\n6. **The page loads LUZ from a public CDN** (an outside file server), so visitors' IP addresses go to it. Installing the `@luz-ds` packages and serving the files yourself avoids that.\n\n**What neither I nor the check could verify:** whether the labels and alt text are right, colour contrast once you add your own branding, and how a screen reader reads the page. Open `site/index.html` in a browser to see it."
+    }
+  ]
+}

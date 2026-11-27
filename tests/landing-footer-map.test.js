@@ -17,7 +17,7 @@ import { find, findAll, hasClass, parse, query, queryAll, textOf } from "./helpe
 
 const repo = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (file) => readFileSync(join(repo, file), "utf-8");
-const GITHUB = "https://github.com/nandovejer/luz";
+const GITHUB = "https://github.com/nandomunoz/luz";
 const coreVersion = JSON.parse(read("packages/core/package.json")).version;
 
 const site = scanSite(join(repo, "apps/docs"), repo);
@@ -28,9 +28,9 @@ const catalog = (code) => JSON.parse(read(`apps/landing/i18n/${code}.json`));
 
 /** The twenty-one links of the site map, as the English home writes them, in order, by group. */
 const GROUPS = [
-  { id: "footer-docs", links: ["/docs/get-started/", "/docs/get-started/migrate/", "/docs/get-started/make-it-yours/", "/docs/get-started/ai/", "/docs/a-z/"] },
+  { id: "footer-docs", links: ["/docs/get-started/", "/docs/get-started/migrate/", "/docs/get-started/make-it-yours/", "/docs/ai/", "/docs/a-z/"] },
   { id: "footer-reference", links: ["/docs/tokens/", "/docs/html/", "/docs/components/", "/docs/catalog/", "/docs/accessibility/", "/docs/privacy/"] },
-  { id: "footer-resources", links: ["https://www.npmjs.com/org/luz-ds", "#inside-4", "/llms.txt", `${GITHUB}/blob/main/CHANGELOG.md`, "/docs/get-started/how-luz-is-built/"] },
+  { id: "footer-resources", links: ["https://www.npmjs.com/org/luz-ds", "#ai", "/llms.txt", `${GITHUB}/blob/main/CHANGELOG.md`, "/docs/get-started/how-luz-is-built/"] },
   { id: "footer-community", links: [GITHUB, `${GITHUB}/issues/new/choose`, `${GITHUB}/blob/main/CONTRIBUTING.md`, `${GITHUB}/blob/main/CODE_OF_CONDUCT.md`, `${GITHUB}/blob/main/SECURITY.md`] },
 ];
 /** Spanish has docs of its own: an internal /docs link goes to them. Arabic has none yet: its links stay English. */
@@ -121,8 +121,8 @@ for (const route of Object.keys(CODES)) {
 
     it("names Fernando Muñoz in the licence line as a link to his GitHub", () => {
       const legal = query(footer, "p.landing-legal");
-      const author = findAll(legal, (n) => n.name === "a").find((a) => a.attrs.get("href") === "https://github.com/nandovejer");
-      expect(author, "a link to https://github.com/nandovejer").toBeTruthy();
+      const author = findAll(legal, (n) => n.name === "a").find((a) => a.attrs.get("href") === "https://github.com/nandomunoz");
+      expect(author, "a link to https://github.com/nandomunoz").toBeTruthy();
       expect(textOf(author)).toBe("Fernando Muñoz");
       expect(textOf(legal)).not.toContain("Nando Muñoz");
       expect(findAll(legal, (n) => n.name === "a").some((a) => a.attrs.get("href") === `${GITHUB}/blob/main/LICENSE`), "the licence stays a link").toBe(true);

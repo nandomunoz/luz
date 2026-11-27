@@ -10,8 +10,8 @@
  * under the bar there. The slack makes both work. Chromium passes with or without it, so this spec pins the
  * number, not the browser's behaviour (the walk with Tab is in tests/modal.spec.js).
  *
- * The same padding reaches every dialog that shares the CSS: core's modal (tests/fixtures/modal.html), the
- * search dialog and the prompt dialog (a `.luz-modal` with its own class). In a larger window none has a scroll
+ * The same padding reaches every dialog that shares the CSS: core's modal (tests/fixtures/modal.html) and the
+ * search dialog. In a larger window none has a scroll
  * padding of this kind. In a window under 30rem tall the footer scrolls with the content, so only the start is
  * pinned there and the end keeps its one small step (`--luz-space-xs`). Heights are read from the page, and the step is resolved through a probe element:
  * nothing is typed.
@@ -23,7 +23,6 @@ import { routeOf } from './helpers/docs-site.js';
 
 const FIXTURE = '/tests/fixtures/modal.html';
 const SEARCH_PAGE = routeOf('c-button');
-const PROMPT_PAGE = '/docs/get-started/ai/';
 
 /** Windows that are the screen: two phones held upright, and a window 800x400 (the `max-height: 30rem` branch). */
 const SMALL = [
@@ -154,50 +153,6 @@ test.describe('search dialog: the scroll padding is the head plus one step', () 
       const dialog = await openSearch(page, viewport);
       const m = await measure(dialog, SEARCH_BARS);
       expect(['auto', '0px'], `scroll-padding-block-start is ${m.startComputed}`).toContain(m.startComputed);
-    });
-  }
-});
-
-/* ---- the prompt dialog ---------------------------------------------------- */
-
-async function openPrompt(page, viewport) {
-  await page.setViewportSize(viewport);
-  await page.goto(PROMPT_PAGE);
-  const opener = page.locator('section:has(> #start-site)').getByRole('button', { name: 'Open the prompt', exact: true });
-  await expect(opener).toBeVisible();
-  await opener.focus();
-  await page.keyboard.press('Enter');
-  const dialog = page.getByRole('dialog', { name: 'The prompt to start a site' });
-  await expect(dialog).toBeVisible();
-  return dialog;
-}
-
-const PROMPT_BARS = { head: '.luz-modal__header', foot: '.site-prompt__foot' };
-
-test.describe('prompt dialog: the scroll padding is the bar plus one step', () => {
-  test.beforeEach(({ javaScriptEnabled }) => {
-    test.skip(javaScriptEnabled === false, 'measured in the page');
-  });
-
-  for (const viewport of SMALL) {
-    test(`${size(viewport)}: at the start it is at least the header and --luz-space-md, at the end (foot pinned) at least the foot and --luz-space-md`, async ({ page }) => {
-      const dialog = await openPrompt(page, viewport);
-      const gap = await lengthOf(page, 'var(--luz-space-md)');
-      const m = await measure(dialog, PROMPT_BARS);
-      expect(m.start, `scroll-padding-block-start ${m.startComputed} against a header of ${m.head}px and a step of ${gap}px`).toBeGreaterThanOrEqual(m.head + gap - 0.5);
-      // Under 30rem tall the foot scrolls with the content and nothing pins it: only a pinned foot needs the room
-      if (m.footPosition === 'sticky') {
-        expect(m.end, `scroll-padding-block-end ${m.endComputed} against a foot of ${m.foot}px and a step of ${gap}px`).toBeGreaterThanOrEqual(m.foot + gap - 0.5);
-      }
-    });
-  }
-
-  for (const viewport of LARGE) {
-    test(`${size(viewport)}: the dialog floats and has no scroll padding of this kind`, async ({ page }) => {
-      const dialog = await openPrompt(page, viewport);
-      const m = await measure(dialog, PROMPT_BARS);
-      expect(['auto', '0px'], `scroll-padding-block-start is ${m.startComputed}`).toContain(m.startComputed);
-      expect(['auto', '0px'], `scroll-padding-block-end is ${m.endComputed}`).toContain(m.endComputed);
     });
   }
 });

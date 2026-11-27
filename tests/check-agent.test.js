@@ -30,10 +30,10 @@
  *                (FORBIDDEN below). The message names the file or the marker
  *                (`accessibility-engineer.md`, `luz:publish`), the first thing
  *                a person who broke it reads. It writes
- *                  <outdir>/agents/luz-accessibility-reviewer.md
+ *                  <outdir>/agents/luz-agent-accessibility.md
  *                which is
  *                  ---
- *                  name: luz-accessibility-reviewer
+ *                  name: luz-agent-accessibility
  *                  description: <one line>
  *                  tools: Read, Grep, Glob
  *                  ---
@@ -53,8 +53,8 @@
  *                file is is the export `@luz-ds/check/agents/accessibility.md`.
  *
  *   The package  exports "./agents/accessibility.md" ->
- *                "./dist/agents/luz-accessibility-reviewer.md"; pack-files.txt
- *                lists dist/agents/luz-accessibility-reviewer.md; the README
+ *                "./dist/agents/luz-agent-accessibility.md"; pack-files.txt
+ *                lists dist/agents/luz-agent-accessibility.md; the README
  *                says that `npx @luz-ds/check agent > .claude/agents/...`
  *                overwrites a file.
  *
@@ -94,7 +94,7 @@ import {
 } from "./helpers/check-build.js";
 
 const SOURCE = ".claude/agents/accessibility-engineer.md";
-const PUBLISHED = "luz-accessibility-reviewer.md";
+const PUBLISHED = "luz-agent-accessibility.md";
 const SNAPSHOT = "tests/fixtures/check/agent.md";
 const START = "<!-- luz:publish:start -->";
 const END = "<!-- luz:publish:end -->";
@@ -476,7 +476,7 @@ describe("scripts/build-check.js: what it reads for the agent", () => {
     expect(parsed, "a frontmatter block").not.toBeNull();
     expect([...parsed.keys].sort()).toEqual(["description", "name", "tools"]);
     expect(parsed.stray).toEqual([]);
-    expect(parsed.values.name).toBe("luz-accessibility-reviewer");
+    expect(parsed.values.name).toBe("luz-agent-accessibility");
     expect(parsed.values.tools).toBe("Read, Grep, Glob");
     expect(parsed.values.description).not.toMatch(/packages\/core|test-writer/);
   }, 120000);
@@ -553,7 +553,7 @@ describe("scripts/build-check.js: what it reads for the agent", () => {
 
 /* ---- The published file ------------------------------------------------------------------------- */
 
-describe("dist/agents/luz-accessibility-reviewer.md: frontmatter and form", () => {
+describe("dist/agents/luz-agent-accessibility.md: frontmatter and form", () => {
   it("is built beside the bundle, by buildCheck({ outdir })", () => {
     expect(built.error, "the builder is importable and builds").toBeNull();
     hasAgent();
@@ -568,7 +568,7 @@ describe("dist/agents/luz-accessibility-reviewer.md: frontmatter and form", () =
       parsed.stray,
       "no nested value or continuation line in the frontmatter"
     ).toEqual([]);
-    expect(parsed.values.name).toBe("luz-accessibility-reviewer");
+    expect(parsed.values.name).toBe("luz-agent-accessibility");
     expect(
       parsed.values.description.length,
       "a one-line description of when to use it"
@@ -620,7 +620,7 @@ describe("dist/agents/luz-accessibility-reviewer.md: frontmatter and form", () =
   });
 });
 
-describe("dist/agents/luz-accessibility-reviewer.md: what it says", () => {
+describe("dist/agents/luz-agent-accessibility.md: what it says", () => {
   it("names WCAG 2.2 and EN 301 549 v3.2.1, with a date stamp", () => {
     hasAgent();
     expect(published).toContain("WCAG 2.2");
@@ -730,7 +730,7 @@ describe("dist/agents/luz-accessibility-reviewer.md: what it says", () => {
   });
 });
 
-describe("dist/agents/luz-accessibility-reviewer.md: what it leaves out", () => {
+describe("dist/agents/luz-agent-accessibility.md: what it leaves out", () => {
   it("contains no repo-private or repo-only string (security and accessibility reviews)", () => {
     hasAgent();
     expect(forbiddenIn(published)).toEqual([]);
@@ -814,7 +814,7 @@ describe("luz-check agent, from a bundle in the layout of the package", () => {
     expect(subcommand.stdout).toBe(expected);
     const folder = luzCheck(["./agent"], cwd);
     expect(folder.status, folder.stderr).toBe(0);
-    expect(folder.stdout).not.toContain("luz-accessibility-reviewer");
+    expect(folder.stdout).not.toContain("luz-agent-accessibility");
   });
 
   it("is exit 2 with one line on stderr, no stack and nothing on stdout, when the file is not beside the bundle", () => {
@@ -869,7 +869,7 @@ describe("the bundle does not carry the agent", () => {
 describe("@luz-ds/check ships the agent", () => {
   const manifest = JSON.parse(readOr("packages/check/package.json") || "{}");
 
-  it("exports it as ./agents/accessibility.md from dist/agents/luz-accessibility-reviewer.md", () => {
+  it("exports it as ./agents/accessibility.md from dist/agents/luz-agent-accessibility.md", () => {
     expect(manifest.exports?.["./agents/accessibility.md"]).toBe(
       `./dist/agents/${PUBLISHED}`
     );
@@ -897,7 +897,7 @@ describe("the README of @luz-ds/check, on the agent", () => {
 
   it("shows the command that copies it, with `npx @luz-ds/check@<version>`, and says it overwrites a file", () => {
     const command =
-      /npx @luz-ds\/check@\d+\.\d+\.\d+ agent > \.claude\/agents\/luz-accessibility-reviewer\.md/;
+      /npx @luz-ds\/check@\d+\.\d+\.\d+ agent > \.claude\/agents\/luz-agent-accessibility\.md/;
     expect(readme).toMatch(command);
     const warned = sections.some(
       (section) => command.test(section) && /overwrit/i.test(section)

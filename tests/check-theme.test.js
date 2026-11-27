@@ -87,7 +87,7 @@ afterAll(removeWorkspaces);
 
 const PREFIXES = ["theme/"];
 const TOKENS_CSS = join(ROOT, "packages/tokens/dist/tokens.css");
-const SITE = "https://nandovejer.github.io/luz/";
+const SITE = "https://luzds.com/";
 const UNREADABLE = "<an unreadable name>";
 const MODES = ["light", "dark", "high-contrast"];
 

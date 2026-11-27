@@ -98,8 +98,8 @@
 }
 
 /* The word LUZ beside a prism (the header's, the home's footer), drawn as
-   the home's hero draws it (the brand's word, landing.css .landing-imago):
-   ET Book, the capitals trimmed to their own height, squeezed to .86 and
+   the home's hero once drew it with letters (its word is an SVG outlined
+   from the same face now, apps/site/_partials/luz-wordmark.html): ET Book, the capitals trimmed to their own height, squeezed to .86 and
    stretched to 1.04, each letter its own width. Its capitals (0.679em) stand
    as tall as the prism's triangle (0.87 of --site-mark, the prism's height
    where it sits), so it follows the mark's size. It takes the colour of the
@@ -311,6 +311,7 @@
    their accessible names, clipped, not removed. */
 .site-header__search,
 .site-header__az,
+.site-header__docs,
 .site-header__github,
 .site-header__menu {
   display: inline-flex;
@@ -329,6 +330,7 @@
 
 .site-header__search:hover,
 .site-header__az:hover,
+.site-header__docs:hover,
 .site-header__github:hover,
 .site-header__menu:hover {
   border-color: transparent;
@@ -336,6 +338,7 @@
   color: var(--luz-text-primary);
 }
 
+.site-header__docs:focus-visible,
 .site-header__github:focus-visible {
   outline: 2px solid var(--luz-focus-ring);
   outline-offset: 2px;
@@ -349,6 +352,7 @@
 
 .site-header__search .luz-search__trigger-label,
 .site-header__az .luz-search__fallback-label,
+.site-header__docs-label,
 .site-header__github-label {
   position: absolute;
   inline-size: 1px;
@@ -370,27 +374,13 @@
   block-size: 1.25rem;
 }
 
-/* 769px and up: GitHub and the search are an icon and a word, as Docs is */
+/* 769px and up: the tools (GitHub, Search, Language) are icons only; their
+   names stay for a reader */
 @media (min-width: 769px) {
   .site-header__search,
-  .site-header__az,
-  .site-header__github {
-    inline-size: auto;
-    gap: var(--luz-space-xs);
-    padding-inline: var(--luz-space-xs);
+  .site-header__az {
     font-family: var(--luz-font-sans);
-    font-size: var(--luz-text-md);
     text-decoration: none;
-  }
-
-  .site-header__search .luz-search__trigger-label,
-  .site-header__az .luz-search__fallback-label,
-  .site-header__github-label {
-    position: static;
-    inline-size: auto;
-    block-size: auto;
-    overflow: visible;
-    clip-path: none;
   }
 
   /* The four controls of the end (Documentation, GitHub, Search, Language)
@@ -417,6 +407,7 @@
   }
 
   .site-header__nav a,
+  .site-header__docs,
   .site-header__github,
   .site-header__search,
   .site-header__az,
@@ -433,6 +424,7 @@
   }
 
   .site-header__nav a:hover,
+  .site-header__docs:hover,
   .site-header__github:hover,
   .site-header__search:hover,
   .site-header__az:hover,
@@ -442,6 +434,7 @@
   }
 
   .site-header__nav a[aria-current],
+  .site-header__docs[aria-current],
   .site-header :where(luz-search):has(dialog[open]) .site-header__search,
   .site-header .luz-lang-switch__button:has(+ :popover-open) {
     border-block-end-color: currentcolor;
@@ -453,6 +446,7 @@
   /* The ring sits inside the control: outside it, the header's edge would
      cut it */
   .site-header__nav a:focus-visible,
+  .site-header__docs:focus-visible,
   .site-header__github:focus-visible,
   .site-header__search:focus-visible,
   .site-header__az:focus-visible,
@@ -470,6 +464,75 @@
 /* The row sits in the site frame, with the page's gutter (--luz-space-xl
    above 640px, like the home sections), so the brand starts where the
    content starts. */
+/* Two groups, as a reader expects them (owner, 2026-11-24): where to go
+   (the sections of the site and the docs, words only, after the logo) and
+   what to use (search, GitHub, language, at the end). GitHub is its mark,
+   with its name for a reader. */
+@media (min-width: 769px) {
+  .site-header__brand {
+    margin-inline-end: 0;
+  }
+
+  /* Where the row is narrow, the sections sit in the middle of the free
+     space between the logo and the tools, in the flow: they never cover them */
+  .site-header__nav {
+    margin-inline: auto;
+  }
+}
+
+/* Where there is room, the sections sit in the middle of the header itself,
+   whatever the widths of the logo and of the tools: out of the flow */
+@media (min-width: 1024px) {
+  .site-header__inner {
+    position: relative;
+  }
+
+  .site-header__brand {
+    margin-inline-end: auto;
+  }
+
+  .site-header__nav {
+    position: absolute;
+    inset-block: 0;
+    inset-inline: 0;
+    margin-inline: auto;
+    inline-size: max-content;
+  }
+}
+
+/* The tools keep their icon and their name for a reader (hidden the way
+   u-sr-only hides, never display: none) */
+@media (min-width: 769px) {
+  .site-header .luz-search__trigger-label,
+  .site-header .luz-search__trigger-key,
+  .site-header .luz-search__fallback-label,
+  .site-header .luz-lang-switch__name {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+/* Below 1100px the badge of the version leaves the row (it is the footer's
+   too) and the controls take less room */
+@media (min-width: 769px) and (max-width: 1099px) {
+  .site-header .site-badge {
+    display: none;
+  }
+
+  .site-header__nav a,
+  .site-header__docs,
+  .site-header__github,
+  .site-header__search,
+  .site-header__az,
+  .site-header .luz-lang-switch__button {
+    padding-inline: var(--luz-space-xs);
+  }
+}
+
 @media (min-width: 641px) {
   .site-header__inner {
     padding-inline: calc(var(--site-edge) + var(--luz-space-xl));
@@ -667,6 +730,7 @@
   @media (max-width: 768px) {
     /* The row: Brand, Search, Mode, menu */
     .site-header__nav,
+    .site-header__docs,
     .site-header__github,
     .site-header :where(luz-lang-switch) {
       display: none;

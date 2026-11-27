@@ -7,12 +7,15 @@
  * - Brand: the logo is one link to the home: the prism, the drawn word LUZ (hidden from a screen
  *   reader) and a "beta v<version>" badge, named "LUZ beta v<version>"; the version is not a link
  *   to the changelog (that is a link of the footer).
- * - No Home link in the row. The end of the row, in this order: Documentation, GitHub, Search,
- *   Language (the docs have no language switch), then the menu button. Each has an icon.
+ * - No Home link in the row. Two groups (owner, 2026-11-24): where to go, words only, after the logo
+ *   (the four sections of the site, AI, Tokens, Core and Catalog, the pages /ai/, /tokens/, /core/
+ *   and /catalog/ of the page's language, the one of the page marked current, then
+ *   Documentation); and what to use, at the end: GitHub (its mark, its name for a reader), Search,
+ *   Language, then the menu button.
  * - The colour mode is not in the header.
  * - The search dialog has no "Popular" block.
- * - The drawer: the home lists its sections, then Documentation and GitHub, then the languages; the
- *   docs have their sidebar.
+ * - The drawer: the home lists its sections, then the four sections of the site, Documentation and
+ *   GitHub, then the languages; the docs have their sidebar.
  */
 import { readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
@@ -20,15 +23,28 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { buildSite, landingDocuments, scanSite } from "../scripts/docs-site/site.js";
 import { find, findAll, hasClass, isInside, parse, query, textOf } from "./helpers/html-dom.js";
+import { levelPagesOf } from "./helpers/level-pages.js";
 
 const repo = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (file) => readFileSync(join(repo, file), "utf-8");
-const GITHUB = "https://github.com/nandovejer/luz";
+const GITHUB = "https://github.com/nandomunoz/luz";
 
 const site = scanSite(join(repo, "apps/docs"), repo);
 const landing = landingDocuments(site, "apps/landing/index.html", read("apps/landing/index.html"));
 const homes = landing.map((d) => d.route);
-const { rendered } = buildSite(site, { extra: landing });
+const levelPages = levelPagesOf(site);
+const { rendered } = buildSite(site, { extra: [...landing, ...levelPages] });
+const levelRoutes = levelPages.map((d) => d.route);
+/** The four sections of the site, by the path under a home and the catalog key of their link: AI first (owner, 2026-11-27), as the home's sections are. */
+const SECTIONS = [
+  ["ai", "site.ai"],
+  ["tokens", "site.tokens"],
+  ["core", "site.core"],
+  ["catalog", "site.catalog"],
+];
+/** The home of a route: the home page itself, the home a level page is under, "/" for the docs. */
+const homeOf = (route) => [...homes].sort((a, b) => b.length - a.length).find((h) => route.startsWith(h) && !route.startsWith("/docs/")) ?? "/";
+const codeOf = (home) => home.replace(/\//g, "") || "en";
 const treeOf = (route) => parse(rendered.get(route), route);
 const headerOf = (route) => query(treeOf(route), "header.site-header");
 const links = (node) => findAll(node, (n) => n.name === "a");
@@ -117,6 +133,42 @@ describe("the header's row", () => {
     }
   });
 
+  it("links to the four sections of the site, AI, Tokens, Core and Catalog, under the page's home and in its language; Documentation is the icon beside GitHub", () => {
+    for (const route of [...homes, ...levelRoutes, ...DOCS_PAGES]) {
+      const nav = query(headerOf(route), "nav.site-header__nav");
+      expect(nav, route).toBeTruthy();
+      const home = homeOf(route);
+      const words = catalog(codeOf(home));
+      const navLinks = links(nav);
+      expect(navLinks.map(href).slice(0, 4), route).toEqual(SECTIONS.map(([path]) => `${home}${path}/`));
+      expect(navLinks.slice(0, 4).map(visibleText), route).toEqual(SECTIONS.map(([, key]) => words[key]));
+      expect(navLinks, route).toHaveLength(4);
+      const docs = query(headerOf(route), "a.site-header__docs");
+      expect(docs, `${route}: the Documentation icon`).toBeTruthy();
+      expect(href(docs), route).toBe(docsHref(home));
+      expect(docs.open.index, `${route}: after the sections`).toBeGreaterThan(nav.open.index);
+    }
+  });
+
+  it("marks the section of a level page as the current page, and no other", () => {
+    for (const route of levelRoutes) {
+      const current = links(query(headerOf(route), "nav.site-header__nav")).filter((a) => a.attrs.get("aria-current") === "page");
+      expect(current.map(href), route).toEqual([route]);
+    }
+    for (const route of homes) {
+      const current = links(query(headerOf(route), "nav.site-header__nav")).filter((a) => a.attrs.has("aria-current"));
+      expect(current.map(href), route).toEqual([]);
+    }
+  });
+
+  it("names the sections in every language, Catalog and AI translated", () => {
+    expect(SECTIONS.map(([, key]) => catalog("en")[key])).toEqual(["AI", "Tokens", "Core", "Catalog"]);
+    expect(SECTIONS.map(([, key]) => catalog("es")[key])).toEqual(["IA", "Tokens", "Core", "Catálogo"]);
+    for (const [, key] of SECTIONS) expect(catalog("ar")[key], key).toBeTruthy();
+    expect(catalog("ar")["site.catalog"]).toMatch(/[\u0600-\u06FF]/);
+    expect(catalog("ar")["site.ai"]).toMatch(/[\u0600-\u06FF]/);
+  });
+
   it("ends with Documentation, GitHub, Search, Language, then the menu button, in that order", () => {
     for (const route of [...homes, ...DOCS_PAGES]) {
       const header = headerOf(route);
@@ -133,19 +185,22 @@ describe("the header's row", () => {
     }
   });
 
-  it("gives Documentation, GitHub and Search an icon and a word", () => {
+  it("gives Documentation, GitHub and Search an icon, their words kept for a reader only, and the links of the nav words alone", () => {
     for (const route of [...homes, ...DOCS_PAGES]) {
       const header = headerOf(route);
-      const docs = links(header).find((a) => href(a) === docsHref(route));
       const github = links(header).find((a) => href(a) === GITHUB);
+      const docs = query(header, "a.site-header__docs");
       const trigger = find(header, (n) => n.name === "button" && n.attrs.has("data-luz-search-open"));
       for (const [name, node] of Object.entries({ docs, github, trigger })) {
         expect(find(node, (n) => n.name === "svg"), `${route}: ${name} has an icon`).toBeTruthy();
-        expect(textOf(node), `${route}: ${name} has a word`).not.toBe("");
+        expect(textOf(node), `${route}: ${name} has a name`).not.toBe("");
       }
-      expect(visibleText(github), route).toBe("GitHub");
+      expect(spokenText(github), route).toBe("GitHub");
+      expect(github.attrs.get("title"), `${route}: its name on hover too`).toBe("GitHub");
+      for (const a of links(query(header, "nav.site-header__nav"))) expect(find(a, (n) => n.name === "svg"), `${route}: ${href(a)} is a word`).toBeFalsy();
     }
   });
+
 
   it("writes the words in the page's language: Documentation / Documentación / التوثيق, and Search / Buscar / بحث", () => {
     const expected = {
@@ -157,7 +212,9 @@ describe("the header's row", () => {
     for (const [route, words] of Object.entries(expected)) {
       const header = headerOf(route);
       const docs = links(header).find((a) => href(a) === docsHref(route));
-      expect(visibleText(docs), `${route}: the docs link`).toBe(words.docs);
+      // An icon: its word is its name for a reader, and on hover
+      expect(spokenText(docs), `${route}: the docs link`).toBe(words.docs);
+      expect(docs.attrs.get("title"), `${route}: the docs link on hover`).toBe(words.docs);
       // A link into docs the page's language does not have is marked as English
       if (route === "/ar/") expect(docs.attrs.get("hreflang"), `${route}: the English docs`).toBe("en");
       const label = query(header, "span.luz-search__trigger-label");
@@ -210,14 +267,14 @@ describe("the search dialog", () => {
 describe("the drawer the menu button opens", () => {
   const drawerOf = (route) => query(treeOf(route), "nav.luz-sidebar.page-nav");
 
-  it("on the home page lists its sections, then Documentation and GitHub, then the languages", () => {
+  it("on the home page lists its sections, then the four sections of the site, Documentation and GitHub, then the languages", () => {
     for (const route of homes) {
       const drawer = drawerOf(route);
       expect(drawer.attrs.has("popover"), route).toBe(true);
       const hrefs = links(drawer).map(href);
       const sections = hrefs.filter((h) => h.startsWith("#"));
       expect(sections.length, `${route}: the sections`).toBeGreaterThan(0);
-      expect(hrefs, route).toEqual([...sections, docsHref(route), GITHUB, ...homes]);
+      expect(hrefs, route).toEqual([...sections, ...SECTIONS.map(([path]) => `${route}${path}/`), docsHref(route), GITHUB, ...homes]);
       const docs = links(drawer).find((a) => href(a) === docsHref(route));
       expect(visibleText(docs), route).toBe(visibleText(links(headerOf(route)).find((a) => href(a) === docsHref(route))));
     }
@@ -239,8 +296,8 @@ describe("the drawer the menu button opens", () => {
     }
   });
 
-  it("on the not-found page keeps the site links, Documentation and GitHub, and no Home", () => {
-    expect(links(drawerOf("/404.html")).map(href)).toEqual(["/docs/", GITHUB]);
+  it("on the not-found page keeps the site links, the four sections, Documentation and GitHub, and no Home", () => {
+    expect(links(drawerOf("/404.html")).map(href)).toEqual([...SECTIONS.map(([path]) => `/${path}/`), "/docs/", GITHUB]);
   });
 });
 

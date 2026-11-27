@@ -37,9 +37,6 @@
  *   curated text for an AI agent, from the same scan; written at the root of
  *   the build, served as plain text in dev (root-absolute links there,
  *   absolute under the site URL in the pages build).
- * - /prompts/<kind>.txt (prompts.js): the five prompts for AI, assembled from
- *   apps/site/prompts/; written at the root of the build, served as plain
- *   text in dev; their links are always the published site's.
  * - examples/ and manifests/ (ai.js): a standalone page per docs page with a
  *   "Copy the markup" section, the CSS and JS they load from relative files
  *   beside them, and the manifests of every package. Written by the build
@@ -63,6 +60,9 @@ import {
   buildSearchIndex,
   buildSite,
   landingDocuments,
+  levelDocuments,
+  levelRoutes,
+  levelTemplate,
   parseFrontMatter,
   readInside,
   relativizeLinks,
@@ -76,12 +76,27 @@ import {
 } from "./site.js";
 import { localize } from "./docs-i18n.js";
 import { DEBUG_FILE, DEBUG_ROUTE, hasDebugPage, renderDebug } from "./debug.js";
+import { HUMANS_FILE, HUMANS_ROUTE, MANIFESTO_FILE, MANIFESTO_ROUTE, ROBOTS_FILE, ROBOTS_ROUTE } from "./manifesto.js";
 import { PACKAGES } from "../luz-packages.js";
-import { promptFiles } from "./prompts.js";
+import { MOVED, renderRedirect } from "./redirect.js";
 import { AI_ROUTES, exampleAssets, exampleDocuments, manifestAssets, renderLlmsFull, renderLlmsTxt, renderPageMarkdown } from "./ai.js";
 import { SITE_URL } from "./i18n.js";
 
 const LANDING = { route: "/", file: "apps/landing/index.html" };
+
+/**
+ * The host GitHub Pages serves the site at, for the CNAME file of the build:
+ * the site URL's host, or null for a github.io address (which needs none).
+ * @param {string} siteUrl
+ */
+export function cnameOf(siteUrl) {
+  if (!siteUrl) return null;
+  const { host } = new URL(siteUrl);
+  return host.endsWith(".github.io") ? null : host;
+}
+
+/** The pages of the levels (tokens, core, catalog) and of the skill (ai): each is the home's template with the <main> of apps/landing/levels/<name>.html. */
+const LEVELS = ["tokens", "core", "catalog", "ai"];
 
 /** Where the virtual pages of the docs languages are (never on disk): apps/docs/_virtual/<code>/<path>.html. */
 const VIRTUAL_DOCS = "apps/docs/_virtual";
@@ -150,11 +165,31 @@ export function docsSite({ repoRoot, relative: relativeUrls, outRoot, pagesBase 
    * language a virtual file next to it (apps/landing/<code>/index.html),
    * which the build and the dev server render from the template.
    */
-  const landings = () =>
-    landingDocuments(scan(), LANDING.file, "").map(({ route, locale }) => {
+  const landings = () => [
+    ...landingDocuments(scan(), LANDING.file, "").map(({ route, locale }) => {
       const file = route === LANDING.route ? LANDING.file : `apps/landing${route}index.html`;
       return { route, file, kind: "landing", locale, virtual: file !== LANDING.file };
-    });
+    }),
+    // The pages of the levels, in every language: no file of their own on disk, a landing in every other way
+    ...levelRoutes(scan(), LEVELS).map(({ route, file, locale, suffix, level }) => ({
+      route,
+      file,
+      kind: "landing",
+      locale,
+      suffix,
+      level,
+      virtual: true,
+    })),
+  ];
+
+  /** The pages that moved, in every language: each answers with a redirect to its new address (redirect.js). */
+  const moved = () =>
+    MOVED.flatMap(({ from, to }) =>
+      (scan().i18n ? scan().i18n.locales : [undefined]).map((locale) => {
+        const route = `${locale?.route ?? "/"}${from}`;
+        return { route, file: `apps/landing${route}index.html`, kind: "redirect", locale, target: `${locale?.route ?? "/"}${to}`, virtual: true };
+      }),
+    );
 
   /**
    * The pages of each docs language (/es/docs/…): one virtual document per
@@ -200,8 +235,11 @@ export function docsSite({ repoRoot, relative: relativeUrls, outRoot, pagesBase 
       ...current.pages.map((p) => ({ route: p.route, file: p.file, kind: "page" })),
       ...(current.notFound ? [{ route: NOT_FOUND_ROUTE, file: current.notFound.file, kind: "page" }] : []),
       ...docsDocuments(),
+      ...moved(),
       // /debug/: a virtual document of the real site, rendered from the scan (debug.js)
       ...(hasDebugPage(current) ? [{ route: DEBUG_ROUTE, file: DEBUG_FILE, kind: "debug", virtual: true }] : []),
+      // /manifesto/: a file on disk, served and built as it is (manifesto.js)
+      ...(existsSync(resolve(repoRoot, MANIFESTO_FILE)) ? [{ route: MANIFESTO_ROUTE, file: MANIFESTO_FILE, kind: "manifesto" }] : []),
     ];
     const markdown = markdownTable(current);
     derived = {
@@ -210,8 +248,8 @@ export function docsSite({ repoRoot, relative: relativeUrls, outRoot, pagesBase 
       byFile: new Map(list.map((d) => [d.file, d])),
       virtual: new Map(list.filter((d) => d.virtual).map((d) => [resolve(repoRoot, d.file), d])),
       markdown,
-      // The routes a link may point at: the documents, their Markdown and the prompts for AI, made relative in the pages build
-      routes: new Set([...list.map((d) => d.route), ...markdown.keys(), ...promptFiles({ root: repoRoot }).keys()]),
+      // The routes a link may point at: the documents and their Markdown, made relative in the pages build
+      routes: new Set([...list.map((d) => d.route), ...markdown.keys()]),
     };
     return derived;
   };
@@ -222,10 +260,16 @@ export function docsSite({ repoRoot, relative: relativeUrls, outRoot, pagesBase 
   const virtualOf = (id) => known().virtual.get(id);
   /** The template, read inside apps/landing (SEC-PLG-1/2). */
   const landingSource = () => readInside(landingAbs, [dirname(landingAbs)]);
+  /** The <main> of a level's page, read inside apps/landing (SEC-PLG-1/2). */
+  const levelSource = (name) => readInside(resolve(dirname(landingAbs), "levels", `${name}.html`), [dirname(landingAbs)]);
+  /** The pages of the levels as `extra` documents: the home's template with each level's <main>. */
+  const levelPages = () =>
+    levelDocuments(scan(), { file: LANDING.file, html: landingSource() }, LEVELS.map((name) => ({ name, html: levelSource(name) })));
   /** The source of a virtual document: the landing's template, or the file of the page a docs language shows (its translation, else the English page). */
   const virtualSource = (doc) => {
-    if (doc.kind === "landing") return landingSource();
+    if (doc.kind === "landing") return doc.level ? levelTemplate(landingSource(), levelSource(doc.level), doc.level, LANDING.file) : landingSource();
     if (doc.kind === "debug") return renderDebug({ site: scan() });
+    if (doc.kind === "redirect") return renderRedirect({ from: doc.route, to: doc.target, lang: doc.locale?.code ?? "en", dir: doc.locale?.dir ?? "ltr", siteUrl: relativeUrls ? siteUrl : "" });
     const language = scan().docsI18n?.byCode.get(doc.locale.code);
     const page = language && localize(scan(), language).byRoute.get(doc.route);
     if (!page) throw new Error(`${doc.file}: ${doc.route} is not a page of the docs in ${doc.locale.code}`);
@@ -253,7 +297,10 @@ export function docsSite({ repoRoot, relative: relativeUrls, outRoot, pagesBase 
     return new Map([
       [AI_ROUTES.llms, () => renderLlmsTxt(scan(), options)],
       [AI_ROUTES.llmsFull, () => renderLlmsFull(scan(), options)],
-      ...promptFiles({ root: repoRoot }),
+      // humans.txt (humanstxt.org): who makes the site, a file of apps/site served as it is
+      ...(existsSync(resolve(repoRoot, HUMANS_FILE)) ? [[HUMANS_ROUTE, () => readFileSync(resolve(repoRoot, HUMANS_FILE), "utf-8")]] : []),
+      // robots.txt: every crawler may read every page; files of apps/site served as they are
+      ...(existsSync(resolve(repoRoot, ROBOTS_FILE)) ? [[ROBOTS_ROUTE, () => readFileSync(resolve(repoRoot, ROBOTS_FILE), "utf-8")]] : []),
     ]);
   };
 
@@ -280,7 +327,7 @@ export function docsSite({ repoRoot, relative: relativeUrls, outRoot, pagesBase 
   /** Render everything and check it; returns the link problems. */
   const check = () =>
     buildSite(scan(), {
-      extra: landingDocuments(scan(), LANDING.file, landingSource()),
+      extra: [...landingDocuments(scan(), LANDING.file, landingSource()), ...levelPages()],
       // Every page of every docs language: a broken link or fragment in any language fails the build
       languages: true,
       ...urlOptions(),
@@ -329,7 +376,7 @@ export function docsSite({ repoRoot, relative: relativeUrls, outRoot, pagesBase 
       const doc = virtualOf(id);
       if (!doc) return undefined;
       if (existsSync(id)) {
-        throw new Error(`${doc.file}: ${doc.kind === "landing" ? `the landing of /${doc.locale.code}/` : doc.route} is generated; remove this file`);
+        throw new Error(`${doc.file}: ${doc.kind === "landing" ? `the landing ${doc.route}` : doc.route} is generated; remove this file`);
       }
       return virtualSource(doc);
     },
@@ -396,7 +443,7 @@ export function docsSite({ repoRoot, relative: relativeUrls, outRoot, pagesBase 
             return next();
           }
         }
-        // llms.txt, llms-full.txt and the prompts: generated, never a file (SEC-PLG-6)
+        // llms.txt and llms-full.txt: generated, never a file (SEC-PLG-6)
         const ai = aiFiles().get(path);
         if (ai) {
           try {
@@ -470,6 +517,7 @@ export function docsSite({ repoRoot, relative: relativeUrls, outRoot, pagesBase 
       const rel = inDocs ? relative(docsDir, file).split(sep).join("/") : null;
       const generated =
         file === landingAbs ||
+        file.startsWith(resolve(dirname(landingAbs), "levels") + sep) ||
         file.startsWith(resolve(repoRoot, "apps/debug") + sep) ||
         file.startsWith(sharedAbs + sep) ||
         file.startsWith(i18nAbs + sep) ||
@@ -507,7 +555,7 @@ export function docsSite({ repoRoot, relative: relativeUrls, outRoot, pagesBase 
           out = renderPage(page, scan(), { root: relativeUrls ? rootFor(doc.route) : "/", dev: command !== "build", ...urlOptions() });
         } else if (doc.kind === "landing") {
           // Errors and line numbers point at the template, for every language
-          out = renderDocument(html, LANDING.file, doc.route, scan(), { locale: doc.locale, siteUrl: relativeUrls ? siteUrl : "", unquote: false });
+          out = renderDocument(html, LANDING.file, doc.route, scan(), { locale: doc.locale, siteUrl: relativeUrls ? siteUrl : "", unquote: false, suffix: doc.suffix });
         }
         if (command === "build") {
           const root = relativeUrls ? rootFor(doc.route) : "/";
@@ -556,6 +604,9 @@ export function docsSite({ repoRoot, relative: relativeUrls, outRoot, pagesBase 
 
       // GitHub Pages: serve the files as they are, without Jekyll
       if (relativeUrls) writeFileSync(join(outRoot, ".nojekyll"), "", "utf-8");
+      // The custom domain: without CNAME in the deployed files, GitHub Pages drops it
+      const cname = relativeUrls ? cnameOf(siteUrl) : null;
+      if (cname) writeFileSync(join(outRoot, "CNAME"), `${cname}\n`, "utf-8");
     },
   };
 }

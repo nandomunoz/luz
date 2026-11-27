@@ -3,7 +3,7 @@
  *
  * - L-02  The home does not say LUZ is "built to" WCAG: it aims at it, and the statement lists what fails. The
  *         accessibility statement says LUZ has not been audited, names EN 301 549 3.2.1 and 4.1.1, and was last
- *         reviewed on 7 November 2026 (English and Spanish).
+ *         reviewed on 27 November 2026 (English and Spanish, R-02 of 2026-11-27).
  * - L-05  CONTRIBUTING.md asks for the Developer Certificate of Origin and the AI tool used, and says a work made
  *         entirely by an AI may not be protected; the pull request template has the box.
  * - L-06  The home in Spanish and Arabic says, in its own language, that an AI wrote the translation and nobody has
@@ -36,36 +36,14 @@ function sectionOf(html, id) {
 
 /* ---- L-02 · No claim of conformance ---------------------------------------- */
 
-describe("L-02: the home aims at WCAG, it does not claim it", () => {
-  it("says in English that it aims at WCAG 2.2 AA and that the statement lists what fails", () => {
-    const access = flat(catalog("en")["why.usable.access"].replace(/<[^>]+>/g, " "));
-    expect(access).not.toContain("Built to WCAG");
-    expect(access).toMatch(/aims at WCAG 2\.2 AA/);
-    expect(access).toMatch(/statement[^.]*lists[^.]*what fails/);
-  });
+describe("L-02: the home does not claim conformance to WCAG", () => {
+  // The home's sections that said "aims at WCAG 2.2 AA" went (owner, 2026-11-23); what stays is that nothing says it is built to it
+  const CLAIMS = [/Built to WCAG/i, /Pensado para WCAG/i, /مبني وفق\s*WCAG/, /Accessible by default, not by add-on/, /متاح افتراضيًا، لا بإضافات لاحقة/];
 
-  it("no longer says Built to / Pensado para WCAG, in any language", () => {
-    expect(catalog("en")["why.usable.access"]).not.toMatch(/Built to WCAG/i);
-    expect(catalog("es")["why.usable.access"]).not.toMatch(/Pensado para WCAG/i);
-    expect(catalog("ar")["why.usable.access"]).not.toMatch(/مبني وفق\s*WCAG/);
-    for (const code of CODES) expect(catalog(code)["why.usable.access"], code).toContain("WCAG 2.2 AA");
-  });
-
-  it("no longer says Accessible by default, not by add-on", () => {
-    expect(catalog("en")["why.usable.sub"]).not.toBe("Accessible by default, not by add-on.");
-    expect(catalog("es")["why.usable.sub"]).not.toMatch(/de serie/);
-    expect(catalog("ar")["why.usable.sub"]).not.toBe("متاح افتراضيًا، لا بإضافات لاحقة.");
-    expect(catalog("ar")["why.usable.sub"]).not.toMatch(/افتراضيًا/);
-  });
-
-  it("does not say a public service must meet WCAG 2.2 AA and stop there: 2.1 or 2.2, and the result is the reader's to test", () => {
-    for (const code of CODES) {
-      const line = catalog(code)["fit.good.public"];
-      expect(line, code).toContain("2.1");
-      expect(line, code).toContain("2.2");
-      expect(line, code).not.toMatch(/WCAG 2\.2 AA\.?$/);
+  it.each(CODES)("%s: no value of the home's catalog claims to be built to WCAG", (code) => {
+    for (const [key, value] of Object.entries(catalog(code))) {
+      for (const claim of CLAIMS) expect(value, `${code} ${key}`).not.toMatch(claim);
     }
-    expect(catalog("en")["fit.good.public"]).toMatch(/yours to test/);
   });
 });
 
@@ -113,10 +91,10 @@ describe("L-02: the accessibility statement says it has not been audited", () =>
     }
   });
 
-  it("was last reviewed on 7 November 2026, in the description and in the lead, in English and in Spanish", () => {
-    expect((en.match(/Last reviewed on 7 November 2026\./g) ?? []).length).toBe(2);
+  it("was last reviewed on 27 November 2026, in the description and in the lead, in English and in Spanish", () => {
+    expect((en.match(/Last reviewed on 27 November 2026\./g) ?? []).length).toBe(2);
     expect(en).not.toContain("17 October 2026");
-    expect((es.match(/Última revisión: 7 de noviembre de 2026\./g) ?? []).length).toBe(2);
+    expect((es.match(/Última revisión: 27 de noviembre de 2026\./g) ?? []).length).toBe(2);
     expect(es).not.toContain("17 de octubre de 2026");
   });
 });

@@ -1,8 +1,8 @@
 /* ==========================================================================
    LUZ website — the light by the hour (apps/site/theme-light.css)
 
-   The site shows a light by the hour when the reader chooses one with the
-   slider of the home; Auto is the system's (catalog's theme-time-boot.js and
+   The site shows a light by the hour when the reader chooses one in the
+   footer's list of moments; Auto is the system's (catalog's theme-time-boot.js and
    <luz-theme-time> write data-moment on <html>: the hour chosen, else the
    default moment of the mode). Afternoon and night are
    Vejer itself, the light and dark modes LUZ ships, so they have no block
@@ -97,16 +97,16 @@
   --luz-brand-fill-hover: #8f510a;
   --luz-brand-fill-active: #6f3f08;
 
-  /* Sidebar */
-  --luz-sidebar-bg: #2e2416;
-  --luz-sidebar-text: #ecdcbf;
-  --luz-sidebar-text-hover: #fff;
-  --luz-sidebar-hover: #3e3120;
-  --luz-sidebar-active-bg: #f2c174;
-  --luz-sidebar-active-text: #1f170c;
-  --luz-sidebar-border: #433522;
-  --luz-sidebar-label: #c2ab84;
-  --luz-sidebar-logo-bg: #f2c174;
+  /* Sidebar: the page of the moment */
+  --luz-sidebar-bg: #fbf6ea;
+  --luz-sidebar-text: #2a2218;
+  --luz-sidebar-text-hover: #2a2218;
+  --luz-sidebar-hover: #f5ecd8;
+  --luz-sidebar-active-bg: #ae630c;
+  --luz-sidebar-active-text: #fff;
+  --luz-sidebar-border: #eadab4;
+  --luz-sidebar-label: #6d6153;
+  --luz-sidebar-logo-bg: #ae630c;
 
 
   /* Inputs */
@@ -174,16 +174,16 @@
   --luz-brand-fill-hover: #8c3212;
   --luz-brand-fill-active: #6e270e;
 
-  /* Sidebar */
-  --luz-sidebar-bg: #331a10;
-  --luz-sidebar-text: #f1d5c2;
-  --luz-sidebar-text-hover: #fff;
-  --luz-sidebar-hover: #47271a;
-  --luz-sidebar-active-bg: #f4a77c;
-  --luz-sidebar-active-text: #2a120a;
-  --luz-sidebar-border: #4c2b1d;
-  --luz-sidebar-label: #cc9d82;
-  --luz-sidebar-logo-bg: #f4a77c;
+  /* Sidebar: the page of the moment */
+  --luz-sidebar-bg: #fcefe2;
+  --luz-sidebar-text: #33190e;
+  --luz-sidebar-text-hover: #33190e;
+  --luz-sidebar-hover: #f7e4d2;
+  --luz-sidebar-active-bg: #ad3f17;
+  --luz-sidebar-active-text: #fff;
+  --luz-sidebar-border: #e8c4a2;
+  --luz-sidebar-label: #7a4d38;
+  --luz-sidebar-logo-bg: #ad3f17;
 
 
   /* Inputs */
@@ -496,49 +496,55 @@
 @property --luz-sidebar-bg {
   syntax: "<color>";
   inherits: true;
-  initial-value: #2a211a;
+  initial-value: #fbf8f2;
 }
 
 @property --luz-sidebar-text {
   syntax: "<color>";
   inherits: true;
-  initial-value: #e3d5bf;
+  initial-value: #4a3c2f;
+}
+
+@property --luz-sidebar-text-hover {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #231c16;
 }
 
 @property --luz-sidebar-hover {
   syntax: "<color>";
   inherits: true;
-  initial-value: #3a2f25;
+  initial-value: #f4ede0;
 }
 
 @property --luz-sidebar-active-bg {
   syntax: "<color>";
   inherits: true;
-  initial-value: #9cc8ee;
+  initial-value: #2365a6;
 }
 
 @property --luz-sidebar-active-text {
   syntax: "<color>";
   inherits: true;
-  initial-value: #1a140f;
+  initial-value: #fff;
 }
 
 @property --luz-sidebar-border {
   syntax: "<color>";
   inherits: true;
-  initial-value: #3d3127;
+  initial-value: #e3d4b8;
 }
 
 @property --luz-sidebar-label {
   syntax: "<color>";
   inherits: true;
-  initial-value: #b9a78f;
+  initial-value: #6b5a48;
 }
 
 @property --luz-sidebar-logo-bg {
   syntax: "<color>";
   inherits: true;
-  initial-value: #9cc8ee;
+  initial-value: #2365a6;
 }
 
 @property --luz-color-success {
@@ -753,6 +759,7 @@
       --luz-brand-fill-active,
       --luz-sidebar-bg,
       --luz-sidebar-text,
+      --luz-sidebar-text-hover,
       --luz-sidebar-hover,
       --luz-sidebar-active-bg,
       --luz-sidebar-active-text,

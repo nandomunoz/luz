@@ -13,7 +13,7 @@
  *
  * tests/fixtures/modal.html has no script: the browser opens the dialogs (command / commandfor), so the same
  * file is the "without JavaScript" page. Sizes are read from the page as the browser resolves the tokens
- * (`lengthOf`), never typed. The dialogs of a prompt for AI and of the search are in tests/prompt-dialog.spec.js
+ * (`lengthOf`), never typed. The dialog of the search is in tests/search.spec.js
  * and tests/search.spec.js; the tokens the CSS declares and reads are tests/modal.test.js.
  *
  * The safe-area insets (a notch, a home bar) cannot be emulated by Playwright: they are not tested here.

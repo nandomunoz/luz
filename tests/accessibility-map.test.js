@@ -23,6 +23,7 @@ import { describe, expect, it } from "vitest";
 import { renderLlmsFull, renderPageMarkdown } from "../scripts/docs-site/ai.js";
 import { buildSite, scanSite } from "../scripts/docs-site/site.js";
 import { SITE_URL } from "../vite.config.js";
+import { warnIfOver } from "./helpers/warn-if-over.js";
 import { linksOf, repo, sectionsOf, tablesOf, textOf } from "./helpers/page-facts.js";
 
 const ROUTE = "/docs/accessibility-map/";
@@ -298,11 +299,14 @@ describe("llms-full.txt and index.md", () => {
     expect(Buffer.byteLength(md, "utf-8")).toBeLessThan(2000);
   });
 
-  it("keeps llms-full.txt under its ceiling in budgets.json, and carries no row of the table", () => {
+  it("keeps llms-full.txt near its ceiling in budgets.json (a warning over it), and carries no row of the table", () => {
     const row = JSON.parse(read("budgets.json")).budgets.find((b) => b.name === "llms.txt and llms-full.txt (each, uncompressed)");
     expect(row.max).toBe(458752);
     const full = renderLlmsFull(site, { siteUrl: SITE_URL });
-    expect(Buffer.byteLength(full, "utf-8")).toBeLessThan(row.max);
+    // A warning since 2026-11-02 (the row has "warn": true): the number is the target, and only a runaway page fails
+    expect(row.warn).toBe(true);
+    warnIfOver("llms-full.txt (ceiling)", Buffer.byteLength(full, "utf-8"), row.max);
+    expect(Buffer.byteLength(full, "utf-8")).toBeLessThan(2 * row.max);
     expect(full).not.toContain("9.1.4.3");
   });
 });

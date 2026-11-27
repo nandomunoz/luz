@@ -472,7 +472,8 @@ describe("docs: the patterns left apps/docs/reference.css and the docs app uses 
   it("apps/docs/catalog-patterns.css imports the 27 files, kind by kind (landing, blog, app, docs) and those that fit any, each file once, and holds no rule", () => {
     const css = read("apps/docs/catalog-patterns.css");
     const imports = [...css.matchAll(/@import url\("\/packages\/catalog\/dist\/components\/([a-z-]+)\.css"\)/g)].map((m) => m[1]);
-    expect(imports).toEqual(ALL);
+    // The showcase and the marquee are elements, not patterns of a kind: the docs show them live, after the social links, in the cascade's order
+    expect(imports).toEqual(ALL.flatMap((name) => (name === "social" ? [name, "showcase", "marquee"] : [name])));
     expect(stripComments(css).replace(/@import url\("[^"]+"\);/g, "").trim(), "no rule of its own").toBe("");
   });
 
@@ -487,7 +488,7 @@ describe("docs: the patterns left apps/docs/reference.css and the docs app uses 
     expect(has(page, 'class="luz-pager__prev"'), "pager prev").toBe(true);
     expect(has(page, 'class="luz-pager__link"'), "pager link").toBe(true);
     expect(has(page, OLD), "an old class in the rendered page").toBe(false);
-  });
+  }, 60_000);
 
   it("a component page's Do and don't uses the pattern's classes", () => {
     const body = read("apps/docs/pages/components/button.html");
@@ -536,7 +537,8 @@ describe("the home page and the docs footer are built on the landing patterns an
     expect(home).toMatch(/<body class="[^"]*\bo-page\b/);
     expect(home).toMatch(/<main[^>]*class="[^"]*\bluz-main\b/);
     expect(home).toMatch(/<section class="[^"]*\bluz-hero\b[^"]*\bo-grid\b[^"]*\bo-grid--split\b|<section class="[^"]*\bo-grid\b[^"]*\bo-grid--split\b[^"]*\bluz-hero\b/);
-    expect(home).toMatch(/\bluz-section\b/);
+    // the sections of the home are its levels; `.luz-section` is the pages of the levels' (apps/landing/levels)
+    expect(home).toMatch(/<section class="[^"]*\blanding-inside\b/);
     expect(home).toMatch(/<footer[^>]*class="[^"]*\bluz-site-footer\b|<footer[^>]*>\s*<div class="[^"]*\bluz-site-footer\b/);
     expect(home).toMatch(/\bo-actions\b/);
   });

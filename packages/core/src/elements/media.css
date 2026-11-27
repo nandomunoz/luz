@@ -5,18 +5,18 @@
    ========================================================================== */
 
 /* Never wider than the box they sit in */
-:where(img, picture, video, canvas, svg, iframe, embed, object) {
+:where(:is(img, picture, video, canvas, svg, iframe, embed, object)) {
   max-width: 100%;
 }
 
 /* Keep the aspect ratio when only the width shrinks. Not svg: an icon with
    just a height attribute would otherwise jump to the 150px default. */
-:where(img, video, canvas) {
+:where(:is(img, video, canvas)) {
   height: auto;
 }
 
 /* Remove the gap the baseline leaves under an inline replaced element */
-:where(img, video, canvas, audio, iframe, embed, object) {
+:where(:is(img, video, canvas, audio, iframe, embed, object)) {
   vertical-align: middle;
 }
 

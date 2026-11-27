@@ -1,0 +1,14 @@
+{
+  "name": "@luz-ds/ai-eval",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Development tooling: a laboratory to run and debug the skills of @luz-ds/ai. Never published.",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "ai-eval": "./src/cli.js"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

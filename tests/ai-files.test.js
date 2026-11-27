@@ -26,8 +26,7 @@
  *   llms.txt (spec 1.2). `# LUZ`, a `> ` summary, one details paragraph, then
  *   one `##` per area of site.json that has pages, in its order, in the
  *   reading order of Previous / Next (the area index first), then `##
- *   Documentation` (the hub's home), then `## Prompts` (the five prompts for AI,
- *   `/prompts/<kind>.txt`, tests/prompts.test.js) and, last, `## Optional`. Each item is
+ *   Documentation` (the hub's home) and, last, `## Optional`. Each item is
  *   `- [<title>](<url>): <description>`, the page's front matter verbatim. The
  *   pages are exactly those of indexData() (the A-Z page has `search: false`
  *   and is out, whatever the spec's sample shows; the spec contradicts
@@ -125,10 +124,8 @@ const bytes = (text) => Buffer.byteLength(text, "utf-8");
 
 const ITEM = /^- \[(.*)\]\(([^)\s]+)\): (.*)$/;
 
-/** The files the build writes for the prompts for AI, which llms.txt lists under `## Prompts`. */
-const PROMPT_ROUTES = ["start", "landing", "blog", "app", "docs"].map((id) => `/prompts/${id}.txt`);
-/** The sections of llms.txt that list pages of the docs: not the prompts, not the optional files. */
-const pageSections = (sections) => sections.filter((s) => s.title !== "Prompts" && s.title !== "Optional");
+/** The sections of llms.txt that list pages of the docs: not the optional files. */
+const pageSections = (sections) => sections.filter((s) => s.title !== "Optional");
 
 /** llms.txt as { h1, quote (first line), quoteText, intro: [lines], sections: [{ title, lines, items }] }. */
 function parseTxt(text) {
@@ -213,9 +210,10 @@ function expectedSections() {
 
 // Patterns a published file must never carry (RL-19, OWNER.md section 5). The one
 // `.claude/` path a page may write is where a project copies the published
-// accessibility reviewer to (`npx @luz-ds/check agent > .claude/agents/luz-accessibility-reviewer.md`,
-// the page "Working with AI"): it is the consumer's folder, not this repository's.
-const PRIVATE = [/\.claude\/(?!agents\/luz-accessibility-reviewer\.md)/, /OWNER\.md/, /MEMORY\.md/, /\/home\/ares/, /ghp_[A-Za-z0-9]{20}/, /npm_[A-Za-z0-9]{30}/, /-----BEGIN/, /sincero/, /settings\.local/];
+// accessibility reviewer to (`npx @luz-ds/check agent > .claude/agents/luz-agent-accessibility.md`,
+// the page "Working with AI"), and where it copies a small skill to (`.claude/skills/luz-readme`, the page of the agents
+// and skills): the consumer's folder, not this repository's, and a skill of this repository's own is never named luz-<word>.
+const PRIVATE = [/\.claude\/(?!agents\/luz-agent-accessibility\.md|skills\/luz-)/, /OWNER\.md/, /MEMORY\.md/, /\/home\/ares/, /ghp_[A-Za-z0-9]{20}/, /npm_[A-Za-z0-9]{30}/, /-----BEGIN/, /sincero/, /settings\.local/];
 
 /* ---- fixtures: a small docs folder ------------------------------------------ */
 
@@ -459,7 +457,7 @@ describe("llms.txt: the index of the site for an agent", () => {
   it("lists the areas in site.json order, each page in the reading order, then Documentation and Optional last", () => {
     const expected = expectedSections();
     const titles = parsed.sections.map((s) => s.title);
-    expect(titles).toEqual([...expected.map((s) => s.title), "Prompts", "Optional"]);
+    expect(titles).toEqual([...expected.map((s) => s.title), "Optional"]);
     for (const [i, section] of expected.entries()) {
       expect(parsed.sections[i].items.map((item) => item.url), section.title).toEqual(section.pages.map((p) => urlOf(p.route)));
     }
@@ -490,7 +488,7 @@ describe("llms.txt: the index of the site for an agent", () => {
 
   it("has absolute URLs under the Pages base, each a route of the generator or a file the build emits", () => {
     const routes = new Set(site.pages.map((p) => p.route));
-    const emitted = [member("AI_ROUTES").llmsFull, member("AI_ROUTES").llms, ...PROMPT_ROUTES];
+    const emitted = [member("AI_ROUTES").llmsFull, member("AI_ROUTES").llms];
     for (const section of parsed.sections) {
       for (const item of section.items) {
         expect(item.url.startsWith(SITE_URL), item.url).toBe(true);
@@ -507,7 +505,7 @@ describe("llms.txt: the index of the site for an agent", () => {
     for (const section of pageSections(dev.sections)) {
       for (const item of section.items) expect(routes.has(item.url), item.url).toBe(true);
     }
-    expect(dev.sections.find((s) => s.title === "Prompts").items.map((i) => i.url)).toEqual(PROMPT_ROUTES);
+    expect(dev.sections.find((s) => s.title === "Prompts")).toBeUndefined();
     expect(dev.sections.at(-1).items.map((i) => i.url)).toContain("/llms-full.txt");
   });
 
@@ -708,7 +706,7 @@ describe("llms-full.txt: the curated text of the pages, from the real site", () 
   it("makes every internal link absolute under the site URL, and none root-absolute", () => {
     const prose = proseOf(full());
     expect(prose).not.toMatch(/\]\(\/docs\//);
-    expect(prose).toMatch(/\]\(https:\/\/nandovejer\.github\.io\/luz\/docs\//);
+    expect(prose).toMatch(/\]\(https:\/\/luzds\.com\/docs\//);
     expect(proseOf(full(""))).toMatch(/\]\(\/docs\//);
   });
 
@@ -722,10 +720,12 @@ describe("llms-full.txt: the curated text of the pages, from the real site", () 
   });
 });
 
-/* ---- the area Kinds of site: a summary, never the whole page ---------------------- */
+/* ---- the area AI: the recipes of a kind of site are a summary, never the whole page ---------------------- */
 
-describe("llms-full.txt and index.md: a page of Kinds of site is a summary, the hub a pointer", () => {
+describe("llms-full.txt and index.md: a page of a kind of site (area AI) is a summary", () => {
   const KINDS = ["landing", "blog", "app", "docs"];
+  /** The routes of the area, in its order: the index (Working with AI), the commands, the agents, then the four kinds. */
+  const AREA = () => site.pages.filter((p) => p.meta.area === "ai").sort((a, b) => Number(a.meta.order) - Number(b.meta.order)).map((p) => p.route);
   const entry = (route) => entriesOf(full()).find((e) => e.url === urlOf(route));
   /** The recipes of a kind page: the text of its h2 outside the demos, as the page says them. */
   const recipesOf = (route) => {
@@ -737,13 +737,13 @@ describe("llms-full.txt and index.md: a page of Kinds of site is a summary, the 
   /** The lines of an entry after its URL line and its description: the part the page adds. */
   const afterDescription = (text, route) => text.split(site.byRoute.get(route).meta.description)[1] ?? "";
 
-  it("has an entry for each kind page, in the order of the area, with its description and its URL", () => {
+  it("has an entry for each page of the area, in its order, with its description and its URL", () => {
     const urls = entriesOf(full())
       .map((e) => e.url)
-      .filter((url) => url?.startsWith(urlOf("/docs/kinds/")));
-    expect(urls).toEqual(["/docs/kinds/", ...KINDS.map((id) => `/docs/kinds/${id}/`)].map((route) => urlOf(route)));
-    for (const id of KINDS) {
-      const route = `/docs/kinds/${id}/`;
+      .filter((url) => url?.startsWith(urlOf("/docs/ai/")));
+    expect(urls).toEqual(AREA().map((route) => urlOf(route)));
+    expect(AREA().slice(-4)).toEqual(KINDS.map((id) => `/docs/ai/${id}/`));
+    for (const route of AREA()) {
       const page = site.byRoute.get(route);
       const e = entry(route);
       expect(e.title, route).toBe(page.meta.title);
@@ -753,7 +753,7 @@ describe("llms-full.txt and index.md: a page of Kinds of site is a summary, the 
 
   it("lists the recipes of a kind page by their h2, one line each and in order, and nothing of their markup or demos", () => {
     for (const id of KINDS) {
-      const route = `/docs/kinds/${id}/`;
+      const route = `/docs/ai/${id}/`;
       const recipes = recipesOf(route);
       expect(recipes.length, route).toBeGreaterThanOrEqual(1);
       const e = entry(route);
@@ -775,21 +775,18 @@ describe("llms-full.txt and index.md: a page of Kinds of site is a summary, the 
     }
   });
 
-  it("gives the hub of the area a description and a pointer, with no list of recipes and no markup", () => {
-    const route = "/docs/kinds/";
+  it("gives the index of the area, Working with AI, its title and description, and no markup of a page", () => {
+    const route = "/docs/ai/";
     const e = entry(route);
-    expect(e, "an entry for the hub of the area").toBeTruthy();
+    expect(e, "an entry for the index of the area").toBeTruthy();
     expect(e.title).toBe(site.byRoute.get(route).meta.title);
     expect(e.text).toContain(site.byRoute.get(route).meta.description);
-    expect(e.text).not.toMatch(/^```/m);
-    expect(e.text.split("\n").filter((l) => l.startsWith("- "))).toEqual([]);
-    expect(afterDescription(e.text, route).trim().length, "a pointer line").toBeGreaterThan(20);
-    expect(Buffer.byteLength(e.text, "utf8")).toBeLessThan(1000);
+    expect(proseOf(e.text)).not.toMatch(TAG);
   });
 
   it("writes the same text to the index.md of each page of the area", () => {
     const renderPageMarkdown = member("renderPageMarkdown");
-    for (const route of ["/docs/kinds/", ...KINDS.map((id) => `/docs/kinds/${id}/`)]) {
+    for (const route of AREA().filter((r) => r === "/docs/ai/commands/" || r === "/docs/ai/" || KINDS.some((id) => r === `/docs/ai/${id}/`))) {
       const page = site.byRoute.get(route);
       const md = renderPageMarkdown(site, page, { siteUrl: SITE_URL });
       const e = entry(route);
@@ -797,7 +794,8 @@ describe("llms-full.txt and index.md: a page of Kinds of site is a summary, the 
       expect(md.startsWith(`# ${page.meta.title}\n\n${page.meta.description}\n`), route).toBe(true);
       // what the entry says after its description is what index.md says after its own
       expect(md.trim().endsWith(afterDescription(e.text, route).trim()), route).toBe(true);
-      expect(md, route).not.toMatch(/^```/m);
+      // the index of the area is the page itself (its prompt and its commands are code); the others are summaries
+      if (route !== "/docs/ai/") expect(md, route).not.toMatch(/^```/m);
     }
   });
 
@@ -806,13 +804,13 @@ describe("llms-full.txt and index.md: a page of Kinds of site is a summary, the 
     expect(LLMS_FULL_IDEAL).toBe(416 * 1024);
   });
 
-  it("lists the area in llms.txt: the hub and the four kinds, in order, and the five prompts after", () => {
+  it("lists the area in llms.txt: its pages in order, and no prompts", () => {
     const parsed = parseTxt(txt());
-    const area = parsed.sections.find((s) => s.title === site.areas.find((a) => a.id === "kinds").label);
+    const area = parsed.sections.find((s) => s.title === site.areas.find((a) => a.id === "ai").label);
     expect(area, "a section for the area in llms.txt").toBeTruthy();
-    const pages = ["/docs/kinds/", ...KINDS.map((id) => `/docs/kinds/${id}/`)].map((route) => urlOf(route));
-    expect(area.items.map((i) => i.url).slice(0, 5)).toEqual(pages);
-    expect(parsed.sections.find((s) => s.title === "Prompts").items.map((i) => i.url)).toEqual(PROMPT_ROUTES.map((r) => urlOf(r)));
+    const pages = AREA().map((route) => urlOf(route));
+    expect(area.items.map((i) => i.url).slice(0, pages.length)).toEqual(pages);
+    expect(parsed.sections.find((s) => s.title === "Prompts")).toBeUndefined();
   });
 });
 
@@ -869,7 +867,7 @@ describe("llms-full.txt: what a page contributes, on a fixture", () => {
   it("lists the fixture's areas in order, the hub under Documentation, and each description in llms.txt", () => {
     const { scan } = fixtureSite(fixtureFiles());
     const parsed = parseTxt(renderLlmsTxt(scan(), options));
-    expect(parsed.sections.map((s) => s.title)).toEqual(["Components", "Tokens", "Documentation", "Prompts", "Optional"]);
+    expect(parsed.sections.map((s) => s.title)).toEqual(["Components", "Tokens", "Documentation", "Optional"]);
     expect(parsed.sections[0].items.map((i) => i.title)).toEqual(["Components", "Widget"]);
     expect(parsed.sections[2].items.map((i) => i.url)).toEqual([`${FIXTURE_URL}docs/`]);
   });
@@ -936,7 +934,7 @@ describe("llms-full.txt: what a page contributes, on a fixture", () => {
 /* ---- the plugin: emitted by the build, served by the dev server -------------- */
 
 describe("the Vite plugin emits and serves the two files", () => {
-  const plugin = (relative) => docsSite({ repoRoot: root, relative, outRoot: join(tmpdir(), "luz-ai-files-out"), pagesBase: "/luz/", siteUrl: SITE_URL });
+  const plugin = (relative) => docsSite({ repoRoot: root, relative, outRoot: join(tmpdir(), "luz-ai-files-out"), pagesBase: new URL(SITE_URL).pathname, siteUrl: SITE_URL });
 
   it("emits llms.txt and llms-full.txt at the root of the pages build, with the absolute site URL", () => {
     const emitted = [];
@@ -1633,7 +1631,7 @@ describe("llms.txt and llms-full.txt name the examples and the manifests", () =>
 
 describe("the Vite plugin emits and serves the examples and the manifests", () => {
   const plugin = (relative) =>
-    docsSite({ repoRoot: root, relative, outRoot: join(tmpdir(), "luz-ai-files-out"), pagesBase: "/luz/", siteUrl: SITE_URL, csp: PAGES_CSP });
+    docsSite({ repoRoot: root, relative, outRoot: join(tmpdir(), "luz-ai-files-out"), pagesBase: new URL(SITE_URL).pathname, siteUrl: SITE_URL, csp: PAGES_CSP });
   const bytesOf = (relative) => readFileSync(join(root, relative));
   const same = (source, expected) => Buffer.from(source).equals(Buffer.isBuffer(expected) ? expected : Buffer.from(expected));
 
@@ -1658,14 +1656,18 @@ describe("the Vite plugin emits and serves the examples and the manifests", () =
   }, 60_000);
 
   describe("in the dev server", () => {
+    // configureServer checks the links and renders every file once: configured once for the describe, not on every request (six requests of the path test took over a minute)
+    let middlewares;
     const serve = async (url) => {
-      const middlewares = [];
-      plugin(false).configureServer({
-        watcher: { on() {} },
-        ws: { send() {} },
-        middlewares: { use: (fn) => middlewares.push(fn) },
-        transformIndexHtml: async (_file, html) => html,
-      });
+      if (!middlewares) {
+        middlewares = [];
+        plugin(false).configureServer({
+          watcher: { on() {} },
+          ws: { send() {} },
+          middlewares: { use: (fn) => middlewares.push(fn) },
+          transformIndexHtml: async (_file, html) => html,
+        });
+      }
       return new Promise((resolve) => {
         const headers = {};
         const res = { statusCode: 200, setHeader: (k, v) => (headers[k.toLowerCase()] = v), end: (body) => resolve({ headers, body, statusCode: res.statusCode }) };

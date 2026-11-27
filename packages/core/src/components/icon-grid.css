@@ -33,7 +33,6 @@
   height: 48px;
   border-radius: var(--luz-radius-md);
   color: var(--luz-text-secondary);
-  background: transparent;
 }
 
 .luz-icon-name {
