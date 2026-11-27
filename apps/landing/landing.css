@@ -394,6 +394,51 @@
   }
 }
 
+/* A short phone (320 x 568, 640 high in Spanish and Arabic, whose title wraps in more lines): the two stacked buttons end
+   below y 500 and the floating colour-mode button (the footer's, fixed at the end corner, from the script) covers the end of
+   one of them. The hero cannot clear it without a smaller title, so the button waits for the first scroll: hidden, and out of
+   the tab order, at the top where the buttons are; drawn once the page has gone by them, in the first 16rem of scroll. The
+   colour mode is still in the footer's radios, and where the browser has no scroll timelines the button is drawn as before */
+@keyframes landing-mode-button-in {
+  0%,
+  60% {
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  100% {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+/* And below 38rem (608 px) the hero is taller than the window in Spanish (622 px of content at 320 px wide) and in Arabic, so
+   its spacing gives way (24 + 16 + 24 px instead of 48 + 24 + 32): the second button's middle line is in the window at the top,
+   where it is 29 px under the fold without it (the buttons stay in the window to be pressed, as the hero's spec tests) */
+@media (max-width: 768px) and (max-height: 38rem) {
+  .landing-tunnel {
+    padding-block-start: var(--luz-space-lg);
+  }
+
+  .landing-tunnel .landing-hero__brand {
+    margin-block-end: var(--luz-space-md);
+  }
+
+  .landing-tunnel .o-actions {
+    margin-block-start: var(--luz-space-lg);
+  }
+}
+
+@media (max-width: 768px) and (max-height: 44rem) {
+  @supports (animation-timeline: scroll()) {
+    :root:has(.landing-tunnel) .luz-theme-mode__button--fixed {
+      animation: landing-mode-button-in linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 16rem;
+    }
+  }
+}
+
 /* The brand on a line of its own, centred above the sentence and the largest
    thing on the page (its size: the hero's clamp above), lit with a soft halo
    of the brand colour, as light spilling past the letters */
