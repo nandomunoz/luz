@@ -143,13 +143,14 @@ describe("apps/landing/index.html: the template of the home", () => {
       expect(at(`/packages/catalog/dist/${file}"`), `${file} is linked`).toBeGreaterThan(-1);
       expect(at(`/packages/catalog/dist/${file}"`), `${file} comes before the home's own`).toBeLessThan(at("/apps/landing/landing.css"));
     }
-    expect(at("/apps/landing/light/light.css")).toBeGreaterThan(-1);
+    // The globe and its light left the home on 2026-11-26: nothing of apps/landing/light/ is linked
+    expect(html).not.toContain("/apps/landing/light/");
   });
 
-  it("writes the sections of the home in order: the hero and the light first, then the four levels and the FAQ", () => {
+  it("writes the sections of the home in order: the hero first, then the four levels and the FAQ", () => {
     const main = html.slice(html.indexOf("<main"), html.indexOf("</main>"));
     const ids = [...main.matchAll(/<section\b[^>]*\sid="([^"]+)"/g)].map((m) => m[1]);
-    expect(ids).toEqual(["hero", "light", "tokens", "core", "catalog", "ai", "faq"]);
+    expect(ids).toEqual(["hero", "tokens", "core", "catalog", "ai", "faq"]);
     expect(main.match(/<h1\b/g)).toHaveLength(1);
     expect(html, "no link to a section that went").not.toMatch(/href="#(?:fit|type|start|why|native|modes)"/);
   });
@@ -159,18 +160,31 @@ describe("apps/landing/index.html: the template of the home", () => {
     expect(html).not.toMatch(/landing-(?:why|fit|modes)\b|\{\{(?:weights|checks|packages)\}\}|\{\{t:(?:why|native|modes|fit)\./);
   });
 
-  it("the first screen holds the hero and the light, and the hero's first action goes to the levels", () => {
+  it("the first screen holds the hero alone, the tunnel of thirteen frames behind its copy, and its first action goes to the prompts", () => {
     const first = html.slice(html.indexOf('class="landing-first"'), html.indexOf("</main>"));
     expect(first.indexOf('class="landing-first"')).toBe(0);
     const heroAt = first.search(/<section\b[^>]*\sid="hero"/);
-    const lightAt = first.search(/<section\b[^>]*\sid="light"/);
     const insideAt = first.search(/<section\b[^>]*\sid="tokens"/);
     expect(heroAt).toBeGreaterThan(-1);
-    expect(lightAt).toBeGreaterThan(heroAt);
-    const closes = first.indexOf("</div>", first.indexOf("</section>", lightAt));
-    expect(closes, "the wrapper closes after the light and before the levels").toBeGreaterThan(lightAt);
-    expect(closes).toBeLessThan(insideAt);
-    expect(first.slice(heroAt, lightAt)).toContain('href="#tokens"');
+    const heroEnd = first.indexOf("</section>", heroAt);
+    const closes = first.indexOf("</div>", heroEnd);
+    expect(closes, "the wrapper closes after the hero and before the levels").toBeLessThan(insideAt);
+    expect(first.slice(heroEnd + 10, closes).trim(), "nothing else in the first screen").toBe("");
+    const hero = first.slice(heroAt, heroEnd);
+    expect(hero).toMatch(/<section\b[^>]*class="[^"]*\blanding-tunnel\b/);
+    // The drawing comes first, hidden from assistive technology; the copy after it
+    const back = hero.match(/<div class="landing-tunnel__back" aria-hidden="true">([\s\S]*?)<div class="luz-hero__copy">/)?.[1];
+    expect(back, "the tunnel, before the copy").toBeTruthy();
+    expect(back.match(/<div class="landing-tunnel__frame">/g)).toHaveLength(13);
+    expect(back.match(/<use href="#tunnel-frame"\/>/g)).toHaveLength(13);
+    // No inline style: the place of each frame is the stylesheet's (:nth-child)
+    expect(back).not.toMatch(/\sstyle=/);
+    expect(html).toMatch(/<symbol id="tunnel-frame" viewBox="0 0 100 87"><polygon points="50,1 1,86 99,86" vector-effect="non-scaling-stroke"/);
+    // Two actions: the AI one first, then the docs
+    const actions = [...hero.matchAll(/<a class="([^"]*)" href="([^"]*)"/g)].map((m) => [m[1].includes("luz-btn--primary") ? "primary" : "outline", m[2]]);
+    expect(actions).toEqual([["primary", "#ai"], ["outline", "/docs/"]]);
+    expect(html).not.toContain("hero.start}}");
+    expect(html, "no globe, no light").not.toMatch(/home-light|landing-light|id="light"/);
   });
 
   it("the type section went with its quote and its scale: nothing is left of it", () => {

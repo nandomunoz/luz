@@ -98,8 +98,8 @@
 }
 
 /* The word LUZ beside a prism (the header's, the home's footer), drawn as
-   the home's hero draws it (the brand's word, landing.css .landing-imago):
-   ET Book, the capitals trimmed to their own height, squeezed to .86 and
+   the home's hero once drew it with letters (its word is an SVG outlined
+   from the same face now, apps/site/_partials/luz-wordmark.html): ET Book, the capitals trimmed to their own height, squeezed to .86 and
    stretched to 1.04, each letter its own width. Its capitals (0.679em) stand
    as tall as the prism's triangle (0.87 of --site-mark, the prism's height
    where it sits), so it follows the mark's size. It takes the colour of the

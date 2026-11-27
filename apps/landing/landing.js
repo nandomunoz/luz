@@ -18,18 +18,11 @@ import { activateTab, initTabs } from "/packages/core/dist/tabs.js";
 // Defines <luz-search> at once, not on idle as catalog.js would: the header's
 // search button wires itself when it connects
 import "/packages/catalog/dist/search.js";
-// The slider of the day (<luz-theme-time variant="bar">) is built by <home-light> after the
-// page is scanned, so its chunk is imported here
-import { initThemeTimeBar } from "/packages/catalog/dist/theme-time-bar.js";
 import { initSiteHeader } from "/apps/site/header.js";
 // The terminal of the fourth level: its lines appear one by one, once
 import { initCli } from "/apps/landing/cli.js";
-// <home-light>, the visitor's sky under the hero: defines the element, which
-// loads its one visual
-import "/apps/landing/light/light.js";
-
-// <home-light> has built its bar by now: give it its slider
-initThemeTimeBar();
+// The hero's tunnel: paused off screen, tilted by a desktop pointer (it flies by CSS alone)
+import { initTunnel } from "/apps/landing/tunnel.js";
 
 /* ---- Copy buttons ----------------------------------------------------- */
 
@@ -272,6 +265,7 @@ initDayBand();
 
 // Color mode, menu drawer and header height (shared with the docs)
 initSiteHeader();
+initTunnel(document.querySelector(".landing-tunnel"));
 initCopy();
 initCopyCommands();
 initMarquee();

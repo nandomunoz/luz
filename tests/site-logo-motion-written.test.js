@@ -74,11 +74,13 @@ describe("the motion of the logo is a written deviation", () => {
     expect(second).toMatch(/2026-10-31/);
   });
 
-  it("PRINCIPLES.md names the globe and the stars of the home page and the 404 page as known failures of 2.2.2 with no decision of the owner yet, and points to the statement", () => {
+  it("PRINCIPLES.md names the tunnel of the home's hero, the stars of the home page and the 404 page as known failures of 2.2.2 with no decision of the owner yet, and points to the statement", () => {
     const line = text("PRINCIPLES.md").split("\n").find((l) => /no infinite loops/i.test(l));
     expect(line, "the 'no infinite loops' line").toBeTruthy();
     const rest = line.slice(line.search(/2026-10-31/));
-    expect(rest).toMatch(/globe/i);
+    // The globe left the home on 2026-11-26; the tunnel of the hero took its place
+    expect(rest).not.toMatch(/globe/i);
+    expect(rest).toMatch(/tunnel/i);
     expect(rest).toMatch(/stars/i);
     expect(rest).toMatch(/\b404\b/);
     expect(rest).toMatch(/\b2\.2\.2\b/);

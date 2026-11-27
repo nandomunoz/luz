@@ -612,28 +612,29 @@ describe("node scripts/check-license.js", () => {
 /* ---- The data a DATA entry names carries its origin note ------------------------------ */
 
 describe("the files of the DATA entries", () => {
-  // The land is the countries of the home's globe (Natural Earth 1:110m admin-0), in globe-data.js; globe.js is code only
-  const GLOBE = "apps/landing/light/globe-data.js";
-  const WITHOUT = "// the globe\nexport const LAND = [[0, 0, 1, 1]];\n";
-  const WITH = "// Land: Natural Earth 1:110m admin-0 countries, public domain (naturalearthdata.com terms of use)\nexport const LAND = [[0, 0, 1, 1]];\n";
+  // The player's page credits the NASA media of its examples (owner decision L-01); the land of the home's globe,
+  // the first DATA entry, left the site with the globe (2026-11-26)
+  const PAGE = "apps/docs/pages/components/player.html";
+  const WITHOUT = "<p>The player.</p>\n";
+  const WITH = "<p>Earth Views from the ISS and the Apollo 11 launch countdown: NASA, public domain in the United States.</p>\n";
 
   it("fails a file a DATA entry names when it lacks its origin note, and names the file", () => {
     const root = fixture();
-    put(root, GLOBE, WITHOUT);
+    put(root, PAGE, WITHOUT);
     const failing = cli(root, "--update");
     expect(failing.code, failing.out).toBe(1);
-    expect(failing.out).toContain(GLOBE);
-    expect(failing.out).toMatch(/Natural Earth/);
+    expect(failing.out).toContain(PAGE);
+    expect(failing.out).toMatch(/Earth Views from the ISS/);
   });
 
   it("passes the same file once the note (the origin and the licence) is there", () => {
     const root = fixture();
-    put(root, GLOBE, WITH);
+    put(root, PAGE, WITH);
     const ok = cli(root, "--update");
     expect(ok.code, ok.out).toBe(0);
   });
 
-  it("is quiet when the file is not there at all (a repository without the home's light)", () => {
+  it("is quiet when the file is not there at all", () => {
     const root = fixture();
     const ok = cli(root, "--update");
     expect(ok.code, ok.out).toBe(0);
@@ -641,29 +642,16 @@ describe("the files of the DATA entries", () => {
 
   it("fails a note that names the origin but not the licence", () => {
     const root = fixture();
-    put(root, GLOBE, "// Land: Natural Earth 1:110m\nexport const LAND = [];\n");
+    put(root, PAGE, "<p>Earth Views from the ISS and the Apollo 11 launch countdown.</p>\n");
     const failing = cli(root, "--update");
     expect(failing.code, failing.out).toBe(1);
-    expect(failing.out).toContain(GLOBE);
+    expect(failing.out).toContain(PAGE);
   });
 
-  it("no longer asks globe.js for a note: it is code, the data is in globe-data.js", () => {
-    const root = fixture();
-    put(root, "apps/landing/light/globe.js", WITHOUT);
-    const ok = cli(root, "--update");
-    expect(ok.code, ok.out).toBe(0);
-  });
-
-  it("names the 1:110m countries in globe-data.js in dev/LICENSES.md of this repository", () => {
-    const line = readFileSync(join(repo, "dev/LICENSES.md"), "utf-8")
-      .split("\n")
-      .find((l) => /Natural Earth/.test(l));
-    expect(line, "a Natural Earth line").toBeDefined();
-    expect(line).toContain("Natural Earth 1:110m");
-    expect(line).toMatch(/countries/i);
-    expect(line).toContain("apps/landing/light/globe-data.js");
-    expect(line).not.toMatch(/1:50m|land polygons|globe\.js(?!-)/);
-    expect(line).toMatch(/public domain/);
+  it("no longer lists Natural Earth: the home's globe, and its land, left the site", () => {
+    const text = readFileSync(join(repo, "dev/LICENSES.md"), "utf-8");
+    expect(text).not.toMatch(/Natural Earth/);
+    expect(text).not.toContain("apps/landing/light/");
   });
 });
 

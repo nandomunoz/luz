@@ -1,13 +1,13 @@
 /**
  * LUZ Design System — Landing page checks
  * The home (apps/landing, served at /, /es/ and /ar/), section by section, in
- * the order of the page: the hero and the light (the first screen), the four
+ * the order of the page: the hero (the first screen, over the tunnel), the four
  * levels of "What's inside", the FAQ, and the footer (a brand and two columns).
  *
  * It is a level-3 consumer on top of catalog's landing files, with the base color
  * modes and the six lights of the hour. What other files own is not repeated
  * here: the header, the drawer and the language switch in tests/site-header.spec.js
- * and tests/landing-i18n.spec.js; <home-light> in tests/home-light.spec.js;
+ * and tests/landing-i18n.spec.js; the tunnel of the hero in tests/landing-tunnel.spec.js;
  * the numbers in the copy in tests/landing-numbers.test.js. The documentation,
  * with every component and its guidance, is in tests/docs.spec.js.
  * Run with: pnpm test:ui
@@ -27,7 +27,7 @@ test.use({ timezoneId: TIMEZONE, storageState: NO_CHOICE });
 
 const MODES = ['light', 'dark', 'high-contrast'];
 /** The ids of the sections of the home, in the order of the page: the four levels are four sections. */
-const SECTIONS = ['hero', 'light', 'tokens', 'core', 'catalog', 'ai', 'faq'];
+const SECTIONS = ['hero', 'tokens', 'core', 'catalog', 'ai', 'faq'];
 /** The sections of the drawer's "On this page", in the order of the page. */
 const DRAWER = ['tokens', 'faq'];
 const ROUTES = [
@@ -445,7 +445,7 @@ test.describe('Landing page', () => {
       expect(Math.abs((actions.left + actions.right) / 2 - centre), 'the buttons sit about the centre').toBeLessThanOrEqual(4);
     });
 
-    test('says what LUZ is (English): the title with the brand and two stressed words, the lead, two actions', async ({ page }) => {
+    test('says what LUZ is (English): the word LUZ above the title with two stressed words, the lead, two actions', async ({ page }) => {
       await page.setViewportSize({ width: 1280, height: 900 });
       await open(page);
 
@@ -457,37 +457,25 @@ test.describe('Landing page', () => {
       // Both ends are stressed: the human and the AI
       await expect(hero.locator('h1 em')).toHaveText(['humans', 'AI']);
       await expect(hero.locator('.luz-hero__lead')).toHaveText(
-        'Tokens, CSS and a little vanilla JavaScript, built on what the browser already does. Start with LUZ, the Light, Usable and Zero-dependency design system.',
+        'Tokens, CSS and a little vanilla JavaScript, built on what the browser already does. Light, Usable and Zero-dependency: start a project, or migrate it page by page.',
       );
-      await expect(hero.locator('.luz-hero__lead strong')).toHaveText(['LUZ', 'Light', 'Usable', 'Zero-dependency']);
+      await expect(hero.locator('.luz-hero__lead strong')).toHaveText(['Light', 'Usable', 'Zero-dependency']);
       // No eyebrow over the title, no second line under the lead, and the lead carries no link
       await expect(hero.locator('.luz-hero__eyebrow')).toHaveCount(0);
       await expect(hero.locator('.landing-built')).toHaveCount(0);
       await expect(hero.locator('.luz-hero__lead a')).toHaveCount(0);
 
-      // Three actions: Get started leads to the levels, Get started with AI (the primary one) to the prompts, and the docs follow
+      // Two actions: Get started with AI (the primary one) to the prompts, then the docs
       // (the buttons themselves are in tests/landing-hero-buttons.spec.js)
-      await expect(hero.locator('a.luz-btn')).toHaveCount(3);
-      await expect(hero.locator('.luz-btn--primary')).toHaveCount(1);
+      await expect(hero.locator('a.luz-btn')).toHaveCount(2);
       const primary = hero.locator('a.luz-btn--primary');
       await expect(primary).toHaveText('Get started with AI');
       await expect(primary).toHaveAttribute('href', '#ai');
       await expect(primary).toBeInViewport();
       const outline = hero.locator('a.luz-btn--outline');
-      await expect(outline).toHaveText(['Get started', 'Read the docs']);
-      await expect(outline.nth(0)).toHaveAttribute('href', '#tokens');
-      await expect(outline.nth(1)).toHaveAttribute('href', '/docs/');
-      await expect(outline.nth(0)).toBeInViewport();
-      await expect(outline.nth(1)).toBeInViewport();
-    });
-
-    test('Get started goes to the first level: its section is where the window looks', async ({ page }) => {
-      await page.setViewportSize({ width: 1280, height: 800 });
-      await open(page);
-
-      await page.locator('#hero a.luz-btn--outline').first().click();
-      await expect(page).toHaveURL(/#tokens$/);
-      await expect(page.locator('#tokens h2')).toBeInViewport();
+      await expect(outline).toHaveText(['Read the docs']);
+      await expect(outline).toHaveAttribute('href', '/docs/');
+      await expect(outline).toBeInViewport();
     });
 
     for (const [route, lang] of ROUTES) {
@@ -501,36 +489,18 @@ test.describe('Landing page', () => {
         // The brand is written in capitals in every language; every language stresses the human and the AI
         await expect(hero.locator('h1 .landing-hero__brand .u-sr-only')).toHaveText('LUZ');
         await expect(hero.locator('h1 em')).toHaveCount(2);
-        // Get started and Read the docs are outline, the one for AI is the primary (tests/landing-hero-buttons.spec.js)
+        // The one for AI is the primary, Read the docs is outline (tests/landing-hero-buttons.spec.js)
         await expect(hero.locator('a.luz-btn--primary')).toHaveText(words['hero.start-ai']);
         await expect(hero.locator('a.luz-btn--secondary')).toHaveCount(0);
-        await expect(hero.locator('a.luz-btn--outline')).toHaveText([words['hero.start'], words['hero.docs']]);
+        await expect(hero.locator('a.luz-btn--outline')).toHaveText([words['hero.docs']]);
         if (lang !== 'en') expect(plain(words['hero.title'])).not.toBe(plain(EN['hero.title']));
-        // The old keys of the TDD statement and the brand line are gone from the catalog
-        expect(Object.keys(words).filter((key) => /^(built|hero\.(eyebrow|github|tdd))/.test(key))).toEqual([]);
+        // The old keys of the TDD statement, the brand line and the first action are gone from the catalog
+        expect(Object.keys(words).filter((key) => /^(built|hero\.(eyebrow|github|tdd|start$))/.test(key))).toEqual([]);
       });
     }
-  });
-
-  /* ---- 2. light --------------------------------------------------------- */
-
-  test.describe('light', () => {
-    test('is <home-light> under a screen-reader heading, in the bleeding wrapper of the hero\'s media', async ({ page }) => {
-      await page.setViewportSize({ width: 1280, height: 800 });
-      await open(page);
-
-      await expect(page.locator('section#light h2.u-sr-only')).toHaveText(EN['light.title']);
-      await expect(page.locator('section#light home-light')).toHaveCount(1);
-      expect(await page.locator('home-light').evaluate((el) => !!el.closest('.luz-hero__media--bleed'))).toBe(true);
-      // Edge to edge of the window
-      const box = await page.locator('home-light').boundingBox();
-      const width = await page.evaluate(() => document.documentElement.clientWidth);
-      expect(Math.abs((box?.x ?? 99) - 0)).toBeLessThanOrEqual(1);
-      expect(Math.abs((box?.width ?? 0) - width)).toBeLessThanOrEqual(1);
-    });
 
     for (const [width, height] of [[1280, 800], [1440, 900]]) {
-      test(`the first screen is the hero over the light, from the header to the bottom of the window at ${width}x${height}`, async ({ page }) => {
+      test(`the first screen is the hero, from the header to the bottom of the window at ${width}x${height}`, async ({ page }) => {
         await page.setViewportSize({ width, height });
         await open(page);
 
@@ -539,13 +509,9 @@ test.describe('Landing page', () => {
         const first = await box('.landing-first');
         expect(Math.abs(first.top - header.bottom), 'starts under the header').toBeLessThanOrEqual(1);
         expect(Math.abs(first.bottom - height), 'ends at the bottom of the window').toBeLessThanOrEqual(2);
-        // The hero is written over the sky, and both are inside the first screen
         const hero = await box('#hero');
-        const sky = await box('#light');
-        for (const inner of [hero, sky]) {
-          expect(inner.top).toBeGreaterThanOrEqual(first.top - 1);
-          expect(inner.bottom).toBeLessThanOrEqual(first.bottom + 1);
-        }
+        expect(Math.abs(hero.top - first.top)).toBeLessThanOrEqual(1);
+        expect(Math.abs(hero.bottom - first.bottom)).toBeLessThanOrEqual(1);
         await expect(page.locator('#hero h1')).toBeInViewport();
         await expect(page.locator('#hero a.luz-btn--primary')).toBeInViewport();
         // The levels start below the fold
@@ -553,20 +519,13 @@ test.describe('Landing page', () => {
       });
     }
 
-    test('on a phone the title and the first action are in the first screen, and the light starts there too', async ({ page }) => {
+    test('on a phone the title and both actions are in the first screen', async ({ page }) => {
       await page.setViewportSize({ width: 360, height: 740 });
       await open(page);
 
       await expect(page.locator('#hero h1')).toBeInViewport();
       await expect(page.locator('#hero a.luz-btn--primary')).toBeInViewport();
-      expect(await page.locator('#light').evaluate((el) => el.getBoundingClientRect().top)).toBeLessThan(740);
-    });
-
-    test('with JavaScript the sentence that stands in for the light is gone', async ({ page }) => {
-      await open(page);
-      await expect.poll(() => page.evaluate(() => !!customElements.get('home-light'))).toBe(true);
-
-      await expect(page.locator('.landing-light__nojs')).toBeHidden();
+      await expect(page.locator('#hero a.luz-btn--outline')).toBeInViewport();
     });
   });
 
@@ -1012,15 +971,6 @@ test.describe('Landing page', () => {
       });
     }
 
-    test('the light says what the room is for', async ({ page }) => {
-      await page.goto('/');
-
-      await expect(page.locator('.landing-light__nojs')).toBeVisible();
-      await expect(page.locator('.landing-light__nojs')).toHaveText(EN['light.nojs']);
-      // Its room is kept: the section does not collapse around a sentence
-      expect((await page.locator('#light').boundingBox())?.height ?? 0).toBeGreaterThan(120);
-    });
-
     test('the panels of each level are all there, one under the other: Install, List and Code example', async ({ page }) => {
       await page.goto('/');
 
@@ -1258,15 +1208,14 @@ test.describe('Landing page', () => {
             return result;
           };
 
-          // The text of the main and of the footer, but not <home-light> (it has its own measure over
-          // its pixels: tests/home-light.spec.js) nor what is aria-hidden
+          // The text of the main and of the footer, but not what is aria-hidden (the tunnel of the hero)
           const failures = [];
           let checked = 0;
           const walker = document.createTreeWalker(document.querySelector('main').parentElement, NodeFilter.SHOW_TEXT);
           while (walker.nextNode()) {
             const node = walker.currentNode;
             const el = node.parentElement;
-            if (!node.textContent.trim() || !el.closest('main, footer') || el.closest('home-light, [aria-hidden="true"], script, style')) continue;
+            if (!node.textContent.trim() || !el.closest('main, footer') || el.closest('[aria-hidden="true"], script, style')) continue;
             if (!el.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true })) continue;
             checked += 1;
             const background = backgroundOf(el);

@@ -142,19 +142,16 @@ describe("the AI-ready rows of budgets.json and PRINCIPLES.md section 8", () => 
     expect(budgets.slice(0, BEFORE.length).map((b) => [b.name, b.max])).toEqual(BEFORE);
   });
 
-  it("appends the three AI-ready rows after the docs page row, then the language chunk row (F6), core's rows of the color mode (the chunk and the boot script), the three rows of the home's light (F3), then the debug page row, and nothing else (catalog has no row: no weight limit, 2026-11-02)", () => {
+  it("appends the three AI-ready rows after the docs page row, then the language chunk row (F6), core's rows of the color mode (the chunk and the boot script), then the debug page row, and nothing else (catalog has no row: no weight limit, 2026-11-02; the three rows of the home's light left with the globe, 2026-11-26)", () => {
     // core has no loose sheet any more (the four charts are catalog's, 2026-11-03): no row for them
     const rest = budgets;
     expect(budgets.filter((b) => /loose sheet/.test(b.name))).toEqual([]);
-    expect(rest).toHaveLength(BEFORE.length + 10);
+    expect(rest).toHaveLength(BEFORE.length + 7);
     expect(rest.at(BEFORE.length - 1).name).toBe(last);
     expect(rest.slice(BEFORE.length + 3).map((b) => b.name)).toEqual([
       "core JS lazy chunk: i18n-es",
       "core JS lazy chunk: theme-mode",
       "core theme-boot script (packages/core/dist/theme-boot.min.js)",
-      "home light controller JS",
-      "home light visual: globe",
-      "home light data: globe",
       "debug page HTML (docs/debug/index.html, uncompressed)",
     ]);
   });
@@ -192,8 +189,8 @@ describe("the AI-ready rows of budgets.json and PRINCIPLES.md section 8", () => 
     ]);
   });
 
-  it("leaves the rows of tokens, core, the check CLI and the home's light as hard limits: no `warn`", () => {
-    const hard = budgets.filter((b) => /^(tokens CSS|core |check CLI|home light)/.test(b.name));
+  it("leaves the rows of tokens, core and the check CLI as hard limits: no `warn`", () => {
+    const hard = budgets.filter((b) => /^(tokens CSS|core |check CLI)/.test(b.name));
     expect(hard.length).toBeGreaterThanOrEqual(10);
     for (const row of hard) expect(row, row.name).not.toHaveProperty("warn");
   });
@@ -626,117 +623,6 @@ describe("scripts/check-size.js on a copy of the repository, with a language chu
     const { status, output } = build({ "luz.min.js": `${ENTRY}import("./i18n-"+document.documentElement.lang+".min.js");` });
     expect(status).toBe(1);
     expect(output).toMatch(/literal/i);
-  });
-});
-
-
-/* ---- The home's light: apps/landing/light/ (F3, SEC-CHUNK-1 and SEC-CHUNK-2) ---- */
-
-describe("scripts/check-size.js on a copy of the repository, with the home's light", () => {
-  let dir;
-  // light.js loads globe.js; globe.js is a loader and a chunk at once, it loads globe-data.js; globe-data.js imports nothing
-  const LIGHT = 'const load=()=>import("./globe.js");customElements.get("home-light")||customElements.define("home-light",class extends HTMLElement{});';
-  const GLOBE = 'const land=()=>import("./globe-data.js");customElements.get("home-globe")||customElements.define("home-globe",class extends HTMLElement{});';
-  const DATA = 'export default{land:"AAAA"};';
-
-  /** A repository with the three files of the light; `files` overrides any of them or adds one (a budgeted file). */
-  function build(files = {}) {
-    const content = { "light.js": LIGHT, "globe.js": GLOBE, "globe-data.js": DATA, ...files };
-    mkdirSync(join(dir, "scripts"), { recursive: true });
-    mkdirSync(join(dir, "apps/landing/light"), { recursive: true });
-    mkdirSync(join(dir, "packages"), { recursive: true }); // check-size reads the packages of the repository: none here
-    cpSync(join(repo, "scripts/check-size.js"), join(dir, "scripts/check-size.js"));
-    const rows = Object.keys(content).map((name, i) => ({ name: `home light row ${i}`, file: `apps/landing/light/${name}`, max: 2048 }));
-    writeFileSync(join(dir, "budgets.json"), JSON.stringify({ budgets: rows }));
-    writeFileSync(
-      join(dir, "PRINCIPLES.md"),
-      ["| Artifact | Warns below | Ideal | Warns above | Ceiling |", "| --- | --- | --- | --- | --- |", ...rows.map((r) => `| ${r.name} | - | - | - | 2 kB |`)].join("\n") + "\n",
-    );
-    for (const [name, code] of Object.entries(content)) writeFileSync(join(dir, "apps/landing/light", name), code);
-    const run = spawnSync(process.execPath, [join(dir, "scripts/check-size.js")], { encoding: "utf-8" });
-    return { status: run.status, output: run.stdout + run.stderr };
-  }
-
-  beforeEach(() => {
-    dir = mkdtempSync(join(tmpdir(), "luz-size-guard-light-"));
-  });
-  afterEach(() => {
-    rmSync(dir, { recursive: true, force: true });
-  });
-
-  it("passes light.js that loads only globe.js, globe.js that loads only globe-data.js, and a globe-data.js that imports nothing", () => {
-    const { status, output } = build();
-    expect(output).not.toMatch(/\u2717/);
-    expect(status).toBe(0);
-  });
-
-  it("fails light.js with an import() of another file", () => {
-    const { status, output } = build({ "light.js": `${LIGHT}import("./other.js");`, "other.js": "export default 1;" }); // budgeted, so only SEC-CHUNK-1 can object
-    expect(status).toBe(1);
-    expect(output).toContain("other.js");
-  });
-
-  it("fails light.js with a static import", () => {
-    const { status, output } = build({ "light.js": `import "./globe.js";${LIGHT}` }); // globe.js is budgeted, so only SEC-CHUNK-2 can object
-    expect(status).toBe(1);
-    expect(output).toMatch(/light\.js/);
-  });
-
-  it.each([
-    ["a variable", `${LIGHT}import(location.hash.slice(1));`],
-    ["a concatenation", `${LIGHT}import("./"+document.title+".js");`],
-    ["a template literal with a value", `${LIGHT}import(\`./\${document.title}.js\`);`],
-  ])("fails an import() in light.js whose argument is %s, and says it is not a literal", (_, code) => {
-    const { status, output } = build({ "light.js": code });
-    expect(status).toBe(1);
-    expect(output).toMatch(/literal/i);
-  });
-
-  it("fails a light.js that does not load globe.js", () => {
-    const { status, output } = build({ "light.js": 'customElements.get("home-light")||customElements.define("home-light",class extends HTMLElement{});' });
-    expect(status).toBe(1);
-    expect(output).toContain("globe.js");
-  });
-
-  it("fails a globe.js that does not load globe-data.js", () => {
-    const { status, output } = build({ "globe.js": 'customElements.get("home-globe")||customElements.define("home-globe",class extends HTMLElement{});' });
-    expect(status).toBe(1);
-    expect(output).toContain("globe-data.js");
-  });
-
-  it("fails a globe.js with an import() of another file", () => {
-    const { status, output } = build({ "globe.js": `${GLOBE}import("./other.js");`, "other.js": "export default 1;" }); // budgeted, so only SEC-CHUNK-1 can object
-    expect(status).toBe(1);
-    expect(output).toMatch(/globe\.js[^\n]*other\.js|other\.js[^\n]*globe\.js/);
-  });
-
-  it("fails a globe.js with a static import of globe-data.js: the land is loaded lazily, never with the code", () => {
-    const { status, output } = build({ "globe.js": `import "./globe-data.js";${GLOBE}` });
-    expect(status).toBe(1);
-    expect(output).toMatch(/globe\.js/);
-  });
-
-  it("fails an import() in globe.js whose argument is not a literal, and says so", () => {
-    const { status, output } = build({ "globe.js": `${GLOBE}import("./"+document.title+".js");` });
-    expect(status).toBe(1);
-    expect(output).toMatch(/literal/i);
-  });
-
-  it.each([
-    ["a static import", 'import "./x.js";'],
-    ["a dynamic import", 'import("./x.js");'],
-    ["a re-export", 'export * from "./x.js";'],
-  ])("fails globe-data.js with %s", (_, code) => {
-    // x.js has a budget row, so only SEC-CHUNK-2 can object
-    const { status, output } = build({ "globe-data.js": `${DATA}${code}`, "x.js": "export default 1;" });
-    expect(status).toBe(1);
-    expect(output).toMatch(/globe-data\.js/);
-  });
-
-  it("fails globe-data.js that imports a bare specifier (red line 1)", () => {
-    const { status, output } = build({ "globe-data.js": `import "lit";${DATA}` });
-    expect(status).toBe(1);
-    expect(output).toMatch(/globe-data\.js/);
   });
 });
 

@@ -398,7 +398,7 @@ describe("the new home page: catalogs and rendered pages (F5)", () => {
   const { rendered: written, problems } = buildSite(site, { extra: [...docs, ...levelPagesOf(site, template)] });
   // What the build wrote (its size is what the ceiling weighs) and the same page with the quotes of its values restored
   const rendered = new Map([...written].map(([route, page]) => [route, quoted(page)]));
-  const SECTIONS = ["hero", "light", "tokens", "core", "catalog", "ai", "faq"];
+  const SECTIONS = ["hero", "tokens", "core", "catalog", "ai", "faq"];
   /** Sections the home no longer has (owner, 2026-11-23): the home is the hero, the four levels and the FAQ. */
   const GONE = ["why", "native", "modes"];
   const placeholders = (value) => [...value.matchAll(/\{[a-z]+(?::[a-z]+)?\}/g)].map((m) => m[0]).sort();
@@ -502,22 +502,37 @@ describe("the new home page: catalogs and rendered pages (F5)", () => {
     }
   });
 
-  it("the hero's lead is short in every language: what LUZ is built on, and its name spelled out", () => {
-    // Owner, 2026-11-23: two short sentences. It spells the name: LUZ, the Light, Usable and Zero-dependency design system (the four words are strong)
+  it("the hero's lead is short in every language: what LUZ is built on, its three words, and the two ways in", () => {
+    // Owner, 2026-11-26 (the tunnel hero): what it is built on, then Light, Usable and Zero-dependency (strong), and
+    // what to do with it: start a project, or migrate one page by page
     const lead = catalogs.en["hero.lead"];
-    expect(lead.replace(/<[^>]*>/g, "")).toMatch(/Start with LUZ, the Light, Usable and Zero-dependency design system\./);
-    expect(lead).not.toMatch(/\(|\)/);
-    expect([...lead.matchAll(/<strong\b[^>]*>([^<]*)<\/strong>/g)].map((m) => m[1])).toEqual(["LUZ", "Light", "Usable", "Zero-dependency"]);
+    expect(lead.replace(/<[^>]*>/g, "")).toBe("Tokens, CSS and a little vanilla JavaScript, built on what the browser already does. Light, Usable and Zero-dependency: start a project, or migrate it page by page.");
+    expect([...lead.matchAll(/<strong\b[^>]*>([^<]*)<\/strong>/g)].map((m) => m[1])).toEqual(["Light", "Usable", "Zero-dependency"]);
     expect(lead).toMatch(/<strong class="landing-nowrap">Zero-dependency<\/strong>/);
-    // Spanish and Arabic keep LUZ and the three words in English: the three are marked lang="en" (in Arabic inside an isolate)
+    // Spanish and Arabic keep the three words in English: marked lang="en" (in Arabic inside an isolate)
     for (const code of ["es", "ar"]) {
       const text = catalogs[code]["hero.lead"];
-      expect([...text.matchAll(/<strong\b[^>]*>([^<]*)<\/strong>/g)].map((m) => m[1]), code).toEqual(["LUZ", "Light", "Usable", "Zero-dependency"]);
+      expect([...text.matchAll(/<strong\b[^>]*>([^<]*)<\/strong>/g)].map((m) => m[1]), code).toEqual(["Light", "Usable", "Zero-dependency"]);
       expect(text, code).toMatch(/<span lang="en"><strong>Light<\/strong>, <strong>Usable<\/strong> and <strong class="landing-nowrap">Zero-dependency<\/strong><\/span>/);
       expect(text, code).not.toMatch(/\(|\)/);
+      expect(text, `${code} is not the English text`).not.toBe(lead);
     }
     expect(catalogs.ar["hero.lead"], "ar: the English words sit in an isolate").toMatch(/[\u2066-\u2068]<span lang="en">[\s\S]*<\/span>\u2069/);
-    for (const code of ["en", "es", "ar"]) expect(catalogs[code]["hero.lead"].replace(/<[^>]*>/g, "").length, code).toBeGreaterThan(80);
+    for (const code of ["en", "es", "ar"]) {
+      const length = catalogs[code]["hero.lead"].replace(/<[^>]*>/g, "").length;
+      expect(length, code).toBeGreaterThan(80);
+      expect(length, code).toBeLessThanOrEqual(190);
+    }
+  });
+
+  it("the hero has two actions and no key left of the old first screen: no hero.start, no light.* of the globe", () => {
+    for (const code of ["en", "es", "ar"]) {
+      const keys = Object.keys(catalogs[code]);
+      expect(keys, code).not.toContain("hero.start");
+      expect(keys.filter((key) => /^light\.(?:nojs|open|fact\.|alt\.|scrub|saved|sep)/.test(key)), code).toEqual([]);
+    }
+    expect(catalogs.en["hero.docs"]).toBe("Read the docs");
+    expect(catalogs.en["hero.start-ai"]).toBe("Get started with AI");
   });
 
   describe("Spanish", () => {

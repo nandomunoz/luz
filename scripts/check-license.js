@@ -237,15 +237,9 @@ export function checkPagesSite(root) {
  * Data the Pages site serves that is neither code nor a dependency: public
  * domain, with its origin noted next to it (PRINCIPLES.md red line 13, owner
  * decision D9, 2026-10-16). Listed in dev/LICENSES.md after the dependencies.
+ * (The land of the home's globe, Natural Earth, left with the globe on 2026-11-26.)
  */
 export const DATA = [
-  {
-    name: "Natural Earth 1:110m admin-0 countries",
-    licence: "public domain, naturalearthdata.com terms of use",
-    where: "the coast, the borders and the countries of the home's globe, re-encoded by `scripts/globe-puzzle-data.js` into `apps/landing/light/globe-data.js`",
-    file: "apps/landing/light/globe-data.js",
-    origin: "Natural Earth",
-  },
   // Media of NASA, a work of the United States government (owner decision L-01, 2026-11-07): served only by the docs site,
   // never in a package, no NASA logotype or insignia, and credited next to each file on the player's page.
   {

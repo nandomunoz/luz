@@ -49,9 +49,9 @@ describe("the home page says it in three languages", () => {
   it("English says what LUZ is built on in the lead, in two short sentences", () => {
     // README.md and PRINCIPLES.md keep STATEMENT and LINE
     const lead = catalog("en")["hero.lead"];
-    // It says what LUZ is built on and spells the name out (four strong words)
-    expect([...lead.matchAll(/<strong\b[^>]*>([^<]*)<\/strong>/g)].map((m) => m[1])).toEqual(["LUZ", "Light", "Usable", "Zero-dependency"]);
-    expect(textOfHtml(lead)).toBe("Tokens, CSS and a little vanilla JavaScript, built on what the browser already does. Start with LUZ, the Light, Usable and Zero-dependency design system.");
+    // It says what LUZ is built on, its three words (strong) and the two ways in (the tunnel hero, 2026-11-26)
+    expect([...lead.matchAll(/<strong\b[^>]*>([^<]*)<\/strong>/g)].map((m) => m[1])).toEqual(["Light", "Usable", "Zero-dependency"]);
+    expect(textOfHtml(lead)).toBe("Tokens, CSS and a little vanilla JavaScript, built on what the browser already does. Light, Usable and Zero-dependency: start a project, or migrate it page by page.");
   });
 
   it.each(["es", "ar"])("%s has the lead, translated: not the English text, and no English left but a name", (code) => {

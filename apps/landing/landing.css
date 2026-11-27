@@ -130,239 +130,281 @@
 }
 
 /* --------------------------------------------------------------------------
-   2. The light: without JavaScript, a sentence in the room light.css keeps
+   1. The hero: the tunnel. Thirteen frames of the logo's triangle fly
+   towards the reader, slowly, behind the title, the lead and the two
+   buttons, which sit in the middle over a halo of the page's colour. The
+   hero fills the window under the header (.landing-first).
+
+   What keeps it light (the owner's decisions of 2026-11-26):
+     - each frame animates transform and opacity only, with a negative
+       delay: the compositor moves it, nothing is restyled or repainted per
+       frame, no script advances it, and no custom property is animated;
+     - slow: 91 s for the whole cycle, 7 s from one frame to the next, 2deg
+       of turn between frames;
+     - the drawing is contained (contain: strict), takes no pointer and is
+       hidden from assistive technology; tunnel.js pauses it off screen and,
+       only on a desktop with a fine pointer, tilts it a little towards the
+       pointer (one transform, once a frame at most);
+     - with reduced motion (or before the stylesheet's motion block) the
+       frames stand still, spread along the tunnel.
+   High contrast draws no tunnel, as it draws no stars and no glow; forced
+   colours draw it in the text colour
    -------------------------------------------------------------------------- */
 
-/* The sentence and the element share one cell: the sentence sits in the
-   middle of the empty box, and goes once <home-light> is defined */
-.landing-light {
-  display: grid;
+/* The window's width without a viewport unit, which counts a visible
+   scrollbar: the drawing runs from edge to edge of the window */
+:root:has(.landing-tunnel) {
+  container-type: inline-size;
 }
 
-/* The first screen: the hero and the light together fill the window under the
-   header, the hero as tall as its content and the light taking what is left,
-   so the globe and its phrase end where the window does. A window too short
-   for the hero's content shows the hero whole and the page goes on below */
 .landing-first {
   display: flex;
   flex-direction: column;
-  gap: var(--luz-space-3xl);
   min-block-size: calc(100svh - var(--site-header-h));
-  /* Room under the globe's phrase, which sits a little below its box; one step
-     less than it was, which the light's own floor (below) takes back */
-  padding-block-end: calc(var(--luz-space-xl) - var(--luz-space-xs));
 }
 
-.landing-first > .luz-hero {
-  flex: none;
-}
+.landing-tunnel {
+  --landing-tunnel-cy: 54%;
+  /* 91 s: the whole cycle; 7 s from one frame to the next */
+  --landing-tunnel-cycle: calc(var(--luz-duration-slower) * 182);
 
-.landing-first > .landing-light {
+  position: relative;
   flex: 1 1 auto;
+  align-content: center;
+  padding-block: var(--luz-space-xl);
 }
 
-/* Wider than a phone, the light's phrase, time and bar sit in the foot of its
-   box, so a window too short for the hero would draw them over its buttons:
-   the box is at least as tall as what reaches up behind the hero (below) plus
-   the room those three need, and the page goes on below the window instead.
-   A taller window takes the fill above and this changes nothing */
-@media (min-width: 641px) {
-  .landing-first > .landing-light {
-    min-block-size: calc(
-      var(--luz-space-lg) + var(--luz-space-xs) + min(4cqi, 3.75rem) + 14.5rem
-    );
+/* The drawing: from edge to edge of the window, as tall as the hero, faded
+   in under the header and out towards the first level. Its inner layout is
+   left to right in every language: it is centred, so it mirrors to itself */
+.landing-tunnel__back {
+  position: absolute;
+  inset-block: 0;
+  inset-inline: calc(50% - 50cqi);
+  direction: ltr;
+  contain: strict;
+  pointer-events: none;
+  perspective: 700px;
+  perspective-origin: 50% var(--landing-tunnel-cy);
+  opacity: 0.5;
+  mask-image: linear-gradient(transparent, #000 var(--luz-space-2xl), #000 calc(100% - var(--luz-space-4xl)), transparent);
+}
+
+.landing-tunnel__track {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transform-origin: 50% var(--landing-tunnel-cy);
+}
+
+/* A frame at rest: its place along the tunnel (--i, 0 the farthest), turned
+   2deg more than the one behind it; the farthest are faint */
+.landing-tunnel__frame {
+  position: absolute;
+  inset-block-start: var(--landing-tunnel-cy);
+  inset-inline-start: 50%;
+  inline-size: 150vmin;
+  margin-block-start: -65vmin;
+  margin-inline-start: -75vmin;
+  backface-visibility: hidden;
+  transform: translateZ(calc(var(--i) * 215px - 2300px)) rotate(calc(var(--i) * 2deg));
+  opacity: min(calc(var(--i) / 4), calc(13 - var(--i)));
+}
+
+.landing-tunnel__frame:nth-child(1) { --i: 0; }
+.landing-tunnel__frame:nth-child(2) { --i: 1; }
+.landing-tunnel__frame:nth-child(3) { --i: 2; }
+.landing-tunnel__frame:nth-child(4) { --i: 3; }
+.landing-tunnel__frame:nth-child(5) { --i: 4; }
+.landing-tunnel__frame:nth-child(6) { --i: 5; }
+.landing-tunnel__frame:nth-child(7) { --i: 6; }
+.landing-tunnel__frame:nth-child(8) { --i: 7; }
+.landing-tunnel__frame:nth-child(9) { --i: 8; }
+.landing-tunnel__frame:nth-child(10) { --i: 9; }
+.landing-tunnel__frame:nth-child(11) { --i: 10; }
+.landing-tunnel__frame:nth-child(12) { --i: 11; }
+.landing-tunnel__frame:nth-child(13) { --i: 12; }
+
+/* The logo's triangle, drawn by its outline: a stroke as fine at every
+   depth (non-scaling). One frame in three is a little stronger and lightly
+   filled. Not an icon: it is not in the page's sprite of icons */
+.landing-tunnel__frame svg {
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
+  overflow: visible;
+  fill: none;
+  stroke: var(--luz-brand-primary);
+  stroke-linejoin: round;
+  stroke-width: 1.5;
+}
+
+.landing-tunnel__frame polygon {
+  vector-effect: non-scaling-stroke;
+}
+
+.landing-tunnel__frame:nth-child(3n + 1) svg {
+  stroke-opacity: 0.3;
+}
+
+.landing-tunnel__frame:nth-child(3n + 2) svg {
+  stroke-opacity: 0.55;
+}
+
+.landing-tunnel__frame:nth-child(3n) svg {
+  stroke-opacity: 0.9;
+  fill: color-mix(in oklab, var(--luz-brand-primary) 5%, transparent);
+}
+
+@keyframes landing-tunnel-fly {
+  0% {
+    transform: translateZ(-2300px) rotate(0deg);
+    opacity: 0;
+  }
+
+  30.77% {
+    opacity: 1;
+  }
+
+  92.31% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateZ(495px) rotate(26deg);
+    opacity: 0;
   }
 }
 
-@media (min-width: 1024px) {
-  .landing-first > .landing-light {
-    min-block-size: calc(
-      var(--luz-space-lg) + var(--luz-space-xs) + min(4cqi, 3.75rem) + 17cqi + 14.5rem
-    );
+@media (prefers-reduced-motion: no-preference) {
+  .landing-tunnel__frame {
+    animation: landing-tunnel-fly var(--landing-tunnel-cycle) linear infinite;
+    animation-delay: calc(var(--i) * var(--landing-tunnel-cycle) / -13);
+    will-change: transform, opacity;
+  }
+
+  /* Off screen (tunnel.js): the frames stop where they are */
+  .landing-tunnel.is-off .landing-tunnel__frame {
+    animation-play-state: paused;
   }
 }
 
-.landing-first > .landing-light > home-light {
-  height: auto;
+:root[data-theme="high-contrast"] .landing-tunnel__back {
+  display: none;
 }
 
-/* Wider than a phone, the globe keeps a floor of room; above it the window's
-   height decides */
-@media (min-width: 641px) {
-  .landing-first > .landing-light > home-light {
-    min-block-size: 18rem;
+@media (forced-colors: active) {
+  .landing-tunnel__frame svg {
+    fill: none;
+    stroke: CanvasText;
   }
 }
 
-/* The globe rises behind the hero's buttons: the light moves up by the
-   page's gap and a little more, plus the room above the globe's edge in its
-   box (about 4% of the width, up to 3.75rem), so the edge crosses the
-   buttons at every width. The hero is drawn above it, so the buttons stay
-   on top and take the clicks */
-.landing-first > .landing-light {
-  margin-block-start: calc(
-    -1 * (var(--luz-space-3xl) + var(--luz-space-lg) + var(--luz-space-xs) + min(4cqi, 3.75rem))
-  );
+/* The text: above the drawing, over a halo of the page's colour */
+.landing-tunnel > .luz-hero__copy {
+  position: relative;
+  z-index: 1;
 }
 
-/* A phone: the light follows the hero, its phrase close under the buttons
-   (the page's gap less its own padding); its stage reaches up behind the
-   description (apps/landing/light/light.css) */
-@media (max-width: 640px) {
-  .landing-first > .landing-light {
-    margin-block-start: calc(-1 * var(--luz-space-2xl));
+.landing-tunnel > .luz-hero__copy::before {
+  content: "";
+  position: absolute;
+  /* Wider than the copy by 18 % on each side, never past the window's edge */
+  inset-block: -14%;
+  inset-inline: calc(-1 * min(18%, (100cqi - 100%) / 2));
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(closest-side, var(--luz-surface-page) 60%, transparent);
+}
+
+@media (forced-colors: active) {
+  .landing-tunnel > .luz-hero__copy::before {
+    background: radial-gradient(closest-side, Canvas 60%, transparent);
+  }
+}
+
+/* The type follows the window's width, in rem and vw, so the reader's text
+   size still scales it (WCAG 1.4.4), and stops growing on a desktop: the
+   title from 2.75rem (every phone) to 4.5rem, reached at about 66em. The
+   word LUZ above it spans about three quarters of a phone's column (1.35em
+   wide: 8rem at 320 px, 40vw on) and stops at 14rem from about 30em, so it is
+   clearly larger than the title everywhere. The sentence is balanced, no
+   longer than 14em, and the buttons stand a contained step under it */
+.landing-tunnel .luz-hero__title {
+  max-inline-size: 14em;
+  margin-inline: auto;
+  margin-block-end: 0;
+  font-size: clamp(2.75rem, 1.25rem + 5vw, 4.5rem);
+  line-height: 1.05;
+  text-wrap: balance;
+}
+
+/* Arabic letters reach higher and lower than Latin ones: its lines need room */
+.landing-tunnel .luz-hero__title:lang(ar) {
+  line-height: 1.25;
+}
+
+.landing-tunnel .landing-hero__brand {
+  font-size: clamp(8rem, 2rem + 40vw, 14rem);
+  margin-block-end: var(--luz-space-lg);
+}
+
+.landing-tunnel .o-actions {
+  margin-block-start: clamp(var(--luz-space-xl), 4vw, var(--luz-space-2xl));
+}
+
+/* A phone or a tablet held upright: the same, centred, with smaller frames
+   so the whole tunnel shows, a softer halo out to the page's edges, and the
+   two buttons one under the other, full width */
+@media (max-width: 768px) {
+  .landing-tunnel {
+    --landing-tunnel-cy: 50%;
+
+    padding-block: var(--luz-space-2xl);
   }
 
-  /* A phone's hero with room between its pieces: the brand, the sentence, the
-     description and the buttons each a step apart, and a wider margin at the
-     sides so the text and the buttons do not touch the edges */
-  .luz-hero__copy {
-    padding-inline: var(--luz-space-md);
+  .landing-tunnel__back {
+    perspective: 420px;
   }
 
-  .landing-hero__brand {
-    margin-block-end: var(--luz-space-sm);
+  .landing-tunnel__frame {
+    inline-size: 120vmin;
+    margin-block-start: -52vmin;
+    margin-inline-start: -60vmin;
   }
 
-  .luz-hero__lead {
-    margin-block: var(--luz-space-md) var(--luz-space-xl);
+  .landing-tunnel__frame svg {
+    stroke-width: 1.25;
   }
 
-  .luz-hero .o-actions {
-    gap: var(--luz-space-sm);
+  .landing-tunnel > .luz-hero__copy::before {
+    inset: -12% calc(-1 * var(--luz-space-md));
+    background: radial-gradient(closest-side, color-mix(in oklab, var(--luz-surface-page) 72%, transparent) 40%, transparent);
   }
 
-  /* A window taller than the content gives the extra room to the middle of the
-     hero: the brand, the sentence and the description stay together at the
-     top, and the buttons, the phrase and the globe behind them move down
-     together, closer to the foot of the window. The light keeps only the room
-     of its phrase and its open bar */
-  .landing-first > .luz-hero {
-    flex: 1 1 auto;
+  .landing-tunnel .o-actions {
+    flex-direction: column;
+    flex-wrap: nowrap;
     align-items: stretch;
   }
 
-  .landing-first > .landing-light {
-    flex: none;
+  .landing-tunnel .o-actions > * {
+    inline-size: 100%;
+    justify-content: center;
   }
-
-  .landing-first .luz-hero__copy {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .landing-first .luz-hero .o-actions {
-    margin-block-start: auto;
-  }
-}
-
-/* On a desktop the edge of the globe rises further, behind the sentence, so
-   the first screen holds the brand, the sentence and the globe with its
-   quote under it */
-@media (min-width: 1024px) {
-  .landing-first > .landing-light {
-    margin-block-start: calc(
-      -1 * (var(--luz-space-3xl) + var(--luz-space-lg) + var(--luz-space-xs) + min(4cqi, 3.75rem) + 17cqi)
-    );
-  }
-}
-
-/* The hero's sentence and lead are the size of a section's title and lead
-   (--luz-text-4xl and --luz-text-lg) at every width: the catalog's hero steps
-   them down on a phone, and a phone is where the text must not shrink */
-.luz-hero__title {
-  font-size: var(--luz-text-4xl);
-}
-
-.luz-hero__lead {
-  font-size: var(--luz-text-lg);
 }
 
 /* The brand on a line of its own, centred above the sentence and the largest
-   thing on the page: 3.75 times the title's step (em, so it follows the
-   title's 4xl, 3xl and 2xl at each width: about 183px on a desktop), and lit
-   with a soft halo of the brand colour, as light spilling past the letters */
+   thing on the page (its size: the hero's clamp above), lit with a soft halo
+   of the brand colour, as light spilling past the letters */
 .landing-hero__brand {
   display: block;
-  font-size: 3.75em;
   line-height: 1;
   letter-spacing: 0.04em;
   text-align: center;
   text-shadow:
     0 0 0.25em color-mix(in oklab, var(--luz-brand-primary) 35%, transparent),
     0 0 0.75em color-mix(in oklab, var(--luz-brand-primary) 22%, transparent);
-}
-
-/* From a tablet up the brand cannot take more than a share of the window's
-   height, so a wide, short window keeps the composition whole */
-@media (min-width: 641px) and (max-width: 1023px) {
-  .landing-hero__brand {
-    font-size: min(3.75em, 17svh);
-  }
-}
-
-/* A short phone: the brand and the room above the hero shrink with the
-   window's height, so the first screen gives up as little as it can */
-@media (max-width: 640px) {
-  .landing-hero__brand {
-    /* and a share of the window's width, so the word does not break in two on a narrow phone */
-    font-size: min(3.75em, 15svh, 30vi);
-  }
-
-  .landing-first > .luz-hero {
-    padding-block-start: clamp(var(--luz-space-xs), 3svh, var(--luz-space-xl));
-  }
-}
-
-/* A phone under about 760px tall: the pieces of the hero closer, which is what
-   lets the bar open inside the window; the text keeps its size (the lead is
-   short enough) */
-@media (max-width: 640px) and (max-height: 760px) {
-  .landing-hero__brand {
-    margin-block-end: var(--luz-space-2xs);
-  }
-
-  .landing-first .luz-hero__lead {
-    margin-block: var(--luz-space-xs);
-  }
-
-  .landing-first .luz-hero .o-actions {
-    gap: var(--luz-space-xs);
-  }
-
-  /* Three stacked buttons at the large control step would reach the round mode
-     button fixed at the window's end (a 568px phone): one step down keeps them
-     above it */
-  .landing-first .luz-hero .o-actions > .luz-btn {
-    min-block-size: var(--luz-control-lg);
-  }
-
-  .landing-first {
-    padding-block-end: var(--luz-space-md);
-  }
-
-  .landing-first > .landing-light {
-    margin-block-start: calc(-1 * var(--luz-space-3xl));
-  }
-}
-
-/* From a desktop up the brand and the room above it follow the window's
-   height, so a tall screen and a short one show the same composition */
-@media (min-width: 1024px) {
-  .landing-hero__brand {
-    font-size: clamp(calc(var(--luz-text-4xl) * 2.3), 19svh, calc(var(--luz-text-4xl) * 5.6));
-  }
-
-  .landing-first > .luz-hero {
-    padding-block-start: clamp(var(--luz-space-lg), 4svh, var(--luz-space-4xl));
-  }
-
-  /* The lead names what LUZ stands for, a line longer than it was: a column
-     a little wider than the catalog's 48rem keeps it to four lines, so the
-     first screen still ends at the window's bottom */
-  .landing-first .luz-hero__copy {
-    max-inline-size: min(100%, 56rem);
-  }
 }
 
 /* The halo is still: a text-shadow cannot be animated on the compositor, so
@@ -372,123 +414,39 @@
   text-shadow: none;
 }
 
-/* The lead spells out the name: LUZ and its three words (Light, Usable,
-   Zero-dependency) in the strong ink, so the word reads out of them */
-.luz-hero__lead strong {
-  font-weight: 600;
-  color: var(--luz-text-primary);
-}
-
-/* A compound that is not split at its hyphen ("Zero-dependency"): one box that
-   moves to the next line whole. Only a box wider than its line (400 % text on
-   a phone) breaks inside, as any word that does not fit (WCAG 1.4.10) */
-.landing-nowrap {
-  display: inline-block;
-  max-inline-size: 100%;
-  overflow-wrap: anywhere;
-}
-
-/* The hero's brand is the word LUZ alone, in ET Book, drawn with CSS (the
-   prism is the logo of the header and the footer, not part of the word).
-   Sized by the brand's own em (3.75em of the title on a phone), so every rule
-   above that sizes the brand still sizes it; the numbers are the demo's
-   (the capitals are 0.679em high) turned into em. The halo is the brand's,
+/* The hero's brand is the word LUZ alone, an SVG of three paths outlined from
+   ET Book (apps/site/_partials/luz-wordmark.html, one path per letter, in
+   currentColor; the prism is the logo of the header and the footer, not part
+   of the word). Its height is .7 of the brand's em, the drawing's own height
+   in the font's units, so the hero's clamp sizes it. The halo is the brand's,
    on the word alike */
 .landing-imago {
   display: flex;
   align-items: center;
   justify-content: center;
-  /* The word is Latin, in ET Book, whatever the page's language: an Arabic page
-     sets its headings in the sans, which this span would inherit (its
-     lang="en" stops :lang(ar) matching it, not the inherited face), and the
-     numbers below are the serif's widths */
-  font-family: var(--luz-font-serif);
   color: var(--luz-brand-primary);
   text-shadow: none;
   filter: drop-shadow(0 0 0.25em color-mix(in oklab, var(--luz-brand-primary) 35%, transparent))
     drop-shadow(0 0 0.75em color-mix(in oklab, var(--luz-brand-primary) 22%, transparent));
 }
 
-/* The word: the capitals trimmed to their own height, squeezed to .86 and
-   stretched to 1.04 from the start; the box gives back what the squeeze takes
-   (its natural width is 1.5737em: the letters' advances L .5947, U .8149,
-   Z .7046 at their own widths, less two gaps of .1em) */
-.landing-imago__word {
-  display: inline-block;
-  font-size: 1em;
-  font-weight: 400;
-  line-height: 1;
-  letter-spacing: 0;
-  text-box: trim-both cap alphabetic;
-  transform: scale(0.86, 1.04);
-  transform-origin: left center;
-  margin-inline-end: -0.2203em;
-  /* The box is trimmed to the capitals, but the mask paints only inside it:
-     the U's round bottom, which dips under the baseline as every round letter
-     does, was cut flat. The box grows .08em above and below (the same both
-     ways, so the mask's middle stays), and the margins take it back, so
-     nothing moves */
-  padding-block: 0.08em;
-  margin-block: -0.08em;
-  /* The prism's three tints, faint (.72, .8, .88 of the colour; the triangle
-     uses .25, .45, .65), as a fan from the point where the light would enter
-     the triangle, written in the word's own unscaled box. The mask only lowers
-     the alpha: the lowest is .72, so it never erases the word */
-  --px: -0.863em;
-  --py: calc(50% + 0.0398em);
+/* The prism's three tints, faint (.72, .8, .88 of the colour; the triangle
+   uses .25, .45, .65), as a fan from the point where the light would enter the
+   triangle, left of the word. The mask only lowers the alpha: the lowest is
+   .72, so it never erases the word */
+.landing-wordmark {
+  --px: -0.742em;
+  --py: calc(50% + 0.0315em);
+
+  display: block;
+  block-size: 0.7em;
+  inline-size: auto;
+  overflow: visible;
+  fill: currentColor;
   -webkit-mask-image: conic-gradient(from 0deg at var(--px) var(--py), #000 0deg 82.6deg, rgb(0 0 0 / 0.72) 82.6deg 86.6deg,
     rgb(0 0 0 / 0.8) 86.6deg 90.6deg, rgb(0 0 0 / 0.88) 90.6deg 94.7deg, #000 94.7deg);
   mask-image: conic-gradient(from 0deg at var(--px) var(--py), #000 0deg 82.6deg, rgb(0 0 0 / 0.72) 82.6deg 86.6deg,
     rgb(0 0 0 / 0.8) 86.6deg 90.6deg, rgb(0 0 0 / 0.88) 90.6deg 94.7deg, #000 94.7deg);
-}
-
-/* An engine without text-box (Firefox before 154, which includes its ESR 153)
-   keeps the line box of ET Book: .14em above the capitals and .2035em under
-   them. The same amounts as margins give the trimmed box back (the first
-   screen keeps its height), and the mask's centre moves by the difference
-   between the middles of the two boxes */
-@supports not (text-box: trim-both cap alphabetic) {
-  .landing-imago__word {
-    margin-block: -0.22em -0.2835em;
-    --py: calc(50% + 0.008em);
-  }
-}
-
-/* Each letter its own width, from its middle, its box given back */
-.landing-imago__word .ch {
-  display: inline-block;
-  transform: scaleX(var(--s));
-  margin-inline: calc((var(--s) - 1) * var(--cw) / 2);
-}
-
-.landing-imago__word .ch + .ch {
-  /* the gap -0.1em, plus one screen pixel (1px before the word's .86 squeeze) */
-  margin-inline-start: calc((var(--s) - 1) * var(--cw) / 2 - 0.1em + 1px / 0.86);
-}
-
-.landing-imago__word .ch--l { --s: 0.88; --cw: 0.5947em; }
-.landing-imago__word .ch--u { --s: 0.86; --cw: 0.8149em; }
-.landing-imago__word .ch--z { --s: 0.78; --cw: 0.7046em; }
-
-/* the Z six screen pixels further from the U than the U is from the L */
-.landing-imago__word .ch--u + .ch--z {
-  margin-inline-start: calc((var(--s) - 1) * var(--cw) / 2 - 0.1em + 7px / 0.86);
-}
-
-/* From a tablet up the word is larger than the phone's (which stays as it
-   is) and has room under it. Its box is trimmed to the capitals, so the room
-   the line used to give is put back as a margin */
-@media (min-width: 641px) {
-  .landing-imago {
-    font-size: min(5em, 22svh);
-    margin-block-end: 0.22em;
-  }
-}
-
-@media (min-width: 1024px) {
-  .landing-imago {
-    font-size: min(5.5em, 24svh);
-  }
 }
 
 /* High contrast and forced colours: no halo, and the word in the system's
@@ -499,46 +457,207 @@
 }
 
 @media (forced-colors: active) {
-  /* The word is drawn, not read: with forced-color-adjust left to the browser
-     it paints a backplate behind its box, which reaches over the first line of
-     the title under it and cuts the tops of its letters */
   .landing-imago {
     filter: none;
     color: CanvasText;
     forced-color-adjust: none;
   }
 
-  .landing-imago__word {
+  .landing-wordmark {
     mask-image: none;
     -webkit-mask-image: none;
   }
 }
 
-.landing-first > .luz-hero {
-  position: relative;
-  z-index: 1;
+/* --------------------------------------------------------------------------
+   Who we are (mock-up v6, Notas + manifiesto): the three words of the name,
+   then one large sentence, then the five points of
+   the manifesto in a row, numbered, and the link. A calm block, no motion
+   -------------------------------------------------------------------------- */
+
+/* The width of the main's container, as the levels below */
+.landing-who {
+  inline-size: 100%;
 }
 
-.landing-light > home-light,
-.landing-light__nojs {
-  grid-area: 1 / 1;
-}
-
-.landing-light__nojs {
-  align-self: center;
-  justify-self: center;
-  max-inline-size: 40ch;
-  margin: 0;
-  padding-inline: var(--luz-space-md);
-  font-family: var(--luz-font-sans);
-  font-size: var(--luz-text-md);
-  color: var(--luz-text-secondary);
+/* The three words of the name, the first letter of each in the actions' blue */
+.landing-who__words {
+  margin: 0 0 var(--luz-space-md);
+  font-family: var(--luz-font-heading);
+  font-size: var(--luz-text-xl);
+  letter-spacing: 0.08em;
   text-align: center;
+  text-transform: uppercase;
+  color: var(--luz-text-secondary);
 }
 
-home-light:defined ~ .landing-light__nojs {
-  display: none;
+.landing-who__words b {
+  font-weight: 600;
+  color: var(--luz-brand-primary);
 }
+
+.landing-who__lead {
+  max-inline-size: 63rem;
+  margin: 0 auto;
+  text-align: center;
+  font-family: var(--luz-font-heading);
+  font-size: clamp(1.875rem, 1rem + 2.75vw, 2.75rem);
+  font-weight: 400;
+  line-height: 1.4;
+  text-wrap: pretty;
+  color: var(--luz-text-primary);
+}
+
+.landing-who__points li {
+  font-size: var(--luz-text-lg);
+  line-height: 1.45;
+  color: var(--luz-text-secondary);
+}
+
+.landing-who__points strong {
+  display: block;
+  font-weight: 400;
+  color: var(--luz-text-primary);
+}
+
+.landing-who__points {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: var(--luz-space-lg) var(--luz-space-xl);
+  margin: var(--luz-space-2xl) 0 var(--luz-space-xl);
+  padding: var(--luz-space-xl) 0 0;
+  list-style: none;
+  border-block-start: 1px solid var(--luz-divider);
+  counter-reset: luz-who;
+}
+
+@media (min-width: 60rem) {
+  .landing-who__points {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+
+.landing-who__points li {
+  counter-increment: luz-who;
+}
+
+.landing-who__points li::before {
+  content: counter(luz-who);
+  display: block;
+  margin-block-end: var(--luz-space-xs);
+  font-family: var(--luz-font-sans);
+  font-size: var(--luz-text-sm);
+  font-weight: 500;
+  line-height: 1;
+  color: var(--luz-brand-primary);
+}
+
+.landing-who__points strong {
+  margin-block-end: var(--luz-space-2xs);
+  font-size: var(--luz-text-xl);
+  line-height: 1.25;
+}
+
+.landing-who__more {
+  margin: 0;
+  text-align: end;
+}
+
+/* A link that says where it goes, with the page's arrow after it */
+.landing-who__link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--luz-space-xs);
+  min-block-size: var(--luz-control-md);
+  font-family: var(--luz-font-sans);
+  font-weight: 600;
+}
+
+.landing-who__link svg {
+  inline-size: 1.25em;
+  block-size: 1.25em;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.landing-who__link:dir(rtl) svg {
+  scale: -1 1;
+}
+
+/* --------------------------------------------------------------------------
+   Built with LUZ: catalog's <luz-showcase scroll> (showcase.css) between the
+   FAQ and the footer, under a small title between two hairlines. The home
+   adds only the title and the wordmarks: each name in its own voice
+   -------------------------------------------------------------------------- */
+
+.landing-users {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--luz-space-md);
+  inline-size: 100%;
+}
+
+/* The name of the band, small, between two hairlines that fade out */
+.landing-users__title {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: var(--luz-space-md);
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  font-family: var(--luz-font-sans);
+  font-size: var(--luz-text-xs);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--luz-text-muted);
+}
+
+.landing-users__title::before,
+.landing-users__title::after {
+  content: "";
+  flex: 0 1 4rem;
+  block-size: 1px;
+  background: linear-gradient(to right, transparent, var(--luz-divider));
+}
+
+.landing-users__title::after {
+  scale: -1 1;
+}
+
+/* The wordmarks: one voice each, from the faces the page already has */
+.landing-users__link--caps {
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+.landing-users__link--serif {
+  font-family: var(--luz-font-heading);
+  font-size: var(--luz-text-2xl);
+  font-weight: 400;
+}
+
+.landing-users__link--light {
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+
+.landing-users__link--sans {
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.landing-users__link--italic {
+  font-family: var(--luz-font-heading);
+  font-size: var(--luz-text-2xl);
+  font-style: italic;
+  font-weight: 400;
+}
+
+
 
 /* --------------------------------------------------------------------------
    4. Inside: one section per level, the words on one side and a panel of
@@ -1006,6 +1125,7 @@ home-light:defined ~ .landing-light__nojs {
   font-family: var(--luz-font-mono);
   font-size: var(--luz-text-sm);
   letter-spacing: 0.08em;
+  text-align: center;
   text-transform: uppercase;
   color: var(--luz-text-secondary);
 }
@@ -1213,6 +1333,7 @@ home-light:defined ~ .landing-light__nojs {
   font-size: var(--luz-text-xs);
   font-weight: 600;
   letter-spacing: 0.08em;
+  text-align: center;
   text-transform: uppercase;
   color: var(--luz-text-primary);
 }
@@ -1496,13 +1617,6 @@ home-light:defined ~ .landing-light__nojs {
 @media (max-width: 640px) {
   .o-page .o-actions {
     flex-wrap: nowrap;
-  }
-
-  /* On a phone the hero's first button is the one for AI: only its place on the
-     screen moves, the markup keeps Get started first (PRINCIPLES.md §7, the
-     written deviation) */
-  .landing-hero__ai {
-    order: -1;
   }
 }
 

@@ -32,7 +32,7 @@
  *     which changes only with its own changeset, so budgets.json cannot be
  *     raised quietly;
  *   - every chunk a budgeted JS file imports lazily is budgeted too, and it
- *     imports no other file statically (the home's light; catalog is not budgeted);
+ *     imports no other file statically (catalog is not budgeted);
  *   - no published packages/*\/dist/*.min.js imports a bare specifier (an
  *     inlined or missing dependency would escape its budget);
  *   - the lazy chunks (SEC-CHUNK-1, SEC-CHUNK-2): every import() of a
@@ -40,10 +40,8 @@
  *     one imports lazily, in any package, and catalog's search, consent,
  *     mode, timeline, embed, chart and sidebar) imports nothing, static or dynamic; catalog.min.js, the presence
  *     loader, has no static import, and its dynamic imports are exactly its
- *     chunks (the LOADERS map). The same holds for the home's light, which no build
- *     touches: apps/landing/light/light.js loads exactly globe.js, globe.js
- *     loads exactly globe-data.js, and globe-data.js imports nothing (a file
- *     that is a loader may import its own chunks, lazily, and nothing else).
+ *     chunks (the LOADERS map) (a file that is a loader may import its own
+ *     chunks, lazily, and nothing else).
  *
  * Usage: node scripts/check-size.js
  */
@@ -120,11 +118,7 @@ const LITERAL_IMPORT = /\bimport\s*\(\s*(["'])([^"'`]+)\1\s*\)/g;
 const STATIC_IMPORT = /(?:^|[;}\s])(?:import\b(?!\s*[(.])|export\b[^"'();]*?\bfrom\b)/;
 const LOADERS = {
   "packages/catalog/dist/catalog.min.js": ["./cookie-consent.min.js", "./theme-time.min.js", "./theme-time-bar.min.js", "./search.min.js", "./sidebar.min.js", "./timeline.min.js", "./embed.min.js", "./chart.min.js"],
-  // The home's light (apps/landing/light/): served as written, no build, so the same rules hold for its sources
-  "apps/landing/light/light.js": ["./globe.js"],
-  "apps/landing/light/globe.js": ["./globe-data.js"],
 };
-const LIGHT = ["light.js", "globe.js", "globe-data.js"].map((name) => `apps/landing/light/${name}`);
 const chunks = new Set(Object.entries(LOADERS).flatMap(([loader, targets]) => targets.map((t) => relative(root, resolve(root, dirname(loader), t)))));
 const published = [];
 for (const pkg of readdirSync(resolve(root, "packages"))) {
@@ -137,13 +131,6 @@ for (const pkg of readdirSync(resolve(root, "packages"))) {
     for (const [, , target] of code.matchAll(LITERAL_IMPORT)) {
       if (/^\.{1,2}\//.test(target)) chunks.add(relative(root, resolve(root, dirname(file), target)));
     }
-  }
-}
-for (const file of LIGHT.filter((f) => existsSync(resolve(root, f)))) {
-  const code = readFileSync(resolve(root, file), "utf-8");
-  published.push([file, code]);
-  for (const [, , target] of code.matchAll(LITERAL_IMPORT)) {
-    if (/^\.{1,2}\//.test(target)) chunks.add(relative(root, resolve(root, dirname(file), target)));
   }
 }
 for (const [file, code] of published) {
