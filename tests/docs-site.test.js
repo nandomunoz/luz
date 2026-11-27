@@ -661,7 +661,7 @@ describe("the LUZ docs site", () => {
     const viewPages = site.pages.filter(
       (p) => (p.meta.area === "components" && p.meta.group && p.meta.group !== "helpers") || (PATTERN_AREAS.includes(p.meta.area) && p.meta.group && p.meta.group !== "reference"),
     );
-    expect(viewPages).toHaveLength(71);
+    expect(viewPages).toHaveLength(72);
     const CODE = ["markup", "variants", "how", "no-js", "keyboard"];
     const DESIGN = ["when", "when-not", "do-dont", "content", "contrast", "tokens"];
     // A page of controls (`parts: controls`, the four pages of Form fields) has this structure for each control, not for the page:
@@ -972,7 +972,7 @@ describe("the LUZ docs site", () => {
     // A stylesheet with no class and no tag (one at-rule) has a page of its own, in the group site-wide
     const sheets = ["page-transition"];
     const layout = ["navbar", "sidebar", "terminal", "timeline"];
-    const elements = ["announcement", "cookie-consent", "embed", "chart", "theme-time", "faq", "showcase", "lang-switch", "search", "submenu"];
+    const elements = ["announcement", "cookie-consent", "embed", "chart", "theme-time", "faq", "showcase", "marquee", "lang-switch", "search", "submenu"];
     expect(routes).toEqual(["/docs/catalog/", ...["classes", ...elements, ...layout, ...sheets, ...patterns].sort().map((slug) => `/docs/catalog/${slug}/`)]);
     const groups = site.pages.filter((p) => p.meta.area === "catalog" && p.meta.group && p.meta.group !== "reference").map((p) => p.route);
     expect(groups.sort()).toEqual([...elements, ...layout, ...sheets, ...patterns].sort().map((slug) => `/docs/catalog/${slug}/`));

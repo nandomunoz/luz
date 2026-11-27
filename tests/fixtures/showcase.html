@@ -9,13 +9,12 @@
   <link rel="stylesheet" href="/packages/catalog/dist/components/showcase.css">
 </head>
 <body>
-  <!-- tests/showcase.spec.js. No script: the showcase is CSS. A logo is a decorative svg (or an img with alt="") and the
-       span is the name of the link. Every row has its list written twice, as the docs say to write a marquee: the copy is
-       aria-hidden="true" and has tabindex="-1" on its links, and is never inert. Without `scroll` the copy is not shown.
+  <!-- tests/showcase.spec.js. No script: the showcase is CSS, and only the still row (the motion is <luz-marquee>, tests/fixtures/marquee.html).
+       A logo is a decorative svg (or an img with alt="") and the span is the name of the link.
        The logos are drawn for this page: LUZ ships no brand logo. -->
   <main id="main">
     <h1>Built with LUZ</h1>
-    <h2>Still, five names</h2>
+    <h2>Five names</h2>
   <luz-showcase id="still">
     <ul>
       <li><a href="#still-0"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="8"/></svg><span>Marea Bikes</span></a></li>
@@ -24,58 +23,13 @@
       <li><a href="#still-3"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 12h16M12 4v16"/></svg><span>Olivar Studio</span></a></li>
       <li><a href="#still-4"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 19V9l7-5 7 5v10z"/></svg><span>Salinas Co-op</span></a></li>
     </ul>
-    <ul aria-hidden="true">
-      <li><a href="#still-0" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="8"/></svg><span>Marea Bikes</span></a></li>
-      <li><a href="#still-1" tabindex="-1"><img alt="" src="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27%3E%3Crect width=%2724%27 height=%2724%27 rx=%274%27 fill=%27%23888%27/%3E%3C/svg%3E"><span>Bodega Sur</span></a></li>
-      <li><a href="#still-2" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 3l9 17H3z"/></svg><span>Faro Press</span></a></li>
-      <li><a href="#still-3" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 12h16M12 4v16"/></svg><span>Olivar Studio</span></a></li>
-      <li><a href="#still-4" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 19V9l7-5 7 5v10z"/></svg><span>Salinas Co-op</span></a></li>
-    </ul>
   </luz-showcase>
-    <h2>Marquee, eight names</h2>
-  <luz-showcase id="marquee" scroll>
+    <h2>Three names, in a right-to-left page</h2>
+  <luz-showcase id="still-rtl" dir="rtl">
     <ul>
-      <li><a href="#marquee-0"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="8"/></svg><span>Marea Bikes</span></a></li>
-      <li><a href="#marquee-1"><img alt="" src="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27%3E%3Crect width=%2724%27 height=%2724%27 rx=%274%27 fill=%27%23888%27/%3E%3C/svg%3E"><span>Bodega Sur</span></a></li>
-      <li><a href="#marquee-2"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 3l9 17H3z"/></svg><span>Faro Press</span></a></li>
-      <li><a href="#marquee-3"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 12h16M12 4v16"/></svg><span>Olivar Studio</span></a></li>
-      <li><a href="#marquee-4"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 19V9l7-5 7 5v10z"/></svg><span>Salinas Co-op</span></a></li>
-      <li><a href="#marquee-5"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="12" r="5"/><circle cx="15" cy="12" r="5"/></svg><span>Atlas Notes</span></a></li>
-      <li><a href="#marquee-6"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 18c4-12 12-12 16 0"/></svg><span>Tinta Cooperativa</span></a></li>
-      <li><a href="#marquee-7"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="8" width="18" height="8" rx="4"/></svg><span>Norte Labs</span></a></li>
-    </ul>
-    <ul aria-hidden="true">
-      <li><a href="#marquee-0" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="8"/></svg><span>Marea Bikes</span></a></li>
-      <li><a href="#marquee-1" tabindex="-1"><img alt="" src="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27%3E%3Crect width=%2724%27 height=%2724%27 rx=%274%27 fill=%27%23888%27/%3E%3C/svg%3E"><span>Bodega Sur</span></a></li>
-      <li><a href="#marquee-2" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 3l9 17H3z"/></svg><span>Faro Press</span></a></li>
-      <li><a href="#marquee-3" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 12h16M12 4v16"/></svg><span>Olivar Studio</span></a></li>
-      <li><a href="#marquee-4" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 19V9l7-5 7 5v10z"/></svg><span>Salinas Co-op</span></a></li>
-      <li><a href="#marquee-5" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="12" r="5"/><circle cx="15" cy="12" r="5"/></svg><span>Atlas Notes</span></a></li>
-      <li><a href="#marquee-6" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 18c4-12 12-12 16 0"/></svg><span>Tinta Cooperativa</span></a></li>
-      <li><a href="#marquee-7" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="8" width="18" height="8" rx="4"/></svg><span>Norte Labs</span></a></li>
-    </ul>
-  </luz-showcase>
-    <h2>Marquee in a right-to-left page</h2>
-  <luz-showcase id="marquee-rtl" scroll dir="rtl">
-    <ul>
-      <li><a href="#marquee-rtl-0"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="8"/></svg><span>Marea Bikes</span></a></li>
-      <li><a href="#marquee-rtl-1"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="4" width="16" height="16" rx="3"/></svg><span>Bodega Sur</span></a></li>
-      <li><a href="#marquee-rtl-2"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 3l9 17H3z"/></svg><span>Faro Press</span></a></li>
-      <li><a href="#marquee-rtl-3"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 12h16M12 4v16"/></svg><span>Olivar Studio</span></a></li>
-      <li><a href="#marquee-rtl-4"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 19V9l7-5 7 5v10z"/></svg><span>Salinas Co-op</span></a></li>
-      <li><a href="#marquee-rtl-5"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="12" r="5"/><circle cx="15" cy="12" r="5"/></svg><span>Atlas Notes</span></a></li>
-      <li><a href="#marquee-rtl-6"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 18c4-12 12-12 16 0"/></svg><span>Tinta Cooperativa</span></a></li>
-      <li><a href="#marquee-rtl-7"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="8" width="18" height="8" rx="4"/></svg><span>Norte Labs</span></a></li>
-    </ul>
-    <ul aria-hidden="true">
-      <li><a href="#marquee-rtl-0" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="8"/></svg><span>Marea Bikes</span></a></li>
-      <li><a href="#marquee-rtl-1" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="4" width="16" height="16" rx="3"/></svg><span>Bodega Sur</span></a></li>
-      <li><a href="#marquee-rtl-2" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 3l9 17H3z"/></svg><span>Faro Press</span></a></li>
-      <li><a href="#marquee-rtl-3" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 12h16M12 4v16"/></svg><span>Olivar Studio</span></a></li>
-      <li><a href="#marquee-rtl-4" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 19V9l7-5 7 5v10z"/></svg><span>Salinas Co-op</span></a></li>
-      <li><a href="#marquee-rtl-5" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="12" r="5"/><circle cx="15" cy="12" r="5"/></svg><span>Atlas Notes</span></a></li>
-      <li><a href="#marquee-rtl-6" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 18c4-12 12-12 16 0"/></svg><span>Tinta Cooperativa</span></a></li>
-      <li><a href="#marquee-rtl-7" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="8" width="18" height="8" rx="4"/></svg><span>Norte Labs</span></a></li>
+      <li><a href="#still-rtl-0"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="8"/></svg><span>Marea Bikes</span></a></li>
+      <li><a href="#still-rtl-1"><img alt="" src="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27%3E%3Crect width=%2724%27 height=%2724%27 rx=%274%27 fill=%27%23888%27/%3E%3C/svg%3E"><span>Bodega Sur</span></a></li>
+      <li><a href="#still-rtl-2"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 3l9 17H3z"/></svg><span>Faro Press</span></a></li>
     </ul>
   </luz-showcase>
     <p><a id="after" href="#after">A link after the rows</a></p>

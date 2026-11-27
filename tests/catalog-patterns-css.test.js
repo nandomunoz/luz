@@ -472,7 +472,8 @@ describe("docs: the patterns left apps/docs/reference.css and the docs app uses 
   it("apps/docs/catalog-patterns.css imports the 27 files, kind by kind (landing, blog, app, docs) and those that fit any, each file once, and holds no rule", () => {
     const css = read("apps/docs/catalog-patterns.css");
     const imports = [...css.matchAll(/@import url\("\/packages\/catalog\/dist\/components\/([a-z-]+)\.css"\)/g)].map((m) => m[1]);
-    expect(imports).toEqual(ALL);
+    // The showcase and the marquee are elements, not patterns of a kind: the docs show them live, after the social links, in the cascade's order
+    expect(imports).toEqual(ALL.flatMap((name) => (name === "social" ? [name, "showcase", "marquee"] : [name])));
     expect(stripComments(css).replace(/@import url\("[^"]+"\);/g, "").trim(), "no rule of its own").toBe("");
   });
 

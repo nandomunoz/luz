@@ -101,8 +101,8 @@ describe("classes.json of catalog has the new names and none of the old", () => 
 describe("custom-elements.json of catalog has the new elements and none of the old", () => {
   const tags = declarations.map((d) => d.tagName).sort();
 
-  it("holds the eleven tags: search, cookie consent, theme time, language switch, submenu, announcement, the FAQ, the showcase, the embed, the chart and the timeline", () => {
-    expect(tags).toEqual(["luz-announcement", "luz-chart", "luz-cookie-consent", "luz-embed", "luz-faq", "luz-lang-switch", "luz-search", "luz-showcase", "luz-submenu", "luz-theme-time", "luz-timeline"]);
+  it("holds the twelve tags: search, cookie consent, theme time, language switch, submenu, announcement, the FAQ, the showcase, the marquee, the embed, the chart and the timeline", () => {
+    expect(tags).toEqual(["luz-announcement", "luz-chart", "luz-cookie-consent", "luz-embed", "luz-faq", "luz-lang-switch", "luz-marquee", "luz-search", "luz-showcase", "luz-submenu", "luz-theme-time", "luz-timeline"]);
     expect(tags).not.toContain("luz-color-mode");
   });
 
@@ -156,10 +156,10 @@ describe("components/<block>.css and its .min.css exist for every new block, and
     expect(exists(`packages/catalog/dist/components/${name}.min.css`), `dist/components/${name}.min.css`).toBe(true);
   });
 
-  it("holds exactly the 42 components of the catalog: the 27 patterns (with the four charts that came from core, 2026-11-03), the four of F7, the ten elements and the page transition (theme-time is the color mode's successor), plain and minified", () => {
+  it("holds exactly the 43 components of the catalog: the 27 patterns (with the four charts that came from core, 2026-11-03), the four of F7, the eleven elements and the page transition (theme-time is the color mode's successor), plain and minified", () => {
     const built = readdirSync(`${root}packages/catalog/dist/components`).filter((f) => f.endsWith(".css") && !f.endsWith(".min.css")).map((f) => f.replace(/\.css$/, "")).sort();
     expect(built).toEqual([...new Set(NEW)].sort());
-    expect(built).toHaveLength(42);
+    expect(built).toHaveLength(43);
   });
 
   it.each(FILES.map(([old]) => old))("components/%s.css is gone, in src, dist and the tarball list", (old) => {
