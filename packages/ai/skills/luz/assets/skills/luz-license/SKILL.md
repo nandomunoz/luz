@@ -33,7 +33,7 @@ A table: what, where, the licence you read and where you read it, and the action
 
 ### 3. Ask only what is missing
 
-One round. First the question about the rights, word for word as in principle 2: "Do you hold the rights to publish this project under the MIT licence? Yes, No or Not sure." On "No" or "Not sure", write nothing: say to ask a lawyer, report the findings of step 2 if the person wants them, and stop. On "Yes", ask the holder's name and the year (offer what you read and where from), and what to do about each item of the separate list.
+One round. First the question about the rights, word for word as in principle 2: "Do you hold the rights to publish this project under the MIT licence (it is not work that an employer or a client owns, or that others wrote under other terms)? Yes, No or Not sure." On "No" or "Not sure", write nothing: say to ask a lawyer, report the findings of step 2 if the person wants them, and stop. On "Yes", ask the holder's name and the year (offer what you read and where from), and what to do about each item of the separate list.
 
 ### 4. Show the plan, wait for "go"
 
