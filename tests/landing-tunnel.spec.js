@@ -116,36 +116,96 @@ test.describe('the hero and its tunnel', () => {
     });
   }
 
-  // The floating colour-mode button (bottom end corner, 44 px, from the script) covers the end of a hero button on a short
-  // phone: at 320 x 568 it sits at y 508 to 552 and the buttons stack from y 410 (English) to y 627 (Spanish), so the hero
-  // cannot be made to clear it without a smaller title. On a short phone it waits for the first scroll instead: hidden (and
-  // out of the tab order) at the top, where the buttons are, drawn once the reader has scrolled past them.
+  // The floating colour-mode button (bottom end corner, 44 px, written by the script) covers the end of a hero button on a
+  // short phone: at 320 x 568 it sits at y 508 to 552 and the buttons stack from y 385 (English) to y 587 (Spanish), so the
+  // hero cannot be made to clear it without a smaller title. On a short phone it waits for the first scroll instead: hidden
+  // (and out of the tab order) at the top, where the buttons are, drawn once the reader has scrolled past them. With no
+  // script there is no button at all (the footer's radios are the control).
+  const fixedButton = (page) => page.locator('.luz-theme-mode__button--fixed');
+  const stateOf = (fixed) => fixed.evaluate((el) => ({ visibility: getComputedStyle(el).visibility, opacity: Number(getComputedStyle(el).opacity), box: el.getBoundingClientRect().toJSON() }));
+  const present = async (page, javaScriptEnabled) => {
+    await expect(fixedButton(page), javaScriptEnabled === false ? 'no script, no floating button' : 'the script writes the floating button').toHaveCount(javaScriptEnabled === false ? 0 : 1);
+    return javaScriptEnabled !== false;
+  };
+  // One frame at a time: scroll to y, wait for the compositor's frame, read the button
+  const sample = (page, ys) => page.evaluate(async (list) => {
+    const el = document.querySelector('.luz-theme-mode__button--fixed');
+    const out = [];
+    for (const y of list) {
+      window.scrollTo({ top: y, behavior: 'instant' });
+      await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+      const cs = getComputedStyle(el);
+      out.push({ y, visibility: cs.visibility, opacity: Number(cs.opacity) });
+    }
+    return out;
+  }, ys);
+
   for (const route of ROUTES) {
-    test(`${route} at 320 x 568: at the top of the page the floating colour-mode button is not over a hero button, and it is drawn once the page is scrolled`, async ({ page }) => {
-      await page.setViewportSize({ width: 320, height: 568 });
-      await page.goto(route);
-      const fixed = page.locator('.luz-theme-mode__button--fixed');
-      const state = () => fixed.evaluate((el) => ({ visibility: getComputedStyle(el).visibility, opacity: Number(getComputedStyle(el).opacity), box: el.getBoundingClientRect().toJSON() }));
-      const hits = (a, b) => a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom;
-      const buttons = await page.locator('#hero .o-actions > a.luz-btn').evaluateAll((all) => all.map((el) => el.getBoundingClientRect().toJSON()));
-      if (await fixed.count()) {
-        const top = await state();
+    for (const height of [568, 200]) {
+      test(`${route} at 320 x ${height}: at the top of the page the floating colour-mode button is not over a hero button, and it is drawn once the page is scrolled`, async ({ page, javaScriptEnabled }) => {
+        await page.setViewportSize({ width: 320, height });
+        await page.goto(route);
+        const buttons = await page.locator('#hero .o-actions > a.luz-btn').evaluateAll((all) => all.map((el) => el.getBoundingClientRect().toJSON()));
+        const hits = (a, b) => a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom;
+        if (!(await present(page, javaScriptEnabled))) return;
+        const fixed = fixedButton(page);
+        const top = await stateOf(fixed);
         for (const [index, box] of buttons.entries()) {
           expect(top.visibility === 'hidden' || !hits(top.box, box), `hero button ${index + 1} is not covered by the floating button at the top`).toBe(true);
         }
         await page.evaluate(() => window.scrollTo({ top: 600, behavior: 'instant' }));
-        await expect.poll(async () => (await state()).visibility, 'drawn after the first screen').toBe('visible');
-        await expect.poll(async () => (await state()).opacity).toBe(1);
+        await expect.poll(async () => (await stateOf(fixed)).visibility, 'drawn after the first screen').toBe('visible');
+        await expect.poll(async () => (await stateOf(fixed)).opacity).toBe(1);
+      });
+    }
+
+    test(`${route} at 320 x 568: the button is never focusable while it is faint (visible only at half opacity or more)`, async ({ page, javaScriptEnabled }) => {
+      await page.setViewportSize({ width: 320, height: 568 });
+      await page.goto(route);
+      if (!(await present(page, javaScriptEnabled))) return;
+      const frames = await sample(page, Array.from({ length: 101 }, (_, i) => i * 3));
+      const faint = frames.filter((f) => f.visibility === 'visible' && f.opacity < 0.5);
+      expect(faint, 'frames where the button takes focus but is hardly drawn').toEqual([]);
+      expect(frames.at(0), 'hidden at the top').toMatchObject({ visibility: 'hidden', opacity: 0 });
+      expect(frames.at(-1), 'drawn at 300 px').toMatchObject({ visibility: 'visible', opacity: 1 });
+    });
+
+    test(`${route} at 320 x 568 with reduced motion: the button is hidden or fully drawn, never in between`, async ({ page, javaScriptEnabled }) => {
+      await page.emulateMedia({ reducedMotion: 'reduce' });
+      await page.setViewportSize({ width: 320, height: 568 });
+      await page.goto(route);
+      if (!(await present(page, javaScriptEnabled))) return;
+      const frames = await sample(page, Array.from({ length: 101 }, (_, i) => i * 3));
+      for (const f of frames) {
+        expect([`hidden 0`, `visible 1`], `at ${f.y} px`).toContain(`${f.visibility} ${f.opacity}`);
       }
+      expect(frames.at(0)).toMatchObject({ visibility: 'hidden', opacity: 0 });
+      expect(frames.at(-1)).toMatchObject({ visibility: 'visible', opacity: 1 });
+    });
+
+    test(`${route} at 320 x 568: a focused button stays drawn and focused when the page goes back to the top, and Shift+Tab leaves it`, async ({ page, javaScriptEnabled }) => {
+      await page.setViewportSize({ width: 320, height: 568 });
+      await page.goto(route);
+      if (!(await present(page, javaScriptEnabled))) return;
+      const fixed = fixedButton(page);
+      await page.evaluate(() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' }));
+      await expect.poll(async () => (await stateOf(fixed)).visibility).toBe('visible');
+      await fixed.focus();
+      await page.keyboard.press('Home');
+      await expect.poll(() => page.evaluate(() => Math.round(window.scrollY)), 'back at the top').toBe(0);
+      expect(await fixed.evaluate((el) => document.activeElement === el), 'still focused').toBe(true);
+      expect(await stateOf(fixed), 'still drawn').toMatchObject({ visibility: 'visible', opacity: 1 });
+      await page.keyboard.press('Shift+Tab');
+      expect(await fixed.evaluate((el) => document.activeElement !== el && document.activeElement !== document.body), 'Shift+Tab goes to the control before it').toBe(true);
     });
   }
 
-  test('/ at 390 x 844 and at 1280 x 800: the floating colour-mode button is drawn at the top, as before', async ({ page }) => {
+  test('/ at 390 x 844 and at 1280 x 800: the floating colour-mode button is drawn at the top, as before', async ({ page, javaScriptEnabled }) => {
     for (const [width, height] of [[390, 844], [1280, 800]]) {
       await page.setViewportSize({ width, height });
       await page.goto('/');
-      const fixed = page.locator('.luz-theme-mode__button--fixed');
-      if (await fixed.count()) expect(await fixed.evaluate((el) => `${getComputedStyle(el).visibility} ${getComputedStyle(el).opacity}`), `${width} x ${height}`).toBe('visible 1');
+      if (!(await present(page, javaScriptEnabled))) return;
+      expect(await fixedButton(page).evaluate((el) => `${getComputedStyle(el).visibility} ${getComputedStyle(el).opacity}`), `${width} x ${height}`).toBe('visible 1');
     }
   });
 
