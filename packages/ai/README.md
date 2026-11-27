@@ -67,7 +67,7 @@ A skill is a folder of one task that your assistant uses on its own once you add
 
 | Skill | What it does | Add it |
 | --- | --- | --- |
-| `luz-readme` | Writes or improves the README of your repository so that it reads as written by a person, with true facts and no signs of machine writing. | `/luz add luz-readme` |
+| `luz-readme` | Writes or improves the README of your repository in plain, specific language, with true facts and without the stock phrases of machine-written text, and ends it with a line saying an AI drafted it. | `/luz add luz-readme` |
 | `luz-theme` | Makes the theme of your brand (colours, fonts, corners) in light, dark and high contrast, started from the template of `@luz-ds/core`, and measures its contrast. | `/luz add luz-theme` |
 | `luz-migrate` | Moves a project that has its own CSS to LUZ one page at a time, with the old CSS running until the last page has moved. | `/luz add luz-migrate` |
 | `luz-translate` | Translates your pages and catalogs of strings with a glossary you approve, keeps the code and the figures as they are, and marks its work as pending review. | `/luz add luz-translate` |

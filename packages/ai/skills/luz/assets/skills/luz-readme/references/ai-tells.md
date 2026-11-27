@@ -1,82 +1,82 @@
-# What makes a README read as machine-written
+# Stock phrases of machine-written READMEs
 
-Two uses: while drafting, do not produce these; in the audit, find them and replace each with something specific.
+Read it twice: before you draft, so you do not write these, and in the audit, to find them and put something checkable in their place.
 
-Nothing here proves anything alone, since people write all of it too. What gives a README away is how much of it there is and how alike it all is. A synonym swap fixes nothing. A vague sentence replaced by a checkable one does.
+No single item proves who wrote a README, and people write every one of them too. What gives a text away is how many there are and how alike they look. Swapping one word for a synonym changes nothing. Replacing a vague sentence with a fact does.
 
-How to count: a **hard** pattern is fixed wherever it appears. A **soft** one is left alone once and fixed when it shows up three times or more.
+How to count: a **hard** pattern is rewritten wherever it appears. A **soft** pattern is left alone the first time and rewritten from the third.
 
-## 1. Words that promise and prove nothing
+## 1. Adjectives that claim and show nothing
 
-Hard: robust, seamless, powerful, comprehensive, cutting-edge, next-generation, blazing fast, effortless, game-changer, supercharge, unlock, revolutionize, leverage, utilize, empower, streamline, elevate, delve, holistic, "best practices" with no practice named, "battle-tested" with no place named.
+Hard: robust, seamless, powerful, comprehensive, cutting-edge, next-generation, effortless, game-changing, revolutionary, supercharge, unlock, leverage, utilize, empower, streamline, elevate, delve, holistic, "best practices" with no practice named, "battle-tested" with no place named, "lightning-quick".
 
 Soft: simple, easy, modern, lightweight, flexible, scalable, clean, elegant, minimal, production-ready, ecosystem, solution.
 
-Fix: swap the adjective for the measurement or the example. "Fast" becomes "builds the 300-page docs in 4 s on a laptop, script in `bench/`". If nothing can be measured or shown, delete the claim.
+Fix: put the number or the example where the adjective was. "Lightweight" becomes "11 kB gzipped, no dependencies". "Easy to configure" becomes "one file, `config.toml`, five keys". When nothing can be counted or shown, cut the claim.
 
-## 2. Sentences that set a scene before saying the thing
+## 2. Openings that clear their throat
 
 Hard:
 
-- "Not just X, but Y", "It is not X, it is Y".
-- "Whether you are a beginner or a seasoned developer".
-- An opening about the pace or state of the world or of the industry.
-- "Imagine ...", "Say goodbye to X", "Here is the thing", "At its core".
-- A heading that is a question, followed by a pitch.
-- A one-line paragraph written for effect.
+- "More than just X": the "not only X but also Y" and "it is not X, it is Y" frames.
+- "No matter how much experience you have".
+- A first line about how quickly software, the web or AI is changing.
+- "Picture this", "Say farewell to X", "The truth is", "At the heart of".
+- A heading phrased as a question and answered with a sales pitch.
+- A sentence set on its own line to sound weighty.
 
-Fix: the first sentence of a section says what it is or does. Reasons come second, and only when they are not obvious.
+Fix: the first sentence of a section says what the thing is or what it does. The reason for it comes after, and only if it is not obvious.
 
-## 3. Rhythm that follows a template
+## 3. Rhythm that repeats
 
-- Lists of exactly three: three adjectives, three bullets, three use cases. Use as many as the project has.
-- Sections of one size and sentences of one length. A real README is uneven: one section is a line, another is a page.
-- The same first word on three sentences in a row.
-- A dash as the joint between every clause. Prefer a full stop, a comma or a colon.
-- Hedges stacked on each other ("may potentially help in some cases"). Keep a hedge only if you can say what the exception is.
-- Linking words that add no link: "Moreover", "Additionally", "Overall", "In conclusion".
+- Triplets: three adjectives in a tagline, three bullets under each heading, three use cases. Write as many as the project has.
+- Sections of the same length and sentences of the same length. A README written by hand is lumpy: one section takes a line, another a screen.
+- Three sentences in a row that start with the same word.
+- A long dash joining every clause. A full stop, a comma or a colon is usually the right mark.
+- Hedges piled up ("could possibly help in certain situations"). Keep one only when you can name the case it is for.
+- Connectors that connect nothing: "Furthermore", "Moreover", "Additionally", "In summary".
 
-## 4. Praise written as description
+## 4. Praise where a fact belongs
 
-- A verdict where a fact belongs: "a testament to", "marks a new era", "reimagines".
-- A trailing clause that sells: "..., ideal for modern teams", "..., ensuring a smooth experience". Cut the clause.
-- A crowd that cannot be checked: "trusted by developers", "widely used", "industry standard". Name who, or how many, or remove it.
-- A fancy verb where a plain one fits: "serves as", "boasts", "offers", "provides a way to". Write "is", "has", "does".
-- The author praising their own design: "a carefully designed API".
+- A verdict instead of a description: "a testament to the team's craft", "ushers in a new era", "rethinks what is possible".
+- A closing clause that markets: "..., perfect for teams of any size", "..., so everything just works". Delete it.
+- A crowd nobody can check: "loved by the community", "adopted across the industry", "the de facto choice". Give a name or a figure, or remove it.
+- A grand verb where a short one works: "serves as", "boasts", "offers", "enables you to". Say "is", "has", "does".
+- The author admiring the design: "a thoughtfully crafted interface".
 
-## 5. Layout that every generated README shares
+## 5. Shape that all generated READMEs share
 
-- **Bold label, colon, vague phrase** as the bullet pattern (`- **Fast:** runs quickly.`). The commonest sign of all. Write the bullet as a sentence, or drop the label.
-- Emoji or ornament (check marks, arrows, stars, coloured dots) in headings and bullets.
-- Headings in Title Case with an ampersand ("Features & Benefits"). Use sentence case and say what the section holds.
-- The same sections in the same order in every repo (Features, Installation, Usage, Contributing, License, Acknowledgements). Keep a section only when it has something to say.
-- A table of contents on a README that fits on one screen.
-- More badges than questions a visitor has. [anatomy.md](anatomy.md) says which ones earn a place.
-- A rule line between all sections.
-- A sentence that announces what the next block is ("The table below lists..."). The heading already did.
-- A summary at the end that repeats the page. End on the last useful fact.
-- "Made with love", "Star this repo", "PRs welcome" as the whole contribution section.
+- **Bold word, colon, empty phrase** as the form of every bullet (`- **Reliable:** works as expected.`). Write the bullet as a plain sentence about this project, or drop the bold word.
+- Emoji or ornament (ticks, rockets, sparkles, coloured dots) in headings and lists.
+- Headings in Title Case joined by an ampersand ("Setup & Configuration"). Use sentence case and say what the section contains.
+- One skeleton for every repository: Features, Installation, Usage, Contributing, License, Acknowledgements. Keep a section only when you have something to put in it.
+- A table of contents above a README that fits on one screen.
+- A row of badges that answers no question a visitor asks. [anatomy.md](anatomy.md) names the few worth keeping.
+- A horizontal rule between every pair of sections.
+- A sentence that introduces the table or the list that follows. The heading has already done that.
+- A recap of the whole page at the bottom. Stop at the last fact the reader needs, usually the licence.
+- "Built with passion" or "Contributions are welcome!" standing in for how to contribute.
 
-## 6. Traces of the conversation it came from
+## 6. Left over from a chat
 
-- "Certainly!", "Here is your README", "I hope this helps", "Feel free to".
-- Hedges about its own knowledge: "as of my last update", "details may vary".
-- Template leftovers: `your-username`, `Project Name Here`, `TODO`, `[ADD DESCRIPTION]`, lorem ipsum.
-- Teaching what the reader already knows: how to install Node, what git is.
-- A long author bio or sponsor links above the first screen.
-- Examples that cannot run: a command the project has no script for, a flag the CLI does not accept.
+- "Sure, here is the README", "Hope this is useful", "Don't hesitate to".
+- Statements about its own knowledge: "to the best of my knowledge", "this may have changed".
+- Template residue: `your-org/your-repo`, `Project Title`, `TODO`, `[Insert description]`, lorem ipsum.
+- Instructions for what the reader knows already: installing Node, what a terminal is.
+- A biography or sponsor banner before the first screen of the project itself.
+- Examples that do not run: a command with no script behind it, an option the program does not take.
 
-## 7. What is missing
+## 7. What is absent
 
-The most reliable sign is absence, and nothing in the text can be struck out to fix it:
+The surest sign is what is not there, and no edit can remove an absence, only fill it:
 
-- no opinion a reader could disagree with;
-- no limit, non-goal or known problem;
-- no reason the project exists, and no history;
-- nothing slightly odd or specific to this project; every feature described in the same grammatical form.
+- no claim anyone could disagree with;
+- no limit, no non-goal, no open problem;
+- no reason the project was started, no past;
+- nothing odd or particular to this project, every feature phrased the same way.
 
-Fix: add what only the author knows. Why it exists, one trade-off made on purpose, something it will not do, one rough edge that is still there, one firm opinion.
+Fix: write what only the author can. Why the project exists, a trade-off taken on purpose, something it refuses to do, a rough edge that is still there, an opinion held firmly.
 
 ## 8. Other languages
 
-Every pattern above has a local version in each language. Apply the same tests to the language of the README, and keep technical terms in the form the community uses. In Spanish, for example: "sumérgete en", "potente", "robusto", "sin fisuras", "lleva X al siguiente nivel", "una solución integral", "no solo X, sino también Y". For another language, look for the same families: the promise with no proof, the scene before the point, the template rhythm.
+Each family above has its own versions in every language. Run the same checks on the language the README is in, and keep technical words in the form that community uses. In Spanish, watch for "en un mundo cada vez más digital", "potente", "robusto", "de forma fluida", "eleva tu proyecto", "una herramienta todo en uno", "más que un simple X". In another language, look for the same families: the claim with nothing behind it, the opening before the point, the repeated rhythm.

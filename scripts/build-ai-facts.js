@@ -138,7 +138,7 @@ const BY_NEED = [
 
 // The same for the small skills: what the person says matters, and the skill for it (checked against the folders)
 const SKILL_NEED = [
-  ["A README that reads as written by a person, with true facts", "luz-readme"],
+  ["A README in plain, specific language, with true facts", "luz-readme"],
   ["The colours, fonts and corners of their own brand on LUZ, in light, dark and high contrast", "luz-theme"],
   ["A site that already exists, moved to LUZ one page at a time", "luz-migrate"],
   ["Pages or catalogs of strings in another language, with a glossary and a translation a person still has to review", "luz-translate"],

@@ -1,13 +1,13 @@
 ---
 name: luz-readme
-description: "Writes or rewrites a project README that reads as written by a person, not by an AI. Works for any kind of repository. Every README gets a strong title and subtitle, a cover, links to its sections, the repo's GitHub data, and fixed sections: what it is, usage, installation, credits and license. Use it when the user asks to create, rewrite or improve a README, or to remove the AI feel from one."
+description: "Writes or rewrites a project README in plain, specific language, without the stock phrases of machine-written text, and ends it with a line saying an AI drafted it. Works for any kind of repository. Every README gets a strong title and subtitle, a cover, links to its sections, the repo's GitHub data, and fixed sections: what it is, usage, installation, credits and license. Use it when the user asks to create, rewrite or improve a README, or to take the stock phrases out of one."
 ---
 
 # luz-readme
 
 Write the README a good engineer with taste would have written by hand, for whatever repository is in front of you.
 
-Removing AI tells is half the job. The other half is putting something specific in their place: real facts, real commands, a real voice.
+Cutting the stock phrases of machine-written text is half the job. The other half is putting something specific in their place: real facts, real commands, a real voice.
 
 ## Principles
 

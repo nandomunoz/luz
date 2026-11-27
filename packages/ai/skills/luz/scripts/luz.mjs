@@ -631,7 +631,7 @@ function planSite(values) {
   if (!GENERATED.includes(stack)) return { error: `--stack ${stack}: a page is written for ${GENERATED.join(" and ")} only. Write the page with --stack vanilla, then move its markup and load LUZ as references/stacks.md says` };
   if (!/^[a-z]{2,3}(-[A-Za-z0-9]+)*$/.test(lang)) return { error: `--lang "${lang}" is not a language code such as en, es or ar` };
 
-  const page = readFileSync(join(HERE, "../assets/templates", `${kind}.html.tpl`), "utf-8").replace("{{lang}}", () => lang).replace("{{title}}", () => escapeHtml(name)).replace("<!doctype html>\n", () => `<!doctype html>\n<!-- ${NOTICE} -->\n`);
+  const page = readFileSync(join(HERE, "../assets/templates", `${kind}.html.tpl`), "utf-8").replace("{{lang}}", () => lang).replace("{{title}}", () => escapeHtml(name)).replace("<!doctype html>\n", () => `<!doctype html>\n<!-- ${PAGE_NOTICE} -->\n`);
   const file = stack === "astro" ? { path: "src/pages/index.astro", content: `---\n---\n${page}` } : { path: "index.html", content: page };
   const todo = (file.content.match(/…/g) ?? []).length;
   const ext = stack === "astro" ? " --ext .astro" : "";
@@ -673,10 +673,14 @@ const SELF = basename(join(HERE, ".."));
 // folder (evals, a stray .env, node_modules) goes into a person's project
 const CARRIES = ["SKILL.md", "LICENSE", "agents", "assets", "references", "scripts"];
 
-// The MIT notice of what luz-ai writes (F-2). The text is the LICENSE this skill carries, never typed here: a skill folder
-// gets a copy of it, an agent or a starter page one line that names it and where the text is
+// The MIT notice of what luz-ai writes (F-2, R-06). The text is the LICENSE this skill carries, never typed here: a skill
+// folder gets a copy of it. An agent gets one line that says SPDX MIT, the copyright and where the text is. The starter page
+// gets its own: the template is MIT, and what the person adds to it is theirs, so the page is not read as all of it being the
+// copyright holder's
 const LICENSE_TEXT = readFileSync(join(HERE, "../LICENSE"), "utf-8");
-const NOTICE = `luz-ai: MIT License. ${LICENSE_TEXT.split("\n").find((l) => l.startsWith("Copyright (c)"))}. Text of the licence: https://github.com/nandomunoz/luz/blob/main/packages/ai/LICENSE`;
+const COPYRIGHT = LICENSE_TEXT.split("\n").find((l) => l.startsWith("Copyright (c)"));
+const NOTICE = `luz-ai: SPDX-License-Identifier: MIT. ${COPYRIGHT}. The licence text is the LICENSE of @luz-ds/ai: https://github.com/nandomunoz/luz/blob/main/packages/ai/LICENSE`;
+const PAGE_NOTICE = `Starter template from luz-ai, MIT (${COPYRIGHT}). The content you add is yours.`;
 
 /**
  * The fields of an agent left to fill: a bullet of its text whose value is `[ADAPT: hint]`. A bullet under a
