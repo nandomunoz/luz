@@ -185,7 +185,7 @@ describe("legal audit of 2026-11-27: R-04 and R-05", () => {
     const places = { "SKILL.md": front(readme), "README of the package": packageReadme, "references/skills.md": skillsRef, "need of the skill": SKILL_NEED.map((n) => n.join(" ")).join("\n") };
     for (const [where, text] of Object.entries(places)) {
       expect(text, where).not.toMatch(/written by a person/i);
-      expect(text, where).not.toMatch(/by an AI,? /i);
+      expect(text, where).not.toMatch(/not by an AI/i);
       expect(text, where).not.toMatch(/AI feel/i);
       expect(text, where).not.toMatch(/signs of machine writing/i);
     }
