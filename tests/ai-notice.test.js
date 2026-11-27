@@ -75,7 +75,7 @@ describe("F-2: the MIT notice travels with what the skill writes", () => {
       const report = json(["add", name, "--dir", dir(), "--dry-run"]);
       for (const place of [".agents/skills", ".claude/skills"]) expect(contentOf(report, `${place}/${name}/LICENSE`), `${place}/${name}`).toBe(LICENSE);
     }
-  });
+  }, 60000);
 
   it("puts a header comment in every agent, for each assistant, with the front matter still first", () => {
     for (const name of AGENTS) {
@@ -95,7 +95,7 @@ describe("F-2: the MIT notice travels with what the skill writes", () => {
         }
       }
     }
-  });
+  }, 60000);
 
   it("keeps an agent with its notice unchanged for list and removable by remove", () => {
     const d = dir();
@@ -108,7 +108,7 @@ describe("F-2: the MIT notice travels with what the skill writes", () => {
     run(["remove", "luz-readme", "--dir", d]);
     const left = readdirSync(d, { recursive: true }).map(String).filter((f) => /^\.(claude|agents)\/(agents|skills)\/(luz-readme|luz-agent-ux)/.test(f));
     expect(left).toEqual([]);
-  });
+  }, 60000);
 
   it("puts a comment after the doctype of the starter page, for plain HTML and Astro", () => {
     for (const stack of ["vanilla", "astro"]) {

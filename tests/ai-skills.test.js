@@ -203,7 +203,7 @@ describe("the script", () => {
     const d = empty();
     const r = run(["add", "luz-migrate", "--dir", d, "--dry-run"]);
     expect(r.code).toBe(0);
-    expect(r.out).toMatch(/would write 6 files/);
+    expect(r.out).toMatch(/would write 8 files/);
     expect(existsSync(join(d, ".claude"))).toBe(false);
   });
 

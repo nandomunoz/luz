@@ -718,7 +718,8 @@ describe("the agents of luz-ai", () => {
   const assets = join(skill, "assets");
   const AGENTS = ["luz-agent-accessibility", "luz-agent-legal", "luz-agent-optimiza", "luz-agent-seogeo", "luz-agent-ux"];
   const list = (kind) => JSON.parse(run([kind, "list", "--json"]).out);
-  const bodyOf = (text) => text.replace(/^---\n[\s\S]*?\n---\n+/, "").trim();
+  // the MIT notice of luz-ai (an HTML comment under the front matter) is not part of the instructions
+  const bodyOf = (text) => text.replace(/^---\n[\s\S]*?\n---\n+/, "").replace(/^<!-- luz-ai: MIT License[^\n]*-->\n+/, "").trim();
   const add = (d, name, flags = []) => run(["agent", "add", name, "--dir", d, "--json", ...flags]);
   // The agent of the package has no field to fill, so the mechanics of fields are tried on a copy of the skill with a template that has them
   let templateScript;
@@ -784,6 +785,7 @@ describe("the agents of luz-ai", () => {
     expect(gemini).toMatch(/^tools:\n {2}- read_file\n {2}- grep_search\n---/m);
     expect(codex).toMatch(/^name = "luz-agent-accessibility"$/m);
     expect(codex).toContain(`developer_instructions = ${"'".repeat(3)}\n${source}\n${"'".repeat(3)}\n`);
+    expect(codex).toMatch(/^# luz-ai: MIT License\. Copyright \(c\) /);
     const c = run(["lint", "--json"], d);
     expect(JSON.parse(c.out).problems).toEqual([]);
     expect(JSON.parse(c.out).checked.length).toBe(3);

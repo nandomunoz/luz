@@ -63,10 +63,10 @@ describe("the build", () => {
   buildAi({ outdir: out });
   const files = () => readdirSync(join(out, "skills/luz"), { recursive: true, withFileTypes: true }).filter((e) => e.isFile()).map((e) => join(e.parentPath, e.name).slice(join(out, "skills/luz").length + 1)).sort();
 
-  it("copies what the skill carries and nothing else: no evals, no hidden file, nothing outside its five entries", () => {
+  it("copies what the skill carries and nothing else: no evals, no hidden file, nothing outside its six entries", () => {
     expect(files()).toEqual(carried(root));
     for (const f of files()) {
-      expect(["SKILL.md", "agents", "assets", "references", "scripts"], f).toContain(f.split("/")[0]);
+      expect(["SKILL.md", "LICENSE", "agents", "assets", "references", "scripts"], f).toContain(f.split("/")[0]);
       expect(f.split("/").some((s) => s.startsWith(".")), f).toBe(false);
     }
     expect(existsSync(join(out, "skills/luz/evals"))).toBe(false);
