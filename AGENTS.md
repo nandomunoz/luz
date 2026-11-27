@@ -4,11 +4,11 @@
 
 **The manifesto** ([MANIFESTO.md](./MANIFESTO.md), published at `/manifesto/`): how LUZ is built, not rules for what is built with it. Every change keeps to it:
 
-1. **Native first.** The standard is the path, and the browser the means.
+1. **Lightweight.** Zero dependencies, more optimization.
 2. **Accessible, always.** Accessibility is not optional in a starting point.
-3. **Lightweight.** Zero dependencies, more optimization.
-4. **Tested, without overdoing it.** No test, no paradise.
-5. **AI is the means, not the end.** AI helps, but does not decide for us.
+3. **Native first.** The standard is the path, and the browser the means.
+4. **AI is the means, not the end.** AI helps, but does not decide for us.
+5. **Keep it simple.** If it needs explaining, it is not simple yet.
 
 The page is `apps/site/manifesto/index.html` (English, Spanish and Arabic, a switch with no script), served as it is by `scripts/docs-site/manifesto.js`; a change to a point changes MANIFESTO.md and the page together (`tests/manifesto-page.test.js`).
 
