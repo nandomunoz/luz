@@ -5946,7 +5946,6 @@ html:has(.landing-marquee) {
 /* The head of a card: the icon and, beside it, the title (owner, 2026-11-26) */
 .landing-ai__head {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   gap: var(--luz-space-sm);
   min-inline-size: 0;
@@ -5955,6 +5954,15 @@ html:has(.landing-marquee) {
 .landing-ai__head .landing-card__title {
   margin: 0;
   min-inline-size: 0;
+}
+
+/* The title stays on the icon's row, wrapping its own words, until there is no room for both: at 400 % text on a
+   narrow screen it goes under the icon instead of being squeezed to nothing (WCAG 1.4.10); the card measures itself
+   in its own em, so the rule follows the reader's text size */
+@container ai-card (max-inline-size: 8em) {
+  .landing-ai__head {
+    flex-wrap: wrap;
+  }
 }
 
 .landing-ai__icon {
@@ -5969,6 +5977,7 @@ html:has(.landing-marquee) {
 }
 
 .landing-ai__card {
+  container: ai-card / inline-size;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
