@@ -617,8 +617,17 @@ describe("the script's capabilities (security-auditor Q1, condition a)", () => {
 describe("the release flow runs ai-readme in the version step, without lifecycle hooks", () => {
   const pkg = JSON.parse(read("package.json"));
 
-  it("the root package.json has a release:version script: changeset version, the versions of the install pages, ai-readme --write, then the facts and starters of the luz skill", () => {
-    expect(pkg.scripts["release:version"]).toBe("changeset version && node scripts/release-sync.js && node scripts/ai-readme.js --write && node scripts/build-ai-facts.js");
+  it("the root package.json has a release:version script: changeset version, the versions of the install pages, ai-readme --write, then the build, which writes the facts and starters of the luz skill", () => {
+    expect(pkg.scripts["release:version"]).toBe("changeset version && node scripts/release-sync.js && node scripts/ai-readme.js --write && pnpm build");
+  });
+
+  it("the build comes before the facts: the version job installs and builds nothing, and the facts read packages/*/dist (the first Version PR failed on packages/catalog/dist/custom-elements.json)", () => {
+    const steps = pkg.scripts["release:version"].split("&&").map((s) => s.trim());
+    expect(steps.at(-1)).toBe("pnpm build");
+    expect(pkg.scripts.build).toMatch(/catalog:build/);
+    expect(pkg.scripts.build).toMatch(/ai:build/);
+    expect(pkg.scripts["ai:build"]).toMatch(/^node scripts\/build-ai-facts\.js/);
+    expect(pkg.scripts.build.indexOf("catalog:build")).toBeLessThan(pkg.scripts.build.indexOf("ai:build"));
   });
 
   it("has no prerelease:version or postrelease:version script (pnpm runs those hooks; --ignore-scripts does not cover them)", () => {
