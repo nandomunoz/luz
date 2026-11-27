@@ -7,10 +7,10 @@
  *     "Human-first, AI-ready"
  *     "Every change starts with a failing test"
  *
- *   Home page    apps/landing/i18n/{en,es,ar}.json carry the lead in `hero.lead`: since 2026-11-23 two short
- *                sentences (what LUZ is built on, and its name spelled out), at the owner's request, so the
- *                home no longer says "every change starts with a failing test": README.md and PRINCIPLES.md do;
- *                apps/landing/index.html writes it as {{html:hero.lead}}; the old built.* keys are gone
+ *   Home page    the hero has no lead (owner, 2026-11-27): its title says what LUZ is, "Design system for
+ *                humans, ready for AI" (`hero.title`, with its `em` words), and two buttons; the three words
+ *                of the name are in Who we are, so the home no longer says "every change starts with a
+ *                failing test": README.md and PRINCIPLES.md do; no `hero.lead` key, and the old built.* keys are gone
  *   README.md, PRINCIPLES.md   both statements before the first `## ` heading
  *   Page         apps/docs/pages/get-started/how-luz-is-built.html: front matter
  *                title "How LUZ is built", area get-started, order 11 (after Migrate),
@@ -46,26 +46,31 @@ describe("the home page says it in three languages", () => {
   const catalog = (code) => JSON.parse(read(`apps/landing/i18n/${code}.json`));
   const textOfHtml = (html) => html.replace(/<[^>]*>/g, "").replace(/&amp;/g, "&").replace(/\s+/g, " ").trim();
 
-  it("English says what LUZ is built on in the lead, in two short sentences", () => {
+  it("English says what LUZ is in the title of the hero, with its two ways in as buttons, and has no lead", () => {
     // README.md and PRINCIPLES.md keep STATEMENT and LINE
-    const lead = catalog("en")["hero.lead"];
-    // It says what LUZ is built on, its three words (strong) and the two ways in (the tunnel hero, 2026-11-26)
-    expect([...lead.matchAll(/<strong\b[^>]*>([^<]*)<\/strong>/g)].map((m) => m[1])).toEqual(["Light", "Usable", "Zero-dependency"]);
-    expect(textOfHtml(lead)).toBe("Tokens, CSS and a little vanilla JavaScript, built on what the browser already does. Light, Usable and Zero-dependency: start a project, or migrate it page by page.");
-  });
-
-  it.each(["es", "ar"])("%s has the lead, translated: not the English text, and no English left but a name", (code) => {
     const en = catalog("en");
-    const lead = catalog(code)["hero.lead"];
-    expect(lead, `${code} hero.lead is not the English text`).not.toBe(en["hero.lead"]);
-    expect(textOfHtml(lead).length, `${code} hero.lead`).toBeGreaterThan(80);
+    expect(textOfHtml(en["hero.title"])).toBe("Design system for humans, ready for AI.");
+    expect([...en["hero.title"].matchAll(/<em\b[^>]*>([^<]*)<\/em>/g)].map((m) => m[1])).toEqual(["humans", "AI"]);
+    expect(en["hero.start-ai"]).toBe("Get started with AI");
+    expect(en["hero.docs"]).toBe("Read the docs");
+    expect(Object.keys(en).filter((k) => k.startsWith("hero.")).sort(), "no hero.lead").toEqual(["hero.docs", "hero.start-ai", "hero.title"]);
   });
 
-  it("Arabic says it in Arabic: the lead has Arabic letters, and only the names of the technologies in Latin", () => {
-    // The three words of the name stay English, in a span marked lang="en": they are not read as Arabic prose
-    const lead = textOfHtml(catalog("ar")["hero.lead"].replace(/<span\b[^>]*\blang="en"[^>]*>[\s\S]*?<\/span>/g, ""));
-    expect(lead).toMatch(/[؀-ۿ]/);
-    expect(lead.replace(/\b(?:LUZ|CSS|JavaScript|HTML)\b/g, "")).not.toMatch(/[A-Za-z]/);
+  it.each(["es", "ar"])("%s has the hero, translated: not the English text, and no English left but a name", (code) => {
+    const en = catalog("en");
+    const hero = catalog(code);
+    expect(Object.keys(hero).filter((k) => k.startsWith("hero.")).sort(), `${code} has the keys of en and no hero.lead`).toEqual(["hero.docs", "hero.start-ai", "hero.title"]);
+    for (const key of ["hero.title", "hero.start-ai", "hero.docs"]) expect(hero[key], `${code} ${key} is not the English text`).not.toBe(en[key]);
+    expect(textOfHtml(hero["hero.title"]).length, `${code} hero.title`).toBeGreaterThan(15);
+  });
+
+  it("Arabic says it in Arabic: the title and the buttons have Arabic letters, and no Latin ones", () => {
+    const ar = catalog("ar");
+    for (const key of ["hero.title", "hero.start-ai", "hero.docs"]) {
+      const text = textOfHtml(ar[key].replace(/<span\b[^>]*\blang="en"[^>]*>[\s\S]*?<\/span>/g, ""));
+      expect(text, key).toMatch(/[؀-ۿ]/);
+      expect(text.replace(/\b(?:LUZ|CSS|JavaScript|HTML)\b/g, ""), key).not.toMatch(/[A-Za-z]/);
+    }
   });
 
   it("the three built.* keys are gone from every catalog, and the template has no line of its own", () => {
@@ -75,7 +80,8 @@ describe("the home page says it in three languages", () => {
     const html = read("apps/landing/index.html");
     expect(html).not.toContain("built.title");
     expect(html).not.toContain("landing-built");
-    expect(html).toContain("{{html:hero.lead}}");
+    expect(html).toContain("{{html:hero.title}}");
+    expect(html, "the hero has no lead").not.toContain("hero.lead");
   });
 });
 

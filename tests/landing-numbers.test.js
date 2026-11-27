@@ -161,13 +161,13 @@ afterEach(() => {
 
 /**
  * The real home and its docs in a throwaway repository (the generator writes the home's weights,
- * lists and checks from the repository for every language), whose English `hero.lead` says `value`.
+ * lists and checks from the repository for every language), whose English `hero.docs` (the hero's second button, a text written as it is) says `value`.
  */
 function fixture(value) {
   const site = makeSite({ languages: [] });
   temps.push(site.repoRoot);
   const path = join(site.repoRoot, "apps/landing/i18n/en.json");
-  writeFileSync(path, JSON.stringify({ ...JSON.parse(readFileSync(path, "utf-8")), "hero.lead": value }, null, 2));
+  writeFileSync(path, JSON.stringify({ ...JSON.parse(readFileSync(path, "utf-8")), "hero.docs": value }, null, 2));
   return site.repoRoot;
 }
 

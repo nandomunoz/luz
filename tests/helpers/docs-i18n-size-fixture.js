@@ -156,6 +156,8 @@ export function makeSite({ languages = ["es", "ar"], probe = false } = {}) {
   });
   mkdirSync(join(repoRoot, "apps/site"), { recursive: true });
   cpSync(join(REAL_REPO, "apps/site/_partials"), join(repoRoot, "apps/site/_partials"), { recursive: true });
+  // The page of the manifesto, a file on disk (the home links to it from Who we are, and its route exists only when the file does)
+  cpSync(join(REAL_REPO, "apps/site/manifesto"), join(repoRoot, "apps/site/manifesto"), { recursive: true });
   mkdirSync(join(repoRoot, "apps/landing"), { recursive: true });
   cpSync(join(REAL_REPO, "apps/landing/i18n"), join(repoRoot, "apps/landing/i18n"), { recursive: true });
   cpSync(join(REAL_REPO, "apps/landing/index.html"), join(repoRoot, "apps/landing/index.html"));

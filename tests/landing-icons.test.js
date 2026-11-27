@@ -35,8 +35,11 @@ describe("the icons of the home page follow the one family of the Icons page", (
     const widths = [...html.matchAll(/\bstroke-width\s*=\s*"?([^"\s>]+)/g)].map((m) => m[1]);
     expect(widths.length, "the symbols of the sprite carry theirs").toBeGreaterThan(0);
     expect(widths.filter((w) => w !== "1.5")).toEqual([]);
-    // and none in a style rule of the page either, but the 1.5 of .ic
-    const inCss = [...css.matchAll(/stroke-width\s*:\s*([^;}]+)/g)].map((m) => m[1].trim());
+    // and none in a style rule of the page either, but the 1.5 of .ic. The frames of the hero's tunnel are
+    // not icons (a drawing behind the copy, not in the sprite): on a phone they are a thinner 1.25, which
+    // tests/landing-tunnel.test.js holds
+    const rules = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)].filter(([, selector]) => !selector.includes(".landing-tunnel"));
+    const inCss = rules.flatMap(([, , body]) => [...body.matchAll(/stroke-width\s*:\s*([^;}]+)/g)].map((m) => m[1].trim()));
     expect(inCss.filter((w) => w !== "1.5")).toEqual([]);
   });
 

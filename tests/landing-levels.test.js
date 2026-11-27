@@ -67,7 +67,11 @@ describe("the pages of the three levels", () => {
     const html = rendered.get(`${prefix}${name}/`);
     // no link to a section the page does not have: they go to the home of the language
     expect(hrefsOf(html, /<a\b[^>]*\shref="(#[^"]*)"/g).filter((href) => href !== "#main-content" && !href.startsWith("#all") && !href.startsWith("#install") && !href.startsWith("#hero") && !href.startsWith("#t-") && href !== "#steps")).toEqual([]);
-    expect(html).toMatch(new RegExp(`href="${prefix}#tokens"`));
+    // the drawer lists the sections the home has that the level pages do not (Who we are, the AI level, the FAQ): they
+    // go to the language's home. The levels themselves (Tokens, Core, Catalog, AI) are the header's and the drawer's site links.
+    for (const id of ["who", "ai", "faq"]) expect(html, `#${id} on the home of the language`).toMatch(new RegExp(`href="${prefix}#${id}"`));
+    expect(html).not.toMatch(new RegExp(`href="${prefix}#(?:tokens|core|catalog)"`));
+    for (const level of ["ai", "tokens", "core", "catalog"]) expect(html, `${level} in the header and the drawer`).toMatch(new RegExp(`<a\\b[^>]*\\shref="${prefix}${level}/"`));
     // the icons are the page's own: a <use> keeps pointing at the sprite, never at the home
     const uses = hrefsOf(html, /<use\b[^>]*\shref="([^"]*)"/g);
     expect(uses.length).toBeGreaterThan(0);

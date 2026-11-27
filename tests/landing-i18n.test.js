@@ -398,7 +398,7 @@ describe("the new home page: catalogs and rendered pages (F5)", () => {
   const { rendered: written, problems } = buildSite(site, { extra: [...docs, ...levelPagesOf(site, template)] });
   // What the build wrote (its size is what the ceiling weighs) and the same page with the quotes of its values restored
   const rendered = new Map([...written].map(([route, page]) => [route, quoted(page)]));
-  const SECTIONS = ["hero", "tokens", "core", "catalog", "ai", "faq"];
+  const SECTIONS = ["hero", "who", "ai", "tokens", "core", "catalog", "faq", "users"];
   /** Sections the home no longer has (owner, 2026-11-23): the home is the hero, the four levels and the FAQ. */
   const GONE = ["why", "native", "modes"];
   const placeholders = (value) => [...value.matchAll(/\{[a-z]+(?::[a-z]+)?\}/g)].map((m) => m[0]).sort();
@@ -454,20 +454,21 @@ describe("the new home page: catalogs and rendered pages (F5)", () => {
   it("the hero's brand is LUZ in every language", () => {
     for (const doc of docs) {
       const html = rendered.get(doc.route);
-      // The word is drawn with CSS: its letters are hidden from the tree and a visually hidden LUZ is what is read
+      // The word is the wordmark partial's SVG (hidden from the tree, one path per letter) and a visually hidden LUZ is what is read
       const h1 = query(parse(html, doc.route), "h1");
       const brand = query(h1, "span.landing-hero__brand.landing-imago");
       expect(brand, `${doc.route} the brand is in the h1`).not.toBeNull();
       expect(brand.attrs.get("lang"), doc.route).toBe("en");
-      const word = query(brand, "span.landing-imago__word");
-      expect(word.attrs.get("dir"), doc.route).toBe("ltr");
+      expect(brand.attrs.get("dir"), doc.route).toBe("ltr");
+      const word = query(brand, "svg.landing-wordmark");
+      expect(word, `${doc.route} the wordmark`).not.toBeNull();
       expect(word.attrs.get("aria-hidden"), doc.route).toBe("true");
-      expect(findAll(word, (node) => node.name === "span" && node.attrs.has("class")).map((node) => textOf(node)), doc.route).toEqual(["L", "U", "Z"]);
+      expect(findAll(word, (node) => node.name === "path").map((node) => node.attrs.get("class")), doc.route).toEqual(["landing-wordmark__l", "landing-wordmark__u", "landing-wordmark__z"]);
       expect(textOf(query(brand, "span.u-sr-only")), doc.route).toBe("LUZ");
     }
   });
 
-  it("each language renders the seven sections in order and none other at the top level, one h1 and no template syntax left", () => {
+  it("each language renders the eight sections in order and none other at the top level, one h1 and no template syntax left", () => {
     for (const doc of docs) {
       const html = rendered.get(doc.route);
       const at = SECTIONS.map((id) => html.search(new RegExp(`<section\\b[^>]*\\sid="${id}"`)));
@@ -502,32 +503,10 @@ describe("the new home page: catalogs and rendered pages (F5)", () => {
     }
   });
 
-  it("the hero's lead is short in every language: what LUZ is built on, its three words, and the two ways in", () => {
-    // Owner, 2026-11-26 (the tunnel hero): what it is built on, then Light, Usable and Zero-dependency (strong), and
-    // what to do with it: start a project, or migrate one page by page
-    const lead = catalogs.en["hero.lead"];
-    expect(lead.replace(/<[^>]*>/g, "")).toBe("Tokens, CSS and a little vanilla JavaScript, built on what the browser already does. Light, Usable and Zero-dependency: start a project, or migrate it page by page.");
-    expect([...lead.matchAll(/<strong\b[^>]*>([^<]*)<\/strong>/g)].map((m) => m[1])).toEqual(["Light", "Usable", "Zero-dependency"]);
-    expect(lead).toMatch(/<strong class="landing-nowrap">Zero-dependency<\/strong>/);
-    // Spanish and Arabic keep the three words in English: marked lang="en" (in Arabic inside an isolate)
-    for (const code of ["es", "ar"]) {
-      const text = catalogs[code]["hero.lead"];
-      expect([...text.matchAll(/<strong\b[^>]*>([^<]*)<\/strong>/g)].map((m) => m[1]), code).toEqual(["Light", "Usable", "Zero-dependency"]);
-      expect(text, code).toMatch(/<span lang="en"><strong>Light<\/strong>, <strong>Usable<\/strong> and <strong class="landing-nowrap">Zero-dependency<\/strong><\/span>/);
-      expect(text, code).not.toMatch(/\(|\)/);
-      expect(text, `${code} is not the English text`).not.toBe(lead);
-    }
-    expect(catalogs.ar["hero.lead"], "ar: the English words sit in an isolate").toMatch(/[\u2066-\u2068]<span lang="en">[\s\S]*<\/span>\u2069/);
-    for (const code of ["en", "es", "ar"]) {
-      const length = catalogs[code]["hero.lead"].replace(/<[^>]*>/g, "").length;
-      expect(length, code).toBeGreaterThan(80);
-      expect(length, code).toBeLessThanOrEqual(190);
-    }
-  });
-
-  it("the hero has two actions and no key left of the old first screen: no hero.start, no light.* of the globe", () => {
+  it("the hero has a title and two actions, no lead (owner, 2026-11-27) and no key left of the old first screen: no hero.start, no light.* of the globe", () => {
     for (const code of ["en", "es", "ar"]) {
       const keys = Object.keys(catalogs[code]);
+      expect(keys.filter((key) => key.startsWith("hero.")).sort(), code).toEqual(["hero.docs", "hero.start-ai", "hero.title"]);
       expect(keys, code).not.toContain("hero.start");
       expect(keys.filter((key) => /^light\.(?:nojs|open|fact\.|alt\.|scrub|saved|sep)/.test(key)), code).toEqual([]);
     }
@@ -538,11 +517,6 @@ describe("the new home page: catalogs and rendered pages (F5)", () => {
   describe("Spanish", () => {
     /** A value as a reader meets it: tags gone, and what is marked as English (lang="en") left out. */
     const spanish = (value) => value.replace(/<span\b[^>]*\blang="en"[^>]*>[\s\S]*?<\/span>/g, "").replace(/<[^>]*>/g, "");
-
-    it("the hero's lead says framework once at most", () => {
-      const mentions = catalogs.es["hero.lead"].replace(/<[^>]*>/g, "").match(/framework/gi) ?? [];
-      expect(mentions.length).toBeLessThanOrEqual(1);
-    });
 
     it("a design system is \"sistema de diseño\" everywhere: no \"design system\" outside a lang=\"en\" span", () => {
       const offenders = Object.entries(catalogs.es).filter(([, value]) => /design system/i.test(spanish(value))).map(([key]) => key);

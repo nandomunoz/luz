@@ -8,8 +8,8 @@
  *   reader) and a "beta v<version>" badge, named "LUZ beta v<version>"; the version is not a link
  *   to the changelog (that is a link of the footer).
  * - No Home link in the row. Two groups (owner, 2026-11-24): where to go, words only, after the logo
- *   (the four sections of the site, Tokens, Core, Catalog and AI, the pages /tokens/, /core/,
- *   /catalog/ and /ai/ of the page's language, the one of the page marked current, then
+ *   (the four sections of the site, AI, Tokens, Core and Catalog, the pages /ai/, /tokens/, /core/
+ *   and /catalog/ of the page's language, the one of the page marked current, then
  *   Documentation); and what to use, at the end: GitHub (its mark, its name for a reader), Search,
  *   Language, then the menu button.
  * - The colour mode is not in the header.
@@ -35,12 +35,12 @@ const homes = landing.map((d) => d.route);
 const levelPages = levelPagesOf(site);
 const { rendered } = buildSite(site, { extra: [...landing, ...levelPages] });
 const levelRoutes = levelPages.map((d) => d.route);
-/** The four sections of the site, by the path under a home and the catalog key of their link. */
+/** The four sections of the site, by the path under a home and the catalog key of their link: AI first (owner, 2026-11-27), as the home's sections are. */
 const SECTIONS = [
+  ["ai", "site.ai"],
   ["tokens", "site.tokens"],
   ["core", "site.core"],
   ["catalog", "site.catalog"],
-  ["ai", "site.ai"],
 ];
 /** The home of a route: the home page itself, the home a level page is under, "/" for the docs. */
 const homeOf = (route) => [...homes].sort((a, b) => b.length - a.length).find((h) => route.startsWith(h) && !route.startsWith("/docs/")) ?? "/";
@@ -133,7 +133,7 @@ describe("the header's row", () => {
     }
   });
 
-  it("links to the four sections of the site, Tokens, Core, Catalog and AI, under the page's home and in its language; Documentation is the icon beside GitHub", () => {
+  it("links to the four sections of the site, AI, Tokens, Core and Catalog, under the page's home and in its language; Documentation is the icon beside GitHub", () => {
     for (const route of [...homes, ...levelRoutes, ...DOCS_PAGES]) {
       const nav = query(headerOf(route), "nav.site-header__nav");
       expect(nav, route).toBeTruthy();
@@ -162,8 +162,8 @@ describe("the header's row", () => {
   });
 
   it("names the sections in every language, Catalog and AI translated", () => {
-    expect(SECTIONS.map(([, key]) => catalog("en")[key])).toEqual(["Tokens", "Core", "Catalog", "AI"]);
-    expect(SECTIONS.map(([, key]) => catalog("es")[key])).toEqual(["Tokens", "Core", "Catálogo", "IA"]);
+    expect(SECTIONS.map(([, key]) => catalog("en")[key])).toEqual(["AI", "Tokens", "Core", "Catalog"]);
+    expect(SECTIONS.map(([, key]) => catalog("es")[key])).toEqual(["IA", "Tokens", "Core", "Catálogo"]);
     for (const [, key] of SECTIONS) expect(catalog("ar")[key], key).toBeTruthy();
     expect(catalog("ar")["site.catalog"]).toMatch(/[\u0600-\u06FF]/);
     expect(catalog("ar")["site.ai"]).toMatch(/[\u0600-\u06FF]/);

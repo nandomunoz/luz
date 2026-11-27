@@ -1,6 +1,4 @@
 /**
- * DRAFT for test-writer (frontend-engineer may not write tests/). Proposed path: tests/landing-tunnel.test.js.
- *
  * The tunnel of the home's hero (owner, 2026-11-26): thirteen frames of the logo's triangle behind the copy.
  * CSS (apps/landing/landing.css) and JS (apps/landing/tunnel.js) guarantees the owner asked for.
  */
@@ -86,13 +84,15 @@ describe("the tunnel's CSS", () => {
     expect(value(rule(forced, ".landing-tunnel__frame svg"), "stroke")).toBe("CanvasText");
     expect(value(rule(css, ':root[data-theme="high-contrast"] .landing-tunnel__back'), "display")).toBe("none");
   });
-  it("phone (max-width 768px): 120vmin, -52vmin/-60vmin, perspective 420px, stroke 1.25px, cy 50%, title clamp, stacked buttons", () => {
+  it("phone (max-width 768px): 120vmin, -52vmin/-60vmin, perspective 420px, stroke 1.25, cy 50%, stacked buttons", () => {
     expect(value(rule(phone, ".landing-tunnel"), "--landing-tunnel-cy")).toBe("50%");
     expect(value(rule(phone, ".landing-tunnel__back"), "perspective")).toBe("420px");
     expect(value(rule(phone, ".landing-tunnel__frame"), "inline-size")).toBe("120vmin");
-    expect(value(rule(phone, ".landing-tunnel__frame svg"), "stroke-width")).toBe("1.25px");
-    expect(value(rule(phone, ".landing-tunnel .luz-hero__title"), "font-size")).toBe("clamp(2.75rem, 13vw, 3.75rem)");
+    expect(value(rule(phone, ".landing-tunnel__frame svg"), "stroke-width")).toBe("1.25");
     expect(value(rule(phone, ".landing-tunnel .o-actions"), "flex-direction")).toBe("column");
+    // The title has one clamp for every width (2.75rem on a phone to 4.5rem), not one for phones
+    expect(value(rule(css, ".landing-tunnel .luz-hero__title"), "font-size")).toBe("clamp(2.75rem, 1.25rem + 5vw, 4.5rem)");
+    expect(value(rule(phone, ".landing-tunnel .luz-hero__title"), "font-size")).toBeUndefined();
   });
 });
 

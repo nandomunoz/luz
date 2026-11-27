@@ -1238,7 +1238,7 @@ describe("the LUZ docs site", () => {
     expect(drawer.attrs.has("popover")).toBe(true);
     expect(query(dom, "button.luz-nav-toggle").attrs.get("popovertarget")).toBe("page-nav");
     const hrefs = findAll(drawer, (n) => n.name === "a").map((a) => a.attrs.get("href"));
-    expect(hrefs).toEqual(["/tokens/", "/core/", "/catalog/", "/ai/", "/docs/", "https://github.com/nandomunoz/luz"]);
+    expect(hrefs).toEqual(["/ai/", "/tokens/", "/core/", "/catalog/", "/docs/", "https://github.com/nandomunoz/luz"]);
   });
 
   it("the not-found page has a decorative \"SYSTEM FAILURE\" first in the main, and its one h1 in a visually hidden wrapper", () => {
