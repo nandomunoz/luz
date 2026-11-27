@@ -174,6 +174,47 @@ describe("the three of 2026-11-26: translate, meta and license", () => {
   });
 });
 
+describe("legal audit of 2026-11-27: R-04 and R-05", () => {
+  const readme = read(join(skill, "assets/skills/luz-readme/SKILL.md"));
+  const license = read(join(skill, "assets/skills/luz-license/SKILL.md"));
+  const front = (text) => text.match(/^description: (.*)$/m)[1];
+  const packageReadme = read(join(root, "packages/ai/README.md"));
+  const skillsRef = read(join(skill, "references/skills.md"));
+
+  it("R-04: luz-readme does not promise that a README passes for a person's, or that the AI feel is gone, and says it ends with a line that an AI drafted it", () => {
+    const places = { "SKILL.md": front(readme), "README of the package": packageReadme, "references/skills.md": skillsRef, "need of the skill": SKILL_NEED.map((n) => n.join(" ")).join("\n") };
+    for (const [where, text] of Object.entries(places)) {
+      expect(text, where).not.toMatch(/written by a person/i);
+      expect(text, where).not.toMatch(/by an AI,? /i);
+      expect(text, where).not.toMatch(/AI feel/i);
+      expect(text, where).not.toMatch(/signs of machine writing/i);
+    }
+    expect(front(readme)).toMatch(/plain, specific language/);
+    expect(front(readme)).toMatch(/stock phrases of machine-written text/);
+    expect(front(readme)).toMatch(/ends it with a line (that )?say(s|ing) an AI drafted it/);
+    expect(packageReadme).toMatch(/plain, specific language/);
+    expect(packageReadme).toMatch(/stock phrases of machine-written text/);
+    expect(packageReadme).toMatch(/ends with a line (that )?say(s|ing) an AI drafted it/);
+    expect(readme).not.toMatch(/Removing AI tells/);
+  });
+
+  it("R-05: luz-license asks once, before it writes, whether the person holds the rights to publish under MIT, and writes nothing on No or Not sure", () => {
+    expect(license).toMatch(/Do you hold the rights to publish this project under the MIT licence/);
+    expect(license).toMatch(/employer or a client/);
+    expect(license).toMatch(/Yes, No or Not sure/);
+    expect(license).toMatch(/Ask it once/i);
+    expect(license).toMatch(/On "No" or "Not sure", write nothing/);
+    expect(license).toMatch(/ask a lawyer/i);
+    // the question comes before the plan and the writing
+    expect(license.indexOf("Do you hold the rights")).toBeLessThan(license.indexOf("### 4. Show the plan"));
+  });
+
+  it("R-05: the MIT text is in references/notices.md, not 'below' in SKILL.md", () => {
+    expect(license).not.toMatch(/the MIT text below/);
+    expect(license).toMatch(/the MIT text in \[references\/notices\.md\]\(references\/notices\.md\)/);
+  });
+});
+
 describe("the script", () => {
   it("lists the six skills with `skill list` and with `skills`, and `luz` is not one of them: init installs it", () => {
     for (const args of [["skill", "list", "--json"], ["skills", "--json"]]) {

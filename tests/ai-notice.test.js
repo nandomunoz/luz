@@ -6,6 +6,9 @@
  *        a skill (the skill itself and the six small ones), a header comment in an agent (HTML comment in the Markdown
  *        of Claude Code and Gemini CLI, `#` lines in the TOML of Codex) and in the starter page `site new` writes.
  *        The text is read from the LICENSE the skill carries, which is the one of @luz-ds/ai, never typed twice.
+ *   R-06 (legal audit 2026-11-27) the header of an agent is `SPDX-License-Identifier: MIT`, the copyright and a pointer
+ *        to the LICENSE of @luz-ds/ai; the starter page has its own, shorter notice, which says that what the person adds
+ *        is theirs, so the page is not read as all of it being the copyright holder's.
  */
 import { spawnSync } from "node:child_process";
 import { mkdtempSync, readFileSync, readdirSync, rmSync } from "node:fs";
@@ -85,13 +88,15 @@ describe("F-2: the MIT notice travels with what the skill writes", () => {
         const [file] = JSON.parse(r.out).files;
         const lines = file.content.split("\n");
         const head = lines.slice(0, 30).join("\n");
-        expect(head, `${name} ${target}`).toContain("MIT License");
+        expect(head, `${name} ${target}`).toContain("SPDX-License-Identifier: MIT");
         expect(head, `${name} ${target}`).toContain(COPYRIGHT);
         expect(head, `${name} ${target}`).toContain("luz-ai");
+        expect(head, `${name} ${target}`).toContain("LICENSE of @luz-ds/ai");
+        expect(head, `${name} ${target}`).toContain("packages/ai/LICENSE");
         if (target === "codex") expect(lines[0], name).toMatch(/^# /);
         else {
           expect(lines[0], name).toBe("---");
-          expect(file.content, name).toMatch(/\n---\n\n<!-- [^>]*MIT License[^>]*-->\n\n# /);
+          expect(file.content, name).toMatch(/\n---\n\n<!-- [^>]*SPDX-License-Identifier: MIT[^>]*-->\n\n# /);
         }
       }
     }
@@ -110,12 +115,14 @@ describe("F-2: the MIT notice travels with what the skill writes", () => {
     expect(left).toEqual([]);
   }, 60000);
 
-  it("puts a comment after the doctype of the starter page, for plain HTML and Astro", () => {
+  it("puts a comment after the doctype of the starter page, for plain HTML and Astro, that says the template is MIT and the content the person's", () => {
     for (const stack of ["vanilla", "astro"]) {
       const report = json(["site", "new", "--name", "Acme", "--kind", "landing", "--stack", stack, "--target", dir(), "--dry-run"]);
       const page = report.files[0].content;
-      expect(page, stack).toMatch(/<!doctype html>\n<!-- [^>]*MIT License[^>]*-->\n<html/);
-      expect(page, stack).toContain(COPYRIGHT);
+      expect(page, stack).toContain(`<!doctype html>\n<!-- Starter template from luz-ai, MIT (${COPYRIGHT}). The content you add is yours. -->\n<html`);
+      // the page is not the agents' notice: no SPDX line, no claim over what the person adds
+      expect(page, stack).not.toContain("SPDX-License-Identifier");
+      expect(page, stack).not.toContain("MIT License");
     }
   });
 });
