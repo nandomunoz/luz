@@ -236,12 +236,12 @@ test.describe('home page hero', () => {
       const hero = document.querySelector('.luz-hero');
       const box = hero.getBoundingClientRect();
       const title = document.querySelector('.luz-hero__title');
-      // The text, not the block: the lines of the sentence (after the word LUZ, which is drawn by its own spans) are centred about the middle of the hero
+      // The text, not the block: the lines of the sentence (after the word LUZ, which is an SVG of three paths) are centred about the middle of the hero
       const range = document.createRange();
       range.setStartAfter(title.querySelector('.landing-imago'));
       range.setEndAfter(title.lastChild);
       const rects = [...range.getClientRects()];
-      const word = title.querySelector('.landing-imago__word').getBoundingClientRect();
+      const word = title.querySelector('.landing-wordmark').getBoundingClientRect();
       return {
         middle: (box.left + box.right) / 2,
         word: (word.left + word.right) / 2,
