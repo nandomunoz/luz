@@ -53,8 +53,15 @@ describe("the tunnel's CSS", () => {
     const frame = rule(moving, ".landing-tunnel__frame");
     expect(value(frame, "animation")).toBe("landing-tunnel-fly var(--landing-tunnel-cycle) linear infinite");
     expect(value(frame, "animation-delay")).toBe("calc(var(--i) * var(--landing-tunnel-cycle) / -13)");
-    const outside = [...motion.rest.matchAll(/([^{}]*)\{([^{}]*)\}/g)].filter((m) => /landing-tunnel/.test(m[1]));
+    // The one exemption: the floating colour-mode button of a short phone, shown by the page's own scroll (a scroll
+    // timeline, which has no duration and is no motion over time) and a single step under reduced motion (RL-8).
+    const colourButton = /\.luz-theme-mode__button--fixed/;
+    const outside = [...motion.rest.matchAll(/([^{}]*)\{([^{}]*)\}/g)].filter((m) => /landing-tunnel/.test(m[1]) && !colourButton.test(m[1]));
     for (const [, selector, decls] of outside) expect(decls, selector).not.toMatch(/(^|[;\s])(animation|transition)[a-z-]*\s*:/);
+    for (const [, selector, decls] of [...motion.rest.matchAll(/([^{}]*)\{([^{}]*)\}/g)].filter((m) => colourButton.test(m[1]) && /(^|[;\s])animation\s*:\s*(?!\s|none\b)/.test(m[2]))) {
+      expect(decls, selector).toMatch(/animation-timeline:\s*scroll\(/);
+      expect(decls, selector).not.toMatch(/infinite|\d(ms|s)\b/);
+    }
     expect(value(rule(moving, ".landing-tunnel.is-off .landing-tunnel__frame"), "animation-play-state")).toBe("paused");
   });
   it("91 s cycle from a motion token (7 s frame to frame)", () => {
