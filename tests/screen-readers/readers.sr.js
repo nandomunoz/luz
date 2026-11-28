@@ -35,13 +35,34 @@ const reachable = (page, selector) =>
       .filter(Boolean),
   );
 
+// Move the reader's own cursor to an element: DOM focus alone does not move it in every
+// reader, a real Tab does, so focus the element, step back and Tab onto it again
+async function reach(sr, page, locator) {
+  await locator.focus();
+  await sr.press("Shift+Tab");
+  await sr.press("Tab");
+  await page.waitForTimeout(1000);
+}
+
 async function headings(sr, page, path, { h1 }) {
   await page.goto(path, { waitUntil: "load" });
   await page.locator("h1").first().waitFor();
   const expected = await reachable(page, "main h2");
   expect(expected.length, `${path} has h2 headings to reach`).toBeGreaterThan(0);
   await sr.navigateToWebContent();
-  for (let i = 0; i < expected.length + 2; i++) await sr.nextHeading();
+  // h3s sit between the h2s, so walk until every h2 is said or the reader stops moving
+  const max = expected.length * 4 + 10;
+  let previous = "";
+  let still = 0;
+  for (let i = 0; i < max; i++) {
+    await sr.nextHeading();
+    const log = await sr.spokenPhraseLog();
+    if (expected.every((text) => said(log, text))) break;
+    const last = log.at(-1) ?? "";
+    still = last === previous ? still + 1 : 0;
+    if (still >= 2) break;
+    previous = last;
+  }
   const log = await sr.spokenPhraseLog();
   record(`${path} headings`, log);
   for (const text of expected) expect(said(log, text), `the reader says the heading "${text}" on ${path}`).toBe(true);
@@ -56,7 +77,8 @@ async function colourMode(sr, page, path) {
   const button = page.locator("luz-theme-mode button").first();
   await button.waitFor();
   await sr.navigateToWebContent();
-  await button.focus();
+  await sr.clearSpokenPhraseLog();
+  await reach(sr, page, button);
   const name = (await button.getAttribute("aria-label")) ?? (await button.textContent());
   const focusLog = await sr.spokenPhraseLog();
   record(`${path} colour mode: focus`, focusLog);
@@ -78,7 +100,8 @@ async function marquee(sr, page, path) {
   const first = page.locator("luz-marquee a").first();
   await first.waitFor();
   await sr.navigateToWebContent();
-  await first.focus();
+  await sr.clearSpokenPhraseLog();
+  await reach(sr, page, first);
   for (let i = 0; i < names.length + 3; i++) await sr.nextLink();
   const log = await sr.spokenPhraseLog();
   record(`${path} marquee links`, log);
