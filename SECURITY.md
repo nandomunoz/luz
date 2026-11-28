@@ -162,7 +162,7 @@ git diff pnpm-lock.yaml
 
 **Publishing:**
 - Packages are published only by `.github/workflows/publish.yml`, through npm trusted publishing (OIDC). No npm token is stored in GitHub or on any machine, and every release carries a provenance attestation.
-- The publish job runs in the `release` environment, which requires a reviewer's approval.
+- The publish job runs in the `release` environment, which requires a reviewer's approval. The publish job runs only when a version of a published package is not on npm yet, and so does the full UI suite before it: the job `gate` asks the public registry (`scripts/has-unpublished.js`, which counts any doubt as unpublished), so a merge that releases nothing ends green with no approval to give.
 - The publish job installs with `--ignore-scripts`: no dependency lifecycle script runs while it can mint an OIDC token.
 - A release happens only when the changesets "version packages" PR is merged, and only after lint, audit, build, unit tests and the tarball contract check (`pnpm check:pack`) pass.
 - Since 0.2.0 nobody publishes from a laptop. The 0.1.0 versions and the placeholder versions of `@luz-ds/catalog` and `@luz-ds/site` were published by hand, before the workflow existed.
