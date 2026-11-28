@@ -6172,6 +6172,7 @@ html:has(.landing-marquee) {
 /* ---- Install it: a table of plans (the visual pass, 2026-11-26). Three choices on one row, the recommended one in the middle,
    taller and on the brand's tint; each lists the same three rows and ends on its command ---- */
 .landing-ai-options {
+  container: ai-options / inline-size;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: var(--luz-space-md);
@@ -6224,6 +6225,24 @@ html:has(.landing-marquee) {
   font-family: var(--luz-font-sans);
   font-size: var(--luz-text-sm);
   font-weight: 600;
+}
+
+/* When the options are only a few words wide (320 px at 200 % text and more, or the spacing of WCAG 1.4.12), the padding of a card,
+   which grows with the text, would leave its content a sliver, and a flag over its edge, as wide as its label, would stick out of
+   it. The card gives back most of its padding at the sides, and the flag joins the flow, as wide as the card's content, the label
+   wrapping inside it. The options measure themselves in their own em, so the rule follows the reader's text size and never fires
+   at the default one (WCAG 1.4.10) */
+@container ai-options (max-inline-size: 14em) {
+  .landing-ai-option {
+    padding-inline: var(--luz-space-xs);
+  }
+
+  .landing-ai-option__flag {
+    position: static;
+    translate: none;
+    padding-inline: var(--luz-space-2xs);
+    text-align: center;
+  }
 }
 
 .landing-ai-option__title {
