@@ -136,6 +136,14 @@ The three packages are versioned together (same version number) with [changesets
 
 Publishing uses npm trusted publishing (OIDC), so there is no npm token to manage.
 
+### What blocks a release
+
+Almost all of a release is automated. Two steps need a person: merging the pull requests, and approving the `release` environment, the one blocking step, kept so that nothing reaches npm without the maintainer.
+
+- **Blocks:** CI (lint, size, strings, exceptions, pack, contrast, unit tests, the Chromium Playwright suite), `pnpm check:i18n --strict`, the full UI run of the publish workflow, and the approval of `release`.
+- **Warns, never blocks:** what only a person can check. A screen reader by hand and on a real device (VoiceOver with Safari, TalkBack), the rows still open in [BROWSER-REVIEWS.md](./dev/BROWSER-REVIEWS.md), translations not yet read (`reviewed: false`), and the legal review of changed legal, privacy or accessibility texts. They are listed as reminders; a release may go out with them open, and the accessibility statement names only what was actually tested.
+- **Automated where a machine can:** the screen readers a machine can drive, and the checks of what is mechanical (licences, stale records), run as scripts in CI, not by an agent (AGENTS.md section 8).
+
 ### Before opening a PR
 
 ```bash

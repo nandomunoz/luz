@@ -38,11 +38,15 @@ Every change to `packages/`, `apps/` or `scripts/` is committed as a test that f
 
 ### 6. Browsers
 
-Test runs use `--project=chromium --project=chromium-nojs`. The `firefox` and `webkit` Playwright projects, and the Safari and Firefox reviews, are run by the maintainer before a release; the record is [BROWSER-REVIEWS.md](./dev/BROWSER-REVIEWS.md).
+Test runs use `--project=chromium --project=chromium-nojs`. The `firefox` and `webkit` Playwright projects, and the Safari and Firefox reviews, are run by the maintainer before a release; the record is [BROWSER-REVIEWS.md](./dev/BROWSER-REVIEWS.md). They are a reminder before a release, not a gate: what a machine can check is automated in CI, and what only a person can check (a real Safari, a screen reader by hand, a reading of a translation) is shown as a warning, never as a blocking step (VERSIONING.md, "What blocks a release").
 
 ### 7. A pull request has its verdict in 30 minutes
 
 From the last push of a pull request to `main`, every required check is green or red within 30 minutes (PRINCIPLES.md SR-10): the whole Playwright suite runs in shards (`ui-tests.yml`), every job has a `timeout-minutes` of 25 at most, and a red check is never merged. When the summary warns that the slowest shard passed 20 minutes, add shards; never drop a check or skip a test to fit. Merging needs only green CI: the security audit and the Safari and Firefox reviews are made before a release to npm. See [TESTING.md](./dev/TESTING.md).
+
+### 8. A script before an agent
+
+What a plain script can do is a script, not a task for an AI agent: running checks and summarising their failures, counting stale rows, checking licences, reading CI logs. It is Node with no dependency, in `scripts/` (or a workflow step), so it runs the same on Linux, macOS, Windows and the CI; it finishes in under a minute on a laptop, and a slow one runs in CI on a schedule or after a merge, never in the 30 minutes of a pull request. An agent is for judgement: reviewing, writing, deciding whether a failure is real. Each agent in `.claude/agents/` uses the cheapest model that does its job: Haiku for mechanical work (`test-runner`, `chore-runner`), Sonnet for writing and review, Opus only for security and prompt injection.
 
 ---
 
