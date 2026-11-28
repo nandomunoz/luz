@@ -36,6 +36,6 @@ if (platform === "win32") {
   orcaTest("Orca reads the headings", async ({ page, orca }) => {
     await page.goto(url, { waitUntil: "load" });
     const log = await walk(orca, "Orca + Firefox");
-    if (!log.some((p) => /LUZ probe/i.test(p))) throw new Error("Orca never said the h1");
+    if (!log.some((p) => /Colour mode/i.test(p)) || !log.some((p) => /Links/i.test(p))) throw new Error("Orca never said the h2s");
   });
 }

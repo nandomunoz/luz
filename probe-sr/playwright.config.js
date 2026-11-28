@@ -11,7 +11,7 @@ const projects =
 
 export default defineConfig(withGuidepup({
   testDir: ".",
-  testMatch: "probe.spec.js",
+  testMatch: ["probe.spec.js", "site.spec.js"],
   reportSlowTests: null,
   timeout: 3 * 60 * 1000,
   retries: 0,

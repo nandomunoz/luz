@@ -27,7 +27,7 @@ jobs:
       - run: npm install
       - run: npx playwright install --with-deps firefox webkit chromium
         if: runner.os != 'Windows'
-      - run: npx playwright install chromium
+      - run: npx playwright install chromium firefox
         if: runner.os == 'Windows'
       - run: sudo apt-get install -y xdotool
         if: runner.os == 'Linux'
