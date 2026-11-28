@@ -1,0 +1,149 @@
+name: Screen readers
+
+# SR-6 (PRINCIPLES.md), automated where a machine can. Guidepup drives a real screen reader
+# over the Pages site that `pnpm pages:build` built: NVDA with Firefox and with Chrome on
+# Windows, VoiceOver with the WebKit of Playwright (not Safari) on macOS, Orca with Firefox on
+# Linux. It proves that the headings, the colour-mode button and its change, and the marquee
+# links reach the reader with their name, role and state. Whether what is said is useful is a
+# person's judgement, and Orca + Firefox by hand, VoiceOver + Safari and TalkBack + Chrome are
+# not driven from here (tests/screen-readers/readers.sr.js has the detail).
+#
+# A report, not a required check: it runs on a schedule, by hand and after a merge to main,
+# never on a pull request. A failure is a failed run (and the mail GitHub sends), and the
+# spoken phrases of every test are in the summary of the job. It runs the Firefox and WebKit
+# of Playwright because a screen reader needs a browser; the suite's own firefox and webkit
+# projects are still the maintainer's (AGENTS.md §6).
+
+on:
+  schedule:
+    - cron: "0 5 * * 1"
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "packages/**"
+      - "apps/**"
+      - "tests/screen-readers/**"
+      - ".github/workflows/screen-readers.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: screen-readers
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build the site
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      # Full history: each docs page shows the date of its last commit
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build the packages and the Pages site into docs/
+        run: pnpm pages:build
+
+      - name: Keep the site for the readers
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: site
+          path: docs
+          retention-days: 1
+
+  readers:
+    name: ${{ matrix.reader }}
+    needs: build
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            reader: Orca + Firefox
+          - os: windows-latest
+            reader: NVDA + Firefox and Chrome
+          - os: macos-latest
+            reader: VoiceOver + WebKit
+    defaults:
+      run:
+        working-directory: tests/screen-readers
+        shell: bash
+    env:
+      SR_SITE_DIR: ${{ github.workspace }}/site
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Get the site
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: site
+          path: site
+
+      - name: Setup Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: tests/screen-readers/package-lock.json
+
+      # The locked versions of tests/screen-readers/package.json, no others
+      - name: Install
+        run: npm ci
+
+      - name: Browsers (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          npx playwright install --with-deps firefox
+          sudo apt-get install -y xdotool
+
+      - name: Browsers (Windows)
+        if: runner.os == 'Windows'
+        run: npx playwright install firefox
+
+      - name: Browsers (macOS)
+        if: runner.os == 'macOS'
+        run: npx playwright install webkit
+
+      - name: Prepare the machine for the screen reader
+        run: npx @guidepup/setup setup --ci
+
+      - name: Install the screen reader
+        run: npx @guidepup/setup install
+
+      # Orca needs a display and a session bus
+      - name: Read the site (Linux)
+        if: runner.os == 'Linux'
+        run: xvfb-run -a dbus-run-session -- npx playwright test --config sr.config.js
+
+      - name: Read the site
+        if: runner.os != 'Linux'
+        run: npx playwright test --config sr.config.js
+
+      - name: Keep what was spoken
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: spoken-${{ matrix.os }}
+          path: tests/screen-readers/test-results
+          if-no-files-found: ignore
+          retention-days: 14

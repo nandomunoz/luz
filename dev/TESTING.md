@@ -323,7 +323,7 @@ The summary of the shards gives the time of each one and warns when the slowest 
 
 - **The `firefox` and `webkit` Playwright projects.** The maintainer runs them before a release, through the `firefox-reviewer` and `safari-reviewer` agents. Do not run them for everyday work.
 - **The Safari and Firefox reviews.** What has not been reviewed yet is in the "Open" section of [BROWSER-REVIEWS.md](./BROWSER-REVIEWS.md), one row for each `needs-browser-review` issue. When you change CSS, HTML or JS that those browsers have not seen, add a row. To help, pick an issue with that label, test the files it names and write what you see. A row is closed only when both browsers have reviewed it.
-- **Assistive technology.** NVDA, VoiceOver, TalkBack and Orca are tested by hand before a release (SR-6). Use `tests/manual/SR-6-evidence-template.md`, and state only the combinations you tested.
+- **Assistive technology.** NVDA + Firefox, NVDA + Chrome, VoiceOver + WebKit and Orca + Firefox are driven from CI by Guidepup against the built site (`.github/workflows/screen-readers.yml`, `tests/screen-readers/`; run it by hand from Actions, and read the spoken phrases in the summary of each job). By hand before a release (SR-6): at least Orca + Firefox, and VoiceOver + Safari and TalkBack + Chrome when a device is at hand. Use `tests/manual/SR-6-evidence-template.md`, and state only the combinations that were used, each marked automated or by hand.
 
 ## Modals and dialogs
 
