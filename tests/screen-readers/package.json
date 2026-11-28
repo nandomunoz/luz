@@ -1,0 +1,12 @@
+{
+  "name": "luz-screen-readers",
+  "private": true,
+  "type": "module",
+  "description": "Screen readers driven from CI (SR-6). Its own package, outside the workspace: nothing here is published or linked by a page.",
+  "devDependencies": {
+    "@guidepup/guidepup": "0.38.0",
+    "@guidepup/playwright": "0.21.0",
+    "@guidepup/setup": "0.29.3",
+    "@playwright/test": "1.65.1"
+  }
+}
