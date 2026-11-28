@@ -1,0 +1,41 @@
+name: SR probe
+# Throwaway: does Guidepup drive a real screen reader on a GitHub runner?
+on:
+  push:
+    branches: [probe/guidepup]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  probe:
+    name: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    defaults:
+      run:
+        working-directory: probe-sr
+        shell: bash
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+      - run: npm install
+      - run: npx playwright install --with-deps firefox webkit chromium
+        if: runner.os != 'Windows'
+      - run: npx playwright install chromium
+        if: runner.os == 'Windows'
+      - name: Guidepup setup
+        run: npx @guidepup/setup setup --ci
+      - name: Guidepup install screen reader
+        run: npx @guidepup/setup install
+      - name: Run (Linux needs a display and a session bus)
+        if: runner.os == 'Linux'
+        run: xvfb-run -a dbus-run-session -- npx playwright test
+      - name: Run
+        if: runner.os != 'Linux'
+        run: npx playwright test

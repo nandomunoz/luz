@@ -1,0 +1,11 @@
+{
+  "name": "sr-probe",
+  "private": true,
+  "type": "module",
+  "devDependencies": {
+    "@guidepup/guidepup": "latest",
+    "@guidepup/playwright": "latest",
+    "@guidepup/setup": "latest",
+    "@playwright/test": "latest"
+  }
+}
