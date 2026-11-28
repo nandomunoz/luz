@@ -3,8 +3,8 @@
   "private": true,
   "type": "module",
   "devDependencies": {
-    "@guidepup/guidepup": "latest",
-    "@guidepup/playwright": "latest",
+    "@guidepup/guidepup": "0.38.0",
+    "@guidepup/playwright": "0.21.0",
     "@guidepup/setup": "latest",
     "@playwright/test": "latest"
   }

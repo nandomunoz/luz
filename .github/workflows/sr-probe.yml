@@ -29,6 +29,8 @@ jobs:
         if: runner.os != 'Windows'
       - run: npx playwright install chromium
         if: runner.os == 'Windows'
+      - run: sudo apt-get install -y xdotool
+        if: runner.os == 'Linux'
       - name: Guidepup setup
         run: npx @guidepup/setup setup --ci
       - name: Guidepup install screen reader

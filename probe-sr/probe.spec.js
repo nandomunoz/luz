@@ -21,9 +21,9 @@ async function walk(sr, name) {
 
 const platform = process.platform;
 if (platform === "win32") {
-  nvdaTest("NVDA reads the headings", async ({ page, nvda }) => {
+  nvdaTest("NVDA reads the headings", async ({ page, nvda }, info) => {
     await page.goto(url, { waitUntil: "load" });
-    const log = await walk(nvda, "NVDA + Chrome");
+    const log = await walk(nvda, `NVDA + ${info.project.name}`);
     if (!log.some((p) => /LUZ probe/i.test(p))) throw new Error("NVDA never said the h1");
   });
 } else if (platform === "darwin") {
