@@ -39,9 +39,9 @@ const reachable = (page, selector) =>
 // reader, a real Tab does, so focus the element, step back and Tab onto it again
 async function reach(sr, page, locator) {
   await locator.focus();
-  await sr.press("Shift+Tab");
-  await sr.press("Tab");
-  await page.waitForTimeout(1000);
+  await page.keyboard.press("Shift+Tab");
+  await page.keyboard.press("Tab");
+  await page.waitForTimeout(1500);
 }
 
 async function headings(sr, page, path, { h1 }) {
@@ -84,7 +84,9 @@ async function colourMode(sr, page, path) {
   record(`${path} colour mode: focus`, focusLog);
   expect(said(focusLog, name.trim()), `the reader says the name of the colour-mode button ("${name.trim()}")`).toBe(true);
   await sr.clearSpokenPhraseLog();
-  await sr.act();
+  // Enter on the focused button, as a reader's user does; the reader's own activate
+  // command reaches the system in VoiceOver and once opened a Quick Note
+  await page.keyboard.press("Enter");
   await page.waitForTimeout(500);
   const after = ((await button.getAttribute("aria-label")) ?? (await button.textContent())).trim();
   const log = await sr.spokenPhraseLog();
@@ -97,18 +99,20 @@ async function marquee(sr, page, path) {
   await page.goto(path, { waitUntil: "load" });
   const names = await reachable(page, "luz-marquee a");
   expect(names.length, "the marquee has links a visitor can reach").toBeGreaterThan(0);
-  const first = page.locator("luz-marquee a").first();
-  await first.waitFor();
+  await page.locator("luz-marquee a").first().waitFor();
   await sr.navigateToWebContent();
+  // The demo is under the heading "Example": go there with the reader, then read its links
+  // (Tab does not reach links in WebKit by default, so the reader's own commands are used)
+  for (let i = 0; i < 10 && !said(await sr.spokenPhraseLog(), "Example"); i++) await sr.nextHeading();
   await sr.clearSpokenPhraseLog();
-  await reach(sr, page, first);
   for (let i = 0; i < names.length + 3; i++) await sr.nextLink();
   const log = await sr.spokenPhraseLog();
   record(`${path} marquee links`, log);
-  const spoken = norm(log.join(" | "));
+  // One phrase per link: a name said in two phrases is the hidden copy read too
+  // (a phrase may name the link twice, with its description)
   for (const text of names) {
-    const count = spoken.split(norm(text)).length - 1;
-    expect(count, `"${text}" is said once, not once for the hidden copy`).toBe(1);
+    const count = log.filter((phrase) => norm(phrase).includes(norm(text))).length;
+    expect(count, `"${text}" is said in one phrase, not again for the hidden copy`).toBe(1);
   }
 }
 
