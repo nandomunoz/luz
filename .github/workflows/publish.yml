@@ -3,7 +3,8 @@ name: Release
 # Flow (changesets):
 #   1. PRs add a changeset (`pnpm changeset`).
 #   2. On push to main this workflow opens/updates the "Version Packages" PR.
-#   3. Merging that PR leaves no pending changesets → the publish job runs.
+#   3. Merging that PR leaves no pending changesets → the gate looks for a
+#      version that is not on npm yet, and only then do ui-full and publish run.
 #
 # Publishing uses npm trusted publishing (OIDC): no npm token is stored
 # anywhere. The `release` environment must exist with a required reviewer,
@@ -65,18 +66,46 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+  # Asks the public registry whether a version of a published package is not
+  # on npm yet. A merge that releases nothing (docs only) ends here, green, with
+  # no approval: otherwise the publish job would sit in `waiting` and hold the
+  # `release` concurrency group. Any doubt (a timeout, a status other than 200
+  # or 404) counts as unpublished, so it can only keep the job, never skip one.
+  gate:
+    name: Is a version unpublished
+    needs: version
+    if: needs.version.outputs.hasChangesets == 'false'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    outputs:
+      unpublished: ${{ steps.registry.outputs.unpublished }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+
+      - name: Ask the registry
+        id: registry
+        run: node scripts/has-unpublished.js
+
   # Every version that leaves has passed the whole Playwright suite on this
   # commit, not only the specs its pull request touched
   ui-full:
     name: UI tests (full)
-    needs: version
-    if: needs.version.outputs.hasChangesets == 'false'
+    needs: [version, gate]
+    if: needs.version.outputs.hasChangesets == 'false' && needs.gate.outputs.unpublished == 'true'
     uses: ./.github/workflows/ui-tests.yml
 
   publish:
     name: Publish to npm
-    needs: [version, ui-full]
-    if: needs.version.outputs.hasChangesets == 'false'
+    needs: [version, gate, ui-full]
+    if: needs.version.outputs.hasChangesets == 'false' && needs.gate.outputs.unpublished == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 25
     environment: release

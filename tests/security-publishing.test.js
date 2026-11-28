@@ -46,4 +46,9 @@ describe("SECURITY.md: publishing a package", () => {
     expect(text).toMatch(/waiting[^.]*`release` concurrency group[^.]*blocks every later Release run/);
     expect(text).toMatch(/approve or cancel it the same day/);
   });
+
+  it("says the publish job, and the full UI suite before it, run only when a version is not on npm yet", () => {
+    expect(text).toMatch(/publish job runs only when[^.]*version[^.]*not on npm/i);
+    expect(text).toContain("scripts/has-unpublished.js");
+  });
 });
