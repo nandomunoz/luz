@@ -16,6 +16,7 @@ const LOG = [
   "UI (shard 1/2)\tRun tests\t2026-11-28T14:54:11.8896274Z     Expected: visible",
   "UI (shard 1/2)\tRun tests\t2026-11-28T14:54:11.8896275Z     Received: hidden",
   "UI (shard 1/2)\tRun tests\t2026-11-28T14:54:11.8907817Z     Error: expect(locator).toBeVisible() failed",
+  "UI (shard 1/2)\tRun tests\t2026-11-28T14:54:11.9000000Z     Error Context: test-results/a/error-context.md",
   "UI (shard 1/2)\tRun tests\t2026-11-28T14:54:11.9035694Z   1 failed",
   "UI (shard 1/2)\tRun tests\t2026-11-28T14:54:12.0000000Z ##[error]Process completed with exit code 1.",
   "Unit\tRun vitest\t2026-11-28T14:55:00.0000000Z  FAIL  tests/a.test.js > sums > adds",

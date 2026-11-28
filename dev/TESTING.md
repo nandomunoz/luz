@@ -268,6 +268,14 @@ pnpm check:ai          # manifests, llms.txt, examples and READMEs against their
 
 ## Flaky or real
 
+To see why a CI run failed without reading its logs, `pnpm ci:status` prints a table of its jobs and only the lines that say why each failed one failed (`scripts/ci-status.js`; it needs `gh`):
+
+```bash
+pnpm ci:status --pr 190            # the latest run of a pull request
+pnpm ci:status --branch main --workflow Release --wait
+pnpm ci:status 46158527076         # a run by id
+```
+
 A test that fails is real until you show it is not. Run it alone, on one worker:
 
 ```bash

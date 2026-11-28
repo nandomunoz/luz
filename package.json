@@ -38,6 +38,7 @@
     "smoke:consumer": "node scripts/smoke-consumer.js",
     "qa:release": "node scripts/qa-release.js",
     "check:all": "node scripts/qa-release.js",
+    "ci:status": "node scripts/ci-status.js",
     "check:ai": "node scripts/check-ai.js",
     "check:ai-tested": "node scripts/check-ai-tested.js",
     "media:build": "node scripts/build-demo-media.js"
